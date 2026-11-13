@@ -228,15 +228,16 @@
     details.proof-drawer > summary::-webkit-details-marker { display: none; }
     details.proof-drawer > summary:hover { border-color: rgb(255, 51, 0); }
     details.proof-drawer > summary .toggle-pill {
+      flex-shrink: 0;
       padding: 3px 8px;
       background: rgb(13, 13, 13);
       color: rgb(247, 247, 245);
       font-size: 10px;
     }
-    details.proof-drawer[open] > summary .toggle-pill::before { content: "[-] HIDE TABLES"; }
-    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: "[+] SHOW 01A & 01B TABLES"; }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
     .proof-body {
-      padding-top: 18px;
+      padding-top: 16px;
     }
 
     /* Scientific Ablation Table */
@@ -319,17 +320,28 @@
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       align-items: center;
     }
     input.search-in, select.sel-in {
       padding: 8px 11px;
       border: 1px solid rgb(13, 13, 13);
       background: rgb(255, 255, 253);
-      font: 13px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      font: 600 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
       color: rgb(13, 13, 13);
+      min-width: 0;
     }
-    input.search-in { flex: 1; min-width: 220px; }
+    input.search-in { flex: 1; min-width: 220px; font-weight: 400; }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+    }
 
     /* Comment Cards — Authentic Hacker News Surface & Typography */
     .card-list {
@@ -449,7 +461,8 @@
       flex-direction: column;
       min-width: 0;
     }
-    details.graph-drawer:not([open]) > .oled-bay {
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
       display: none;
     }
     summary.graph-summary {
@@ -468,9 +481,10 @@
     }
 
     @media (max-width: 960px) {
+      .wrap { padding: 18px 14px 48px; }
       .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
       .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
-      .dual-oled { grid-template-columns: 1fr; gap: 12px; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
       details.graph-drawer { display: block; }
       summary.graph-summary {
         pointer-events: auto;
@@ -485,11 +499,12 @@
         user-select: none;
       }
       summary.graph-summary h2 {
-        font-size: 18px;
+        font-size: 17px;
         margin: 0;
         white-space: normal;
       }
-      details.graph-drawer[open] > .oled-bay {
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
         margin-top: 8px;
       }
       .mob-graph-pill {
@@ -505,6 +520,22 @@
       details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+] SHOW"; }
       .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .kpi-cell { border-bottom: 1px solid rgb(205, 205, 200); }
+      .filter-bar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .filter-bar select.sel-in {
+        width: 100%;
+        font-size: 16px;
+        padding: 8px 9px;
+      }
+      .filter-bar input.search-in {
+        grid-column: span 2;
+        width: 100%;
+        min-width: 0;
+        font-size: 16px;
+      }
     }
   </style>
 </head>
@@ -523,23 +554,28 @@
     </p>
   </header>
 
-  <section class="band">
-    <div class="kpi-strip">
-      <div class="kpi-cell">
-        <div class="kpi-label">Corpus Audited</div>
-        <div class="kpi-val">254</div>
-        <div class="kpi-sub">1 HTML page(s) &bull; 151 cached/live authors</div>
-      </div>
-      <div class="kpi-cell">
-        <div class="kpi-label">Actual Useful Signal</div>
-        <div class="kpi-val ok">19.3%</div>
-        <div class="kpi-sub">49 comments (19 Gold / 7.5%)</div>
-      </div>
-      <div class="kpi-cell">
-        <div class="kpi-label">Chatter &amp; Bullshit</div>
-        <div class="kpi-val hi">80.7%</div>
-        <div class="kpi-sub">94 chatter &bull; 83 BS &bull; 18 faded</div>
-      </div>
+  <details class="proof-drawer" id="kpiDrawer">
+    <summary>
+      <span>00 // CORPUS SUMMARY (254 COMMENTS &bull; 19.3% USEFUL SIGNAL &bull; 19 GOLD &bull; MAX SUBTREE 49 SLOTS)</span>
+      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    </summary>
+    <div class="proof-body">
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">254</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 151 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">19.3%</div>
+          <div class="kpi-sub">49 comments (19 Gold / 7.5%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">80.7%</div>
+          <div class="kpi-sub">94 chatter &bull; 83 BS &bull; 18 faded</div>
+        </div>
       <div class="kpi-cell">
         <div class="kpi-label">Primary Citations</div>
         <div class="kpi-val ok">17</div>
@@ -550,18 +586,19 @@
         <div class="kpi-val">0.959</div>
         <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
       </div>
-      <div class="kpi-cell">
-        <div class="kpi-label">Largest Root Monopoly</div>
-        <div class="kpi-val hi">49</div>
-        <div class="kpi-sub">HN POS 126..174 (19.3% of thread)</div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">49</div>
+          <div class="kpi-sub">HN POS 126..174 (19.3% of thread)</div>
+        </div>
       </div>
     </div>
-  </section>
+  </details>
 
-  <details class="proof-drawer">
+  <details class="proof-drawer" id="proofDrawer">
     <summary>
       <span>01 // UNSUPERVISED CORPUS TELEMETRY: 01A AUTO-LABELED TOPIC CLUSTERS &amp; 01B CROSS-DOMAIN SOURCE REGISTRY (DIVERSITY 0.959 &bull; 25 ANCHORS)</span>
-      <span class="toggle-pill"></span>
+      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
     </summary>
     <div class="proof-body grid-12">
       <div class="col-7">
@@ -601,109 +638,121 @@
     </div>
   </details>
 
-  <section class="band grid-12">
-    <div class="col-3">
-      <div class="sec-tag">02 / INTERACTIVE EQUATION</div>
-      <h2>Live Epistemic Tuner</h2>
-      <div class="control-panel">
-        <div class="slider-row">
-          <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
-          <input type="range" id="sl_ig" min="0" max="5" step="0.05">
-        </div>
-        <div class="slider-row">
-          <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
-          <input type="range" id="sl_fa" min="0" max="5" step="0.05">
-        </div>
-        <div class="slider-row">
-          <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
-          <input type="range" id="sl_gp" min="0" max="4" step="0.05">
-        </div>
-        <div class="slider-row">
-          <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
-          <input type="range" id="sl_bp" min="0" max="5" step="0.05">
-        </div>
-        <div class="slider-row">
-          <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
-          <input type="range" id="sl_dp" min="0" max="5" step="0.05">
-        </div>
-        <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
-        <p style="font-size:11.5px;line-height:1.42;color:rgb(85,85,82);margin:12px 0 0">
-          <strong>Live Feedback Loop:</strong><br>
-          Drag any weight to watch the 254-point phase plane and comment ranking re-solve instantaneously.<br>
-          &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
-          &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
-        </p>
-      </div>
-    </div>
-
-    <div class="col-9">
-      <div class="dual-oled">
-        <details class="graph-drawer" id="phaseDrawer" open>
+  <details class="proof-drawer" id="labDrawer">
+    <summary>
+      <span>02 // EPISTEMIC PHASE PLANE, NEWS.ARC GRAVITY &amp; LIVE WEIGHT TUNER (TAP TO INSPECT N = 254)</span>
+      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
           <summary class="graph-summary">
             <div class="graph-title-group">
-              <div class="sec-tag">03 / EPISTEMIC PHASE PLANE</div>
-              <h2>Crowd Chatter vs. Grounded Signal</h2>
+              <div class="sec-tag">02A / INTERACTIVE EQUATION</div>
+              <h2>Live Epistemic Tuner</h2>
             </div>
             <span class="mob-graph-pill"></span>
           </summary>
-          <div class="oled-bay">
-            <div class="oled-head">
-              <span>X: Epistemic Potential // Y: Bullshit &amp; Sink</span>
-              <span class="sig">CLICK POINT (N = 254)</span>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
             </div>
-            <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
-            <div class="legend-row">
-              <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (19)</span>
-              <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (30)</span>
-              <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (94)</span>
-              <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (10)</span>
-              <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (83)</span>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
             </div>
-            <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Hover or click any point to inspect its epistemic coordinates and filter the comment stream below.</div></div>
-          </div>
-        </details>
-
-        <details class="graph-drawer" id="gravityDrawer" open>
-          <summary class="graph-summary">
-            <div class="graph-title-group">
-              <div class="sec-tag">04 / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
-              <h2>Why Live HN Buried Primary Evidence</h2>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
             </div>
-            <span class="mob-graph-pill"></span>
-          </summary>
-          <div class="oled-bay">
-            <div class="oled-head">
-              <span>X: Age (Hours) // Y: Live HN POS (1..254)</span>
-              <span class="sig">(T + 2)^1.8</span>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
             </div>
-            <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
-            <div class="legend-row">
-              <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 76)</span>
-              <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
-              <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
             </div>
-            <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (@nirinor, 14.8h); largest subtree (@pmichaud) occupies 49 slots (HN POS 126..174).</div></div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p style="font-size:11.5px;line-height:1.42;color:rgb(85,85,82);margin:12px 0 0">
+              <strong>Live Feedback Loop:</strong><br>
+              Drag any weight to watch the 254-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
           </div>
         </details>
       </div>
-    </div>
-  </section>
 
-  <section class="band grid-12" style="padding-top:18px">
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">03 / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>X: Epistemic Potential // Y: Bullshit &amp; Sink</span>
+                <span class="sig">TAP POINT (N = 254)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (19)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (30)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (94)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (10)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (83)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">04 / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>X: Age (Hours) // Y: Live HN POS (1..254)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 76)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (@nirinor, 14.8h); largest subtree (@pmichaud) occupies 49 slots (HN POS 126..174).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
     <div class="col-12">
       <div class="sec-tag">05 / CORPUS EXPLORER (254 COMMENTS)</div>
       <h2>Signal Rank vs. Live Hacker News</h2>
-      <div class="btn-bar" id="presetBar">
-        <button class="tab-btn active" data-mode="top_signal">Epistemic Top 50</button>
-        <button class="tab-btn" data-mode="buried_gems">Buried Gems Rescued (HN POS &gt; 76)</button>
-        <button class="tab-btn" data-mode="hn_top40">Live HN Top 40 Autopsy</button>
-        <button class="tab-btn" data-mode="c5a_rescues">c5A Heterodox Rescues</button>
-        <button class="tab-btn" data-mode="bullshit_traps">High-Karma / URL Bullshit Caught</button>
-        <button class="tab-btn" data-mode="mod_morgue">Mod Rebukes &amp; Downvoted Morgue</button>
-      </div>
       <div class="filter-bar">
-        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, version, type, rust, release, versions...">
-        <select id="facetSelect" class="sel-in">
+        <select id="modeSelect" class="sel-in" aria-label="Ranking view">
+          <option value="top_signal">View: Epistemic Top 50</option>
+          <option value="buried_gems">View: Buried Gems (HN POS &gt; 76)</option>
+          <option value="hn_top40">View: Live HN Top 40 Autopsy</option>
+          <option value="c5a_rescues">View: c5A Heterodox Rescues</option>
+          <option value="bullshit_traps">View: High-Karma / URL Traps Caught</option>
+          <option value="mod_morgue">View: Mod Rebukes &amp; Downvoted Morgue</option>
+        </select>
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
           <option value="all">All Facets (254)</option>
           <option value="bool_method">Bool &amp; Method (Mutable) (49)</option>
           <option value="fast_language">Fast &amp; Language (Paradox) (48)</option>
@@ -712,6 +761,7 @@
           <option value="cargo_dependencies">Cargo &amp; Dependencies (Files) (35)</option>
           <option value="general_commentary">General Commentary (37)</option>
         </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, version, type, rust, release, versions...">
       </div>
       <div id="resultMeta" style="font:600 11px/1.4 ui-monospace,Menlo,monospace;color:rgb(90,90,88);margin-bottom:10px"></div>
       <div id="cardContainer" class="card-list"></div>
@@ -993,31 +1043,62 @@
     gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
   }
 
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
   function attachCanvasProbe(canvas, getPts, probeElId) {
     const probeEl = document.getElementById(probeElId);
-    function findNearest(ev) {
+    function findNearest(ev, maxDistSq) {
       const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
       const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
       const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
-      let best = null, bestD = 144;
+      let best = null, bestD = maxDistSq;
       for (const p of getPts()) {
         const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
         if (d < bestD) { bestD = d; best = p.c; }
       }
       return best;
     }
-    canvas.addEventListener("mousemove", (ev) => {
-      const hit = findNearest(ev);
-      if (!hit) return;
+    function showProbeSummary(hit, isPinned) {
       const delta = hit.dom - hit.liveRank;
       const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
-      probeEl.textContent = `@${hit.au} | Signal Rank ${hit.liveRank} vs HN POS ${hit.dom} (${dStr}) | tier=${hit.tier} | age=${hit.age}h | "${hit.txt.slice(0, 115).replace(/\s+/g, " ")}..."`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      const jumpBtns = isPinned
+        ? `<button type="button" class="probe-inline-btn" data-probe-jump="1">Comment &darr;</button>` +
+          `<button type="button" class="probe-inline-btn" data-probe-clear="1">Clear &times;</button>`
+        : "";
+      probeEl.innerHTML =
+        `<strong>@${escHtml(hit.au)}</strong> | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})` +
+        jumpBtns +
+        `<br>"${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
     });
     canvas.addEventListener("click", (ev) => {
-      const hit = findNearest(ev);
+      const hit = findNearest(ev, 576);
       if (!hit) return;
       selectedId = hit.id;
       document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
       drawPhaseCanvas();
       drawGravityCanvas();
       renderCards();
@@ -1080,13 +1161,7 @@
       (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear selection</button>` : "");
     const clrBtn = document.getElementById("clearFilterBtn");
     if (clrBtn) {
-      clrBtn.addEventListener("click", () => {
-        selectedId = null;
-        document.getElementById("searchInput").value = "";
-        drawPhaseCanvas();
-        drawGravityCanvas();
-        renderCards();
-      });
+      clrBtn.addEventListener("click", clearSelectedPoint);
     }
 
     const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
@@ -1144,23 +1219,25 @@
     }
   }
 
-  document.querySelectorAll("button.tab-btn[data-mode]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll("button.tab-btn[data-mode]").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      activeMode = btn.dataset.mode;
-      document.getElementById("searchInput").value = "";
-      renderCards();
-    });
+  const modeSelect = document.getElementById("modeSelect");
+  modeSelect.addEventListener("change", () => {
+    activeMode = modeSelect.value;
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
   });
   document.getElementById("searchInput").addEventListener("input", renderCards);
   document.getElementById("facetSelect").addEventListener("change", renderCards);
 
-  const graphDrawers = [
-    document.getElementById("phaseDrawer"),
-    document.getElementById("gravityDrawer")
-  ];
-  graphDrawers.forEach(d => {
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
     d.addEventListener("toggle", () => {
       if (d.open) {
         drawPhaseCanvas();
@@ -1168,14 +1245,21 @@
       }
     });
   });
+
   const mobMq = window.matchMedia("(max-width: 960px)");
-  mobMq.addEventListener("change", (e) => {
-    if (!e.matches) {
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
       graphDrawers.forEach(d => { d.open = true; });
-      drawPhaseCanvas();
-      drawGravityCanvas();
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
     }
-  });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
 
   syncSliders();
   recomputeAndRender();

@@ -475,14 +475,22 @@ def build_pages_site(
     repo: str = "",
     server_url: str = "https://github.com",
     workflow_file: str = "hn-observatory-pages.yml",
+    force_ids: set[int] | None = None,
 ) -> dict[str, Any]:
-    """Build or incrementally update a GitHub Pages directory with `/item?id=<id>` routing."""
+    """Build or incrementally update a GitHub Pages directory with `/item?id=<id>` routing.
+
+    Explicitly refreshed `force_ids` always overwrite `items/<id>.html`. Other baseline
+    `show-me-hn-<id>.html` files in `source_dir` never overwrite a newer/larger version
+    already published on `gh-pages`.
+    """
     site_dir = Path(site_dir)
     items_dir = site_dir / "items"
     items_dir.mkdir(parents=True, exist_ok=True)
+    forced = force_ids or set()
 
-    # Copy all `show-me-hn-<id>.html` observatories from source_dir into `site_dir/items/<id>.html`
+    # Copy `show-me-hn-<id>.html` observatories without regressing fresher gh-pages builds
     copied_ids: list[int] = []
+    skipped_fresher_ids: list[int] = []
     for src_html in sorted(Path(source_dir).glob("show-me-hn-*.html")):
         m = ITEM_FILE_RE.match(src_html.name)
         if not m:
@@ -491,6 +499,14 @@ def build_pages_site(
         raw_html = src_html.read_text(encoding="utf-8")
         assert "#" not in raw_html, f"Zero-hash mandate violated in {src_html}"
         dst = items_dir / f"{item_id}.html"
+        if dst.is_file() and item_id not in forced and src_html.resolve() != dst.resolve():
+            src_meta = extract_item_summary(src_html, item_id)
+            dst_meta = extract_item_summary(dst, item_id)
+            src_key = (str(src_meta.get("t2_ref_utc") or ""), int(src_meta.get("total_comments") or 0))
+            dst_key = (str(dst_meta.get("t2_ref_utc") or ""), int(dst_meta.get("total_comments") or 0))
+            if dst_key > src_key:
+                skipped_fresher_ids.append(item_id)
+                continue
         if src_html.resolve() != dst.resolve():
             shutil.copyfile(src_html, dst)
         copied_ids.append(item_id)
@@ -537,6 +553,7 @@ def build_pages_site(
     return {
         "site_dir": str(site_dir),
         "copied_ids": copied_ids,
+        "skipped_fresher_ids": skipped_fresher_ids,
         "published_ids": [int(x["story_id"]) for x in summaries],
     }
 
@@ -553,6 +570,13 @@ def main() -> None:
     parser.add_argument("--repo", default="", help="owner/repo slug for workflow links")
     parser.add_argument("--server-url", default="https://github.com", help="GitHub server base URL")
     parser.add_argument("--workflow-file", default="hn-observatory-pages.yml", help="Workflow filename")
+    parser.add_argument(
+        "--force-id",
+        type=int,
+        action="append",
+        default=[],
+        help="Story ID explicitly refreshed in this run (always overwrites gh-pages copy)",
+    )
     args = parser.parse_args()
 
     res = build_pages_site(
@@ -561,6 +585,7 @@ def main() -> None:
         repo=args.repo,
         server_url=args.server_url,
         workflow_file=args.workflow_file,
+        force_ids=set(args.force_id),
     )
     print(json.dumps(res, indent=2))
 
