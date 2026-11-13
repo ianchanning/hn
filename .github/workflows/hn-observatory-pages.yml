@@ -108,18 +108,24 @@ jobs:
         env:
           GH_REPO: ${{ github.repository }}
           GH_SERVER_URL: ${{ github.server_url }}
+          STORY_ID: ${{ steps.build_item.outputs.story_id }}
         run: |
           set -euo pipefail
           APP_DIR="."
           if [ ! -f "build_pages_site.py" ]; then
             APP_DIR="hn-comments"
           fi
+          FORCE_ARGS=()
+          if [ -n "${STORY_ID:-}" ]; then
+            FORCE_ARGS=(--force-id "$STORY_ID")
+          fi
           python3 "$APP_DIR/build_pages_site.py" \
             --site-dir _gh_pages \
             --source-dir "$APP_DIR" \
             --repo "$GH_REPO" \
             --server-url "$GH_SERVER_URL" \
-            --workflow-file hn-observatory-pages.yml
+            --workflow-file hn-observatory-pages.yml \
+            "${FORCE_ARGS[@]}"
 
       - name: Commit & push to gh-pages branch
         env:
