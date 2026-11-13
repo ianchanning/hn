@@ -7,12 +7,15 @@ Algolia's item API for complete comment/dead-comment structure, the story's exte
 """
 
 from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import UTC, datetime
 import html
 import json
 from pathlib import Path
 import re
 import time
 from typing import Any
+import urllib.error
 from urllib.parse import parse_qs, urlparse
 import urllib.request
 
@@ -113,8 +116,13 @@ def fetch_hn_html_pages(
         url = f"https://news.ycombinator.com/item?id={sid}&p={p}"
         for attempt in range(3):
             try:
-                raw_bytes, _ = fetch_url_bytes(url, timeout=20.0, max_bytes=8_000_000)
+                raw_bytes, _ = fetch_url_bytes(url, timeout=15.0, max_bytes=8_000_000)
                 return raw_bytes.decode("utf-8", errors="replace")
+            except urllib.error.HTTPError as exc:
+                # Fail fast on datacenter IP blocks (403/419/429) so Algolia+Firebase fallback runs immediately
+                if exc.code in (403, 419, 429) or attempt == 2:
+                    raise
+                time.sleep(0.5 * (attempt + 1))
             except Exception:
                 if attempt == 2:
                     raise
@@ -174,6 +182,175 @@ def fetch_algolia_item(story_id: int) -> dict[str, Any]:
     except Exception:
         pass
     return {"id": story_id, "children": []}
+
+
+def fetch_firebase_items_batch(
+    item_ids: list[int],
+    *,
+    max_workers: int = 24,
+    item_fetcher: Callable[[int], dict[str, Any] | None] | None = None,
+) -> dict[int, dict[str, Any]]:
+    """Concurrently fetch official Firebase v0 item records (`kids` news.arc rank order & metadata)."""
+    if not item_ids:
+        return {}
+    ctx = build_ssl_context()
+
+    def _fetch_one(iid: int) -> dict[str, Any] | None:
+        fb_url = f"https://hacker-news.firebaseio.com/v0/item/{iid}.json"
+        try:
+            req = urllib.request.Request(fb_url, headers={"User-Agent": BROWSER_UA, "Accept": "application/json"})
+            with urllib.request.urlopen(req, timeout=8.0, context=ctx) as resp:
+                data = json.loads(resp.read(1_500_000).decode("utf-8", errors="replace"))
+            return data if isinstance(data, dict) and data.get("id") else None
+        except Exception:
+            return None
+
+    fn = item_fetcher or _fetch_one
+    unique_ids = list(dict.fromkeys(item_ids))
+    out: dict[int, dict[str, Any]] = {}
+    workers = max(1, min(max_workers, len(unique_ids)))
+    if workers == 1:
+        for iid in unique_ids:
+            rec = fn(iid)
+            if rec is not None:
+                out[iid] = rec
+        return out
+
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        futs = {pool.submit(fn, iid): iid for iid in unique_ids}
+        for fut in as_completed(futs):
+            iid = futs[fut]
+            try:
+                rec = fut.result()
+            except Exception:
+                rec = None
+            if rec is not None:
+                out[iid] = rec
+    return out
+
+
+def synthesize_hn_html_from_api(
+    story_id: int,
+    algolia_data: dict[str, Any],
+    *,
+    firebase_items: dict[int, dict[str, Any]] | None = None,
+) -> str:
+    """Synthesize canonical HN item HTML from Algolia tree + Firebase `kids` `news.arc` ordering.
+
+    Used automatically when `news.ycombinator.com` blocks datacenter/CI runner IPs (e.g. HTTP 419
+    on GitHub Actions) while official Algolia + Firebase APIs remain unrestricted.
+    """
+    fb_map = firebase_items or {}
+    story_fb = fb_map.get(story_id) or {}
+
+    title = html.escape(str(algolia_data.get("title") or story_fb.get("title") or f"HN Item {story_id}"))
+    raw_url = str(algolia_data.get("url") or story_fb.get("url") or f"item?id={story_id}")
+    href = html.escape(raw_url, quote=True)
+    points = int(algolia_data.get("points") or story_fb.get("score") or 0)
+    author = html.escape(str(algolia_data.get("author") or story_fb.get("by") or "hn"))
+    created_i = int(algolia_data.get("created_at_i") or story_fb.get("time") or 0)
+    created_iso = (
+        str(algolia_data.get("created_at") or "")
+        or (datetime.fromtimestamp(created_i, tz=UTC).strftime("%Y-%m-%dT%H:%M:%S") if created_i else "")
+    )
+    toptext_raw = str(story_fb.get("text") or algolia_data.get("text") or "")
+
+    kids_order_map: dict[int, dict[int, int]] = {}
+    dead_ids: set[int] = set()
+    for iid, rec in fb_map.items():
+        if rec.get("dead") or rec.get("deleted"):
+            dead_ids.add(iid)
+        kids = rec.get("kids")
+        if isinstance(kids, list) and kids:
+            kids_order_map[iid] = {int(cid): idx for idx, cid in enumerate(kids) if isinstance(cid, int)}
+
+    def _ordered_children(parent_id: int, children: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        rank_lookup = kids_order_map.get(parent_id)
+        if not rank_lookup or len(children) <= 1:
+            return children
+        return sorted(
+            children,
+            key=lambda ch: (rank_lookup.get(int(ch.get("id") or 0), 10**9), int(ch.get("id") or 0)),
+        )
+
+    def _live_subtree_size(node: dict[str, Any]) -> int:
+        total = 1
+        for ch in node.get("children") or []:
+            cid = int(ch.get("id") or 0)
+            if not cid or cid in dead_ids or (not ch.get("text") and not ch.get("author")):
+                continue
+            total += _live_subtree_size(ch)
+        return total
+
+    tr_rows: list[str] = []
+
+    def _walk(children: list[dict[str, Any]], parent_id: int, depth: int) -> None:
+        for ch in _ordered_children(parent_id, children):
+            raw_cid = ch.get("id")
+            if raw_cid is None:
+                continue
+            cid = int(raw_cid)
+            if cid in dead_ids:
+                continue
+            raw_text = str(ch.get("text") or "")
+            raw_au = str(ch.get("author") or "")
+            if not raw_text and not raw_au:
+                continue
+            au_esc = html.escape(raw_au or "[deleted]", quote=True)
+            c_ts = int(ch.get("created_at_i") or created_i)
+            c_iso = str(ch.get("created_at") or "") or (
+                datetime.fromtimestamp(c_ts, tz=UTC).strftime("%Y-%m-%dT%H:%M:%S") if c_ts else ""
+            )
+            age_title = html.escape(f"{c_iso} {c_ts}".strip(), quote=True)
+            sub_n = _live_subtree_size(ch)
+            tr_rows.append(
+                f'<tr class="athing comtr" id="{cid}"><td><table><tr>'
+                f'<td class="ind" indent="{depth}"></td>'
+                f'<td class="default"><span class="comhead">'
+                f'<a href="user?id={au_esc}">{au_esc}</a> '
+                f'<span class="age" title="{age_title}">1h</span> '
+                f'<a class="togg clicky" id="{cid}" n="{sub_n}" href="javascript:void(0)">[-]</a>'
+                f'</span><div class="comment"><div class="commtext c00">{raw_text}</div>'
+                f'<div class="reply"></div></div></td></tr></table></td></tr>'
+            )
+            _walk(list(ch.get("children") or []), cid, depth + 1)
+
+    _walk(list(algolia_data.get("children") or []), story_id, 0)
+    toptext_div = f'<div class="toptext">{toptext_raw}</div>' if toptext_raw else ""
+    story_age = html.escape(f"{created_iso} {created_i}".strip(), quote=True)
+    return (
+        f'<html lang="en" op="item"><head><title>{title} | Hacker News</title></head><body>'
+        f'<table class="fatitem"><tr class="athing submission" id="{story_id}">'
+        f'<td class="title"><span class="titleline"><a href="{href}">{title}</a></span></td></tr>'
+        f'<tr><td class="subtext"><span class="subline"><span class="score">{points} points</span> '
+        f'by <a href="user?id={author}">{author}</a> '
+        f'<span class="age" title="{story_age}">1h</span></span></td></tr>'
+        f'<tr><td>{toptext_div}</td></tr></table>'
+        f'<table class="comment-tree">{"".join(tr_rows)}</table></body></html>'
+    )
+
+
+def build_api_fallback_html(
+    story_id: int,
+    algolia_data: dict[str, Any],
+    *,
+    max_parent_nodes: int = 350,
+    firebase_fetcher: Callable[[int], dict[str, Any] | None] | None = None,
+) -> str:
+    """Fetch Firebase `kids` ordering for multi-child branches and synthesize HN item HTML."""
+    # Collect multi-child parent IDs breadth-first so root & shallow subtrees get exact news.arc order
+    bfs_queue: list[dict[str, Any]] = [algolia_data]
+    parent_ids: list[int] = [story_id]
+    while bfs_queue and len(parent_ids) < max_parent_nodes + 1:
+        node = bfs_queue.pop(0)
+        children = list(node.get("children") or [])
+        nid = int(node.get("id") or 0)
+        if nid and nid != story_id and len(children) >= 2:
+            parent_ids.append(nid)
+        bfs_queue.extend(children)
+
+    fb_items = fetch_firebase_items_batch(parent_ids, item_fetcher=firebase_fetcher)
+    return synthesize_hn_html_from_api(story_id, algolia_data, firebase_items=fb_items)
 
 
 def extract_readable_article_text(raw_html: str, max_chars: int = 32_000) -> str:
@@ -342,7 +519,15 @@ def ingest_story(
     meta_file = item_dir / "story_meta.json"
 
     if (not existing_pages or refresh) and not offline:
-        raw_pages = fetch_hn_html_pages(story_id, max_pages=max_pages)
+        alg_data = fetch_algolia_item(story_id)
+        alg_file.write_text(json.dumps(alg_data, ensure_ascii=False), encoding="utf-8")
+        try:
+            raw_pages = fetch_hn_html_pages(story_id, max_pages=max_pages)
+        except Exception:
+            raw_pages = []
+        has_live_rows = any("<tr" in p and "comtr" in p for p in raw_pages)
+        if not raw_pages or (alg_data.get("children") and not has_live_rows):
+            raw_pages = [build_api_fallback_html(story_id, alg_data)]
         for old_p in item_dir.glob("live_p*.html"):
             old_p.unlink()
         existing_pages = []
@@ -350,9 +535,6 @@ def ingest_story(
             p_path = item_dir / f"live_p{idx}.html"
             p_path.write_text(page_html, encoding="utf-8")
             existing_pages.append(p_path)
-
-        alg_data = fetch_algolia_item(story_id)
-        alg_file.write_text(json.dumps(alg_data, ensure_ascii=False), encoding="utf-8")
     else:
         if not existing_pages:
             raise FileNotFoundError(

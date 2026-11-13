@@ -16,7 +16,6 @@ JUDGE_SCRIPT = HERE / "judge" / "judge_v1_1.py"
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 
-import ablation
 import corpus_science
 from ingest import parse_hn_item_id
 import ranker
@@ -117,6 +116,9 @@ def build_html(
         and corpus is None
         and manifest is None
         and (resolved_data_dir / "corpus_v2.json").is_file()
+        and (resolved_data_dir / "manifest_v2.json").is_file()
+        and JUDGE_SCRIPT.is_file()
+        and (HERE / "ablation.py").is_file()
     )
 
     judge_res: dict[str, Any] | None = None
@@ -124,6 +126,8 @@ def build_html(
     tourney_history: list[dict[str, Any]] = []
 
     if use_frozen_50467087:
+        import ablation
+
         corpus = json.loads((resolved_data_dir / "corpus_v2.json").read_text(encoding="utf-8"))
         manifest = json.loads((resolved_data_dir / "manifest_v2.json").read_text(encoding="utf-8"))
         ablations = ablation.run_ablations()

@@ -150,6 +150,7 @@ def run_cli(argv: list[str] | None = None) -> dict[str, Any]:
         story_id == 50467087
         and not args.refresh
         and (args.data_dir / "corpus_v2.json").is_file()
+        and (args.data_dir / "manifest_v2.json").is_file()
     )
     if use_frozen:
         rows = json.loads((args.data_dir / "corpus_v2.json").read_text(encoding="utf-8"))

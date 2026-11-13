@@ -236,7 +236,7 @@ class AuthorCache:
         now: float | None = None,
         offline: bool = False,
         max_fetch: int = 1500,
-        max_workers: int = 16,
+        max_workers: int = 24,
         fetcher: Callable[[str], dict[str, Any] | None] | None = None,
     ) -> dict[str, dict[str, Any]]:
         """Return cached profiles within TTL and concurrently fetch any misses when online."""
