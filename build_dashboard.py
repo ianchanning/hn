@@ -1025,7 +1025,7 @@ def build_html(
     </div>
     <h1>Bullshit vs. <span class="accent">Epistemic.</span></h1>
     <p class="sublead">
-      Empirical autopsy of all <strong>{total_cnt:,}</strong> Hacker News comments on {story_link_html}.
+      Empirical autopsy of <strong>{total_cnt:,}</strong> Hacker News comments on {story_link_html}.
       Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
       Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
     </p>
