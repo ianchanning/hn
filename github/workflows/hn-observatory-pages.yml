@@ -1,0 +1,220 @@
+name: HN Epistemic Observatory Pages
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Hacker News item ID or URL (e.g. 50472038 or https://news.ycombinator.com/item?id=50472038)"
+        required: true
+        type: string
+      refresh:
+        description: "Fetch fresh live HTML, Algolia tree, and story article"
+        required: false
+        default: true
+        type: boolean
+      runs_on:
+        description: "Runner label (default: ubuntu-latest; override for self-hosted GHES runners)"
+        required: false
+        default: "ubuntu-latest"
+        type: string
+  push:
+    branches:
+      - main
+    paths:
+      - "hn-comments/show-me-hn-*.html"
+      - "hn-comments/build_pages_site.py"
+      - "show-me-hn-*.html"
+      - "build_pages_site.py"
+      - ".github/workflows/hn-observatory-pages.yml"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: hn-observatory-gh-pages
+  cancel-in-progress: false
+
+jobs:
+  publish-observatory:
+    name: Build & Publish /item?id= Mirror
+    runs-on: ${{ inputs.runs_on || 'ubuntu-latest' }}
+    outputs:
+      story_id: ${{ steps.meta.outputs.story_id }}
+      hn_uri: ${{ steps.meta.outputs.hn_uri }}
+      pages_url: ${{ steps.meta.outputs.pages_url }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Restore 7-day SQLite author cache
+        uses: actions/cache@v4
+        continue-on-error: true
+        with:
+          path: |
+            hn-comments/data/author_cache.db
+            data/author_cache.db
+          key: hn-author-cache-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            hn-author-cache-${{ runner.os }}-
+
+      - name: Build observatory for requested HN story
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        id: build_item
+        env:
+          HN_TARGET: ${{ inputs.target }}
+          HN_REFRESH: ${{ inputs.refresh }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os, pathlib, subprocess, sys
+
+          app_dir = pathlib.Path(".") if pathlib.Path("cli.py").is_file() else pathlib.Path("hn-comments")
+          sys.path.insert(0, str(app_dir))
+          from ingest import parse_hn_item_id
+
+          raw_target = os.environ["HN_TARGET"]
+          story_id = parse_hn_item_id(raw_target)
+
+          cmd = [sys.executable, str(app_dir / "cli.py"), "build", str(story_id)]
+          if os.environ.get("HN_REFRESH", "true").lower() == "true":
+              cmd.append("--refresh")
+          subprocess.run(cmd, check=True)
+
+          with pathlib.Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as fh:
+              fh.write(f"story_id={story_id}\n")
+          PY
+
+      - name: Prepare persistent gh-pages worktree
+        run: |
+          set -euo pipefail
+          if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
+            git fetch origin gh-pages --depth=1
+            git worktree add --detach _gh_pages origin/gh-pages
+            git -C _gh_pages checkout -B gh-pages
+          else
+            git worktree add --detach _gh_pages
+            git -C _gh_pages checkout --orphan gh-pages
+            git -C _gh_pages rm -rf . >/dev/null 2>&1 || true
+          fi
+
+      - name: Assemble /item?id= GitHub Pages site
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_SERVER_URL: ${{ github.server_url }}
+        run: |
+          set -euo pipefail
+          APP_DIR="."
+          if [ ! -f "build_pages_site.py" ]; then
+            APP_DIR="hn-comments"
+          fi
+          python3 "$APP_DIR/build_pages_site.py" \
+            --site-dir _gh_pages \
+            --source-dir "$APP_DIR" \
+            --repo "$GH_REPO" \
+            --server-url "$GH_SERVER_URL" \
+            --workflow-file hn-observatory-pages.yml
+
+      - name: Commit & push to gh-pages branch
+        env:
+          STORY_ID: ${{ steps.build_item.outputs.story_id }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          set -euo pipefail
+          git -C _gh_pages config user.name "${ACTOR:-github-actions[bot]}"
+          git -C _gh_pages config user.email "${ACTOR:-github-actions[bot]}@users.noreply.github.com"
+          git -C _gh_pages add -A
+          if git -C _gh_pages diff --cached --quiet; then
+            echo "No static site changes to publish."
+          else
+            MSG="chore(pages): publish HN observatory ${STORY_ID:-catalog}"
+            git -C _gh_pages commit -m "$MSG"
+            git -C _gh_pages push origin HEAD:gh-pages
+          fi
+
+      - name: Compute equivalent GitHub Pages /item?id= URL & summary
+        id: meta
+        env:
+          STORY_ID: ${{ steps.build_item.outputs.story_id }}
+          GH_REPO: ${{ github.repository }}
+          GH_OWNER: ${{ github.repository_owner }}
+          GH_SERVER_URL: ${{ github.server_url }}
+          GH_API_URL: ${{ github.api_url }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, pathlib, urllib.request
+          from urllib.parse import urlparse
+
+          repo = os.environ["GH_REPO"]
+          owner = os.environ["GH_OWNER"]
+          repo_name = repo.split("/", 1)[1]
+          server_url = os.environ["GH_SERVER_URL"].rstrip("/")
+          api_url = os.environ["GH_API_URL"].rstrip("/")
+          token = os.environ.get("GH_TOKEN", "")
+          story_id = os.environ.get("STORY_ID", "").strip()
+
+          # Query live Pages endpoint if already enabled; otherwise compute deterministic Pages root
+          pages_base = ""
+          if token:
+              try:
+                  req = urllib.request.Request(
+                      f"{api_url}/repos/{repo}/pages",
+                      headers={
+                          "Authorization": f"Bearer {token}",
+                          "Accept": "application/vnd.github+json",
+                          "User-Agent": "hn-epistemic-observatory",
+                      },
+                  )
+                  with urllib.request.urlopen(req, timeout=8) as resp:
+                      pdata = json.loads(resp.read().decode("utf-8"))
+                      pages_base = str(pdata.get("html_url") or "").rstrip("/")
+              except Exception:
+                  pages_base = ""
+
+          if not pages_base:
+              host = urlparse(server_url).hostname or "github.com"
+              if host == "github.com":
+                  pages_base = f"https://{owner.lower()}.github.io/{repo_name}"
+              else:
+                  pages_base = f"https://pages.{host}/{owner}/{repo_name}"
+
+          hn_uri = f"/item?id={story_id}" if story_id else "/"
+          pages_url = f"{pages_base}{hn_uri}"
+          orig_url = (
+              f"https://news.ycombinator.com/item?id={story_id}"
+              if story_id
+              else "https://news.ycombinator.com"
+          )
+          direct_url = f"{pages_base}/items/{story_id}.html" if story_id else f"{pages_base}/"
+
+          out_path = pathlib.Path(os.environ["GITHUB_OUTPUT"])
+          with out_path.open("a", encoding="utf-8") as fh:
+              fh.write(f"story_id={story_id}\n")
+              fh.write(f"hn_uri={hn_uri}\n")
+              fh.write(f"pages_url={pages_url}\n")
+
+          summary_lines = [
+              "## HN Epistemic Observatory Published",
+              "",
+              "| Field | Value |",
+              "| :--- | :--- |",
+              f"| **Relative URI (HN parity)** | `{hn_uri}` |",
+              f"| **GitHub Pages Observatory** | [{pages_url}]({pages_url}) |",
+              f"| **Direct Static Artifact** | [{direct_url}]({direct_url}) |",
+              f"| **Original Hacker News** | [{orig_url}]({orig_url}) |",
+              f"| **Published Directory** | [{pages_base}/]({pages_base}/) |",
+              "",
+              "> **One-time repo setup:** Ensure **Settings → Pages → Source** is set to **Deploy from a branch → `gh-pages` / `/ (root)`**.",
+          ]
+          summary_path = pathlib.Path(os.environ["GITHUB_STEP_SUMMARY"])
+          summary_path.write_text("\n".join(summary_lines) + "\n", encoding="utf-8")
+          print("\n".join(summary_lines))
+          PY
