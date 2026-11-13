@@ -1023,7 +1023,7 @@ def build_html(
       <span>NYX OBSERVATORY // <a class="ext-link" href="{hn_item_href}" target="_blank" rel="noopener">HN ITEM {story_id}</a> // {safe_host.upper()}</span>
       {eyebrow_right}
     </div>
-    <h1>Bullshit vs. <span class="accent">Epistemic Signal.</span></h1>
+    <h1>Bullshit vs. <span class="accent">Epistemic.</span></h1>
     <p class="sublead">
       Empirical autopsy of all <strong>{total_cnt:,}</strong> Hacker News comments on {story_link_html}.
       Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
