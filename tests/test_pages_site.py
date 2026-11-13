@@ -106,6 +106,85 @@ class TestGitHubPagesMirror(unittest.TestCase):
                 finally:
                     httpd.shutdown()
 
+    def test_refresh_updates_target_and_never_regresses_fresher_gh_pages_item(self) -> None:
+        """Overwrite an explicitly refreshed story while protecting newer gh-pages items from older git snapshots."""
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            src_dir = tmp_path / "src"
+            site_dir = tmp_path / "site"
+            src_dir.mkdir()
+            (site_dir / "items").mkdir(parents=True)
+
+            # gh-pages already has a refreshed 600-comment version of 50472038 from yesterday
+            fresher_gh_pages = json.dumps(
+                {
+                    "story_id": 50472038,
+                    "story_title": "Rust 1.100",
+                    "manifest": {"t2_ref_utc": "2026-11-14T12:00:00+00:00"},
+                    "tiers": {"epistemic_gold": 35},
+                    "comments": [{"id": i} for i in range(600)],
+                }
+            )
+            (site_dir / "items" / "50472038.html").write_text(
+                f'<!doctype html><script id="observatoryData" type="application/json">{fresher_gh_pages}</script>',
+                encoding="utf-8",
+            )
+
+            # Repo checkout (`main`) still has the older 254-comment baseline of 50472038 + a newly built 50499999
+            stale_repo_copy = json.dumps(
+                {
+                    "story_id": 50472038,
+                    "story_title": "Rust 1.100",
+                    "manifest": {"t2_ref_utc": "2026-11-13T09:00:00+00:00"},
+                    "tiers": {"epistemic_gold": 19},
+                    "comments": [{"id": i} for i in range(254)],
+                }
+            )
+            (src_dir / "show-me-hn-50472038.html").write_text(
+                f'<!doctype html><script id="observatoryData" type="application/json">{stale_repo_copy}</script>',
+                encoding="utf-8",
+            )
+            new_story = json.dumps(
+                {
+                    "story_id": 50499999,
+                    "story_title": "New Story",
+                    "manifest": {"t2_ref_utc": "2026-11-15T08:00:00+00:00"},
+                    "tiers": {"epistemic_gold": 8},
+                    "comments": [{"id": i} for i in range(90)],
+                }
+            )
+            (src_dir / "show-me-hn-50499999.html").write_text(
+                f'<!doctype html><script id="observatoryData" type="application/json">{new_story}</script>',
+                encoding="utf-8",
+            )
+
+            # Run 1: building 50499999 must NOT clobber the fresher 600-comment 50472038 on gh-pages
+            res1 = build_pages_site(site_dir=site_dir, source_dir=src_dir, force_ids={50499999})
+            self.assertEqual(res1["skipped_fresher_ids"], [50472038])
+            cat1 = json.loads((site_dir / "catalog.json").read_text(encoding="utf-8"))
+            by_id1 = {x["story_id"]: x for x in cat1["items"]}
+            self.assertEqual(by_id1[50472038]["total_comments"], 600)
+
+            # Run 2: explicitly re-running workflow for 50472038 (`force_ids={50472038}`) updates it in-place
+            even_newer = json.dumps(
+                {
+                    "story_id": 50472038,
+                    "story_title": "Rust 1.100",
+                    "manifest": {"t2_ref_utc": "2026-11-15T10:00:00+00:00"},
+                    "tiers": {"epistemic_gold": 42},
+                    "comments": [{"id": i} for i in range(720)],
+                }
+            )
+            (src_dir / "show-me-hn-50472038.html").write_text(
+                f'<!doctype html><script id="observatoryData" type="application/json">{even_newer}</script>',
+                encoding="utf-8",
+            )
+            res2 = build_pages_site(site_dir=site_dir, source_dir=src_dir, force_ids={50472038})
+            self.assertIn(50472038, res2["copied_ids"])
+            cat2 = json.loads((site_dir / "catalog.json").read_text(encoding="utf-8"))
+            by_id2 = {x["story_id"]: x for x in cat2["items"]}
+            self.assertEqual(by_id2[50472038]["total_comments"], 720)
+
     def test_workflow_yaml_exists_and_avoids_shell_injection(self) -> None:
         """Ensure workflow_dispatch passes inputs strictly via env vars rather than inline run interpolation."""
         local_wf = HERE / ".github" / "workflows" / "hn-observatory-pages.yml"

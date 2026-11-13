@@ -276,6 +276,12 @@ class TestGeneralizationPipeline(unittest.TestCase):
             self.assertTrue(res["zero_hash_verified"])
             html_text = out_html.read_text(encoding="utf-8")
             self.assertNotIn("#", html_text)
+            self.assertIn('id="modeSelect"', html_text)
+            self.assertNotIn('id="presetBar"', html_text)
+            self.assertIn('<details class="proof-drawer" id="kpiDrawer">', html_text)
+            self.assertIn('<details class="proof-drawer" id="proofDrawer">', html_text)
+            self.assertIn('<details class="proof-drawer" id="labDrawer">', html_text)
+            self.assertIn('<details class="graph-drawer" id="tunerDrawer">', html_text)
             self.assertEqual(res["top"][0]["id"], 777010)
 
 
