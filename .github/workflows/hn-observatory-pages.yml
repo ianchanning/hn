@@ -1,12 +1,25 @@
 name: HN Epistemic Observatory Pages
 
 on:
+  schedule:
+    # GitHub Actions cron is UTC-only; build_pages_site.py --check-schedule gates these 4 UTC slots
+    # so the sync runs at exact 08:00 Europe/London (GMT/BST) and 08:00 America/Los_Angeles (PST/PDT) year-round.
+    - cron: "0 7 * * *"
+    - cron: "0 8 * * *"
+    - cron: "0 15 * * *"
+    - cron: "0 16 * * *"
   workflow_dispatch:
     inputs:
       target:
-        description: "Hacker News item ID or URL (e.g. 50472038 or https://news.ycombinator.com/item?id=50472038)"
-        required: true
+        description: "HN item ID/URL (e.g. 50472038), or 'frontpage' to sync all Top 30 front-page stories"
+        required: false
+        default: "frontpage"
         type: string
+      frontpage_limit:
+        description: "Max front-page stories when target is 'frontpage' (default: 30)"
+        required: false
+        default: 30
+        type: number
       refresh:
         description: "Fetch fresh live HTML, Algolia tree, and story article"
         required: false
@@ -53,7 +66,43 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Check DST-aware 08:00 London & 08:00 San Francisco schedule window
+        id: schedule_gate
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          CRON_EXPR: ${{ github.event.schedule }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, pathlib, subprocess, sys
+
+          event_name = os.environ.get("EVENT_NAME", "")
+          out_path = pathlib.Path(os.environ["GITHUB_OUTPUT"])
+          if event_name != "schedule":
+              with out_path.open("a", encoding="utf-8") as fh:
+                  fh.write("should_run=true\n")
+                  fh.write(f"schedule_slot={event_name}\n")
+              sys.exit(0)
+
+          app_dir = pathlib.Path(".") if pathlib.Path("build_pages_site.py").is_file() else pathlib.Path("hn-comments")
+          cron_expr = os.environ.get("CRON_EXPR", "")
+          proc = subprocess.run(
+              [sys.executable, str(app_dir / "build_pages_site.py"), "--check-schedule", "--cron-expr", cron_expr],
+              check=True,
+              capture_output=True,
+              text=True,
+          )
+          res = json.loads(proc.stdout)
+          should_run = "true" if res.get("should_run") else "false"
+          slot = str(res.get("matched_slot") or "inactive_dst_slot")
+          print(json.dumps(res, indent=2))
+          with out_path.open("a", encoding="utf-8") as fh:
+              fh.write(f"should_run={should_run}\n")
+              fh.write(f"schedule_slot={slot}\n")
+          PY
+
       - name: Restore 7-day SQLite author cache
+        if: ${{ steps.schedule_gate.outputs.should_run == 'true' }}
         uses: actions/cache@v4
         continue-on-error: true
         with:
@@ -64,11 +113,13 @@ jobs:
           restore-keys: |
             hn-author-cache-${{ runner.os }}-
 
-      - name: Build observatory for requested HN story
-        if: ${{ github.event_name == 'workflow_dispatch' }}
+      - name: Build observatory (single story or Front Page Top 30)
+        if: ${{ steps.schedule_gate.outputs.should_run == 'true' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') }}
         id: build_item
         env:
+          EVENT_NAME: ${{ github.event_name }}
           HN_TARGET: ${{ inputs.target }}
+          HN_LIMIT: ${{ inputs.frontpage_limit }}
           HN_REFRESH: ${{ inputs.refresh }}
         run: |
           set -euo pipefail
@@ -79,19 +130,48 @@ jobs:
           sys.path.insert(0, str(app_dir))
           from ingest import parse_hn_item_id
 
-          raw_target = os.environ["HN_TARGET"]
-          story_id = parse_hn_item_id(raw_target)
+          event_name = os.environ.get("EVENT_NAME", "")
+          raw_target = os.environ.get("HN_TARGET", "").strip()
+          raw_limit = os.environ.get("HN_LIMIT", "").strip()
+          limit_val = int(float(raw_limit)) if raw_limit else 30
+          refresh_on = os.environ.get("HN_REFRESH", "true").lower() != "false"
+          out_path = pathlib.Path(os.environ["GITHUB_OUTPUT"])
 
-          cmd = [sys.executable, str(app_dir / "cli.py"), "build", str(story_id)]
-          if os.environ.get("HN_REFRESH", "true").lower() == "true":
-              cmd.append("--refresh")
-          subprocess.run(cmd, check=True)
-
-          with pathlib.Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as fh:
-              fh.write(f"story_id={story_id}\n")
+          is_frontpage = event_name == "schedule" or raw_target.lower() in ("", "frontpage", "front-page", "topstories")
+          if is_frontpage:
+              fp_manifest = pathlib.Path("_frontpage_manifest.json").resolve()
+              cmd = [
+                  sys.executable,
+                  str(app_dir / "cli.py"),
+                  "frontpage",
+                  "--limit",
+                  str(max(1, limit_val)),
+                  "--out-dir",
+                  str(app_dir),
+                  "--frontpage-manifest",
+                  str(fp_manifest),
+              ]
+              if refresh_on:
+                  cmd.append("--refresh")
+              subprocess.run(cmd, check=True)
+              with out_path.open("a", encoding="utf-8") as fh:
+                  fh.write("mode=frontpage\n")
+                  fh.write("story_id=\n")
+                  fh.write(f"frontpage_manifest={fp_manifest}\n")
+          else:
+              story_id = parse_hn_item_id(raw_target)
+              cmd = [sys.executable, str(app_dir / "cli.py"), "build", str(story_id)]
+              if refresh_on:
+                  cmd.append("--refresh")
+              subprocess.run(cmd, check=True)
+              with out_path.open("a", encoding="utf-8") as fh:
+                  fh.write("mode=single\n")
+                  fh.write(f"story_id={story_id}\n")
+                  fh.write("frontpage_manifest=\n")
           PY
 
       - name: Prepare persistent gh-pages worktree
+        if: ${{ steps.schedule_gate.outputs.should_run == 'true' }}
         run: |
           set -euo pipefail
           if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
@@ -105,19 +185,24 @@ jobs:
           fi
 
       - name: Assemble /item?id= GitHub Pages site
+        if: ${{ steps.schedule_gate.outputs.should_run == 'true' }}
         env:
           GH_REPO: ${{ github.repository }}
           GH_SERVER_URL: ${{ github.server_url }}
           STORY_ID: ${{ steps.build_item.outputs.story_id }}
+          FP_MANIFEST: ${{ steps.build_item.outputs.frontpage_manifest }}
         run: |
           set -euo pipefail
           APP_DIR="."
           if [ ! -f "build_pages_site.py" ]; then
             APP_DIR="hn-comments"
           fi
-          FORCE_ARGS=()
+          EXTRA_ARGS=()
           if [ -n "${STORY_ID:-}" ]; then
-            FORCE_ARGS=(--force-id "$STORY_ID")
+            EXTRA_ARGS+=(--force-id "$STORY_ID")
+          fi
+          if [ -n "${FP_MANIFEST:-}" ] && [ -f "$FP_MANIFEST" ]; then
+            EXTRA_ARGS+=(--frontpage-manifest "$FP_MANIFEST")
           fi
           python3 "$APP_DIR/build_pages_site.py" \
             --site-dir _gh_pages \
@@ -125,11 +210,14 @@ jobs:
             --repo "$GH_REPO" \
             --server-url "$GH_SERVER_URL" \
             --workflow-file hn-observatory-pages.yml \
-            "${FORCE_ARGS[@]}"
+            "${EXTRA_ARGS[@]}"
 
       - name: Commit & push to gh-pages branch
+        if: ${{ steps.schedule_gate.outputs.should_run == 'true' }}
         env:
           STORY_ID: ${{ steps.build_item.outputs.story_id }}
+          BUILD_MODE: ${{ steps.build_item.outputs.mode }}
+          SCHED_SLOT: ${{ steps.schedule_gate.outputs.schedule_slot }}
           ACTOR: ${{ github.actor }}
         run: |
           set -euo pipefail
@@ -139,15 +227,26 @@ jobs:
           if git -C _gh_pages diff --cached --quiet; then
             echo "No static site changes to publish."
           else
-            MSG="chore(pages): publish HN observatory ${STORY_ID:-catalog}"
-            git -C _gh_pages commit -m "$MSG"
-            git -C _gh_pages push origin HEAD:gh-pages
+            if [ "${BUILD_MODE:-}" = "frontpage" ]; then
+              MSG="chore(pages): sync HN front page (${SCHED_SLOT:-manual})"
+            else
+              MSG="chore(pages): publish HN observatory ${STORY_ID:-catalog}"
+            fi
+            # Squash gh-pages into a single root commit so twice-daily runs never bloat git history
+            SINGLE_SHA=$(git -C _gh_pages commit-tree "$(git -C _gh_pages write-tree)" -m "$MSG")
+            if ! git -C _gh_pages push --force origin "$SINGLE_SHA:refs/heads/gh-pages"; then
+              git -C _gh_pages commit -m "$MSG"
+              git -C _gh_pages push origin HEAD:gh-pages
+            fi
           fi
 
       - name: Compute equivalent GitHub Pages /item?id= URL & summary
+        if: ${{ steps.schedule_gate.outputs.should_run == 'true' }}
         id: meta
         env:
           STORY_ID: ${{ steps.build_item.outputs.story_id }}
+          BUILD_MODE: ${{ steps.build_item.outputs.mode }}
+          SCHED_SLOT: ${{ steps.schedule_gate.outputs.schedule_slot }}
           GH_REPO: ${{ github.repository }}
           GH_OWNER: ${{ github.repository_owner }}
           GH_SERVER_URL: ${{ github.server_url }}
@@ -166,6 +265,8 @@ jobs:
           api_url = os.environ["GH_API_URL"].rstrip("/")
           token = os.environ.get("GH_TOKEN", "")
           story_id = os.environ.get("STORY_ID", "").strip()
+          build_mode = os.environ.get("BUILD_MODE", "").strip()
+          sched_slot = os.environ.get("SCHED_SLOT", "").strip()
 
           # Query live Pages endpoint if already enabled; otherwise compute deterministic Pages root
           pages_base = ""
@@ -192,6 +293,12 @@ jobs:
               else:
                   pages_base = f"https://pages.{host}/{owner}/{repo_name}"
 
+          cat_path = pathlib.Path("_gh_pages/catalog.json")
+          cat_data = json.loads(cat_path.read_text(encoding="utf-8")) if cat_path.is_file() else {}
+          fp_count = len(cat_data.get("frontpage_ids") or [])
+          total_pub = int(cat_data.get("total_published") or 0)
+          size_mb = float(cat_data.get("total_size_mb") or 0.0)
+
           hn_uri = f"/item?id={story_id}" if story_id else "/"
           pages_url = f"{pages_base}{hn_uri}"
           orig_url = (
@@ -212,6 +319,8 @@ jobs:
               "",
               "| Field | Value |",
               "| :--- | :--- |",
+              f"| **Mode** | `{build_mode or 'catalog'}` (`{sched_slot or 'manual'}`) |",
+              f"| **Front Page Synced** | `{fp_count}` stories (`{total_pub}` total archived, `{size_mb:.2f} MB`) |",
               f"| **Relative URI (HN parity)** | `{hn_uri}` |",
               f"| **GitHub Pages Observatory** | [{pages_url}]({pages_url}) |",
               f"| **Direct Static Artifact** | [{direct_url}]({direct_url}) |",
