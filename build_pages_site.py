@@ -237,7 +237,6 @@ def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -
       padding: 16px 0 26px;
       border-top: 3px solid rgb(13, 13, 13);
       border-bottom: 1px solid rgb(13, 13, 13);
-      background: rgb(255, 255, 253);
     }}
     .eyebrow {{
       font: 600 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
