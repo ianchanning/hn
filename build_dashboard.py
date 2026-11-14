@@ -371,9 +371,9 @@ def build_html(
     safe_placeholder = _safe_html_no_hash(search_placeholder)
     hn_item_href = f"https://news.ycombinator.com/item?id={story_id}"
     story_link_html = (
-        f'<a class="ext-link" href="{_safe_url_no_hash(story_url)}" target="_blank" rel="noopener">{safe_title} ({safe_host})</a>'
+        f'<a class="ext-link" href="{_safe_url_no_hash(story_url)}">{safe_title} ({safe_host})</a>'
         if story_url
-        else f'<a class="ext-link" href="{hn_item_href}" target="_blank" rel="noopener">{safe_title}</a>'
+        else f'<a class="ext-link" href="{hn_item_href}">{safe_title}</a>'
     )
 
     if judge_res is not None:
@@ -1085,7 +1085,7 @@ def build_html(
 <div class="wrap">
   <header class="sheet-top">
     <div class="eyebrow">
-      <span>NYX OBSERVATORY // <a class="ext-link" href="{hn_item_href}" target="_blank" rel="noopener">HN ITEM {story_id}</a> // {safe_host.upper()}</span>
+      <span>NYX OBSERVATORY // <a class="ext-link" href="{hn_item_href}">HN ITEM {story_id}</a> // {safe_host.upper()}</span>
       {eyebrow_right}
     </div>
     <h1>Bullshit vs. <span class="accent">Epistemic.</span></h1>
@@ -1628,20 +1628,20 @@ def build_html(
       const urlLinks = c.urls.map(u => {{
         let host = "source";
         try {{ host = new URL(u).hostname.replace(/^www\\./, ""); }} catch (_e) {{}}
-        return `<a class="ext-link" href="${{escHtml(u)}}" target="_blank" rel="noopener">[${{escHtml(host)}}]</a>`;
+        return `<a class="ext-link" href="${{escHtml(u)}}">[${{escHtml(host)}}]</a>`;
       }}).join(" ");
 
       const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
       return `<article class="c-card tier-${{c.tier}}">
         <div class="hn-comhead">
-          <a href="https://news.ycombinator.com/user?id=${{encodeURIComponent(c.au)}}" target="_blank" rel="noopener">${{escHtml(c.au)}}</a>
+          <a href="https://news.ycombinator.com/user?id=${{encodeURIComponent(c.au)}}">${{escHtml(c.au)}}</a>
           <span>${{c.age}} hours ago</span>
           <span>|</span>
           <span>depth ${{c.d}}</span>
           <span>|</span>
           <span>karma ${{c.k.toLocaleString()}} (${{c.kpp}}/post)</span>
           <span>|</span>
-          <a href="https://news.ycombinator.com/item?id=${{c.id}}" target="_blank" rel="noopener">link</a>
+          <a href="https://news.ycombinator.com/item?id=${{c.id}}">link</a>
         </div>
         <div class="c-meta">
           <span class="badge rank-sig">SIGNAL ${{c.liveRank}}</span>

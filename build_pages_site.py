@@ -372,9 +372,9 @@ def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -
   bar.className = "actions";
   const btns = [];
   if (CFG.actions_url) {{
-    btns.push(`<a class="btn" href="${{CFG.actions_url}}" target="_blank" rel="noopener">Run GitHub Workflow</a>`);
+    btns.push(`<a class="btn" href="${{CFG.actions_url}}">Run GitHub Workflow</a>`);
   }}
-  btns.push(`<a class="btn alt" href="${{hnUrl}}" target="_blank" rel="noopener">View Original HN Thread</a>`);
+  btns.push(`<a class="btn alt" href="${{hnUrl}}">View Original HN Thread</a>`);
   btns.push(`<a class="btn alt" href="${{indexHref}}">Published Index</a>`);
   bar.innerHTML = btns.join("");
   shellEl.appendChild(bar);
@@ -397,10 +397,8 @@ def _render_item_row_html(it: dict[str, Any], *, rank: int) -> str:
     item_href = f"./item?id={sid}"
 
     if ext_href:
-        title_link = (
-            f'<a class="storylink" href="{ext_href}" rel="noopener">{title}</a>'
-        )
-        sitebit_html = f' <span class="sitebit comhead">(<a href="{ext_href}" rel="noopener">{sitebit}</a>)</span>'
+        title_link = f'<a class="storylink" href="{ext_href}">{title}</a>'
+        sitebit_html = f' <span class="sitebit comhead">(<a href="{ext_href}">{sitebit}</a>)</span>'
     else:
         title_link = f'<a class="storylink" href="{item_href}">{title}</a>'
         sitebit_html = ""
@@ -432,9 +430,7 @@ def _render_item_row_html(it: dict[str, Any], *, rank: int) -> str:
     else:
         meta_bits.append(f'<a href="{item_href}">discuss</a>')
 
-    meta_bits.append(
-        f'<a href="https://news.ycombinator.com/item?id={sid}" target="_blank" rel="noopener">hn</a>'
-    )
+    meta_bits.append(f'<a href="https://news.ycombinator.com/item?id={sid}">hn</a>')
     subtext_html = " | ".join(meta_bits)
 
     return f"""<tr class="athing">
@@ -483,12 +479,8 @@ def render_index_html(
     utc_stamp = _format_utc_stamp(updated_utc or frontpage_synced_utc)
 
     footer_bits = ["08:00 London &amp; 08:00 SF", f"{len(items)} published"]
-    if actions_url:
-        footer_bits.append(
-            f'<a href="{_safe_no_hash(actions_url)}" target="_blank" rel="noopener">run workflow</a>'
-        )
     footer_bits.append(
-        '<a href="https://news.ycombinator.com/" target="_blank" rel="noopener">news.ycombinator.com</a>'
+        '<a href="https://news.ycombinator.com/">news.ycombinator.com</a>'
     )
     footer_links_html = " | ".join(footer_bits)
 
@@ -703,7 +695,6 @@ def render_index_html(
     <div class="topbar-left">
       <a class="hn-logo" href="./">E</a>
       <a class="hnname" href="./">Epistemic News</a>
-      <span class="pagetop"><a href="https://news.ycombinator.com/" target="_blank" rel="noopener">hn</a></span>
     </div>
     <div class="topbar-right">Updated {utc_stamp}</div>
   </div>
