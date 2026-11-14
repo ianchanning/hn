@@ -280,7 +280,6 @@ class TestGeneralizationPipeline(unittest.TestCase):
             self.assertNotIn("#", html_text)
             self.assertIn('id="modeSelect"', html_text)
             self.assertNotIn('id="presetBar"', html_text)
-            self.assertIn('<details class="proof-drawer" id="kpiDrawer">', html_text)
             self.assertIn('<details class="proof-drawer" id="proofDrawer">', html_text)
             self.assertIn('<details class="proof-drawer" id="labDrawer">', html_text)
             self.assertIn('<details class="graph-drawer" id="tunerDrawer">', html_text)

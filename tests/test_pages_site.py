@@ -232,26 +232,42 @@ class TestGitHubPagesMirror(unittest.TestCase):
             src_dir.mkdir()
             (site_dir / "items").mkdir(parents=True)
 
-            def _mk_item(sid: int, title: str, ts_iso: str, pad_chars: int = 800) -> str:
+            def _mk_item(
+                sid: int,
+                title: str,
+                ts_iso: str,
+                pad_chars: int = 800,
+                story_url: str = "",
+                points: int = 128,
+                author: str = "pg",
+            ) -> str:
                 payload = json.dumps(
                     {
                         "story_id": sid,
                         "story_title": title,
-                        "manifest": {"t2_ref_utc": ts_iso},
+                        "story_url": story_url,
+                        "manifest": {"t2_ref_utc": ts_iso, "points": points, "story_author": author},
                         "tiers": {"epistemic_gold": 5, "grounded_analysis": 8},
-                        "comments": [{"id": 1}],
+                        "comments": [{"id": i} for i in range(20)],
                         "pad": "x" * pad_chars,
                     }
                 )
                 return f'<!doctype html><script id="observatoryData" type="application/json">{payload}</script>'
 
-            # Old >90d unpinned item on gh-pages + two current front-page items
+            # Old >90d unpinned item on gh-pages + two current front-page items (including a `#fragment` URL)
             (site_dir / "items" / "49000001.html").write_text(
                 _mk_item(49000001, "Ancient Archived Story", "2026-06-01T08:00:00+00:00", pad_chars=2400),
                 encoding="utf-8",
             )
             (site_dir / "items" / "50400001.html").write_text(
-                _mk_item(50400001, "Lower ID But Rank 1 On HN", "2026-11-14T08:00:00+00:00"),
+                _mk_item(
+                    50400001,
+                    "Lower ID But Rank 1 On HN #1",
+                    "2026-11-14T08:00:00+00:00",
+                    story_url="https://blog.rust-lang.org/2026/11/12/post/#sec-2",
+                    points=342,
+                    author="steveklabnik",
+                ),
                 encoding="utf-8",
             )
             (site_dir / "items" / "50499999.html").write_text(
@@ -276,11 +292,15 @@ class TestGitHubPagesMirror(unittest.TestCase):
 
             idx_html = (site_dir / "index.html").read_text(encoding="utf-8")
             self.assertNotIn("#", idx_html)
-            self.assertIn("Current HN Front Page (2)", idx_html)
+            self.assertIn('class="hnmain"', idx_html)
+            self.assertIn(">blog.rust-lang.org</a>)", idx_html)
+            self.assertIn("342 points by steveklabnik", idx_html)
+            self.assertIn("35% bullshit", idx_html)
+            self.assertNotIn('id="pastDrawer"', idx_html)
             # Rank 1 (`50400001`) appears before Rank 2 (`50499999`) despite smaller numeric ID
             self.assertLess(idx_html.index("50400001"), idx_html.index("50499999"))
 
-            # Subsequent single-story run without frontpage_ids preserves frontpage.json & Front Page table
+            # Subsequent single-story run without frontpage_ids preserves frontpage.json & tucks manual item into Past
             (src_dir / "show-me-hn-50511111.html").write_text(
                 _mk_item(50511111, "Manual Single Dispatch", "2026-11-14T17:00:00+00:00"),
                 encoding="utf-8",
@@ -294,7 +314,8 @@ class TestGitHubPagesMirror(unittest.TestCase):
             self.assertEqual(res2["frontpage_ids"], [50400001, 50499999])
             idx_html2 = (site_dir / "index.html").read_text(encoding="utf-8")
             self.assertNotIn("#", idx_html2)
-            self.assertIn("Current HN Front Page (2)", idx_html2)
+            self.assertIn('id="pastDrawer"', idx_html2)
+            self.assertIn("past (1)", idx_html2)
             self.assertIn("50511111", idx_html2)
 
     def test_workflow_yaml_exists_and_avoids_shell_injection(self) -> None:

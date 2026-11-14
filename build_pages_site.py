@@ -26,6 +26,7 @@ from pathlib import Path
 import re
 import shutil
 from typing import Any
+from urllib.parse import urlparse
 from zoneinfo import ZoneInfo
 
 HERE = Path(__file__).resolve().parent
@@ -40,6 +41,35 @@ OBS_JSON_RE = re.compile(
 def _safe_no_hash(text: str) -> str:
     """Escape HTML entities and ensure zero literal `#` characters."""
     return html.escape(str(text), quote=True).replace("#", "No. ")
+
+
+def _safe_url_no_hash(url: str) -> str:
+    """Sanitize an external http(s) URL and strip `#fragment` for zero-hash HTML."""
+    raw = str(url or "").split("#", 1)[0].strip()
+    if not raw:
+        return ""
+    parsed = urlparse(raw)
+    if parsed.scheme not in ("http", "https") or not parsed.netloc:
+        return ""
+    return html.escape(raw, quote=True).replace("#", "")
+
+
+def _format_hn_sitebit(url: str) -> str:
+    """Format an HN-style `(domain)` comhead label, or empty string for internal/empty URLs."""
+    raw = str(url or "").split("#", 1)[0].strip()
+    if not raw:
+        return ""
+    parsed = urlparse(raw)
+    if parsed.scheme not in ("http", "https") or not parsed.hostname:
+        return ""
+    host = parsed.hostname.lower().removeprefix("www.")
+    if host == "news.ycombinator.com":
+        return ""
+    if host in ("github.com", "gitlab.com"):
+        parts = [seg for seg in parsed.path.split("/") if seg]
+        if parts:
+            return _safe_no_hash(f"{host}/{parts[0].lower()}")
+    return _safe_no_hash(host)
 
 
 def evaluate_schedule_window(
@@ -130,6 +160,8 @@ def extract_item_summary(html_path: Path, item_id: int) -> dict[str, Any]:
             "story_id": item_id,
             "story_title": f"HN Item {item_id}",
             "story_url": "",
+            "points": 0,
+            "story_author": "",
             "total_comments": 0,
             "epistemic_gold": 0,
             "grounded_analysis": 0,
@@ -146,11 +178,15 @@ def extract_item_summary(html_path: Path, item_id: int) -> dict[str, Any]:
         or ("Jensen Huang resigns" if item_id == 50467087 else f"HN Item {item_id}")
     )
     story_url = str(data.get("story_url") or manifest.get("story_url") or "")
+    points = int(manifest.get("points") or data.get("points") or 0)
+    story_author = str(manifest.get("story_author") or data.get("story_author") or "")
     t2_utc = str(manifest.get("t2_ref_utc") or "")
     return {
         "story_id": item_id,
         "story_title": str(title),
         "story_url": story_url,
+        "points": points,
+        "story_author": story_author,
         "total_comments": int(len(comments)),
         "epistemic_gold": int(tiers.get("epistemic_gold") or 0),
         "grounded_analysis": int(tiers.get("grounded_analysis") or 0),
@@ -338,24 +374,62 @@ def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -
     return doc
 
 
-def _render_item_row_html(it: dict[str, Any], *, fp_rank: int | None = None) -> str:
-    """Render a zero-hash table row for either the Live Front Page or Archive table."""
+def _render_item_row_html(it: dict[str, Any], *, rank: int) -> str:
+    """Render a classic Hacker News 3-row item block (`athing`, `subtext`, `spacer`) with zero `#`."""
     sid = int(it["story_id"])
     title = _safe_no_hash(it["story_title"])
-    total = int(it["total_comments"])
-    gold = int(it["epistemic_gold"])
-    grounded = int(it["grounded_analysis"])
+    raw_url = str(it.get("story_url") or "")
+    sitebit = _format_hn_sitebit(raw_url)
+    ext_href = _safe_url_no_hash(raw_url) if sitebit else ""
+    item_href = f"./item?id={sid}"
+
+    if ext_href:
+        title_link = f'<a class="storylink" href="{ext_href}" rel="noopener">{title}</a>'
+        sitebit_html = f' <span class="sitebit comhead">(<a href="{ext_href}" rel="noopener">{sitebit}</a>)</span>'
+    else:
+        title_link = f'<a class="storylink" href="{item_href}">{title}</a>'
+        sitebit_html = ""
+
+    points = int(it.get("points") or 0)
+    author = _safe_no_hash(it["story_author"]) if it.get("story_author") else ""
+    total = int(it.get("total_comments") or 0)
+    gold = int(it.get("epistemic_gold") or 0)
+    grounded = int(it.get("grounded_analysis") or 0)
     useful = gold + grounded
-    useful_pct = 100.0 * useful / max(1, total) if total else 0.0
-    rank_cell = f'<td class="fp-rank">FP {fp_rank:02d}</td>' if fp_rank is not None else ""
-    return f"""<tr>
-              {rank_cell}
-              <td><a class="uri-link" href="./item?id={sid}">/item?id={sid}</a></td>
-              <td style="text-align:left"><strong><a class="title-link" href="./item?id={sid}">{title}</a></strong></td>
-              <td>{total:,}</td>
-              <td>{gold} Gold / {grounded} Grounded ({useful_pct:.1f}%)</td>
-              <td><a class="hn-orig" href="https://news.ycombinator.com/item?id={sid}" target="_blank" rel="noopener">news.ycombinator.com/item?id={sid}</a></td>
-            </tr>"""
+    bs_pct = max(0.0, 100.0 - (100.0 * useful / max(1, total))) if total else 0.0
+
+    meta_bits: list[str] = []
+    if points > 0 and author:
+        pt_word = "point" if points == 1 else "points"
+        meta_bits.append(f"{points} {pt_word} by {author}")
+    elif points > 0:
+        pt_word = "point" if points == 1 else "points"
+        meta_bits.append(f"{points} {pt_word}")
+    elif author:
+        meta_bits.append(f"by {author}")
+
+    if total > 0:
+        c_word = "comment" if total == 1 else "comments"
+        meta_bits.append(f'<a href="{item_href}">{total:,} {c_word}</a>')
+        meta_bits.append(f'<a href="{item_href}">{gold} gold &middot; {bs_pct:.0f}% bullshit</a>')
+    else:
+        meta_bits.append(f'<a href="{item_href}">discuss</a>')
+
+    meta_bits.append(
+        f'<a href="https://news.ycombinator.com/item?id={sid}" target="_blank" rel="noopener">hn</a>'
+    )
+    subtext_html = " | ".join(meta_bits)
+
+    return f"""<tr class="athing">
+            <td class="title rank">{rank}.</td>
+            <td class="votelinks"><a href="{item_href}" class="votearrow" title="Open epistemic observatory">▴</a></td>
+            <td class="title"><span class="titleline">{title_link}{sitebit_html}</span></td>
+          </tr>
+          <tr>
+            <td colspan="2"></td>
+            <td class="subtext">{subtext_html}</td>
+          </tr>
+          <tr class="spacer"><td colspan="3"></td></tr>"""
 
 
 def render_index_html(
@@ -367,7 +441,7 @@ def render_index_html(
     frontpage_ids: Sequence[int] = (),
     frontpage_synced_utc: str = "",
 ) -> str:
-    """Build zero-hash landing directory with Live HN Front Page Top 30 + Published Archive."""
+    """Build zero-hash Hacker News style front-page index (`news.ycombinator.com` layout)."""
     actions_url = (
         f"{server_url.rstrip('/')}/{repo.strip('/')}/actions/workflows/{workflow_file}"
         if repo
@@ -376,240 +450,291 @@ def render_index_html(
     by_id = {int(it["story_id"]): it for it in items}
     fp_ordered = [by_id[int(sid)] for sid in frontpage_ids if int(sid) in by_id]
     fp_id_set = {int(it["story_id"]) for it in fp_ordered}
-    archive_items = [it for it in items if int(it["story_id"]) not in fp_id_set] if fp_ordered else list(items)
 
-    fp_section_html = ""
-    if fp_ordered:
-        fp_rows = "\n".join(
-            _render_item_row_html(it, fp_rank=idx) for idx, it in enumerate(fp_ordered, start=1)
-        )
-        sync_note = (
-            f"Last synced {_safe_no_hash(frontpage_synced_utc[:19].replace('T', ' '))} UTC "
-            "(scheduled daily at 08:00 London &amp; 08:00 San Francisco)"
-            if frontpage_synced_utc
-            else "Scheduled daily at 08:00 London &amp; 08:00 San Francisco"
-        )
-        fp_section_html = f"""
-  <section style="margin-bottom:32px">
-    <div class="sec-head">
-      <h2>Current HN Front Page ({len(fp_ordered)})</h2>
-      <span>{sync_note}</span>
-    </div>
-    <div style="overflow-x:auto">
-      <table>
-        <thead>
-          <tr>
-            <th>Rank</th>
-            <th>Pages Mirror URI</th>
-            <th style="text-align:left">Story Title</th>
-            <th>Comments</th>
-            <th>Epistemic Signal</th>
-            <th>Original Hacker News</th>
-          </tr>
-        </thead>
-        <tbody>
-          {fp_rows}
-        </tbody>
-      </table>
-    </div>
-  </section>"""
+    main_items = fp_ordered if fp_ordered else list(items)
+    past_items = [it for it in items if int(it["story_id"]) not in fp_id_set] if fp_ordered else []
 
-    rows_html = [_render_item_row_html(it) for it in archive_items]
-    table_body = (
-        "\n".join(rows_html)
-        if rows_html
-        else '<tr><td colspan="5" style="text-align:left">All published threads are currently on the Front Page above.</td></tr>'
-        if fp_ordered
-        else '<tr><td colspan="5">No items published yet.</td></tr>'
+    if main_items:
+        main_rows_html = "\n          ".join(
+            _render_item_row_html(it, rank=idx) for idx, it in enumerate(main_items, start=1)
+        )
+    else:
+        main_rows_html = (
+            '<tr><td colspan="3" class="empty-msg">No stories built yet. '
+            "Run the GitHub Actions frontpage workflow or paste an item ID below.</td></tr>"
+        )
+
+    past_nav_html = ""
+    past_section_html = ""
+    if past_items:
+        past_nav_html = (
+            f' | <button type="button" class="nav-btn" id="openPastBtn">past ({len(past_items)})</button>'
+        )
+        start_rank = len(main_items) + 1
+        past_rows_html = "\n              ".join(
+            _render_item_row_html(it, rank=idx)
+            for idx, it in enumerate(past_items, start=start_rank)
+        )
+        past_section_html = f"""
+        <details class="past-drawer" id="pastDrawer">
+          <summary class="morelink">More &middot; past threads ({len(past_items)})</summary>
+          <table class="itemlist pastlist">
+            <tbody>
+              {past_rows_html}
+            </tbody>
+          </table>
+        </details>"""
+
+    sync_label = (
+        f"Synced {_safe_no_hash(frontpage_synced_utc[:16].replace('T', ' '))} UTC"
+        if frontpage_synced_utc
+        else "08:00 London &amp; 08:00 SF"
     )
-    archive_heading = (
-        f'<div class="sec-head"><h2>Published Thread Archive ({len(archive_items)})</h2><span>Preserved /item?id= builds</span></div>'
-        if fp_ordered
-        else ""
-    )
-    actions_btn = (
-        f'<a class="btn alt" href="{_safe_no_hash(actions_url)}" target="_blank" rel="noopener">Trigger Workflow on GitHub</a>'
+    right_top_html = (
+        f'<a href="{_safe_no_hash(actions_url)}" target="_blank" rel="noopener">sync</a>'
         if actions_url
-        else ""
+        else sync_label
     )
+
+    footer_bits = [sync_label, f"{len(items)} published"]
+    if actions_url:
+        footer_bits.append(
+            f'<a href="{_safe_no_hash(actions_url)}" target="_blank" rel="noopener">run workflow</a>'
+        )
+    footer_bits.append(
+        '<a href="https://news.ycombinator.com/" target="_blank" rel="noopener">news.ycombinator.com</a>'
+    )
+    footer_links_html = " | ".join(footer_bits)
 
     doc = f"""<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HN Epistemic Observatory // Published Mirror Index</title>
+  <title>Hacker News // Epistemic</title>
   <style>
     * {{ box-sizing: border-box; }}
     body {{
-      margin: 0;
-      background: rgb(247, 247, 245);
-      color: rgb(13, 13, 13);
-      font: 15px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
-      -webkit-font-smoothing: antialiased;
+      margin: 8px;
+      padding: 0;
+      background: rgb(255, 255, 255);
+      color: rgb(0, 0, 0);
+      font: 10pt/1.35 Verdana, Geneva, sans-serif;
     }}
-    .wrap {{
+    .hnmain {{
+      width: 85%;
       max-width: 1240px;
       margin: 0 auto;
-      padding: 28px 28px 64px;
+      background: rgb(246, 246, 239);
     }}
-    header {{
-      border-top: 3px solid rgb(13, 13, 13);
-      border-bottom: 1px solid rgb(13, 13, 13);
-      padding: 16px 0 24px;
-      margin-bottom: 24px;
-    }}
-    .eyebrow {{
-      font: 700 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: rgb(90, 90, 88);
+    .topbar {{
+      background: rgb(255, 102, 0);
+      padding: 2px 4px;
       display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 8px;
-    }}
-    .eyebrow strong {{ color: rgb(255, 51, 0); }}
-    h1 {{
-      font-size: clamp(32px, 4.5vw, 58px);
-      line-height: 0.98;
-      letter-spacing: -0.04em;
-      margin: 14px 0 12px;
-      font-weight: 800;
-    }}
-    h1 .accent {{ color: rgb(255, 51, 0); }}
-    .launcher {{
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      padding: 16px;
-      background: rgb(239, 239, 234);
-      border: 1px solid rgb(13, 13, 13);
-      margin-bottom: 24px;
       align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
     }}
-    .launcher input {{
-      flex: 1;
-      min-width: 260px;
-      padding: 9px 12px;
-      border: 1px solid rgb(13, 13, 13);
-      background: rgb(255, 255, 253);
-      font: 13px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+    .topbar-left {{
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
     }}
-    button.btn, a.btn {{
-      appearance: none;
-      padding: 9px 14px;
-      border: 1px solid rgb(13, 13, 13);
-      background: rgb(13, 13, 13);
-      color: rgb(247, 247, 245);
-      font: 600 12px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+    .hn-logo {{
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      line-height: 16px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
       text-decoration: none;
-      cursor: pointer;
+      flex-shrink: 0;
     }}
-    a.btn.alt {{
-      background: rgb(255, 255, 253);
-      color: rgb(13, 13, 13);
-    }}
-    table {{
-      width: 100%;
-      border-collapse: collapse;
-      background: rgb(255, 255, 253);
-      border: 1px solid rgb(13, 13, 13);
-      font-size: 13.5px;
-    }}
-    th, td {{
-      padding: 10px 12px;
-      border-bottom: 1px solid rgb(214, 214, 208);
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-    }}
-    th:first-child, td:first-child {{
-      text-align: left;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    }}
-    th:nth-child(2) {{ text-align: left; }}
-    th {{
-      background: rgb(236, 236, 231);
-      font: 700 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: rgb(60, 60, 58);
-    }}
-    a.uri-link {{
-      color: rgb(255, 51, 0);
+    a.hnname {{
+      color: rgb(0, 0, 0);
       font-weight: 700;
       text-decoration: none;
+      margin-right: 4px;
     }}
-    a.title-link {{
-      color: rgb(13, 13, 13);
-      text-decoration: underline;
-      text-underline-offset: 3px;
+    .pagetop, .pagetop a, .topbar-right, .topbar-right a {{
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      text-decoration: none;
     }}
-    a.hn-orig {{
-      color: rgb(90, 90, 88);
-      font: 12px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
-    }}
-    td.fp-rank {{
-      font: 700 11.5px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
-      color: rgb(90, 90, 88);
-      text-align: left;
+    .topbar-right {{
+      padding-right: 4px;
       white-space: nowrap;
+      font-size: 9pt;
     }}
-    .sec-head {{
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 0 0 10px;
-    }}
-    .sec-head h2 {{
+    button.nav-btn {{
+      appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0;
       margin: 0;
-      font-size: 18px;
-      letter-spacing: -0.02em;
+      font: inherit;
+      color: rgb(0, 0, 0);
+      cursor: pointer;
     }}
-    .sec-head span {{
-      font: 600 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
-      color: rgb(90, 90, 88);
+    button.nav-btn:hover, .pagetop a:hover, .topbar-right a:hover {{
+      text-decoration: underline;
+    }}
+    .list-pad {{
+      padding: 10px 8px 4px 4px;
+    }}
+    table.itemlist {{
+      border-collapse: collapse;
+      border: 0;
+      width: 100%;
+    }}
+    td.title {{
+      font-size: 10pt;
+      line-height: 14pt;
+      vertical-align: top;
+    }}
+    td.rank {{
+      color: rgb(130, 130, 130);
+      text-align: right;
+      padding-right: 4px;
+      white-space: nowrap;
+      width: 1%;
+      font-variant-numeric: tabular-nums;
+    }}
+    td.votelinks {{
+      vertical-align: top;
+      text-align: center;
+      width: 14px;
+      padding: 0 3px 0 1px;
+    }}
+    a.votearrow {{
+      color: rgb(153, 153, 153);
+      font-size: 9pt;
+      line-height: 14pt;
+      text-decoration: none;
+      display: inline-block;
+    }}
+    a.storylink {{
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }}
+    a.storylink:visited {{
+      color: rgb(130, 130, 130);
+    }}
+    .comhead, .comhead a {{
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }}
+    .comhead a:hover, td.subtext a:hover {{
+      text-decoration: underline;
+    }}
+    td.subtext {{
+      font-size: 7.5pt;
+      line-height: 11pt;
+      color: rgb(130, 130, 130);
+      padding-bottom: 1px;
+    }}
+    td.subtext a {{
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }}
+    tr.spacer td {{
+      height: 5px;
+    }}
+    td.empty-msg {{
+      padding: 16px 12px;
+      color: rgb(130, 130, 130);
+      font-size: 9.5pt;
+    }}
+    details.past-drawer {{
+      margin: 6px 0 2px;
+    }}
+    summary.morelink {{
+      list-style: none;
+      cursor: pointer;
+      padding: 4px 0 6px 32px;
+      font-size: 10pt;
+      color: rgb(0, 0, 0);
+      user-select: none;
+    }}
+    summary.morelink::-webkit-details-marker {{ display: none; }}
+    summary.morelink:hover {{ text-decoration: underline; }}
+    table.pastlist {{
+      margin-top: 4px;
+      padding-top: 6px;
+      border-top: 1px solid rgb(226, 226, 218);
+    }}
+    .hn-footer {{
+      margin-top: 12px;
+      border-top: 2px solid rgb(255, 102, 0);
+      padding: 12px 10px 18px;
+      text-align: center;
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+    }}
+    .yclinks a {{
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }}
+    .yclinks a:hover {{
+      text-decoration: underline;
+    }}
+    form.hn-search {{
+      margin-top: 10px;
+      color: rgb(130, 130, 130);
+      font-size: 8.5pt;
+    }}
+    form.hn-search input {{
+      font: 9pt/1.2 Verdana, Geneva, sans-serif;
+      padding: 2px 5px;
+      border: 1px solid rgb(130, 130, 130);
+      background: rgb(255, 255, 255);
+      color: rgb(0, 0, 0);
+      max-width: 86vw;
+    }}
+    @media (max-width: 750px) {{
+      body {{ margin: 0; }}
+      .hnmain {{ width: 100%; }}
+      .topbar {{ padding: 4px 6px; }}
+      td.title {{ font-size: 11pt; line-height: 15pt; }}
+      td.subtext {{ font-size: 8.5pt; line-height: 13pt; }}
+      tr.spacer td {{ height: 7px; }}
     }}
   </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="eyebrow">
-      <span>NYX EPISTEMIC OBSERVATORY // GITHUB PAGES MIRROR</span>
-      <span><strong>{len(items)} PUBLISHED THREADS</strong> // URI PARITY: <code>/item?id=&lt;HN_ID&gt;</code></span>
+<div class="hnmain">
+  <div class="topbar">
+    <div class="topbar-left">
+      <a class="hn-logo" href="./">Y</a>
+      <a class="hnname" href="./">Hacker News</a>
+      <span class="pagetop">epistemic{past_nav_html} | <a href="https://news.ycombinator.com/" target="_blank" rel="noopener">hn</a></span>
     </div>
-    <h1>Same <code>/item?id=</code> URI. <span class="accent">Zero Bullshit.</span></h1>
-    <p style="max-width:860px;color:rgb(52,52,50);margin:0">
-      Swap <code>https://news.ycombinator.com</code> with this GitHub Pages base URL:
-      every built story resolves at its exact Hacker News relative URI <code>/item?id=&lt;id&gt;</code>.
-    </p>
-  </header>
+    <div class="topbar-right">{right_top_html}</div>
+  </div>
 
-  <form class="launcher" id="jumpForm">
-    <input type="text" id="hnInput" placeholder="Paste https://news.ycombinator.com/item?id=50472038 or item ID..." required>
-    <button type="submit" class="btn">Open /item?id=...</button>
-    {actions_btn}
-  </form>
-  {fp_section_html}
-  {archive_heading}
-  <div style="overflow-x:auto">
-    <table>
-      <thead>
-        <tr>
-          <th>Pages Mirror URI</th>
-          <th style="text-align:left">Story Title</th>
-          <th>Comments</th>
-          <th>Epistemic Signal</th>
-          <th>Original Hacker News</th>
-        </tr>
-      </thead>
+  <div class="list-pad">
+    <table class="itemlist" id="frontpageList">
       <tbody>
-        {table_body}
+        {main_rows_html}
       </tbody>
-    </table>
+    </table>{past_section_html}
+  </div>
+
+  <div class="hn-footer">
+    <div class="yclinks">{footer_links_html}</div>
+    <form class="hn-search" id="jumpForm">
+      <label for="hnInput">Open item:</label>
+      <input type="text" id="hnInput" size="28" placeholder="ID or news.ycombinator.com/item?id=..." required>
+    </form>
   </div>
 </div>
 <script>
@@ -621,6 +746,14 @@ document.getElementById("jumpForm").addEventListener("submit", (ev) => {{
     window.location.href = `./item?id=${{encodeURIComponent(m[1])}}`;
   }}
 }});
+const pastBtn = document.getElementById("openPastBtn");
+const pastDrawer = document.getElementById("pastDrawer");
+if (pastBtn && pastDrawer) {{
+  pastBtn.addEventListener("click", () => {{
+    pastDrawer.open = true;
+    pastDrawer.scrollIntoView({{ behavior: "smooth", block: "start" }});
+  }});
+}}
 </script>
 </body>
 </html>
