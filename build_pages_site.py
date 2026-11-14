@@ -427,14 +427,13 @@ def _render_item_row_html(it: dict[str, Any], *, rank: int) -> str:
 
     return f"""<tr class="athing">
             <td class="title rank">{rank}.</td>
-            <td class="votelinks"><a href="{item_href}" class="votearrow" title="Open epistemic observatory">▴</a></td>
             <td class="title"><span class="titleline">{title_link}{sitebit_html}</span></td>
           </tr>
           <tr>
-            <td colspan="2"></td>
+            <td></td>
             <td class="subtext">{subtext_html}</td>
           </tr>
-          <tr class="spacer"><td colspan="3"></td></tr>"""
+          <tr class="spacer"><td colspan="2"></td></tr>"""
 
 
 def render_index_html(
@@ -474,34 +473,10 @@ def render_index_html(
             "Run the GitHub Actions frontpage workflow or paste an item ID below.</td></tr>"
         )
 
-    past_nav_html = ""
-    past_section_html = ""
-    if past_items:
-        past_nav_html = f' | <button type="button" class="nav-btn" id="openPastBtn">past ({len(past_items)})</button>'
-        start_rank = len(main_items) + 1
-        past_rows_html = "\n              ".join(
-            _render_item_row_html(it, rank=idx)
-            for idx, it in enumerate(past_items, start=start_rank)
-        )
-        past_section_html = f"""
-        <details class="past-drawer" id="pastDrawer">
-          <summary class="morelink">More &middot; past threads ({len(past_items)})</summary>
-          <table class="itemlist pastlist">
-            <tbody>
-              {past_rows_html}
-            </tbody>
-          </table>
-        </details>"""
-
     sync_label = (
         f"Synced {_safe_no_hash(frontpage_synced_utc[:16].replace('T', ' '))} UTC"
         if frontpage_synced_utc
         else "08:00 London &amp; 08:00 SF"
-    )
-    right_top_html = (
-        f'<a href="{_safe_no_hash(actions_url)}" target="_blank" rel="noopener">sync</a>'
-        if actions_url
-        else sync_label
     )
 
     footer_bits = [sync_label, f"{len(items)} published"]
@@ -519,7 +494,7 @@ def render_index_html(
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Hacker News // Epistemic</title>
+  <title>Hacker News // Bullshit vs. Epistemic.</title>
   <style>
     * {{ box-sizing: border-box; }}
     body {{
@@ -722,11 +697,10 @@ def render_index_html(
 <div class="hnmain">
   <div class="topbar">
     <div class="topbar-left">
-      <a class="hn-logo" href="./">Y</a>
-      <a class="hnname" href="./">Hacker News</a>
-      <span class="pagetop">epistemic{past_nav_html} | <a href="https://news.ycombinator.com/" target="_blank" rel="noopener">hn</a></span>
+      <a class="hn-logo" href="./">E</a>
+      <a class="hnname" href="./">Epistemic News</a>
+      <span class="pagetop"><a href="https://news.ycombinator.com/" target="_blank" rel="noopener">hn</a></span>
     </div>
-    <div class="topbar-right">{right_top_html}</div>
   </div>
 
   <div class="list-pad">
@@ -734,7 +708,7 @@ def render_index_html(
       <tbody>
         {main_rows_html}
       </tbody>
-    </table>{past_section_html}
+    </table>
   </div>
 
   <div class="hn-footer">

@@ -1634,7 +1634,6 @@ def build_html(
       const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
       return `<article class="c-card tier-${{c.tier}}">
         <div class="hn-comhead">
-          <span class="hn-votearrow">▲</span>
           <a href="https://news.ycombinator.com/user?id=${{encodeURIComponent(c.au)}}" target="_blank" rel="noopener">${{escHtml(c.au)}}</a>
           <span>${{c.age}} hours ago</span>
           <span>|</span>
