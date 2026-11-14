@@ -224,16 +224,16 @@ def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -
   <style>
     * {{ box-sizing: border-box; }}
     body {{
-      margin: 0;
+      margin: 8px;
       background: rgb(247, 247, 245);
       color: rgb(13, 13, 13);
       font: 15px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
       -webkit-font-smoothing: antialiased;
     }}
     .shell {{
-      max-width: 820px;
-      margin: 56px auto;
-      padding: 24px 28px 32px;
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
       border-top: 3px solid rgb(13, 13, 13);
       border-bottom: 1px solid rgb(13, 13, 13);
       background: rgb(255, 255, 253);
@@ -384,7 +384,9 @@ def _render_item_row_html(it: dict[str, Any], *, rank: int) -> str:
     item_href = f"./item?id={sid}"
 
     if ext_href:
-        title_link = f'<a class="storylink" href="{ext_href}" rel="noopener">{title}</a>'
+        title_link = (
+            f'<a class="storylink" href="{ext_href}" rel="noopener">{title}</a>'
+        )
         sitebit_html = f' <span class="sitebit comhead">(<a href="{ext_href}" rel="noopener">{sitebit}</a>)</span>'
     else:
         title_link = f'<a class="storylink" href="{item_href}">{title}</a>'
@@ -411,7 +413,9 @@ def _render_item_row_html(it: dict[str, Any], *, rank: int) -> str:
     if total > 0:
         c_word = "comment" if total == 1 else "comments"
         meta_bits.append(f'<a href="{item_href}">{total:,} {c_word}</a>')
-        meta_bits.append(f'<a href="{item_href}">{gold} gold &middot; {bs_pct:.0f}% bullshit</a>')
+        meta_bits.append(
+            f'<a href="{item_href}">{gold} gold &middot; {bs_pct:.0f}% bullshit</a>'
+        )
     else:
         meta_bits.append(f'<a href="{item_href}">discuss</a>')
 
@@ -452,11 +456,16 @@ def render_index_html(
     fp_id_set = {int(it["story_id"]) for it in fp_ordered}
 
     main_items = fp_ordered if fp_ordered else list(items)
-    past_items = [it for it in items if int(it["story_id"]) not in fp_id_set] if fp_ordered else []
+    past_items = (
+        [it for it in items if int(it["story_id"]) not in fp_id_set]
+        if fp_ordered
+        else []
+    )
 
     if main_items:
         main_rows_html = "\n          ".join(
-            _render_item_row_html(it, rank=idx) for idx, it in enumerate(main_items, start=1)
+            _render_item_row_html(it, rank=idx)
+            for idx, it in enumerate(main_items, start=1)
         )
     else:
         main_rows_html = (
@@ -467,9 +476,7 @@ def render_index_html(
     past_nav_html = ""
     past_section_html = ""
     if past_items:
-        past_nav_html = (
-            f' | <button type="button" class="nav-btn" id="openPastBtn">past ({len(past_items)})</button>'
-        )
+        past_nav_html = f' | <button type="button" class="nav-btn" id="openPastBtn">past ({len(past_items)})</button>'
         start_rank = len(main_items) + 1
         past_rows_html = "\n              ".join(
             _render_item_row_html(it, rank=idx)
@@ -805,11 +812,21 @@ def build_pages_site(
         raw_html = src_html.read_text(encoding="utf-8")
         assert "#" not in raw_html, f"Zero-hash mandate violated in {src_html}"
         dst = items_dir / f"{item_id}.html"
-        if dst.is_file() and item_id not in forced and src_html.resolve() != dst.resolve():
+        if (
+            dst.is_file()
+            and item_id not in forced
+            and src_html.resolve() != dst.resolve()
+        ):
             src_meta = extract_item_summary(src_html, item_id)
             dst_meta = extract_item_summary(dst, item_id)
-            src_key = (str(src_meta.get("t2_ref_utc") or ""), int(src_meta.get("total_comments") or 0))
-            dst_key = (str(dst_meta.get("t2_ref_utc") or ""), int(dst_meta.get("total_comments") or 0))
+            src_key = (
+                str(src_meta.get("t2_ref_utc") or ""),
+                int(src_meta.get("total_comments") or 0),
+            )
+            dst_key = (
+                str(dst_meta.get("t2_ref_utc") or ""),
+                int(dst_meta.get("total_comments") or 0),
+            )
             if dst_key > src_key:
                 skipped_fresher_ids.append(item_id)
                 continue
@@ -836,7 +853,9 @@ def build_pages_site(
     elif fp_json_path.is_file():
         try:
             fp_saved = json.loads(fp_json_path.read_text(encoding="utf-8"))
-            resolved_fp_ids = [int(x) for x in (fp_saved.get("frontpage_ids") or []) if int(x) > 0]
+            resolved_fp_ids = [
+                int(x) for x in (fp_saved.get("frontpage_ids") or []) if int(x) > 0
+            ]
             resolved_fp_utc = str(fp_saved.get("synced_utc") or "")
         except Exception:
             resolved_fp_ids = []
@@ -853,7 +872,9 @@ def build_pages_site(
         meta = extract_item_summary(pub_html, sid)
         fsize = pub_html.stat().st_size
         total_bytes += fsize
-        raw_entries.append((sid, pub_html, meta, fsize, _parse_item_timestamp(meta, pub_html)))
+        raw_entries.append(
+            (sid, pub_html, meta, fsize, _parse_item_timestamp(meta, pub_html))
+        )
 
     pruned_ids: list[int] = []
     trigger_bytes = int(prune_trigger_mb * 1024 * 1024)
@@ -916,7 +937,11 @@ def build_pages_site(
         "total_published": len(summaries),
         "total_size_mb": round(total_bytes / (1024.0 * 1024.0), 2),
         "frontpage_synced_utc": resolved_fp_utc,
-        "frontpage_ids": [sid for sid in resolved_fp_ids if any(int(s["story_id"]) == sid for s in summaries)],
+        "frontpage_ids": [
+            sid
+            for sid in resolved_fp_ids
+            if any(int(s["story_id"]) == sid for s in summaries)
+        ],
         "uri_template": "/item?id={story_id}",
         "items": summaries,
     }
@@ -936,7 +961,9 @@ def build_pages_site(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--site-dir", type=Path, default=None, help="Output GitHub Pages directory")
+    parser.add_argument(
+        "--site-dir", type=Path, default=None, help="Output GitHub Pages directory"
+    )
     parser.add_argument(
         "--source-dir",
         type=Path,
@@ -944,8 +971,12 @@ def main() -> None:
         help="Directory containing show-me-hn-<id>.html files",
     )
     parser.add_argument("--repo", default="", help="owner/repo slug for workflow links")
-    parser.add_argument("--server-url", default="https://github.com", help="GitHub server base URL")
-    parser.add_argument("--workflow-file", default="hn-observatory-pages.yml", help="Workflow filename")
+    parser.add_argument(
+        "--server-url", default="https://github.com", help="GitHub server base URL"
+    )
+    parser.add_argument(
+        "--workflow-file", default="hn-observatory-pages.yml", help="Workflow filename"
+    )
     parser.add_argument(
         "--force-id",
         type=int,
@@ -982,8 +1013,14 @@ def main() -> None:
         action="store_true",
         help="Evaluate whether --cron-expr matches 08:00 Europe/London or 08:00 America/Los_Angeles and exit",
     )
-    parser.add_argument("--cron-expr", default="", help="UTC cron string from github.event.schedule")
-    parser.add_argument("--now-utc", default="", help="Optional ISO-8601 UTC override for schedule evaluation")
+    parser.add_argument(
+        "--cron-expr", default="", help="UTC cron string from github.event.schedule"
+    )
+    parser.add_argument(
+        "--now-utc",
+        default="",
+        help="Optional ISO-8601 UTC override for schedule evaluation",
+    )
     args = parser.parse_args()
 
     if args.check_schedule:
@@ -1006,7 +1043,9 @@ def main() -> None:
         fp_doc = json.loads(args.frontpage_manifest.read_text(encoding="utf-8"))
         fp_ids = [int(x) for x in (fp_doc.get("frontpage_ids") or []) if int(x) > 0]
         fp_utc = str(fp_doc.get("synced_utc") or "")
-        forced_set.update(int(x) for x in (fp_doc.get("built_ids") or fp_ids) if int(x) > 0)
+        forced_set.update(
+            int(x) for x in (fp_doc.get("built_ids") or fp_ids) if int(x) > 0
+        )
 
     res = build_pages_site(
         site_dir=args.site_dir,
