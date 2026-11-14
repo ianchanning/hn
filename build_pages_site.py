@@ -234,6 +234,7 @@ def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -
       max-width: 1240px;
       margin: 0 auto;
       width: 85%;
+      padding: 16px 0 26px;
       border-top: 3px solid rgb(13, 13, 13);
       border-bottom: 1px solid rgb(13, 13, 13);
       background: rgb(255, 255, 253);
