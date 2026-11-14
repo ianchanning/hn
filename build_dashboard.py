@@ -564,9 +564,9 @@ def build_html(
       -webkit-font-smoothing: antialiased;
     }}
     .wrap {{
-      max-width: 1420px;
+      max-width: 1240px;
       margin: 0 auto;
-      padding: 28px 28px 64px;
+      width: 85%;
     }}
     .sheet-top {{
       border-top: 3px solid rgb(13, 13, 13);
@@ -1024,7 +1024,6 @@ def build_html(
     }}
 
     @media (max-width: 960px) {{
-      .wrap {{ padding: 18px 14px 48px; }}
       .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
       .col-7, .col-8, .col-9, .col-10, .col-11 {{ grid-column: span 12; }}
       .dual-oled {{ grid-template-columns: 1fr; gap: 10px; }}
