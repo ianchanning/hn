@@ -1,0 +1,1259 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50484235 // A technical vision for the Haskell ecosystem — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      background: rgb(247, 247, 245);
+      color: rgb(13, 13, 13);
+      font: 15px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+    }
+    .sheet-top {
+      border-top: 3px solid rgb(13, 13, 13);
+      border-bottom: 1px solid rgb(13, 13, 13);
+      padding: 16px 0 26px;
+    }
+    .eyebrow {
+      font: 600 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .eyebrow strong { color: rgb(255, 51, 0); }
+    h1 {
+      font-size: clamp(36px, 5.2vw, 72px);
+      line-height: 0.96;
+      letter-spacing: -0.045em;
+      margin: 18px 0 14px;
+      font-weight: 800;
+    }
+    h1 .accent { color: rgb(255, 51, 0); }
+    .sublead {
+      max-width: 920px;
+      font-size: 16px;
+      color: rgb(52, 52, 50);
+      margin: 0;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      font: 700 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 24px;
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+    }
+    .kpi-cell {
+      padding: 16px 16px 14px;
+      border-right: 1px solid rgb(205, 205, 200);
+    }
+    .kpi-cell:last-child { border-right: 0; }
+    .kpi-label {
+      font: 600 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 8px 0 4px;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      font-size: 12px;
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      background: rgb(13, 15, 17);
+      color: rgb(228, 232, 236);
+      border: 2px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 6px;
+      corner-shape: bevel;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(156, 166, 176);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      background: rgb(9, 11, 13);
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(180, 188, 196);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 58px;
+      background: rgb(20, 24, 28);
+      border-left: 3px solid rgb(0, 230, 118);
+      font: 12px/19px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(220, 226, 232);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 38px;
+    }
+
+    /* Collapsible 03A / 03B Justification Drawer */
+    details.proof-drawer {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 12px 0;
+    }
+    details.proof-drawer > summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      font: 700 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      user-select: none;
+    }
+    details.proof-drawer > summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary:hover { border-color: rgb(255, 51, 0); }
+    details.proof-drawer > summary .toggle-pill {
+      flex-shrink: 0;
+      padding: 3px 8px;
+      background: rgb(13, 13, 13);
+      color: rgb(247, 247, 245);
+      font-size: 10px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 16px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: rgb(255, 255, 253);
+      border: 1px solid rgb(13, 13, 13);
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+    }
+    table.ablation th {
+      background: rgb(236, 236, 231);
+      font: 700 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgb(60, 60, 58);
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      font: 600 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+      color: rgb(13, 13, 13);
+      padding: 7px 11px;
+      font: 600 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      box-shadow: 0 2px 0 rgb(13, 13, 13);
+    }
+    button.tab-btn.active {
+      background: rgb(13, 13, 13);
+      color: rgb(247, 247, 245);
+    }
+    button.tab-btn:hover {
+      border-color: rgb(255, 51, 0);
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      padding: 8px 11px;
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+      font: 600 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { flex: 1; min-width: 220px; font-weight: 400; }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border: 1px solid rgb(216, 216, 206);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      border-top: 3px solid rgb(13, 13, 13);
+      padding-top: 14px;
+      margin-top: 36px;
+      font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        background: rgb(239, 239, 234);
+        border: 1px solid rgb(13, 13, 13);
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        font-size: 17px;
+        margin: 0;
+        white-space: normal;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        background: rgb(13, 13, 13);
+        color: rgb(247, 247, 245);
+        font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-] HIDE"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+] SHOW"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpi-cell { border-bottom: 1px solid rgb(205, 205, 200); }
+      .filter-bar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .filter-bar select.sel-in {
+        width: 100%;
+        font-size: 16px;
+        padding: 8px 9px;
+      }
+      .filter-bar input.search-in {
+        grid-column: span 2;
+        width: 100%;
+        min-width: 0;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="sheet-top">
+    <div class="eyebrow">
+      <span>NYX OBSERVATORY // <a class="ext-link" href="https://news.ycombinator.com/item?id=50484235">HN ITEM 50484235</a> // DISCOURSE.HASKELL.ORG</span>
+      <span><strong>BULLSHIT: 79.1%</strong>
+    </div>
+    <h1>Bullshit vs. <span class="accent">Epistemic.</span></h1>
+    <p class="sublead">
+      <strong>134</strong> Hacker News comments on <a class="ext-link" href="https://discourse.haskell.org/t/a-technical-vision-for-the-haskell-ecosystem/15078">A technical vision for the Haskell ecosystem (discourse.haskell.org)</a>.
+    </p>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary>
+      <span>01 // EVIDENCE</span>
+      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    </summary>
+    <p>
+      Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+      Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+    </p>
+    <div class="proof-body">
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">134</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 77 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">20.9%</div>
+          <div class="kpi-sub">28 comments (5 Gold / 3.7%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">79.1%</div>
+          <div class="kpi-sub">75 chatter &bull; 30 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">5</div>
+        <div class="kpi-sub">13% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.887</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">55</div>
+          <div class="kpi-sub">HN POS 1..55 (41.0% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="margin-top:10px;font:600 11px/1.5 ui-monospace,Menlo,monospace;color:rgb(70,70,68)"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary>
+      <span>02 // EXPLORE</span>
+      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / INTERACTIVE EQUATION</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p style="font-size:11.5px;line-height:1.42;color:rgb(85,85,82);margin:12px 0 0">
+              Drag any weight to watch the 134-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 134)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (5)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (23)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (75)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (1)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (30)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..134) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 40)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (@ecshafer, 20.3h); largest subtree (@ecshafer) occupies 55 slots (HN POS 1..55).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="modeSelect" class="sel-in" aria-label="Ranking view">
+          <option value="hn_top40">HN Top 40</option>
+          <option value="top_signal">Epistemic Top 50</option>
+          <option value="buried_gems">Buried Gems (HN POS &gt; 40)</option>
+          <option value="bullshit_traps">High-Karma / URL Traps Caught</option>
+          <option value="mod_morgue">Mod Rebukes &amp; Downvoted Morgue</option>
+          <option value="c5a_rescues">c5A Heterodox Rescues</option>
+        </select>
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (134)</option>
+          <option value="languages_lean">Languages &amp; Lean (LLMS) (32)</option>
+          <option value="nix_ghcup">Nix &amp; Ghcup (Stack) (28)</option>
+          <option value="syntax_hard">Syntax &amp; Hard (Beginner) (26)</option>
+          <option value="code_type">Code &amp; Type (LLMS) (19)</option>
+          <option value="library_care">Library &amp; Care (Web) (16)</option>
+          <option value="general_commentary">General Commentary (13)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, ecosystem, community, haskell, spent, ways...">
+      </div>
+      <div id="resultMeta" style="font:600 11px/1.4 ui-monospace,Menlo,monospace;color:rgb(90,90,88);margin-bottom:10px"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50484235 + DISCOURSE.HASKELL.ORG + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50484235, "story_title": "A technical vision for the Haskell ecosystem", "story_url": "https://discourse.haskell.org/t/a-technical-vision-for-the-haskell-ecosystem/15078", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50484235, "story_title": "A technical vision for the Haskell ecosystem", "story_url": "https://discourse.haskell.org/t/a-technical-vision-for-the-haskell-ecosystem/15078", "points": 223, "story_author": "cosmic_quanta", "article_source": "fetched_url", "t1_ref_utc": "2026-11-14T14:04:25+00:00", "t2_ref_utc": "2026-11-14T14:04:25+00:00", "delta_minutes": 0.0, "story_anchors": ["ecosystem", "community", "haskell", "spent", "ways", "technical", "vision", "course", "believe", "help", "getting", "bunch", "class", "confused", "deep", "drop", "faster", "feel", "ghci", "incremental", "inside", "knows", "lisp", "lol", "path"], "facet_labels": {"languages_lean": "Languages & Lean (LLMS)", "library_care": "Library & Care (Web)", "code_type": "Code & Type (LLMS)", "syntax_hard": "Syntax & Hard (Beginner)", "nix_ghcup": "Nix & Ghcup (Stack)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "languages_lean", "label": "Languages & Lean (LLMS)", "count": 32, "top_terms": ["languages", "lean", "llms", "tokens"]}, {"slug": "library_care", "label": "Library & Care (Web)", "count": 16, "top_terms": ["library", "care", "web", "rust"]}, {"slug": "code_type", "label": "Code & Type (LLMS)", "count": 19, "top_terms": ["code", "type", "llms", "assembly"]}, {"slug": "syntax_hard", "label": "Syntax & Hard (Beginner)", "count": 26, "top_terms": ["syntax", "hard", "beginner", "feedback"]}, {"slug": "nix_ghcup", "label": "Nix & Ghcup (Stack)", "count": 28, "top_terms": ["nix", "ghcup", "stack", "tools"]}], "counts": {"total_comments": 134, "live_t2_comments": 134, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 77, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "c005cd919015ff73f508950fdf27270f86d36bef1d534fd7b7bde4a138d8e8b4"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 5, "grounded_analysis": 23, "crowd_chatter": 75, "bullshit_or_flamewar": 30, "meme_or_snark": 1}, "facets": {"languages_lean": 32, "nix_ghcup": 28, "library_care": 16, "syntax_hard": 26, "code_type": 19, "general_commentary": 13}, "facet_options": [{"slug": "languages_lean", "label": "Languages & Lean (LLMS)", "count": 32}, {"slug": "nix_ghcup", "label": "Nix & Ghcup (Stack)", "count": 28}, {"slug": "syntax_hard", "label": "Syntax & Hard (Beginner)", "count": 26}, {"slug": "code_type", "label": "Code & Type (LLMS)", "count": 19}, {"slug": "library_care", "label": "Library & Care (Web)", "count": 16}, {"slug": "general_commentary", "label": "General Commentary", "count": 13}], "facet_diagnostics": [{"slug": "languages_lean", "label": "Languages & Lean (LLMS)", "count": 32, "useful": 10, "useful_pct": 31.2, "terms": "languages, lean, llms, tokens"}, {"slug": "nix_ghcup", "label": "Nix & Ghcup (Stack)", "count": 28, "useful": 6, "useful_pct": 21.4, "terms": "nix, ghcup, stack, tools"}, {"slug": "syntax_hard", "label": "Syntax & Hard (Beginner)", "count": 26, "useful": 4, "useful_pct": 15.4, "terms": "syntax, hard, beginner, feedback"}, {"slug": "code_type", "label": "Code & Type (LLMS)", "count": 19, "useful": 3, "useful_pct": 15.8, "terms": "code, type, llms, assembly"}, {"slug": "library_care", "label": "Library & Care (Web)", "count": 16, "useful": 5, "useful_pct": 31.2, "terms": "library, care, web, rust"}, {"slug": "general_commentary", "label": "General Commentary", "count": 13, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 10}, {"category": "investigative_or_tech_press", "count": 2}, {"category": "github_artifact", "count": 2}, {"category": "code_repository", "count": 1}, {"category": "primary_technical_doc", "count": 1}, {"category": "low_cred_or_joke", "count": 1}], "story_anchors": ["ecosystem", "community", "haskell", "spent", "ways", "technical", "vision", "course", "believe", "help", "getting", "bunch", "class", "confused", "deep", "drop", "faster", "feel"], "largest_root": {"root_id": 50487028, "author": "ecshafer", "slots": 55, "start_dom": 1, "end_dom": 55, "share_pct": 41.0, "top_dom1_age": 20.3, "top_dom1_author": "ecshafer"}, "buried_cutoff": 40, "rescue_top_k": 27, "ablations": [], "tournament": [], "comments": [{"id": 50495736, "au": "mietek", "dom": 14, "sr": 1, "sc": 12.47, "ep": 12.47, "bs": 0.0, "d": 5, "age": 3.82, "grav": 23.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 44, "qw": 0, "k": 2273, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "epistemic_gold", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": ["https://agdapad.quasicoherent.io/~Padova2026/", "https://plfa.github.io", "https://github.com/pigworker/CS410-18"], "ig": 1.389, "fa": 2.76, "gp": 0.922, "bl": 0.0, "ds": 0.0, "txt": "Here are some resources to help you get started.\n\nAn Agda course taught in Padova since 2024: \nhttps://agdapad.quasicoherent.io/~Padova2026/\n\n\"Programming Language Foundations in Agda\", a course taught at multiple universities since 2018:\nhttps://plfa.github.io\n\nConor Titania McBride's lectures on Agda, including videos:\nhttps://github.com/pigworker/CS410-18\n\nThorsten Altenkirch's lectures on computer-aided formal reasoning using Agda:\nhttps://www.cs.nott.ac.uk/~psztxa/g53cfr"}, {"id": 50486673, "au": "chriswarbo", "dom": 111, "sr": 2, "sc": 12.03, "ep": 12.03, "bs": 0.0, "d": 4, "age": 20.67, "grav": 275.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 42, "qw": 18, "k": 7964, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": ["https://nixos.org/manual/nixpkgs/stable/\u0023haskell-overriding-haskell-packages", "https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/haskell-modules/lib/compose.nix"], "ig": 1.086, "fa": 2.77, "gp": 1.094, "bl": 0.0, "ds": 0.0, "txt": "> You can take what’s included with OS packages, but then you’re stuck with whatever version that is.\n\nIt's pretty easy to override things in Nixpkgs though, whether at the system level, or for one application, or just a particular dependency deep in the tree of one script.\n\nNixpkgs has a bunch of powerful functions to make this easier, e.g. callCabal2nix, makePackageSet, etc.\n\nhttps://nixos.org/manual/nixpkgs/stable/\u0023haskell-overriding-...\n\nhttps://github.com/NixOS/nixpkgs/blob/master/pkgs/developmen..."}, {"id": 50496899, "au": "itishappy", "dom": 103, "sr": 3, "sc": 11.67, "ep": 11.82, "bs": 0.0, "d": 4, "age": 0.52, "grav": 5.3, "surf": 48.5, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 65, "qw": 0, "k": 5020, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "epistemic_gold", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": ["https://edolstra.github.io/pubs/nixos-jfp-final.pdf"], "ig": 1.516, "fa": 2.35, "gp": 1.073, "bl": 0.0, "ds": 0.0, "txt": "NixOS is subtly marketed to Haskell folks.\n\nI got into Haskell because I wanted to learn ADTs, and quickly found I really appreciate the ways that purely functional programming tickles my brain!\n\nNixOS has been described as a \"purely functional Linux distribution\" and I liked the sound of that at first. I haven't figured out what this means, lol, but I tried it anyway and quickly found I really appreciate it's declarative configuration.\n\nhttps://edolstra.github.io/pubs/nixos-jfp-final.pdf"}, {"id": 50487468, "au": "calebkaiser", "dom": 6, "sr": 4, "sc": 9.52, "ep": 9.67, "bs": 0.0, "d": 1, "age": 19.83, "grav": 257.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 366, "qw": 0, "k": 1151, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": ["https://avi.press/posts/2026-07-10-after-7-years-in-production-scarf-has-reluctantly-moved-away-from-haskell.html"], "ig": 1.89, "fa": 0.9, "gp": 1.837, "bl": 0.0, "ds": 0.0, "txt": "I do AI research and mostly work with Lean these days. I love Haskell, though I wouldn't consider myself a particularly strong Haskell programmer (just never spent a ton of time working in it). I think you're spiritually correct that there are lots of reasons to use extremely strict languages with AI, but the reality is a little messier than you'd expect.\n\nToken efficiency is specifically the place where strict languages get a little trickier. With dynamic languages where the model has a ton of training data, like Python, the agents are really good at writing code that just works. You still have challenges there, but they're just different than the challenges you hit with a language like Haskell/Lean/Agda etc. With Lean, for example, the amount of things the agent decides it needs to prove for a relatively trivial operation can lead to an absurd amount of code. And the way it decides to prove them can be borderline labyrinthian. It sort of plays perfectly towards current agent weaknesses, where agents can run off and reinvent a lot of machinery and build unnecessarily complex abstractions.\n\nAnd those iterations have a cost. Even if the final artifact is more terse, the path to getting there can involve a huge amount of backtracking and rewriting and off-by-one syntactic corrections.\n\nUltimately, a lot of this comes down to developer experience. Getting useful error messages for"}, {"id": 50490502, "au": "lcprk", "dom": 22, "sr": 5, "sc": 9.25, "ep": 9.55, "bs": 0.0, "d": 1, "age": 16.1, "grav": 183.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 43, "qw": 0, "k": 4, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": ["https://danluu.com/pl-tokens/"], "ig": 0.855, "fa": 2.06, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "It's not more popular because Dan Luu actually measured this [1] and those languages aren't better in practice.\n\nA priori, it does seem strange. But the relative Haskell vs Python tokens in the internet go a long way to explaining it, as another commenter has said.\n\n[1] https://danluu.com/pl-tokens/"}, {"id": 50485513, "au": "_bent", "dom": 93, "sr": 6, "sc": 6.59, "ep": 6.59, "bs": 0.0, "d": 0, "age": 22.0, "grav": 305.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 168, "qw": 51, "k": 417, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": [], "ig": 1.541, "fa": 0.42, "gp": 1.223, "bl": 0.0, "ds": 0.0, "txt": "> the onboarding experience of rust\n\n> we are going to build the best onboarding experience in the programming language ecosystem\n\n> This can only be done if we commit to unix principles\n> write programs that do one thing and do it well\n\nRust is so approachable because Cargo does not subscribe to \"do one thing\".\nIn fact Cargo does a bunch of things. Which is very convenient for newcomers, because they only need to learn one thing instead of a bunch (and how they interact).\n\nThe same holds for a GUI like a file explorer with buttons and interactions like drag / drop or marquee select, which is a bunch simpler than chaining 3 programs together to delete 30 old files and move some folder into a subdirectory.\n\nIt also explains why the most successful tools within the land of Unix philosophy are stuff like AWK, which really don't just do one thing. Or why PowerShell is less usable than GNU. Or why Emacs is an 'operating system'.\n\nIt's also a reason why the installation experience for Haskell is so bad: there are a bunch of programs and users don't know where to start and what they need.\n\n> Cabal and Stack: which one should I install?\n> We recommend installing both.\n\nOne thing and one thing well.\n\nAtleast it seems they've added a combined installer for these tools since the last time I've checked."}, {"id": 50485929, "au": "the__alchemist", "dom": 65, "sr": 7, "sc": 6.58, "ep": 6.58, "bs": 0.0, "d": 1, "age": 21.52, "grav": 294.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 93, "qw": 0, "k": 7442, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "library_care", "flbl": "Library & Care (Web)", "urls": [], "ig": 1.735, "fa": 0.56, "gp": 0.621, "bl": 0.0, "ds": 0.0, "txt": "It sounds like it needs foundational libraries? Or is it something else. For example, almost everything I write requires one or more of:\n\n  - Embedded toolchain and/or HAL/register map for my MCU family or CPU arhitecture\n  - A GUI library and/or basic I/O interaction library (keyboard/mouse to start)\n  - A GPU interaction library\n  - A web framework (Not going to roll my own DB interface, auth, user system, router, template system etc)\n\n\n(Etc). I.e., some core library which handles the drudgery I can build my application on. If this is what you're getting at, this suggests a plan of attack!"}, {"id": 50488840, "au": "Jtsummers", "dom": 131, "sr": 8, "sc": 6.53, "ep": 6.53, "bs": 0.0, "d": 1, "age": 18.09, "grav": 221.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 80, "qw": 24, "k": 29784, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "syntax_hard", "flbl": "Syntax & Hard (Beginner)", "urls": ["https://learnyouahaskell.github.io/types-and-typeclasses.html"], "ig": 1.16, "fa": 1.04, "gp": 0.581, "bl": 0.0, "ds": 0.0, "txt": "> For the beginner, there isn't enough syntax on offer to discern who's doing what to whom here.\n\nIf you throw a beginner at any non-trivial code in any language without teaching them anything about the language, then, yeah, it'll be hard for them to figure it out. That says nothing about the language itself, though. That's pretty obvious to everybody.\n\n> Is there a \"function signatures for dummys\" somewhere?\n\nYeah, of course. There's actual beginner material, here's one example:\n\nhttps://learnyouahaskell.github.io/types-and-typeclasses.htm...\n\nNot hard to find, and not the only introduction to the language that covers this material. I guess you never bothered to look, or even to ask Gemini."}, {"id": 50493001, "au": "axman6", "dom": 59, "sr": 9, "sc": 6.01, "ep": 6.16, "bs": 0.0, "d": 3, "age": 11.7, "grav": 111.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 144, "qw": 0, "k": 500, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": [], "ig": 1.423, "fa": 0.68, "gp": 0.603, "bl": 0.0, "ds": 0.0, "txt": "I used to tutor at the Australian National University, where the first semester CS course is 100% Haskell, it it was absolutely the right choice. People who’ve programmed before are at very little advantage over students who’ve never written a line of code, and often it’s the ones who did well in maths in high school that do best with it. It teaches many important ideas in a way that doesn’t give you an escape hatch to do bad things. I think for a CS degree, the primary goal is not to teach students how to program in the languages they’ll use in industry, but to teach them the ideas they’ll be able to apply to _any_ language they use in the future. I’ve also spent most of the 15 years since I took that course working professionally in Haskell, so it’s not like it’s “useless” for everyone."}, {"id": 50487207, "au": "segmondy", "dom": 46, "sr": 10, "sc": 5.81, "ep": 6.25, "bs": 0.0, "d": 1, "age": 20.12, "grav": 263.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 133, "qw": 0, "k": 9038, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "code_type", "flbl": "Code & Type (LLMS)", "urls": [], "ig": 1.463, "fa": 0.34, "gp": 1.269, "bl": 0.0, "ds": 0.0, "txt": "It's as popular as you make it.  Nothing is stopping you from using it.  People generate code for what they are familiar with or have desire for.  There are people who have wanted to give rust a try and AI opens that possibility up.  There are certainly less people that want to try Haskell.  Furthermore, Rust has more training data so LLMs generally will provide better Rust code than Haskell code.   Because of LLM, I'm back into obscure languages that I didn't have the mental capacity to carry day by day.  Prolog, Lisp and Forth, and like you said, they are very terse and token efficient.  However, I must point out that terse was only relevant prior to the entire thinking era, a model could use 100k tokens to think only to give you 100 tokens of final output."}, {"id": 50485788, "au": "carterschonwald", "dom": 79, "sr": 11, "sc": 5.75, "ep": 5.75, "bs": 0.0, "d": 0, "age": 21.68, "grav": 297.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 168, "qw": 0, "k": 4034, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "code_type", "flbl": "Code & Type (LLMS)", "urls": [], "ig": 2.006, "fa": 0.0, "gp": 0.71, "bl": 0.0, "ds": 0.0, "txt": "hasufell has been a wonderful person in haskell land.  hes got very clear headed ideas about stuff and so forth.\n\nalso the stuff i can now build in haskell with computer aid is epic.  earlier this week i stood up what i believe is one of the/ if not the: best step file format reader writer on like every axis. some c ones are 20-30 percent faster on the largest possible cad assemblies i could try out.\n\nan important axis that folks neglect to consider: the main way llms are getting scaled up for better coding is metric megatons of reinforcement learning traces, and type checking thats  fancy gives a cheaper and faster training feedback loop.\n\nwith an llm as a sortah insane manic intern im looking over the shoulder, so to speak, im able to build the apis and designs i can see but cant type anywhere near the same scale.  but i can specify the keystones for the exact designs quite compactly and then the agent kinda acts as a compiler inhave to correct and iterate running"}, {"id": 50489053, "au": "klntsky", "dom": 38, "sr": 12, "sc": 5.68, "ep": 6.12, "bs": 0.0, "d": 3, "age": 17.78, "grav": 215.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 59, "qw": 0, "k": 778, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "library_care", "flbl": "Library & Care (Web)", "urls": ["https://chatgpt.com/s/t_6af76fd8f2a081918fa37f8c30bdb3ba"], "ig": 1.535, "fa": 0.62, "gp": 0.513, "bl": 0.0, "ds": 0.0, "txt": "Businesses care. I worked with Haskell in production (a fairly normal B2B SaaS). Some things you would expect to have in the ecosystem had to be maintained domestically.\n\nMy former company was generous enough to publish most of these[0] as open source projects. But what's really telling is that oftentimes vendoring a commonly used OSS library was unavoidable.\n\n[0] Here's a potentially incomplete list: https://chatgpt.com/s/t_6af76fd8f2a081918fa37f8c30bdb3ba"}, {"id": 50486520, "au": "chriswarbo", "dom": 94, "sr": 13, "sc": 5.64, "ep": 5.79, "bs": 0.0, "d": 1, "age": 20.86, "grav": 279.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 243, "qw": 0, "k": 7964, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": [], "ig": 1.963, "fa": 0.0, "gp": 0.812, "bl": 0.0, "ds": 0.0, "txt": "I disagree. About a decade ago I made some tooling to extract and analyse code from Haskell packages. That's easier said than done, given the use of pre-processors, TemplateHaskell, language extensions affecting the syntax/grammar, using external files like `.cabal` to specify such pre-processors/extensions, etc.\n\nI went through several iterations, to get something that I could throw arbitrary packages at from Hackage, GitHub, etc. The result was a hacky mess containing a GHC plugin to dump Core code, a library to dynamically generate and evaluate strings of Nix to handle dependencies, shell scripts that piped `:t` commands through GHCi, and so on.\n\nIt was annoying, not because of the effort involved (I was doing weird, bespoke things; so it's no surprise it needed weird, bespoke code to be written); but because all of the functionality I needed already existed, just buried deep inside GHC/Cabal/etc.\n\nAdmittedly the GHC API has gotten much better in recent years; but there's no way the developers of \"one tool to rule them all\" can predict all of the different things that users will want it to do. Indeed, it's probably wise for such tools to avoid supporting/maintaining particularly weird/niche uses!\n\nHaving a collection of tools instead, which \"do one thing and do it well\", side-steps that problem entirely: users with weird use-cases are empowered to plug things together in a w"}, {"id": 50495513, "au": "snordgren", "dom": 91, "sr": 14, "sc": 5.42, "ep": 5.42, "bs": 0.0, "d": 1, "age": 4.49, "grav": 29.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 88, "qw": 0, "k": 188, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "code_type", "flbl": "Code & Type (LLMS)", "urls": [], "ig": 1.608, "fa": 0.34, "gp": 0.463, "bl": 0.0, "ds": 0.0, "txt": "Elm was on a strong upward trajectory, getting more and more attention and usage, when the fateful change that killed it was introduced. Who knows what it could have become if things were different?\n\nHaskell also heavily inspired Rust, not in terms of syntax, but Rust traits and enums are very similar to Haskell type classes and ADTs.\n\nAs a vehicle for PL research, Haskell has been very successful. Practically every language introduced after ~2015 includes some variant of ADTs, option types, and result types. Many include type class analogues, too."}, {"id": 50485715, "au": "pmkary", "dom": 56, "sr": 15, "sc": 5.41, "ep": 5.71, "bs": 0.0, "d": 0, "age": 21.75, "grav": 299.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 311, "qw": 0, "k": 695, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "library_care", "flbl": "Library & Care (Web)", "urls": [], "ig": 1.754, "fa": 0.0, "gp": 1.092, "bl": 0.0, "ds": 0.0, "txt": "There is this memo video of S. P. Jones that famously says \"Haskell is Useless\". I love Haskell, but I wished it was universal like C, C++, JavaScript, Rust, and C\u0023. By that I mean: It could be used to create apps for desktop, mobile, and web. JavaScript can be used to do so many things like power the entire web, be on node and let anyone create cli and share the code with web, and mobile through React Native, on desktop with Electron and its alike things, it lets you do plugins for god knows how many things, it lets you write things for the GNOME Shell... C and C++ are perhaps behind everything in the world and string theory finally gets seen will see they are written in C. And they can be compiled to Web and almost everything in the world. Rust is a placeholder for the two, and C\u0023 reinvented itself when it saw Mono and now works even in the browser. Each time I see Haskell I wonder what else can I do rather than creating CLI apps, and it makes me choose something else that grants me more code reuse and interesting applications.\n\nIf I could have a vision for Haskell, it was for it to be useful. Academic research and making compilers is cool, a few cli things here and there are cool too, but why can't we build music players and game engines and flutters and web pages with it? The language is way more elegant and beautiful than all the JS/C like languages out there and I really "}, {"id": 50486428, "au": "georgewsinger", "dom": 77, "sr": 16, "sc": 5.39, "ep": 5.61, "bs": 0.0, "d": 0, "age": 20.95, "grav": 281.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 34, "qw": 0, "k": 2701, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": ["https://simulavr.com/blog/debug-hud/"], "ig": 1.126, "fa": 0.62, "gp": 0.826, "bl": 0.0, "ds": 0.0, "txt": "RE the debugging experience in Haskell: we recently wrote a post about bringing live run-time debugging to our Haskell VR compositor: https://simulavr.com/blog/debug-hud/\n\nLive step-through debugging and interactivity we think is pretty underrated in the Haskell ecosystem."}, {"id": 50493747, "au": "kodoman", "dom": 95, "sr": 17, "sc": 4.72, "ep": 5.24, "bs": 0.0, "d": 1, "age": 10.07, "grav": 88.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 152, "qw": 40, "k": 178, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": [], "ig": 1.446, "fa": 0.42, "gp": 0.443, "bl": 0.0, "ds": 0.0, "txt": "Size of programs binary, memory usage, heavy runtime and the size of the compiler can be very painful and possibly non-starts for some things as well. I do like Haskell but a lot of things I could never use it for because of those issues.\n\n> It also explains why the most successful tools within the land of Unix philosophy are stuff like AWK, which really don't just do one thing. Or why PowerShell is less usable than GNU. Or why Emacs is an 'operating system'.\n\nI am not really sure this is true. I find my self composing Unix tools (partly because I don't know AWK that well lol) and I think 'do one thing well' when can mean easier time thinking how things interact and from primitives rather then one big opaque program. I agree for this to work things have to sit well together and adherence philosophies and respecting the boundaries of the other programs is an important thing to do.\n\nCabal and Stack step on each others toes constantly and it does seem confusing. I am a masochist so use nix on top of this and there a a very many ways to go when you do that for Haskell projects."}, {"id": 50487898, "au": "drewr", "dom": 2, "sr": 18, "sc": 4.62, "ep": 5.5, "bs": 0.0, "d": 1, "age": 19.35, "grav": 247.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 57, "qw": 0, "k": 1515, "kpp": 9.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": [], "ig": 1.401, "fa": 0.0, "gp": 1.523, "bl": 0.0, "ds": 0.0, "txt": "It's my default for all the reasons you mention.\n\nIn fact if I have to ship in a different language, I'll often do a Haskell version first to steer towards isolating IO, enforcing referential transparency, and generally picking up other functional patterns that are a good idea no matter what. Then I'll port the Haskell version to whatever the solution demands."}, {"id": 50487545, "au": "klntsky", "dom": 35, "sr": 19, "sc": 4.51, "ep": 4.95, "bs": 0.0, "d": 1, "age": 19.74, "grav": 255.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 778, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "library_care", "flbl": "Library & Care (Web)", "urls": [], "ig": 1.196, "fa": 0.0, "gp": 1.473, "bl": 0.0, "ds": 0.0, "txt": "Haskell does not have a good low level library wrappers story, unlike Rust.\n\nNobody prepared it for adoption nearly as much as Rust evangelists did for their language. Years of hard work they invested into maintaining bindings as hobby projects paid off."}, {"id": 50488199, "au": "pimeys", "dom": 47, "sr": 20, "sc": 4.49, "ep": 4.93, "bs": 0.0, "d": 2, "age": 19.01, "grav": 240.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 93, "qw": 0, "k": 7139, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "syntax_hard", "flbl": "Syntax & Hard (Beginner)", "urls": [], "ig": 1.732, "fa": 0.0, "gp": 0.59, "bl": 0.0, "ds": 0.0, "txt": "I've been generating probably 500k lines of Rust with all the SOTA models (and now DeepSeek). Every model does an absolutely horrible job generating good Rust code. You have to babysit it and you need to question everything the model spat out.\n\nI mean, free functions and no general nice trait/struct/enum based architecture, random `Mutex`/`RwLock` everywhere, all your big futures inside a `tokio::select!` etc.\n\nYes it's great when you do your first Rust project. After a year it's a nightmare if you don't keep a clear control how the code is generated and organized."}, {"id": 50487868, "au": "raddan", "dom": 58, "sr": 21, "sc": 4.48, "ep": 4.92, "bs": 0.0, "d": 2, "age": 19.39, "grav": 248.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 191, "qw": 0, "k": 1287, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "syntax_hard", "flbl": "Syntax & Hard (Beginner)", "urls": [], "ig": 1.788, "fa": 0.0, "gp": 0.497, "bl": 0.0, "ds": 0.0, "txt": "I've loved this video for years, primarily because of SPJ's willingness (and excitement, even) to talk about Haskell's shortcomings.  I think SPJ and other important people in the Haskell community are keenly aware that Haskell appeals to a specific demographic and that, to survive as more than just a research plaything, that they need to broaden participation.\n\nThe famously friendly \"Learn You a Haskell\" book features its first \"helloworld\" program deep into the middle of the book, _after_ functors and (if I recall correctly) monads.  It takes a very special beginner programmer to push that far through, working in the REPL, before they can write programs that do basic I/O.\n\nI teach functional programming to college sophomores and juniors, and I would love to teach them Haskell.  But I have to meet them where they are, and it would be difficult to do in Haskell.  This is why we have taught either F\u0023, Scala, or LISP over the years.  F\u0023 in particular has a lot of the aesthetic qualities of Haskell while allowing impurity or mutability escape hatches without too much trouble.  If somebody has truly beginner-friendly Haskell resources, I would love to hear about it-- I'm apparently not smart enough to chart that path myself."}, {"id": 50488969, "au": "lambdas", "dom": 122, "sr": 22, "sc": 4.03, "ep": 4.18, "bs": 0.0, "d": 1, "age": 17.91, "grav": 217.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 105, "qw": 0, "k": 297, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "syntax_hard", "flbl": "Syntax & Hard (Beginner)", "urls": [], "ig": 1.366, "fa": 0.28, "gp": 0.117, "bl": 0.0, "ds": 0.0, "txt": "Huh? How would that be a good criteria - how many languages exist where a non-user can easily grok non trivial functions with at least five distinct arguments?\n\nIf someone told me German was easy to learn, I wouldn’t get an LLM to generate me a complex sentence with two clauses and three adjectives and then be like “sure about that?”\n\n`processRecord :: (a -> b) -> Maybe c -> [d] -> (e -> Bool) -> (b, c, [d], e) -> Either String (b, c, [d], e)`\n\nSays:\n“\ngive me:\n1) a function of a to b,\n2) a ‘c’ wrapped in a Maybe,\n3) a list of d’s,\n4) a function of e to a Bool,\n5) a 4 tuple of a, b, list of d’s, and an e\n\nAnd I will give you either a String  or your original tuple back”\n\nIt doesn’t really do anything so there’s not much more to explain"}, {"id": 50491028, "au": "calebkaiser", "dom": 8, "sr": 23, "sc": 3.89, "ep": 4.99, "bs": 0.0, "d": 3, "age": 15.5, "grav": 172.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 148, "qw": 0, "k": 1151, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": ["https://kim-em.github.io/blog/2026-7-24-why-lean-is-faster-than-rust/"], "ig": 1.128, "fa": 0.62, "gp": 0.397, "bl": 0.0, "ds": 0.0, "txt": "Yeah, I think this is roughly where things are headed. Or at least, it's part of what I'm working on these days, though I'd characterize myself as \"generally kind of bad at things,\" so maybe that's anti-signal.\n\nBut I think this is actually in the design of many languages already, especially in languages like Lean, where you can prove that the presentable API is correct.\n\nHere's one rough example that is related to this direction:\n\nA common convention in Lean is to write essentially two versions of a function, with a theorem proving their equality or correspondence.\n\nSo you can write a more demonstrative version that is more easily understood, which you can treat sort of as a spec that all other implementations must satisfy. And then you can set the agent loose to do whatever nastiness it wants to do to improve performance.\n\nHere's a fun write up from someone doing just this with zip file compression: https://kim-em.github.io/blog/2026-7-24-why-lean-is-faster-t..."}, {"id": 50495167, "au": "internet_points", "dom": 36, "sr": 24, "sc": 3.83, "ep": 4.49, "bs": 0.0, "d": 2, "age": 5.67, "grav": 39.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 30, "qw": 0, "k": 2339, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "library_care", "flbl": "Library & Care (Web)", "urls": ["https://well-typed.com/blog/2026/10/hs-bindgen-official-release/"], "ig": 0.984, "fa": 0.62, "gp": 0.286, "bl": 0.0, "ds": 0.0, "txt": "Hm, I found writing FFI code from Haskell quite easy.\n\nI've been meaning to try the new\nhttps://well-typed.com/blog/2026/10/hs-bindgen-official-rele... \nwhich looks even nicer, but haven't found a missing library yet to try it on :)"}, {"id": 50486079, "au": "Buttons840", "dom": 102, "sr": 25, "sc": 3.8, "ep": 4.53, "bs": 0.0, "d": 3, "age": 21.35, "grav": 290.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 14851, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": [], "ig": 1.085, "fa": 0.0, "gp": 1.368, "bl": 0.0, "ds": 0.0, "txt": "The Haskell ecosystem seems obsessed with NixOS in a way I haven't seen anywhere else.\n\nI recall wanting to use Haskell packages that were only available in Nix, but nobody had bothered to make just a normal package."}, {"id": 50496489, "au": "kodoman", "dom": 19, "sr": 26, "sc": 3.59, "ep": 4.88, "bs": 0.85, "d": 4, "age": 1.62, "grav": 10.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 176, "qw": 33, "k": 178, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "code_type", "flbl": "Code & Type (LLMS)", "urls": [], "ig": 1.308, "fa": 0.42, "gp": 0.421, "bl": 0.32, "ds": 0.0, "txt": "> Here is an example where I literally just told claude I wanted generic instances for these type classes and we had a brief back and forth about the approach then it one shotted this entire module\n\nYes this is basically what I thought you where doing (what seems to me the correct thing). I have found it's very good at implementing interfaces or in your case type classes and completing generic functions. Though I am not sure if you wrote the type class definitions in this file or not, but sounds like either way you explained what you wanted. Also this sort of Haskell code is well above what I did in Haskell so I can only take your word for it that this is good code and I am sure it is.\n\nThough I always use plans like you, and found them to always be good. I have experimented with just asking it to implement features with minimal direct and it does end up being very bad. Particularly in creating data structures/ data types or interfaces and classes.\n\nMy guess was only that when you try and get the agent to decide stuff like data types and type classes and how to structure the program it does a poor job and worse then if you did it in other languages."}, {"id": 50488494, "au": "kccqzy", "dom": 118, "sr": 27, "sc": 3.46, "ep": 3.98, "bs": 0.0, "d": 1, "age": 18.61, "grav": 232.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 99, "qw": 0, "k": 19940, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "syntax_hard", "flbl": "Syntax & Hard (Beginner)", "urls": [], "ig": 1.352, "fa": 0.0, "gp": 0.552, "bl": 0.0, "ds": 0.0, "txt": "Your brain crashes just because of unfamiliarity with the syntax. Just mentally translate it into C++ or Rust syntax.\n\n    template<typename A, typename B, typename C, typename D, typename E>\n    std::variant<std::string, std::tuple<B, C, std::vector<D>, E> processRecord(std::function_ref<B(A const&)>, std::optional<C> const&, std::span<D>, std::function_ref<bool(E const&)>, std::tuple<B, C, std::vector<D>, E>);\n\nThis familiarity can be gained in frankly a day or two of trying, and afterwards you’ll find it to be clear and information dense. The example doesn’t even involve anything truly mind blowing for a beginner yet, like the Traversable class, the lens/traversal/prism signatures, or polymorphic recursion."}, {"id": 50487899, "au": "sublinear", "dom": 9, "sr": 28, "sc": 3.44, "ep": 4.76, "bs": 0.0, "d": 2, "age": 19.35, "grav": 247.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 75, "qw": 42, "k": 4174, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": [], "ig": 1.308, "fa": 0.42, "gp": 0.339, "bl": 0.0, "ds": 0.0, "txt": ">  I think you're spiritually correct that there are lots of reasons to use extremely strict languages with AI\n\n> With dynamic languages where the model has a ton of training data, like Python, the agents are really good at writing code that just works.\n\nI'm confused how the former supports the latter here.\n\nSurely, you mean that LLMs are not the right kind of \"AI\". Languages like Haskell expose how fundamentally porous LLMs are with information.\n\nI wouldn't even say it's the dynamic nature of Python that leads to good results, but the consistency. Javascript is the obvious counterexample. There's far more javascript out there to train on than any other programming language, yet LLMs are terrible at writing it too."}, {"id": 50490291, "au": "lallysingh", "dom": 7, "sr": 29, "sc": 3.22, "ep": 3.88, "bs": 0.0, "d": 2, "age": 16.33, "grav": 187.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 161, "qw": 0, "k": 9761, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_type", "flbl": "Code & Type (LLMS)", "urls": [], "ig": 1.577, "fa": 0.0, "gp": 0.121, "bl": 0.0, "ds": 0.0, "txt": "I'm wondering the inverse, actually.  That LLMs can make regular haskell programming (e.g. typing in code, not english that LLMs convert to code) powerful enough to prefer.  Can we have LLMs do enough of the grunt work on building type machinery, dealing with compiler errors, looking up exact types and conversion systems, to make the APIs presented to us preferable?\n\nSo, I could write what I want in haskell, and it's faster for me than to have an LLM do it.  The haskell would be high-level enough and precise enough to describe what I want the program to do with less iterations than I'd have with an LLM writing code, finding its own bugs, fixing them, then having me ask it what it did, tell it what to do differently, etc.\n\nDirect control is very powerful.  LLMs take that away from us, in exchange for a great speedup.  But perhaps we can use LLMs to give it back to us by making our actual programming languages more powerful."}, {"id": 50488545, "au": "jose_zap", "dom": 67, "sr": 30, "sc": 3.12, "ep": 4.0, "bs": 0.0, "d": 2, "age": 18.55, "grav": 230.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 54, "qw": 0, "k": 596, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "library_care", "flbl": "Library & Care (Web)", "urls": [], "ig": 1.246, "fa": 0.28, "gp": 0.188, "bl": 0.0, "ds": 0.0, "txt": "Embedded toolchain and/or HAL/register map:\n\n- Copilot (by NASA)\n\n- MicroHs — for running Haskell on an MCU\n\nGUI library and/or basic keyboard/mouse I/O:\n\n- Monomer\n\n- sdl2\n\n- gi-gtk4\n\nGPU interaction library\n\n- OpenGL bindings\n\n- vulkan bindnigs\n\n- Accelerate — numerical GPU computation with an NVIDIA backend.\n\nWeb framework with database access, auth, users, routing, and templates:\n\n- IHP\n\n- Yesod"}, {"id": 50495460, "au": "cosmic_quanta", "dom": 43, "sr": 31, "sc": 3.0, "ep": 4.1, "bs": 0.0, "d": 2, "age": 4.67, "grav": 30.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 1514, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": [], "ig": 1.109, "fa": 0.34, "gp": 0.363, "bl": 0.0, "ds": 0.0, "txt": "What's the runtime performance of a lean program? I've ever used it.\n\nHaskell has had 36 years to get a really good runtime system (including software transactional memory, pure concurrency bliss) and an amazing optimizing compiler"}, {"id": 50488851, "au": "nilkn", "dom": 88, "sr": 32, "sc": 2.94, "ep": 4.04, "bs": 0.0, "d": 0, "age": 18.07, "grav": 221.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 71, "qw": 0, "k": 12069, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": [], "ig": 1.516, "fa": 0.0, "gp": 0.33, "bl": 0.0, "ds": 0.0, "txt": "It doesn't have enough marginal value add on top of competitors like Rust. There are other more significant synergies with coding agents that are getting attention instead, like autonomous formal verification. Languages like Lean enable an entirely new category of engineering, and Haskell just doesn't. So it's stuck in a difficult middle where it's too different to justify relative to its gains, but not different enough to capture the new opportunities emerging."}, {"id": 50489509, "au": "srcreigh", "dom": 30, "sr": 33, "sc": 2.8, "ep": 4.34, "bs": 0.0, "d": 1, "age": 17.16, "grav": 203.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 51, "qw": 0, "k": 2505, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": [], "ig": 1.33, "fa": 0.0, "gp": 0.837, "bl": 0.0, "ds": 0.0, "txt": "The ideal language is the one the agent knows how to use.\n\nI used prolog for a project and GPT 6.1 Sol repeatedly made dumb mistakes as if it doesn’t understand the symbolic resolution capabilities.\n\nFor vibe coded Haskell id not be surprised to see it just not use strict types, hucking strings around"}, {"id": 50488394, "au": "kccqzy", "dom": 26, "sr": 34, "sc": 2.73, "ep": 4.28, "bs": 0.0, "d": 1, "age": 18.76, "grav": 234.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 19940, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": [], "ig": 1.11, "fa": 0.0, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "The popularity or the lack thereof has nothing to do with AI. AI writes good Haskell code, certainly not worse than much more popular languages like Python.\n\nBut I just don’t think terseness matters much; most of the cost is spent on reasoning tokens, not the sheer volume of code output."}, {"id": 50496659, "au": "nyssos", "dom": 20, "sr": 35, "sc": 2.73, "ep": 3.61, "bs": 0.0, "d": 5, "age": 1.13, "grav": 7.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 113, "qw": 41, "k": 327, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_type", "flbl": "Code & Type (LLMS)", "urls": [], "ig": 1.029, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> My guess was only that when you try and get the agent to decide stuff like data types and type classes and how to structure the program it does a poor job and worse then if you did it in other languages.\n\nIt's about the same as for other languages, in my experience. LLMs are terrible at Haskell type design, but they're terrible at Rust type design too, terrible at deciding when and how to use Python classes, terrible at deciding when metaprogramming is appropriate, terrible at deciding what is well factored and what is not - great scripters, terrible lead engineers. The root causes seem to be things like bad domain modeling, judgement about which things matter and which things don't, prioritization, and so on, all of which produce bad designs in any language that will let you. The only really Haskell-specific defect I've noticed is an aversion to polymorphism and especially to HKTs."}, {"id": 50488531, "au": "rramadass", "dom": 60, "sr": 36, "sc": 2.7, "ep": 3.58, "bs": 0.0, "d": 2, "age": 18.57, "grav": 231.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 73, "qw": 0, "k": 6133, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "syntax_hard", "flbl": "Syntax & Hard (Beginner)", "urls": [], "ig": 1.523, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Great video! Thanks for the link.\n\nIt is important to clearly understand that Simon uses the word \"useless\" in the sense of having no side-effects on the external world i.e. if state changes are not reflected in the external world at some point then there is no practical purpose to it and hence \"useless\".\n\nFunctional languages solved this by using the type system at different levels to combine both effectful and effect-free computations cleanly."}, {"id": 50486026, "au": "KolmogorovComp", "dom": 80, "sr": 37, "sc": 2.66, "ep": 3.54, "bs": 0.0, "d": 0, "age": 21.41, "grav": 291.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 58, "qw": 0, "k": 2809, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": [], "ig": 1.13, "fa": 0.0, "gp": 0.612, "bl": 0.0, "ds": 0.0, "txt": "While I agree compile time is a big issue, I think the focus should really be on incremental build, because considering how much work the Haskell compiler has to do, it is expected to be quite slow on full build.\n\nBut incremental build has no reason to be slow, if the scope is as fine-grained as the function and type level."}, {"id": 50487028, "au": "ecshafer", "dom": 1, "sr": 38, "sc": 2.56, "ep": 4.1, "bs": 0.0, "d": 0, "age": 20.32, "grav": 267.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 92, "qw": 0, "k": 11044, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": [], "ig": 1.267, "fa": 0.0, "gp": 0.773, "bl": 0.0, "ds": 0.0, "txt": "I was thinking of Haskell recently, why isn't it more popular with AI? Haskell is very terse and token efficient, it has many expressive safety features. Rust is getting additional adoption because of its strictness, so hey why not have this in Rust over Javascript if it takes the same time to write?\n\nAn ideal language for agentic AI I would think is extremely strict, where the AI can iterate over the tooling for correctness. It would probably be less verbose and more terse to allow the AI to be more efficient with tokens."}, {"id": 50495537, "au": "alethic", "dom": 40, "sr": 39, "sc": 2.49, "ep": 4.03, "bs": 0.0, "d": 1, "age": 4.44, "grav": 28.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 80, "qw": 0, "k": 83, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": [], "ig": 1.257, "fa": 0.28, "gp": 0.192, "bl": 0.0, "ds": 0.0, "txt": "Because Lean 4 exists, which is a strictly (heh) better Haskell.\n\nIn seriousness, Lean is indeed a better Haskell (strict-by-default, performant data structures, BEAUTIFUL do-notation, full dependent types, etc), and you indeed do see a lot of slopped-out projects in it. However, certainly fewer than Rust, to be sure. I think the bitter truth of the matter is that additional static guarantees beyond what specifically Rust gives you -- type safety, interfaces, and linearity -- are simply not worth all that much in practical software applications."}, {"id": 50491831, "au": "GZGavinZhao", "dom": 42, "sr": 40, "sc": 2.44, "ep": 3.98, "bs": 0.0, "d": 1, "age": 14.26, "grav": 151.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 197, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": [], "ig": 1.267, "fa": 0.0, "gp": 0.692, "bl": 0.0, "ds": 0.0, "txt": "Is it really better than Lean though? I started learning programming in Haskell but gradually transitioned into Lean, both because it has almost everything Haskell has (minus laziness), great meta-programming support, and most importantly allows me to drop down into proofs / formal verification if needed."}, {"id": 50487401, "au": "dcss_gardener", "dom": 50, "sr": 41, "sc": 2.44, "ep": 3.98, "bs": 0.0, "d": 1, "age": 19.91, "grav": 259.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 110, "qw": 0, "k": 331, "kpp": 6.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": [], "ig": 1.17, "fa": 0.0, "gp": 0.847, "bl": 0.0, "ds": 0.0, "txt": "The ideal language for the AI has very short feedback loops with highly localized errors and minimal up front reasoning about types that itself provides a surface for flailing and errors. I'm not familiar enough with haskell to say for sure but I don't think this describes the language very well.\n\nThe ideal language for the engineer driving the agent has maximum comprehensibility, since review and understanding are the real bottlenecks now. I'm also pretty sure this doesn't describe haskell. It incompletely describes rust I think.\n\nIt does describe ocaml. And also gleam and maybe scala. And moonbit, developed by someone who is a proven expert in exactly this domain and explicitly targeting this problem space."}, {"id": 50488427, "au": "smitty1e", "dom": 117, "sr": 42, "sc": 2.43, "ep": 3.53, "bs": 0.0, "d": 0, "age": 18.71, "grav": 234.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 46, "k": 4790, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "syntax_hard", "flbl": "Syntax & Hard (Beginner)", "urls": [], "ig": 0.655, "fa": 0.42, "gp": 0.55, "bl": 0.0, "ds": 0.0, "txt": "> Beginners: the onboarding experience must be our benchmark for usability\n\nOK, so I put this into Gemini:\n\"show me a non-trivial haskell function and type signature with at least five distinct arguments\"\n\nAnd I get:\n\n---\n\nprocessRecord :: (a -> b) -> Maybe c -> [d] -> (e -> Bool) -> (b, c, [d], e) -> Either String (b, c, [d], e)\n\nprocessRecord transform mVal items pred (bVal, cVal, dList, eVal)\n\n  | pred eVal = Right (transform (const bVal undefined) mVal, cVal, dList, eVal) -- simplified example logic\n\n  | otherwise = Left \"Predicate failed on the fifth argument\"\n\n---\n\nMy brain just crashes after the \"::\".\n\nFor the beginner, there isn't enough syntax on offer to discern who's doing what to whom here.\n\nIs there a \"function signatures for dummys\" somewhere?"}, {"id": 50488438, "au": "jose_zap", "dom": 51, "sr": 43, "sc": 2.33, "ep": 3.44, "bs": 0.0, "d": 2, "age": 18.69, "grav": 233.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 596, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_type", "flbl": "Code & Type (LLMS)", "urls": [], "ig": 1.358, "fa": 0.0, "gp": 0.168, "bl": 0.0, "ds": 0.0, "txt": "Yet, \"short feedback loops with highly localized errors\" is exactly what Haskell is. You can start Haskell in interpreter mode (ghci) and you get instant feedback. Errors are always localized. Although my experience with claude in the last few months shows that it rarely hits a compilation error at all."}, {"id": 50487936, "au": "raddan", "dom": 73, "sr": 44, "sc": 2.31, "ep": 3.85, "bs": 0.0, "d": 4, "age": 19.3, "grav": 246.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 85, "qw": 0, "k": 1287, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": [], "ig": 1.429, "fa": 0.0, "gp": 0.341, "bl": 0.0, "ds": 0.0, "txt": "I can only speak from my own experience, but expressing a program as a composition of pure functions, where effects are carefully managed, is a challenging way of thinking at first.  The imperative approach really is simpler to wrap one's head around _until you start worrying about correctness_.  I think many developers never really care that deeply, so Haskell never appeals to them.  You really do have to take a mathematical approach to program construction.  I personally think that the mathematical perspective is liberating, but it's not an easy one to cultivate."}, {"id": 50489166, "au": "3836293648", "dom": 10, "sr": 45, "sc": 2.26, "ep": 3.81, "bs": 0.0, "d": 2, "age": 17.62, "grav": 212.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 65, "qw": 0, "k": 1094, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": [], "ig": 1.397, "fa": 0.0, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "Just reading chain of thought traces for Agda (I'm using Qwen 3.8-Flash-Next) and it's struggling so hard with just the syntax, long before it can struggle with semantics or type errors.\n\nAdmittedly I'm not much better, Agda has some crazy scoping rules at times and its operators are a mess, so much worse than Haskell, but at least I don't have to re-learn from scratch after every compaction."}, {"id": 50488446, "au": "kccqzy", "dom": 37, "sr": 46, "sc": 2.22, "ep": 3.32, "bs": 0.0, "d": 2, "age": 18.69, "grav": 233.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 58, "qw": 0, "k": 19940, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "library_care", "flbl": "Library & Care (Web)", "urls": [], "ig": 0.974, "fa": 0.0, "gp": 0.712, "bl": 0.0, "ds": 0.0, "txt": "People care a lot more about Rust-C++ interop because people expect to replace C++ with Rust. People don’t care as much about Haskell-C++ interop, so in the end people just rely on C ABI because it’s the lowest common denominator. If your low level library has a C interface, Haskell works very fine. Some people even prefer the OpenSSL C library over Haskell-native TLS."}, {"id": 50496848, "au": "itishappy", "dom": 109, "sr": 47, "sc": 2.2, "ep": 3.74, "bs": 0.0, "d": 4, "age": 0.62, "grav": 5.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 72, "qw": 0, "k": 5020, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": [], "ig": 1.59, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "This wasn't a hypothetical.\n\nI decided to go with GHC via nix-shell, which worked fine, but it's a different path than I went with installing Rust (global rustup), and I'm not sure how to evaluate the pros/cons of each. I miss having ghci invocable anywhere, but doubt that's a good reason to change.\n\nAlso, ghcup failing on my Rasberry Pi was a fun troubleshooting experience! I don't remember how I got around that one either, but they eventually fixed the issue."}, {"id": 50489787, "au": "flossly", "dom": 27, "sr": 48, "sc": 2.13, "ep": 3.67, "bs": 0.0, "d": 2, "age": 16.81, "grav": 196.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 105, "qw": 0, "k": 411, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": [], "ig": 1.563, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "One \"did not compile, fix error, try again\" loop takes so many tokens, that a well-trained-on lang like JS/Py/Bash/C easily outperforms a strict one.\n\nThe benefits of strict are still the same: once the code grows bigger you have alll kinds of guarantees built into the software, that JS/Py/Bash/C needs lots of test achieve the same.\n\nSince writing code is cheap, it like to go more on the tests and the strong typing, simply because it is so cheap. Why write Ruby/Py/JS when you can write Haskell/Kotlin/Rust? There's simply no reason not to be doing TDD these days."}, {"id": 50487346, "au": "petra", "dom": 61, "sr": 49, "sc": 2.1, "ep": 3.42, "bs": 0.0, "d": 1, "age": 19.96, "grav": 260.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 88, "qw": 0, "k": 3943, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "syntax_hard", "flbl": "Syntax & Hard (Beginner)", "urls": [], "ig": 1.367, "fa": 0.0, "gp": 0.144, "bl": 0.0, "ds": 0.0, "txt": "It's really hard to be the best at every platform, and at every problem area. Especially at the start. But once you have dominance in some niche, that may give you the power/possibility to dominate other niches.\n\nI think this article tries to figure out where can Haskell be the best.\n\nAs for a platform? If Haskell can offer the most secure, correct, and trusted web apps(the biggest platform), created with the help of LLM's, and they can use LLM's to make reading Haskell intuitive, that's a good place."}, {"id": 50493094, "au": "axman6", "dom": 81, "sr": 50, "sc": 2.08, "ep": 3.33, "bs": 0.0, "d": 1, "age": 11.55, "grav": 109.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 0, "k": 500, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": [], "ig": 1.224, "fa": 0.0, "gp": 0.312, "bl": 0.0, "ds": 0.0, "txt": "It’s one of the reasons Tweag built rules_haskell for building Haskell with Bazel (and IIRC Buck2 too). Simon Marlow has also been talking recently about his work to build Haskell with Buck2, which he has on a fork of cabal-install.\n\n(Disclaimer, I work at Tweag and recently did some work on the project)"}, {"id": 50495142, "au": "internet_points", "dom": 23, "sr": 51, "sc": 2.03, "ep": 3.57, "bs": 0.0, "d": 2, "age": 5.75, "grav": 39.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 86, "qw": 0, "k": 2339, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": [], "ig": 1.124, "fa": 0.28, "gp": 0.094, "bl": 0.0, "ds": 0.0, "txt": "My main takeaway from that post was that, apart from \"don't use assembly\", none of the experiments showed strong evidence either way, and the things that took time were when the agent got stuck doing silly things like invoking cargo with the wrong arguments. Ie. there's a lot of measurement noise, and not any strong signal, and \"LLMs are good at generating $PL\" isn't well-founded as an argument for picking $PL. So we're back to the old arguments for picking a language, like \"I find it readable/enjoyable\""}, {"id": 50486405, "au": "ourcat", "dom": 84, "sr": 52, "sc": 2.0, "ep": 3.1, "bs": 0.0, "d": 0, "age": 20.98, "grav": 282.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 759, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": [], "ig": 0.926, "fa": 0.0, "gp": 0.637, "bl": 0.0, "ds": 0.0, "txt": "I remember when Charles Hoskinson announced that smart contracts on his crypto platform Cardano / Plutus would use Haskell.\n\nIt just didn't get anything like the adoption that Solidity had at the time."}, {"id": 50487928, "au": "solomonb", "dom": 16, "sr": 53, "sc": 1.88, "ep": 3.42, "bs": 0.0, "d": 1, "age": 19.31, "grav": 246.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 1308, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "syntax_hard", "flbl": "Syntax & Hard (Beginner)", "urls": [], "ig": 0.744, "fa": 0.0, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "I write Haskell every day, both for work and in my free time. Without commenting on the general quality of LLM generated code, my experience is that Haskell is at least as good as any other language for LLM code gen."}, {"id": 50492297, "au": "danpalmer", "dom": 41, "sr": 54, "sc": 1.86, "ep": 3.4, "bs": 0.0, "d": 1, "age": 13.24, "grav": 134.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 141, "qw": 7, "k": 24967, "kpp": 4.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": [], "ig": 0.564, "fa": 0.42, "gp": 0.602, "bl": 0.0, "ds": 0.0, "txt": "> Haskell is very terse and token efficient\n\nI'm not certain this is the case. I find AI better at producing code in languages where there are fewer abstractions. It's great at writing Go, because everything is there on the page in text/tokens, and I find it less good at writing (good) Swift, because there are lots more abstractions for it to reason about, which are not written in text/tokens on the page.\n\nThis is part of why I think LLMs producing dense and unpleasant to read text is linked to their ability, it's no coincidence that people have this criticism of all of the independently developed frontier models.\n\nWe can train around this, the frontier models are getting better at it, but it's a good reminder that LLMs are just text calculators at some level, and do much better when the concepts are in text rather than abstractions in our minds."}, {"id": 50494576, "au": "cowlevel", "dom": 24, "sr": 55, "sc": 1.85, "ep": 3.39, "bs": 0.0, "d": 1, "age": 7.56, "grav": 58.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": [], "ig": 0.834, "fa": 0.0, "gp": 0.986, "bl": 0.0, "ds": 0.0, "txt": "LLMs predict next tokens following their training data. Following \"so i wrote this little program in\", \"Haskell\" is not a likely prediction."}, {"id": 50493221, "au": "axman6", "dom": 104, "sr": 56, "sc": 1.85, "ep": 3.38, "bs": 0.0, "d": 4, "age": 11.29, "grav": 105.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 47, "qw": 0, "k": 500, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": [], "ig": 1.097, "fa": 0.28, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I’ve been using Haskell for about eighteen years and can’t think of a single example of anything that was only available via nix, other than Obsidian System’s stuff that used WASM back when building for that as a target was _complicated_ and having a reproducible environment was kind of a necessity."}, {"id": 50490142, "au": "the_af", "dom": 123, "sr": 57, "sc": 1.85, "ep": 3.35, "bs": 0.0, "d": 1, "age": 16.47, "grav": 190.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 90, "qw": 0, "k": 15263, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "syntax_hard", "flbl": "Syntax & Hard (Beginner)", "urls": [], "ig": 1.364, "fa": 0.0, "gp": 0.103, "bl": 0.0, "ds": 0.0, "txt": "If you read the most introductory guide of Haskell, or ask your LLM to explain, you'll find there's nothing mystifying about the syntax you quoted. You're just unfamiliar with it because you didn't do the bare minimum effort.\n\nIf I ask my grandma what she thinks of the supposedly easy Python syntax, or C-style curly braces, her brain would similarly crash. Unless she read an intro to Python or C first.\n\nIn other words, do not confuse \"I'm unfamiliar with this because it doesn't resemble what I know\" with \"hard to understand\"."}, {"id": 50492961, "au": "the_af", "dom": 125, "sr": 58, "sc": 1.85, "ep": 3.32, "bs": 0.0, "d": 3, "age": 11.78, "grav": 112.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 100, "qw": 0, "k": 15263, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "syntax_hard", "flbl": "Syntax & Hard (Beginner)", "urls": [], "ig": 1.413, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I'm not part of the Haskell community. I dabbled for a while, years ago. I would have given the same answer for, say, someone complaining they cannot understand lisp syntax without first trying reading an intro article about it. \"All those parentheses, what do they even mean?\".\n\nThere's valid feedback in the form \"after reading the free Learn You A Haskell or some chapters from Real World Haskell, I cannot figure out how to write a useful program\", and then there's \"I asked ChatGPT to write some code and I cannot figure out the basic syntax elements because I couldn't be bothered to read anything about the programming language first\"."}, {"id": 50486001, "au": "pbrowne011", "dom": 57, "sr": 59, "sc": 1.85, "ep": 6.6, "bs": 3.58, "d": 1, "age": 21.44, "grav": 292.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": -1, "lu": 1, "w": 94, "qw": 13, "k": 520, "kpp": 5.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "syntax_hard", "flbl": "Syntax & Hard (Beginner)", "urls": ["https://youtu.be/iSmkqocn0oQ"], "ig": 1.549, "fa": 0.42, "gp": 1.218, "bl": 1.35, "ds": 0.0, "txt": "> There is this memo video of S. P. Jones that famously says \"Haskell is Useless\".\n\nI think that is an unfair characterization of the video and the intent of Haskell's co-creator, based on the rest of your comment. Simon Peyton Jones makes a graph with two dimensions, useful/useless and safe/unsafe. The question he gets at is: how can one distinguish between effectful and effect-free computations in a programming language? He proceeds to characterize most useful languages as unsafe, and Haskell as useless but safe. He then spends the majority of the video talking about how useful languages are becoming safer, and at the same time how Haskell must become useful.\n\nhttps://youtu.be/iSmkqocn0oQ"}, {"id": 50487888, "au": "win311fwg", "dom": 53, "sr": 60, "sc": 1.85, "ep": 2.65, "bs": 0.0, "d": 1, "age": 19.36, "grav": 247.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 54, "qw": 9, "k": 186, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": [], "ig": 0.538, "fa": 0.42, "gp": 0.128, "bl": 0.0, "ds": 0.0, "txt": "> Rust is getting additional adoption because of its strictness\n\nThat's doubtful. It's not strict in any way that matters, especially when LLMs are writing it. You still have to rely on tests for everything. The languages that are strict are still largely ignored.\n\nIt is seeing adoption because of a well executed advertising campaign combined with \"C++ without the dependency hell\" being a real value proposition."}, {"id": 50487500, "au": "petra", "dom": 105, "sr": 61, "sc": 1.85, "ep": 2.64, "bs": 0.0, "d": 4, "age": 19.8, "grav": 256.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 3943, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": [], "ig": 1.123, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "If you want to create an ecosystem optimized towards correctness, you'll have to   curate what you let inside, and drop many things. And Nix is probably the best package manager for correctness.\n\nThat of course hurts market share."}, {"id": 50495964, "au": "icrbow", "dom": 92, "sr": 62, "sc": 1.85, "ep": 2.6, "bs": 0.0, "d": 2, "age": 3.17, "grav": 19.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 41, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": [], "ig": 1.106, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "And this in turn invalidates some of the \"but certainly Rust has more code in the corpus than Haskell\" claims. Sure, by the cloc, perhaps. But when agents dive into Haskell they feel right at home conceptually, because the concepts reverberated throughout CS domain."}, {"id": 50495799, "au": "icrbow", "dom": 39, "sr": 63, "sc": 1.85, "ep": 2.5, "bs": 0.0, "d": 2, "age": 3.66, "grav": 22.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 41, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": [], "ig": 1.065, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It totally can wrap c and c++ and whatnot. The hard part is done only once, then it is incremental maintenance that's mechanical. Some are even scripted. Huge API surfaces like Vulkan and AWS were bound and used that way."}, {"id": 50491974, "au": "time4tea", "dom": 83, "sr": 64, "sc": 1.85, "ep": 2.47, "bs": 0.0, "d": 0, "age": 14.0, "grav": 147.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 615, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": [], "ig": 0.966, "fa": 0.0, "gp": 0.136, "bl": 0.0, "ds": 0.0, "txt": "Ok, so shoot me down...\n\nThe jvm world has achieved a few of these goals, and is in some ways an exemplar for these lofty goals.\n\nLong term api stability, innovation, mapping hardware to software etc etc ."}, {"id": 50491049, "au": "mncharity", "dom": 3, "sr": 65, "sc": 1.85, "ep": 2.46, "bs": 0.0, "d": 2, "age": 15.48, "grav": 172.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 5, "k": 3510, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_type", "flbl": "Code & Type (LLMS)", "urls": [], "ig": 0.539, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> do a Haskell version first [...] port\n\nAs lower-hanging fruit, to get some style steering, but not the strictness/correctness assist in implementation, there's also doing code sketches in hs - writing without testing - and then asking for whatever code as inspired by / in the spirit of / based on the reference sketch."}, {"id": 50497075, "au": "kodoman", "dom": 21, "sr": 66, "sc": 1.85, "ep": 2.45, "bs": 0.0, "d": 6, "age": 0.1, "grav": 3.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 116, "qw": 0, "k": 178, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": [], "ig": 1.041, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Yes agree it's not a good architect (and thankful as it puts a ceiling of crappy vibe coded apps and what vibe coders can do). But in languages like go-lang and python it's easier for you to just hand off something you want made to an llm and come back and possibly maintain and fix it in the future or modify it.\n\nI have found go-lang fantastic for this, and although I would not do this for an important thing, for writing little tools that are a little beyond what would usually be a script and you want to maintain, it's great. I did this for a tool to insert data from stripe into a db for my service and it was a one shot thing."}, {"id": 50493129, "au": "axman6", "dom": 89, "sr": 67, "sc": 1.85, "ep": 2.31, "bs": 0.0, "d": 1, "age": 11.48, "grav": 108.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 67, "qw": 0, "k": 500, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "syntax_hard", "flbl": "Syntax & Hard (Beginner)", "urls": [], "ig": 0.981, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "As a Haskell developer who wants to like Rust, I just find it to incredibly verbose and noisy. It’s really hard to see the program through the code, all the types are messy, there’s so many things that feel like they should be abstracted so you can see the business logic, but there’s all these `if … .unwrap()`, and other guff I can’t remember that makes it really unpalatable to me."}, {"id": 50488163, "au": "mhitza", "dom": 86, "sr": 68, "sc": 1.85, "ep": 2.26, "bs": 0.0, "d": 1, "age": 19.04, "grav": 240.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 3655, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "syntax_hard", "flbl": "Syntax & Hard (Beginner)", "urls": [], "ig": 0.963, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I don't know what it takes to write (or wire up) a smart contracts language, but when I, as someone past beginner level, looked up the Cardano docs on how to build contracts I was mega confused and had no clear way how to get started."}, {"id": 50493317, "au": "smitty1e", "dom": 126, "sr": 69, "sc": 1.85, "ep": 2.18, "bs": 0.0, "d": 4, "age": 11.05, "grav": 101.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 4790, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "syntax_hard", "flbl": "Syntax & Hard (Beginner)", "urls": [], "ig": 0.926, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I actually own Paul Hudak's Haskell School of Expression and a couple other dead tree books.\n\nThe means of getting over the hump with this syntax just has not been found."}, {"id": 50493167, "au": "axman6", "dom": 87, "sr": 70, "sc": 1.85, "ep": 2.15, "bs": 0.0, "d": 2, "age": 11.4, "grav": 106.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 62, "qw": 0, "k": 500, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": [], "ig": 0.914, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Cardano contracts are _strange_, because they don’t describe what you want to happen, they check if what’s happening in a transaction is allowed — all contracts are a function `Transaction -> Bool` — and most people want to describe the actions. There are plenty of ways to write Cardano contracts in several languages, but I do agree it’s not clear how you go from idea to on chain."}, {"id": 50485590, "au": "wasted_intel", "dom": 110, "sr": 71, "sc": 1.85, "ep": 2.13, "bs": 0.0, "d": 3, "age": 21.92, "grav": 303.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 283, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": [], "ig": 0.699, "fa": 0.0, "gp": 0.336, "bl": 0.0, "ds": 0.0, "txt": "To be fair, that’s a general problem on NixOS (and other OSes), and one that tools like devenv have tried to solve. You can take what’s included with OS packages, but then you’re stuck with whatever version that is."}, {"id": 50489876, "au": "flossly", "dom": 90, "sr": 72, "sc": 1.85, "ep": 2.12, "bs": 0.0, "d": 0, "age": 16.73, "grav": 195.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 411, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": [], "ig": 0.783, "fa": 0.0, "gp": 0.197, "bl": 0.0, "ds": 0.0, "txt": "Just like Ruby was IMHO a \"simple\" lang carved out of Perl;\nElm is a \"simple\" lang carved out of Haskell.\n\nSome languages are here merely to inspire others.\n\nNot that Elm is such a success... But it is \"simple\" (Haskell and Perl are not; they big)."}, {"id": 50493646, "au": "kodoman", "dom": 17, "sr": 73, "sc": 1.85, "ep": 2.1, "bs": 0.0, "d": 2, "age": 10.28, "grav": 91.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 95, "qw": 0, "k": 178, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_type", "flbl": "Code & Type (LLMS)", "urls": [], "ig": 0.892, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I have not generated haskell code yet and did some haskell a while ago (before LLMs) and liked it a lot but I would imagine you are prompting the LLM like an engineer so to say and making sure you know the data types and everything before hand and probably tending to write type signatures and asking the LLM to complete it. I would imagine if you vibe code and ask it to write things without thinking that sort of thing though it might produce very bad code, but not sure, would like to know you experience on that matter."}, {"id": 50495205, "au": "internet_points", "dom": 82, "sr": 74, "sc": 1.85, "ep": 2.06, "bs": 0.0, "d": 1, "age": 5.54, "grav": 37.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 2339, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "library_care", "flbl": "Library & Care (Web)", "urls": [], "ig": 0.878, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I find initial build to be the most annoying, since it stops me from starting new projects in Haskell. It's also very annoying when setting up CI or switching machines or introducing new team members."}, {"id": 50490053, "au": "calebkaiser", "dom": 15, "sr": 75, "sc": 1.85, "ep": 2.06, "bs": 0.0, "d": 3, "age": 16.56, "grav": 192.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 1151, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": [], "ig": 0.875, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Yeah I know this pain. I actually have had some success by giving the agent a style guide for Lean that is strictly not conventional. The nice syntactic shortcuts and different modes that make Lean more ergonomic for humans, in my experience, actually make it easier for an agent to trip itself up."}, {"id": 50495518, "au": "3836293648", "dom": 13, "sr": 76, "sc": 1.85, "ep": 1.98, "bs": 0.0, "d": 4, "age": 4.48, "grav": 28.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 147, "qw": 0, "k": 1094, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "syntax_hard", "flbl": "Syntax & Hard (Beginner)", "urls": [], "ig": 0.841, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It's a cool hack. It's also a catastrophe for actual usage. State-of-the-art doesn't mean good, it just means new, shiny and complex. Not being able to do syntax highlighting without a full typechecking pass is a usability nightmare.\n\nAnyway, that's not the part I the human struggle with, it's remembering what level of infix each new custom operator has. Why λ() isn't equivalent with λ{}, if `a b , c` is `(a b) , c` or `a (b , c)` with this version of comma (Though now I've given up on the others and just use Σ a (λ _ -> b) for all kinds of tuples just to make it consistent). Why implicits won't unify as I expect them to. Why with just doesn't work in a reasonable fashion at all ever beyond the most basic two cases (no nesting and only nest in the final case). Literally copy pasting from the docs doesn't parse.\n\nCool trick, but in practice it was a mistake and Haskell's take on custom operators was far enough."}, {"id": 50487478, "au": "treyd", "dom": 85, "sr": 77, "sc": 1.85, "ep": 1.96, "bs": 0.0, "d": 1, "age": 19.82, "grav": 257.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 45, "qw": 0, "k": 2887, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": [], "ig": 0.834, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "That's not the reason Cardano failed though.  All the capital had already established itself on other platforms and \"it uses a better language\" wasn't enough of an incentive to switch.  It's an overwhelmingly common story in that ecosystem, even with other networks that Solidity can target."}, {"id": 50489085, "au": "_doctor_love", "dom": 54, "sr": 78, "sc": 1.84, "ep": 1.84, "bs": 0.0, "d": 1, "age": 17.73, "grav": 214.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 1149, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_type", "flbl": "Code & Type (LLMS)", "urls": [], "ig": 0.785, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The most interesting idea in this space I have heard is to have LLMs generate formally verified assembly. And then from that assembly generate higher levels projections in languages like Haskell to help the human understanding."}, {"id": 50495870, "au": "bmacho", "dom": 108, "sr": 79, "sc": 1.82, "ep": 1.82, "bs": 0.0, "d": 3, "age": 3.45, "grav": 21.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 2426, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": [], "ig": 0.762, "fa": 0.0, "gp": 0.019, "bl": 0.0, "ds": 0.0, "txt": "There is no such problem with Haskell! You either use your distro version of GHC or you use ghcup for the latest GHC.\n\nEvery other language does/must do the same since Ubuntu/Debian have 2+ years old packages."}, {"id": 50491274, "au": "seizethecheese", "dom": 31, "sr": 80, "sc": 1.79, "ep": 3.78, "bs": 1.99, "d": 2, "age": 15.19, "grav": 167.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 34, "qw": 0, "k": 4606, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": ["https://micjm.com/blog/gpt-6.1-sol-long-tail-languages/"], "ig": 0.503, "fa": 0.62, "gp": 0.572, "bl": 0.75, "ds": 0.0, "txt": "We happen to have data on GPT 6.1 Sol and programming languages used, so I looked into this.\n\nLooks like the claim is true that Sol sucks at the long tail of languages (vs. battle opponents). https://micjm.com/blog/gpt-6.1-sol-long-tail-languages/"}, {"id": 50492881, "au": "hexasquid", "dom": 116, "sr": 81, "sc": 1.79, "ep": 1.79, "bs": 0.0, "d": 0, "age": 11.97, "grav": 115.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 400, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "syntax_hard", "flbl": "Syntax & Hard (Beginner)", "urls": [], "ig": 0.73, "fa": 0.0, "gp": 0.05, "bl": 0.0, "ds": 0.0, "txt": "Haskell community \"we're going to be more beginner friendly than ever\"\n\nBeginners \"I'm confused\"\n\nHaskell community \"well that's certainly your fault, this isn't hard\""}, {"id": 50496741, "au": "amelius", "dom": 5, "sr": 82, "sc": 1.77, "ep": 1.77, "bs": 0.0, "d": 3, "age": 0.93, "grav": 6.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 52467, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": [], "ig": 0.752, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Yes, this is why I believe LLMs will (finally) allow us all to make the move to purely functional languages."}, {"id": 50496429, "au": "Hendrikto", "dom": 28, "sr": 83, "sc": 1.74, "ep": 1.74, "bs": 0.0, "d": 1, "age": 1.82, "grav": 11.2, "surf": 23.6, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 4238, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "syntax_hard", "flbl": "Syntax & Hard (Beginner)", "urls": [], "ig": 0.537, "fa": 0.0, "gp": 0.326, "bl": 0.0, "ds": 0.0, "txt": "Haskell just feels too much like the academic experiment it is. And you really get the feeling that this is what most of the community and leadership want it to be."}, {"id": 50492385, "au": "epgui", "dom": 74, "sr": 84, "sc": 1.42, "ep": 1.42, "bs": 0.0, "d": 5, "age": 13.05, "grav": 131.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 5008, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "syntax_hard", "flbl": "Syntax & Hard (Beginner)", "urls": [], "ig": 0.605, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I wouldn’t call imperative programming simpler. I’d say it’s more familiar to most people, because it’s the first thing they learn, and it’s hard to unlearn things."}, {"id": 50493063, "au": "axman6", "dom": 78, "sr": 85, "sc": 1.4, "ep": 1.4, "bs": 0.0, "d": 1, "age": 11.6, "grav": 109.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 500, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.595, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Yeah the availability of Haskell tooling has improved so much in the past five or so years."}, {"id": 50492374, "au": "epgui", "dom": 75, "sr": 86, "sc": 1.31, "ep": 2.16, "bs": 0.85, "d": 4, "age": 13.07, "grav": 132.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 5008, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "syntax_hard", "flbl": "Syntax & Hard (Beginner)", "urls": [], "ig": 0.82, "fa": 0.0, "gp": 0.161, "bl": 0.32, "ds": 0.0, "txt": "I mean, everyone who learns programming learns a fortran/C family language.\n\nSo Haskell is asking of them that they unlearn most of the things they’ve learned. It’s unfamiliar, and people react in a hostile way.\n\nIn reality, objectively speaking, it’s a very fine language to work with."}, {"id": 50497115, "au": "mrkeen", "dom": 130, "sr": 87, "sc": 1.23, "ep": 1.23, "bs": 0.0, "d": 4, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 5984, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "syntax_hard", "flbl": "Syntax & Hard (Beginner)", "urls": [], "ig": 0.521, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "And you're getting specific feedback to your specific feedback.\n\nJust post the language that makes your example code look acceptable."}, {"id": 50495281, "au": "mietek", "dom": 12, "sr": 88, "sc": 1.06, "ep": 1.06, "bs": 0.0, "d": 3, "age": 5.28, "grav": 35.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 2273, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": [], "ig": 0.451, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "No, Agda's mixfix operators and general syntactic malleability is state-of-the-art in programming language design.  Try learning how to write it yourself, before relying on LLM to write it for you."}, {"id": 50492309, "au": "faangguyindia", "dom": 48, "sr": 89, "sc": 0.82, "ep": 2.01, "bs": 1.19, "d": 1, "age": 13.21, "grav": 134.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 955, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": [], "ig": 0.446, "fa": 0.0, "gp": 0.666, "bl": 0.45, "ds": 0.0, "txt": "If you are developing on mac and deploying to linux, Haskell is pain.\n\nI had to switch to Rust for this reason otherwise Haskell was decent for my project"}, {"id": 50488654, "au": "jose_zap", "dom": 114, "sr": 90, "sc": 0.28, "ep": 1.47, "bs": 1.19, "d": 1, "age": 18.41, "grav": 227.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 596, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "library_care", "flbl": "Library & Care (Web)", "urls": [], "ig": 0.477, "fa": 0.0, "gp": 0.244, "bl": 0.45, "ds": 0.0, "txt": "It is definitely possible for incremental compilation, but requires more work in that area. It is possible today in interpreter mode."}, {"id": 50495732, "au": "icrbow", "dom": 11, "sr": 91, "sc": 0.16, "ep": 1.35, "bs": 1.19, "d": 3, "age": 3.83, "grav": 23.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 41, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "library_care", "flbl": "Library & Care (Web)", "urls": [], "ig": 0.524, "fa": 0.0, "gp": 0.082, "bl": 0.45, "ds": 0.0, "txt": "Opus 5.5 has no problem with Haskell in any domain whatsoever, including mixing it up with FFI and eDSLs. You call it, it does it."}, {"id": 50487105, "au": "txdv", "dom": 68, "sr": 92, "sc": 0.09, "ep": 1.29, "bs": 1.19, "d": 1, "age": 20.23, "grav": 265.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 536, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_type", "flbl": "Code & Type (LLMS)", "urls": [], "ig": 0.455, "fa": 0.0, "gp": 0.149, "bl": 0.45, "ds": 0.0, "txt": "whats holding you back? buy claude pro and make it reality, hell im gonna give it try because your comment offends me"}, {"id": 50486707, "au": "chriswarbo", "dom": 66, "sr": 93, "sc": 0.04, "ep": 1.23, "bs": 1.19, "d": 2, "age": 20.62, "grav": 274.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 7964, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "library_care", "flbl": "Library & Care (Web)", "urls": [], "ig": 0.446, "fa": 0.0, "gp": 0.128, "bl": 0.45, "ds": 0.0, "txt": "Pretty sure those all exist; e.g. at work we use Yesod and Servant, which are a couple of Haskell web frameworks."}, {"id": 50486169, "au": "jimbokun", "dom": 113, "sr": 94, "sc": -0.03, "ep": 1.16, "bs": 1.19, "d": 0, "age": 21.24, "grav": 288.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 22073, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": [], "ig": 0.329, "fa": 0.0, "gp": 0.266, "bl": 0.45, "ds": 0.0, "txt": "Is it even possible for Haskell to have compilation times similar to Go, given the language semantics?"}, {"id": 50486664, "au": "odyssey7", "dom": 96, "sr": 95, "sc": -0.05, "ep": 1.14, "bs": 1.19, "d": 0, "age": 20.68, "grav": 275.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 1859, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_type", "flbl": "Code & Type (LLMS)", "urls": [], "ig": 0.32, "fa": 0.0, "gp": 0.271, "bl": 0.45, "ds": 0.0, "txt": "They’re pitching a tall order. First they will need to convince the masses that code should be understood."}, {"id": 50495805, "au": "icrbow", "dom": 45, "sr": 96, "sc": -0.15, "ep": 1.04, "bs": 1.19, "d": 2, "age": 3.64, "grav": 22.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 41, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": [], "ig": 0.443, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Better than Lean for what? It certainly has more ready to use packages in a bunch of domains."}, {"id": 50494664, "au": "pimeys", "dom": 33, "sr": 97, "sc": -0.15, "ep": 1.04, "bs": 1.19, "d": 2, "age": 7.24, "grav": 54.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 7139, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": [], "ig": 0.3, "fa": 0.0, "gp": 0.23, "bl": 0.45, "ds": 0.0, "txt": "Pretty much like with Rust it passes Value or String more often than using a struct for JSON data..."}, {"id": 50495779, "au": "icrbow", "dom": 34, "sr": 98, "sc": -0.16, "ep": 1.03, "bs": 1.19, "d": 2, "age": 3.72, "grav": 23.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 41, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_type", "flbl": "Code & Type (LLMS)", "urls": [], "ig": 0.438, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "You can totally demand doing most of the domain modelling in types before messing around with implementation details.\n\nPlan.hs > plan.md"}, {"id": 50490021, "au": "Buttons840", "dom": 106, "sr": 99, "sc": -0.21, "ep": 0.98, "bs": 1.19, "d": 5, "age": 16.6, "grav": 192.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 14851, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "library_care", "flbl": "Library & Care (Web)", "urls": [], "ig": 0.417, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "There is no correct, only pros and cons. How you weight the pros and cons will not be the same as everyone else."}, {"id": 50493669, "au": "the_af", "dom": 127, "sr": 100, "sc": -0.24, "ep": 0.95, "bs": 1.19, "d": 5, "age": 10.24, "grav": 90.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 15263, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "syntax_hard", "flbl": "Syntax & Hard (Beginner)", "urls": [], "ig": 0.403, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "So were you just faking that you didn't understand Haskell syntax or that you didn't know there are gentle introductions to it?\n\nSeems dishonest."}, {"id": 50490136, "au": "jimbokun", "dom": 4, "sr": 101, "sc": -0.66, "ep": 0.54, "bs": 1.19, "d": 2, "age": 16.48, "grav": 190.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 22073, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_type", "flbl": "Code & Type (LLMS)", "urls": [], "ig": 0.228, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "With LLMs that’s not a terrible approach.  They are generally very good at translating between programming languages."}, {"id": 50493653, "au": "whateveracct", "dom": 112, "sr": 102, "sc": -0.74, "ep": 0.45, "bs": 1.19, "d": 3, "age": 10.26, "grav": 91.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 6715, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": [], "ig": 0.192, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "if you're on NixOS, why don't you know how to install stuff? seems like you somehow don't know Nix??"}, {"id": 50495462, "au": "cosmic_quanta", "dom": 49, "sr": 103, "sc": -0.78, "ep": 0.41, "bs": 1.19, "d": 2, "age": 4.66, "grav": 30.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 1514, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": [], "ig": 0.176, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "We do this at work and it seems no more painful to deploy from Mac than deploying from Linux"}, {"id": 50486104, "au": "epgui", "dom": 62, "sr": 104, "sc": -1.26, "ep": 1.78, "bs": 3.05, "d": 1, "age": 21.32, "grav": 289.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 12, "k": 5008, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "library_care", "flbl": "Library & Care (Web)", "urls": [], "ig": 0.247, "fa": 0.34, "gp": 0.161, "bl": 1.15, "ds": 0.0, "txt": "> It could be used to create apps for desktop, mobile, and web\n\nHaskell can 100% be used to create all of these kinds of apps."}, {"id": 50492858, "au": "hexasquid", "dom": 124, "sr": 105, "sc": -1.74, "ep": 1.3, "bs": 3.05, "d": 2, "age": 12.03, "grav": 116.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 400, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "syntax_hard", "flbl": "Syntax & Hard (Beginner)", "urls": [], "ig": 0.555, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "This is a great example of how the haskell community takes feedback.\nPerhaps I'll get a response to this like \"well actually you're wrong\""}, {"id": 50496752, "au": "nyssos", "dom": 44, "sr": 106, "sc": -1.94, "ep": 1.1, "bs": 3.05, "d": 3, "age": 0.88, "grav": 6.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 327, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.469, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Good enough to be usable, still several times slower than Haskell."}, {"id": 50489309, "au": "klntsky", "dom": 55, "sr": 107, "sc": -2.26, "ep": 0.78, "bs": 3.05, "d": 2, "age": 17.44, "grav": 208.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 778, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "code_type", "flbl": "Code & Type (LLMS)", "urls": [], "ig": 0.333, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "It's not going to work. Formally verified assembly needs a low level spec which is comparable in length to the assembly code, so not really comprehensible.\n\n\"higher level projections\" - wtf is this even about?"}, {"id": 50496082, "au": "thatsabadlook", "dom": 52, "sr": 108, "sc": -2.55, "ep": 1.69, "bs": 4.24, "d": 1, "age": 2.76, "grav": 16.6, "surf": 14.9, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 283, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": [], "ig": 0.717, "fa": 0.0, "gp": 0.003, "bl": 1.6, "ds": 0.0, "txt": "That's when you know a company wants to irreversibly go full vibe code. Turn their entire stack into LLM generated haskell. No one will ever read it again the end."}, {"id": 50494812, "au": "polarsanel", "dom": 121, "sr": 109, "sc": -2.95, "ep": 0.76, "bs": 3.71, "d": 1, "age": 6.75, "grav": 49.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 36, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "code_type", "flbl": "Code & Type (LLMS)", "urls": [], "ig": 0.311, "fa": 0.0, "gp": 0.022, "bl": 1.4, "ds": 0.0, "txt": "You don't need to make everything anonymous. Types can be given names. This would be similarly definable and confusing in C\u0023"}, {"id": 50485508, "au": "itishappy", "dom": 101, "sr": 110, "sc": -3.01, "ep": 1.23, "bs": 4.24, "d": 2, "age": 22.01, "grav": 305.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 5020, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": [], "ig": 0.189, "fa": 0.0, "gp": 0.54, "bl": 1.6, "ds": 0.0, "txt": "That's the problem!\n\nIf I'm on NixOS, should I be installing via ghcup, stack, or nix?"}, {"id": 50493659, "au": "whateveracct", "dom": 115, "sr": 111, "sc": -3.16, "ep": 1.08, "bs": 4.24, "d": 1, "age": 10.25, "grav": 90.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 6715, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "code_type", "flbl": "Code & Type (LLMS)", "urls": [], "ig": 0.459, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "the interpreter is faster than Go when reloading comparable stuff"}, {"id": 50492391, "au": "epgui", "dom": 64, "sr": 112, "sc": -3.17, "ep": 1.07, "bs": 4.24, "d": 3, "age": 13.03, "grav": 131.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 5008, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.189, "fa": 0.22, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "It’s unclear to me why that would particularly be the case with Haskell."}, {"id": 50484978, "au": "origini", "dom": 99, "sr": 113, "sc": -3.2, "ep": 1.04, "bs": 4.24, "d": 0, "age": 22.57, "grav": 318.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 214, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.254, "fa": 0.0, "gp": 0.308, "bl": 1.6, "ds": 0.0, "txt": "Sooo they are fixing how you install Haskell? :D"}, {"id": 50486383, "au": "gavmor", "dom": 72, "sr": 114, "sc": -3.36, "ep": 0.88, "bs": 4.24, "d": 3, "age": 21.01, "grav": 282.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 1009, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.153, "fa": 0.0, "gp": 0.36, "bl": 1.6, "ds": 0.0, "txt": "I thought so. What's the reason for the PR problem, then?"}, {"id": 50496991, "au": "smitty1e", "dom": 132, "sr": 115, "sc": -3.43, "ep": 0.81, "bs": 4.24, "d": 2, "age": 0.33, "grav": 4.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 4790, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "syntax_hard", "flbl": "Syntax & Hard (Beginner)", "urls": [], "ig": 0.346, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Thank you. A welcome respite from the \"tough love\" elsewhere in the thread."}, {"id": 50497023, "au": "N_Lens", "dom": 25, "sr": 116, "sc": -3.54, "ep": 0.7, "bs": 4.24, "d": 2, "age": 0.25, "grav": 4.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 1765, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.297, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "At this stage, people who parrot “next token prediction” appear the most predictable of all!"}, {"id": 50488920, "au": "nurumaik", "dom": 133, "sr": 117, "sc": -3.59, "ep": 0.65, "bs": 4.24, "d": 1, "age": 17.98, "grav": 219.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 481, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": [], "ig": 0.278, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "-- Show me a non-trivial function\n\n-- Here you go\n\n-- Oh my god, it's non-trivial"}, {"id": 50495090, "au": "solomonb", "dom": 18, "sr": 118, "sc": -3.62, "ep": 1.55, "bs": 5.17, "d": 3, "age": 5.89, "grav": 41.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 119, "qw": 0, "k": 1308, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "code_type", "flbl": "Code & Type (LLMS)", "urls": ["https://github.com/solomon-b/monoidal-functors/blob/main/src/Data/Functor/Monoidal/Generic.hs"], "ig": 0.66, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "I don't know how to answer this. I find that the quality of claude's output in any language is highly dependent on your skill at prompting it and what context you can provide. Sometimes I might give it type signatures and heavily micromanage it but other times not. I almost always ask claude to develop a plan and architecture which I review before having it produce code.\n\nHere is an example where I literally just told claude I wanted generic instances for these type classes and we had a brief back and forth about the approach then it one shotted this entire module: \nhttps://github.com/solomon-b/monoidal-functors/blob/main/src...\n\nI would say this code is indistinguishable from generics code written by a human. However, this type of code has a tendency to only be writable one way."}, {"id": 50493285, "au": "smitty1e", "dom": 129, "sr": 119, "sc": -3.76, "ep": 0.48, "bs": 4.24, "d": 3, "age": 11.1, "grav": 102.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 4790, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "syntax_hard", "flbl": "Syntax & Hard (Beginner)", "urls": [], "ig": 0.204, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "I quoted TFA with specific feedback and get modded to -2.\n\nI'm not bitter."}, {"id": 50490007, "au": "classified", "dom": 97, "sr": 120, "sc": -3.8, "ep": 0.44, "bs": 4.24, "d": 1, "age": 16.61, "grav": 192.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 1312, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.188, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "That seems like a losing proposition in these times."}, {"id": 50485322, "au": "rafaelRiv", "dom": 100, "sr": 121, "sc": -3.86, "ep": 0.38, "bs": 4.24, "d": 1, "age": 22.19, "grav": 309.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 35, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": [], "ig": 0.161, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "How this was ever a problem ? and today we have ghcup, stack and nix"}, {"id": 50489837, "au": "flossly", "dom": 63, "sr": 122, "sc": -3.99, "ep": 0.25, "bs": 4.24, "d": 2, "age": 16.77, "grav": 196.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 411, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "library_care", "flbl": "Library & Care (Web)", "urls": [], "ig": 0.106, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "But expect to be in pain when not web."}, {"id": 50493623, "au": "petra", "dom": 107, "sr": 123, "sc": -4.04, "ep": 1.05, "bs": 5.09, "d": 6, "age": 10.33, "grav": 92.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 3943, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "code_type", "flbl": "Code & Type (LLMS)", "urls": [], "ig": 0.447, "fa": 0.0, "gp": 0.0, "bl": 1.92, "ds": 0.0, "txt": "in correct i meant \"minimizes the amount of bugs\"."}, {"id": 50496953, "au": "smitty1e", "dom": 120, "sr": 124, "sc": -4.05, "ep": 0.19, "bs": 4.24, "d": 3, "age": 0.39, "grav": 4.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 4790, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.079, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "You can typedef your way to readability in C++."}, {"id": 50497095, "au": "neutronicus", "dom": 29, "sr": 125, "sc": -4.13, "ep": 1.3, "bs": 5.43, "d": 1, "age": 0.05, "grav": 3.6, "surf": 72.2, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 4980, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "languages_lean", "flbl": "Languages & Lean (LLMS)", "urls": [], "ig": 0.541, "fa": 0.0, "gp": 0.019, "bl": 2.05, "ds": 0.0, "txt": "There was one post about a startup moving from Haskell to a Python because compile times had become a bottleneck for their Agents."}, {"id": 50486108, "au": "epgui", "dom": 71, "sr": 126, "sc": -4.15, "ep": 0.09, "bs": 4.24, "d": 2, "age": 21.32, "grav": 289.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 5008, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "library_care", "flbl": "Library & Care (Web)", "urls": [], "ig": 0.038, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Nothing is really missing, Haskell can do all of that."}, {"id": 50496977, "au": "smitty1e", "dom": 128, "sr": 127, "sc": -4.9, "ep": 1.11, "bs": 6.02, "d": 6, "age": 0.35, "grav": 4.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 4790, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "syntax_hard", "flbl": "Syntax & Hard (Beginner)", "urls": [], "ig": 0.474, "fa": 0.0, "gp": 0.0, "bl": 2.27, "ds": 0.0, "txt": "No, I'm actually communicating that this syntax, for whatever reason, is not yielding itself to understanding for my brain cells.\n\nThis in response to a quoted statement from TFA about beginners.\n\nThe moderation and feedback here strangely congruent with the syntax."}, {"id": 50495151, "au": "internet_points", "dom": 32, "sr": 128, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 3, "age": 5.73, "grav": 39.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 2339, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "nix_ghcup", "flbl": "Nix & Ghcup (Stack)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "shell in the long tail? lol"}, {"id": 50488833, "au": "Y_Y", "dom": 69, "sr": 129, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 18.1, "grav": 221.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 0, "qw": 27, "k": 10887, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://news.ycombinator.com/item?id=15486063"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "> Functional programming should not be viewed as a tuxedo that we dust off and use when we want to be \"fancy programmers.\" It's simply a tool in the toolbox.\n\nhttps://news.ycombinator.com/item?id=15486063"}, {"id": 50485875, "au": "gavmor", "dom": 70, "sr": 130, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 21.58, "grav": 295.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 1009, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "library_care", "flbl": "Library & Care (Web)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "So what's missing? GUI libraries?"}, {"id": 50493639, "au": "whateveracct", "dom": 76, "sr": 131, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 4, "age": 10.29, "grav": 91.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 6715, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "dumb people are loud"}, {"id": 50493650, "au": "whateveracct", "dom": 98, "sr": 132, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 10.27, "grav": 91.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 6715, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "haskell is a bastion for the actually intelligent"}, {"id": 50487363, "au": "galacticaactual", "dom": 134, "sr": 133, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 0, "age": 19.94, "grav": 259.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 797, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "In before a certain defense tech engineer in 3...2...1"}, {"id": 50493259, "au": "axman6", "dom": 119, "sr": 134, "sc": -13.49, "ep": 0.0, "bs": 11.26, "d": 2, "age": 11.17, "grav": 103.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 500, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 4.25, "ds": 0.0, "txt": "See how much more readable that is? /s"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      const jumpBtns = isPinned
+        ? `<button type="button" class="probe-inline-btn" data-probe-jump="1">Comment &darr;</button>` +
+          `<button type="button" class="probe-inline-btn" data-probe-clear="1">Clear &times;</button>`
+        : "";
+      probeEl.innerHTML =
+        `<strong>@${escHtml(hit.au)}</strong> | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})` +
+        jumpBtns +
+        `<br>"${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 60);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 50);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 50);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 50);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `Showing ${shown.length} of ${pool.length} matching comments (mode: ${activeMode})` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear selection</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeSelect = document.getElementById("modeSelect");
+  modeSelect.addEventListener("change", () => {
+    activeMode = modeSelect.value;
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

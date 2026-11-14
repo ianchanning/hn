@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hacker News // Bullshit vs. Epistemic.</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 8px;
+      padding: 0;
+      background: rgb(255, 255, 255);
+      color: rgb(0, 0, 0);
+      font: 10pt/1.35 Verdana, Geneva, sans-serif;
+    }
+    .hnmain {
+      width: 85%;
+      max-width: 1240px;
+      margin: 0 auto;
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      line-height: 16px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    a.hnname {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+    }
+    .pagetop, .pagetop a, .topbar-right, .topbar-right a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      text-decoration: none;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 9pt;
+    }
+    button.nav-btn {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: rgb(0, 0, 0);
+      cursor: pointer;
+    }
+    button.nav-btn:hover, .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .list-pad {
+      padding: 10px 8px 4px 4px;
+    }
+    table.itemlist {
+      border-collapse: collapse;
+      border: 0;
+      width: 100%;
+    }
+    td.title {
+      font-size: 10pt;
+      line-height: 14pt;
+      vertical-align: top;
+    }
+    td.rank {
+      color: rgb(130, 130, 130);
+      text-align: right;
+      padding-right: 4px;
+      white-space: nowrap;
+      width: 1%;
+      font-variant-numeric: tabular-nums;
+    }
+    td.votelinks {
+      vertical-align: top;
+      text-align: center;
+      width: 14px;
+      padding: 0 3px 0 1px;
+    }
+    a.votearrow {
+      color: rgb(153, 153, 153);
+      font-size: 9pt;
+      line-height: 14pt;
+      text-decoration: none;
+      display: inline-block;
+    }
+    a.storylink {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.storylink:visited {
+      color: rgb(130, 130, 130);
+    }
+    .comhead, .comhead a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .comhead a:hover, td.subtext a:hover {
+      text-decoration: underline;
+    }
+    td.subtext {
+      font-size: 7.5pt;
+      line-height: 11pt;
+      color: rgb(130, 130, 130);
+      padding-bottom: 1px;
+    }
+    td.subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    tr.spacer td {
+      height: 5px;
+    }
+    td.empty-msg {
+      padding: 16px 12px;
+      color: rgb(130, 130, 130);
+      font-size: 9.5pt;
+    }
+    details.past-drawer {
+      margin: 6px 0 2px;
+    }
+    summary.morelink {
+      list-style: none;
+      cursor: pointer;
+      padding: 4px 0 6px 32px;
+      font-size: 10pt;
+      color: rgb(0, 0, 0);
+      user-select: none;
+    }
+    summary.morelink::-webkit-details-marker { display: none; }
+    summary.morelink:hover { text-decoration: underline; }
+    table.pastlist {
+      margin-top: 4px;
+      padding-top: 6px;
+      border-top: 1px solid rgb(226, 226, 218);
+    }
+    .hn-footer {
+      margin-top: 12px;
+      border-top: 2px solid rgb(255, 102, 0);
+      padding: 12px 10px 18px;
+      text-align: center;
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+    }
+    .yclinks a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .yclinks a:hover {
+      text-decoration: underline;
+    }
+    form.hn-search {
+      margin-top: 10px;
+      color: rgb(130, 130, 130);
+      font-size: 8.5pt;
+    }
+    form.hn-search input {
+      font: 9pt/1.2 Verdana, Geneva, sans-serif;
+      padding: 2px 5px;
+      border: 1px solid rgb(130, 130, 130);
+      background: rgb(255, 255, 255);
+      color: rgb(0, 0, 0);
+      max-width: 86vw;
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .hnmain { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; }
+      .topbar-right { font-size: 8pt; padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+</head>
+<body>
+<div class="hnmain">
+  <div class="topbar">
+    <div class="topbar-left">
+      <a class="hn-logo" href="./">E</a>
+      <a class="hnname" href="./">Epistemic News</a>
+    </div>
+    <div class="topbar-right">Updated 2026-11-14 14:12 UTC</div>
+  </div>
+
+  <div class="list-pad">
+    <table class="itemlist" id="frontpageList">
+      <tbody>
+        <tr class="athing">
+            <td class="title rank">1.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://so.long.thanks.fish/why-pi-when-i-have-an-old-phone/">Why get an expensive Pi when I have an old phone?</a> <span class="sitebit comhead">(<a href="https://so.long.thanks.fish/why-pi-when-i-have-an-old-phone/">so.long.thanks.fish</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">217 points by casi | <a href="./item?id=50440709">144 comments</a> | <a href="./item?id=50440709">3 gold &middot; 82% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50440709">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">2.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://news.umich.edu/generative-ai-uses-more-energy-on-non-english-text/">Generative AI uses more energy on non-English text</a> <span class="sitebit comhead">(<a href="https://news.umich.edu/generative-ai-uses-more-energy-on-non-english-text/">news.umich.edu</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">24 points by DeepLogin | <a href="./item?id=50441444">13 comments</a> | <a href="./item?id=50441444">1 gold &middot; 92% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50441444">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">3.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://github.com/ggml-org/ggml/releases/tag/v1.0.0">Ggml v1.0.0</a> <span class="sitebit comhead">(<a href="https://github.com/ggml-org/ggml/releases/tag/v1.0.0">github.com/ggml-org</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">325 points by cobychapple | <a href="./item?id=50493062">36 comments</a> | <a href="./item?id=50493062">1 gold &middot; 86% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50493062">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">4.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://monkeyisland.pages.dev/">Monkey Island: all 13 versions side by side</a> <span class="sitebit comhead">(<a href="https://monkeyisland.pages.dev/">monkeyisland.pages.dev</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">265 points by maximilianburke | <a href="./item?id=50493904">83 comments</a> | <a href="./item?id=50493904">0 gold &middot; 87% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50493904">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">5.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://www.eff.org/deeplinks/2026/11/tech-companies-are-trying-shift-entire-concept-privacy-again">Tech Companies Are Trying to Shift the Concept of Privacy (Again)</a> <span class="sitebit comhead">(<a href="https://www.eff.org/deeplinks/2026/11/tech-companies-are-trying-shift-entire-concept-privacy-again">eff.org</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">62 points by gslin | <a href="./item?id=50496602">8 comments</a> | <a href="./item?id=50496602">0 gold &middot; 100% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50496602">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">6.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://beyondloom.com/blog/postscript.html">Let&No. x27;s Write a PostScript Interpreter</a> <span class="sitebit comhead">(<a href="https://beyondloom.com/blog/postscript.html">beyondloom.com</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">25 points by RebelPotato | <a href="./item?id=50478632">6 comments</a> | <a href="./item?id=50478632">0 gold &middot; 100% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50478632">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">7.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://www.techpowerup.com/354814/nvidia-allegedly-engineered-scarcity-by-funding-ai-startups-to-buy-its-gpus">Nvidia allegedly engineered scarcity by funding AI startups to buy its GPUs</a> <span class="sitebit comhead">(<a href="https://www.techpowerup.com/354814/nvidia-allegedly-engineered-scarcity-by-funding-ai-startups-to-buy-its-gpus">techpowerup.com</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">794 points by speckx | <a href="./item?id=50493251">466 comments</a> | <a href="./item?id=50493251">28 gold &middot; 79% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50493251">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">8.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://unsloth.ai/docs/models/qwen3.8">Unsloth Qwen3.8-27B Quantizations – Dynamic v3.1 Update</a> <span class="sitebit comhead">(<a href="https://unsloth.ai/docs/models/qwen3.8">unsloth.ai</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">196 points by Retro_Dev | <a href="./item?id=50491980">55 comments</a> | <a href="./item?id=50491980">2 gold &middot; 71% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50491980">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">9.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://www.joshka.net/cell-borders/">Terminal borders that don&No. x27;t cost a cell</a> <span class="sitebit comhead">(<a href="https://www.joshka.net/cell-borders/">joshka.net</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">328 points by vinhnx | <a href="./item?id=50491423">144 comments</a> | <a href="./item?id=50491423">6 gold &middot; 83% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50491423">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">10.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://www.nbcnews.com/news/us-news/faa-orders-nationwide-ground-stop-departing-flights-reasons-safety-rcna609247">FAA issues national ground stop – lifted 4.5 hours later</a> <span class="sitebit comhead">(<a href="https://www.nbcnews.com/news/us-news/faa-orders-nationwide-ground-stop-departing-flights-reasons-safety-rcna609247">nbcnews.com</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">1587 points by zulln | <a href="./item?id=50489641">1,125 comments</a> | <a href="./item?id=50489641">47 gold &middot; 86% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50489641">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">11.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://arsh.zip/posts/north-east-arrow/">The curious case of the north-east arrow</a> <span class="sitebit comhead">(<a href="https://arsh.zip/posts/north-east-arrow/">arsh.zip</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">18 points by arshxyz | <a href="./item?id=50466069">8 comments</a> | <a href="./item?id=50466069">0 gold &middot; 100% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50466069">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">12.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://www.youtube.com/watch?v=IRK8h67ol7Q">Jonathan Blow – If AI solved coding, why is my software still the same? [video]</a> <span class="sitebit comhead">(<a href="https://www.youtube.com/watch?v=IRK8h67ol7Q">youtube.com</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">369 points by helloplanets | <a href="./item?id=50484658">502 comments</a> | <a href="./item?id=50484658">31 gold &middot; 75% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50484658">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">13.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://dfarq.homeip.net/what-happened-to-3com/">What happened to 3Com?</a> <span class="sitebit comhead">(<a href="https://dfarq.homeip.net/what-happened-to-3com/">dfarq.homeip.net</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">174 points by gvieri | <a href="./item?id=50491830">92 comments</a> | <a href="./item?id=50491830">12 gold &middot; 67% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50491830">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">14.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://grounds.top/">Show HN: Live map of U.S. flights during tonight&No. x27;s FAA nationwide ground stop</a> <span class="sitebit comhead">(<a href="https://grounds.top/">grounds.top</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">172 points by gvsi | <a href="./item?id=50491545">23 comments</a> | <a href="./item?id=50491545">0 gold &middot; 91% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50491545">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">15.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://www.fws.gov/story/2026-11/service-crew-discovers-rare-yellow-burbot-oswego-harbor">Service Crew Discovers Rare Yellow Burbot in Oswego Harbor</a> <span class="sitebit comhead">(<a href="https://www.fws.gov/story/2026-11/service-crew-discovers-rare-yellow-burbot-oswego-harbor">fws.gov</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">16 points by tart-lemonade | <a href="./item?id=50454791">5 comments</a> | <a href="./item?id=50454791">1 gold &middot; 80% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50454791">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">16.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://www.nature.com/articles/d41586-026-03638-3">Found: A protein that drives ageing without unleashing inflammation</a> <span class="sitebit comhead">(<a href="https://www.nature.com/articles/d41586-026-03638-3">nature.com</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">222 points by gumby | <a href="./item?id=50488470">30 comments</a> | <a href="./item?id=50488470">0 gold &middot; 100% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50488470">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">17.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://open.m-vave.com/fm1-workbench">FM-1 Workbench</a> <span class="sitebit comhead">(<a href="https://open.m-vave.com/fm1-workbench">open.m-vave.com</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">248 points by simonebrunozzi | <a href="./item?id=50488325">161 comments</a> | <a href="./item?id=50488325">5 gold &middot; 81% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50488325">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">18.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://alichraghi.github.io/blog/how-not-to-build-a-music-player/">How Not to Build a Music Player</a> <span class="sitebit comhead">(<a href="https://alichraghi.github.io/blog/how-not-to-build-a-music-player/">alichraghi.github.io</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">142 points by vinhnx | <a href="./item?id=50491400">62 comments</a> | <a href="./item?id=50491400">3 gold &middot; 82% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50491400">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">19.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://orcasairband.com/">Live airband on all frequencies from KORS. Victoria, CA also ground stopped</a> <span class="sitebit comhead">(<a href="https://orcasairband.com/">orcasairband.com</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">280 points by mmaunder | <a href="./item?id=50490593">65 comments</a> | <a href="./item?id=50490593">2 gold &middot; 86% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50490593">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">20.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://haddyalchaer.com/jepa">After 600 experiments, here&No. x27;s what I discovered about JEPA world models</a> <span class="sitebit comhead">(<a href="https://haddyalchaer.com/jepa">haddyalchaer.com</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">273 points by halcdev | <a href="./item?id=50487185">45 comments</a> | <a href="./item?id=50487185">0 gold &middot; 89% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50487185">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">21.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://github.com/0xdeadf1sh/T1DMAI">Show HN: I have trained 15 blood glucose forecasting models on my own data</a> <span class="sitebit comhead">(<a href="https://github.com/0xdeadf1sh/T1DMAI">github.com/0xdeadf1sh</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">53 points by 0xdeadf1sh | <a href="./item?id=50444761">31 comments</a> | <a href="./item?id=50444761">0 gold &middot; 90% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50444761">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">22.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://engineering.fb.com/2026/11/09/developer-tools/extending-lldb-to-debug-applications-that-span-cpus-and-gpus/">Extending LLDB to Debug Applications That Span CPUs and GPUs</a> <span class="sitebit comhead">(<a href="https://engineering.fb.com/2026/11/09/developer-tools/extending-lldb-to-debug-applications-that-span-cpus-and-gpus/">engineering.fb.com</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">25 points by JDevlieghere | <a href="./item?id=50448432">3 comments</a> | <a href="./item?id=50448432">0 gold &middot; 100% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50448432">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">23.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://isometricsf.com/">Show HN: Isometric SF – A pixel-art map of the SF Bay Area</a> <span class="sitebit comhead">(<a href="https://isometricsf.com/">isometricsf.com</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">231 points by juscha1 | <a href="./item?id=50487228">73 comments</a> | <a href="./item?id=50487228">1 gold &middot; 82% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50487228">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">24.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://www.perplexity.ai/hub/blog/perplexity-decider">Perplexity Decider v1.3: Training, eval, and use cases</a> <span class="sitebit comhead">(<a href="https://www.perplexity.ai/hub/blog/perplexity-decider">perplexity.ai</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">140 points by gmays | <a href="./item?id=50488464">25 comments</a> | <a href="./item?id=50488464">1 gold &middot; 88% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50488464">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">25.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://gyptazy.com/blog/freebsd-bhyve-live-migration-support-rfc/">Live-migration support in FreeBSD and bhyve coming</a> <span class="sitebit comhead">(<a href="https://gyptazy.com/blog/freebsd-bhyve-live-migration-support-rfc/">gyptazy.com</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">124 points by JohnDohnBohn | <a href="./item?id=50488835">32 comments</a> | <a href="./item?id=50488835">1 gold &middot; 91% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50488835">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">26.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://www.echopress.com/business/minnesota-guitarists-invention-strikes-a-new-chord">Minnesota guitarist&No. x27;s &quot;palmfrets&quot; invention strikes a new chord</a> <span class="sitebit comhead">(<a href="https://www.echopress.com/business/minnesota-guitarists-invention-strikes-a-new-chord">echopress.com</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">187 points by bookofjoe | <a href="./item?id=50484650">105 comments</a> | <a href="./item?id=50484650">3 gold &middot; 88% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50484650">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">27.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://scottjg.com/posts/2026-11-11-reverse-engineering-my-coway-air-purifier-to-ditch-the-cloud/">Reverse engineering my Coway air purifier to ditch the cloud</a> <span class="sitebit comhead">(<a href="https://scottjg.com/posts/2026-11-11-reverse-engineering-my-coway-air-purifier-to-ditch-the-cloud/">scottjg.com</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">767 points by scottjg | <a href="./item?id=50474959">214 comments</a> | <a href="./item?id=50474959">10 gold &middot; 78% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50474959">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">28.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://today.ucsd.edu/story/elephants-found-to-be-increasingly-isolated-leading-to-fractured-social-networks">Elephants found to be increasingly isolated leading to fractured social networks</a> <span class="sitebit comhead">(<a href="https://today.ucsd.edu/story/elephants-found-to-be-increasingly-isolated-leading-to-fractured-social-networks">today.ucsd.edu</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">161 points by gmays | <a href="./item?id=50492860">35 comments</a> | <a href="./item?id=50492860">1 gold &middot; 94% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50492860">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">29.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://www.fox5dc.com/news/amtrak-outage-ticket-booking-faa-ground-stop-november-13-2026">Amtrak booking system experiencing major issues amid nationwide FAA ground stop</a> <span class="sitebit comhead">(<a href="https://www.fox5dc.com/news/amtrak-outage-ticket-booking-faa-ground-stop-november-13-2026">fox5dc.com</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">183 points by snow_mac | <a href="./item?id=50492315">70 comments</a> | <a href="./item?id=50492315">0 gold &middot; 94% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50492315">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+          <tr class="athing">
+            <td class="title rank">30.</td>
+            <td class="title"><span class="titleline"><a class="storylink" href="https://discourse.haskell.org/t/a-technical-vision-for-the-haskell-ecosystem/15078">A technical vision for the Haskell ecosystem</a> <span class="sitebit comhead">(<a href="https://discourse.haskell.org/t/a-technical-vision-for-the-haskell-ecosystem/15078">discourse.haskell.org</a>)</span></span></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="subtext">223 points by cosmic_quanta | <a href="./item?id=50484235">134 comments</a> | <a href="./item?id=50484235">5 gold &middot; 79% bullshit</a> | <a href="https://news.ycombinator.com/item?id=50484235">hn</a></td>
+          </tr>
+          <tr class="spacer"><td colspan="2"></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="hn-footer">
+    <div class="yclinks">08:00 London &amp; 08:00 SF | 43 published | <a href="https://news.ycombinator.com/">news.ycombinator.com</a></div>
+    <form class="hn-search" id="jumpForm">
+      <label for="hnInput">Open item:</label>
+      <input type="text" id="hnInput" size="28" placeholder="ID or news.ycombinator.com/item?id=..." required>
+    </form>
+  </div>
+</div>
+<script>
+document.getElementById("jumpForm").addEventListener("submit", (ev) => {
+  ev.preventDefault();
+  const raw = document.getElementById("hnInput").value.trim();
+  const m = raw.match(/[?&]id=(\d+)/) || raw.match(/^(\d+)$/) || raw.match(/(\d{5,})/);
+  if (m) {
+    window.location.href = `./item?id=${encodeURIComponent(m[1])}`;
+  }
+});
+</script>
+</body>
+</html>

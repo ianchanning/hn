@@ -1,0 +1,1258 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50444761 // Show HN: I have trained 15 blood glucose forecasting models on my own data — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      background: rgb(247, 247, 245);
+      color: rgb(13, 13, 13);
+      font: 15px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+    }
+    .sheet-top {
+      border-top: 3px solid rgb(13, 13, 13);
+      border-bottom: 1px solid rgb(13, 13, 13);
+      padding: 16px 0 26px;
+    }
+    .eyebrow {
+      font: 600 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .eyebrow strong { color: rgb(255, 51, 0); }
+    h1 {
+      font-size: clamp(36px, 5.2vw, 72px);
+      line-height: 0.96;
+      letter-spacing: -0.045em;
+      margin: 18px 0 14px;
+      font-weight: 800;
+    }
+    h1 .accent { color: rgb(255, 51, 0); }
+    .sublead {
+      max-width: 920px;
+      font-size: 16px;
+      color: rgb(52, 52, 50);
+      margin: 0;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      font: 700 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 24px;
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+    }
+    .kpi-cell {
+      padding: 16px 16px 14px;
+      border-right: 1px solid rgb(205, 205, 200);
+    }
+    .kpi-cell:last-child { border-right: 0; }
+    .kpi-label {
+      font: 600 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 8px 0 4px;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      font-size: 12px;
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      background: rgb(13, 15, 17);
+      color: rgb(228, 232, 236);
+      border: 2px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 6px;
+      corner-shape: bevel;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(156, 166, 176);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      background: rgb(9, 11, 13);
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(180, 188, 196);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 58px;
+      background: rgb(20, 24, 28);
+      border-left: 3px solid rgb(0, 230, 118);
+      font: 12px/19px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(220, 226, 232);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 38px;
+    }
+
+    /* Collapsible 03A / 03B Justification Drawer */
+    details.proof-drawer {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 12px 0;
+    }
+    details.proof-drawer > summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      font: 700 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      user-select: none;
+    }
+    details.proof-drawer > summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary:hover { border-color: rgb(255, 51, 0); }
+    details.proof-drawer > summary .toggle-pill {
+      flex-shrink: 0;
+      padding: 3px 8px;
+      background: rgb(13, 13, 13);
+      color: rgb(247, 247, 245);
+      font-size: 10px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 16px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: rgb(255, 255, 253);
+      border: 1px solid rgb(13, 13, 13);
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+    }
+    table.ablation th {
+      background: rgb(236, 236, 231);
+      font: 700 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgb(60, 60, 58);
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      font: 600 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+      color: rgb(13, 13, 13);
+      padding: 7px 11px;
+      font: 600 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      box-shadow: 0 2px 0 rgb(13, 13, 13);
+    }
+    button.tab-btn.active {
+      background: rgb(13, 13, 13);
+      color: rgb(247, 247, 245);
+    }
+    button.tab-btn:hover {
+      border-color: rgb(255, 51, 0);
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      padding: 8px 11px;
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+      font: 600 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { flex: 1; min-width: 220px; font-weight: 400; }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border: 1px solid rgb(216, 216, 206);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      border-top: 3px solid rgb(13, 13, 13);
+      padding-top: 14px;
+      margin-top: 36px;
+      font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        background: rgb(239, 239, 234);
+        border: 1px solid rgb(13, 13, 13);
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        font-size: 17px;
+        margin: 0;
+        white-space: normal;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        background: rgb(13, 13, 13);
+        color: rgb(247, 247, 245);
+        font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-] HIDE"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+] SHOW"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpi-cell { border-bottom: 1px solid rgb(205, 205, 200); }
+      .filter-bar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .filter-bar select.sel-in {
+        width: 100%;
+        font-size: 16px;
+        padding: 8px 9px;
+      }
+      .filter-bar input.search-in {
+        grid-column: span 2;
+        width: 100%;
+        min-width: 0;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="sheet-top">
+    <div class="eyebrow">
+      <span>NYX OBSERVATORY // <a class="ext-link" href="https://news.ycombinator.com/item?id=50444761">HN ITEM 50444761</a> // GITHUB.COM</span>
+      <span><strong>BULLSHIT: 90.3%</strong>
+    </div>
+    <h1>Bullshit vs. <span class="accent">Epistemic.</span></h1>
+    <p class="sublead">
+      <strong>31</strong> Hacker News comments on <a class="ext-link" href="https://github.com/0xdeadf1sh/T1DMAI">Show HN: I have trained 15 blood glucose forecasting models on my own data (github.com)</a>.
+    </p>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary>
+      <span>01 // EVIDENCE</span>
+      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    </summary>
+    <p>
+      Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+      Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+    </p>
+    <div class="proof-body">
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">31</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 17 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">9.7%</div>
+          <div class="kpi-sub">3 comments (0 Gold / 0.0%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">90.3%</div>
+          <div class="kpi-sub">18 chatter &bull; 10 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">0</div>
+        <div class="kpi-sub">0% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.856</div>
+        <div class="kpi-sub">4 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">6</div>
+          <div class="kpi-sub">HN POS 26..31 (19.4% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="margin-top:10px;font:600 11px/1.5 ui-monospace,Menlo,monospace;color:rgb(70,70,68)"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary>
+      <span>02 // EXPLORE</span>
+      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / INTERACTIVE EQUATION</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p style="font-size:11.5px;line-height:1.42;color:rgb(85,85,82);margin:12px 0 0">
+              Drag any weight to watch the 31-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 31)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (0)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (3)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (18)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (10)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..31) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 25)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (@viraptor, 0.1h); largest subtree (@ddorian43) occupies 6 slots (HN POS 26..31).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="modeSelect" class="sel-in" aria-label="Ranking view">
+          <option value="hn_top40">HN Top 40</option>
+          <option value="top_signal">Epistemic Top 50</option>
+          <option value="buried_gems">Buried Gems (HN POS &gt; 25)</option>
+          <option value="bullshit_traps">High-Karma / URL Traps Caught</option>
+          <option value="mod_morgue">Mod Rebukes &amp; Downvoted Morgue</option>
+          <option value="c5a_rescues">c5A Heterodox Rescues</option>
+        </select>
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (31)</option>
+          <option value="carbs_model">Carbs &amp; Model (App) (11)</option>
+          <option value="t1d_interesting">T1d &amp; Interesting (Appreciate) (7)</option>
+          <option value="insulin_dietary">Insulin &amp; Dietary (Info) (6)</option>
+          <option value="repo_training">Repo &amp; Training (Hands) (6)</option>
+          <option value="general_commentary">General Commentary (1)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, trained, glucose, blood, model, training...">
+      </div>
+      <div id="resultMeta" style="font:600 11px/1.4 ui-monospace,Menlo,monospace;color:rgb(90,90,88);margin-bottom:10px"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50444761 + GITHUB.COM + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50444761, "story_title": "Show HN: I have trained 15 blood glucose forecasting models on my own data", "story_url": "https://github.com/0xdeadf1sh/T1DMAI", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50444761, "story_title": "Show HN: I have trained 15 blood glucose forecasting models on my own data", "story_url": "https://github.com/0xdeadf1sh/T1DMAI", "points": 53, "story_author": "0xdeadf1sh", "article_source": "fetched_url", "t1_ref_utc": "2026-11-14T13:34:35+00:00", "t2_ref_utc": "2026-11-14T13:34:35+00:00", "delta_minutes": 0.0, "story_anchors": ["trained", "glucose", "blood", "model", "training", "insulin", "carbs", "metabonet", "github", "test", "dataset", "repo", "cgm", "data", "forecasting", "models", "show", "accuracy", "research", "published", "results", "cool", "food", "project", "t1d"], "facet_labels": {"carbs_model": "Carbs & Model (App)", "repo_training": "Repo & Training (Hands)", "t1d_interesting": "T1d & Interesting (Appreciate)", "insulin_dietary": "Insulin & Dietary (Info)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "carbs_model", "label": "Carbs & Model (App)", "count": 11, "top_terms": ["carbs", "model", "app", "data"]}, {"slug": "repo_training", "label": "Repo & Training (Hands)", "count": 6, "top_terms": ["repo", "training", "hands", "helping"]}, {"slug": "t1d_interesting", "label": "T1d & Interesting (Appreciate)", "count": 7, "top_terms": ["t1d", "interesting", "appreciate", "sharing"]}, {"slug": "insulin_dietary", "label": "Insulin & Dietary (Info)", "count": 6, "top_terms": ["insulin", "dietary", "info", "factors"]}], "counts": {"total_comments": 31, "live_t2_comments": 31, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 17, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "b3c521b5be57e2ba851269873ff016ce6ca1ef91a257c4d94361ec3c9680ee37"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"grounded_analysis": 3, "crowd_chatter": 18, "bullshit_or_flamewar": 10}, "facets": {"t1d_interesting": 7, "carbs_model": 11, "insulin_dietary": 6, "repo_training": 6, "general_commentary": 1}, "facet_options": [{"slug": "carbs_model", "label": "Carbs & Model (App)", "count": 11}, {"slug": "t1d_interesting", "label": "T1d & Interesting (Appreciate)", "count": 7}, {"slug": "insulin_dietary", "label": "Insulin & Dietary (Info)", "count": 6}, {"slug": "repo_training", "label": "Repo & Training (Hands)", "count": 6}, {"slug": "general_commentary", "label": "General Commentary", "count": 1}], "facet_diagnostics": [{"slug": "carbs_model", "label": "Carbs & Model (App)", "count": 11, "useful": 1, "useful_pct": 9.1, "terms": "carbs, model, app, data"}, {"slug": "t1d_interesting", "label": "T1d & Interesting (Appreciate)", "count": 7, "useful": 2, "useful_pct": 28.6, "terms": "t1d, interesting, appreciate, sharing"}, {"slug": "insulin_dietary", "label": "Insulin & Dietary (Info)", "count": 6, "useful": 0, "useful_pct": 0.0, "terms": "insulin, dietary, info, factors"}, {"slug": "repo_training", "label": "Repo & Training (Hands)", "count": 6, "useful": 0, "useful_pct": 0.0, "terms": "repo, training, hands, helping"}, {"slug": "general_commentary", "label": "General Commentary", "count": 1, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 1}], "story_anchors": ["trained", "glucose", "blood", "model", "training", "insulin", "carbs", "metabonet", "github", "test", "dataset", "repo", "cgm", "data", "forecasting", "models", "show", "accuracy"], "largest_root": {"root_id": 50495434, "author": "ddorian43", "slots": 6, "start_dom": 26, "end_dom": 31, "share_pct": 19.4, "top_dom1_age": 0.1, "top_dom1_author": "viraptor"}, "buried_cutoff": 25, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50445536, "au": "nuthje", "dom": 5, "sr": 1, "sc": 5.91, "ep": 5.91, "bs": 0.0, "d": 0, "age": 89.53, "grav": 3394.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 61, "qw": 0, "k": 49, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "t1d_interesting", "flbl": "T1d & Interesting (Appreciate)", "urls": [], "ig": 1.17, "fa": 0.34, "gp": 1.51, "bl": 0.0, "ds": 0.0, "txt": "89% TIR, well done! Cool to see the research, I’m surprised there aren’t more in-depth n=1 studies out there from statistics/data-savvy diabetics. I built a small dashboard exactly collating carb, insulin, sleep, and movement data and trying to coax out useful correlations to help manage. Some interesting insights, but clearly I should eat less and move more. Keep up the good work, and thanks for sharing!"}, {"id": 50496025, "au": "ddorian43", "dom": 29, "sr": 2, "sc": 5.16, "ep": 5.16, "bs": 0.0, "d": 2, "age": 2.45, "grav": 14.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 79, "qw": 0, "k": 2474, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "carbs_model", "flbl": "Carbs & Model (App)", "urls": [], "ig": 1.178, "fa": 0.68, "gp": 0.31, "bl": 0.0, "ds": 0.0, "txt": "I have done keto for 4+ years, and have done ~2 years epilepsy keto, where the measurement was to have blood ketones 2+ & glucose 4 (mmol/l) , 1 hour after wakeup.\n\nEpilepsy-keto is in the same realm as this, but even harder, because you need high ketones & low glucose. You're literally eating 10-20g carbs a day. The maximum that I ever ate while maintaining epilepsy keto was 50g carbs/day, and it was only possible by doing heavy exercise (120 squats with your body weight in the bar)."}, {"id": 50495795, "au": "hypendev", "dom": 6, "sr": 3, "sc": 4.3, "ep": 4.44, "bs": 0.0, "d": 1, "age": 3.18, "grav": 19.3, "surf": 138.2, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 158, "qw": 0, "k": 168, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "t1d_interesting", "flbl": "T1d & Interesting (Appreciate)", "urls": [], "ig": 1.211, "fa": 0.56, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Ironically, did the same thing and ended up with the same answer.\n\nFrom wearing a CGM, whoop, using an impedance analyzing scale (I know, I know), blood tests - all the data shows pretty much the same correlation. I mostly did it for fun, but also  because I wanted to \"figure out how different things impact my body\".\n\nWhile yes, there were some interesting discoveries like:\n- Some things raise my blood glucose more than I'd expect, pasta for example - those were the things I usually \"knew\" and foods I'd avoid eating.\n\n- Sleep quality only had correlation with amount of activity/time I went to sleep, so my food and caffeine choice didn't impact it much.\n\nThe results were pretty much:\nEating bad and moving less is bad for you. Eating good and moving more is good. What your intuition tells you is healthy and good for you, usually is. What it says isn't, usually isn't.\n\nCould have saved me some time and money, but at least I had fun."}, {"id": 50496068, "au": "hturan", "dom": 3, "sr": 4, "sc": 3.35, "ep": 3.35, "bs": 0.0, "d": 0, "age": 2.3, "grav": 13.8, "surf": 246.2, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 113, "qw": 0, "k": 271, "kpp": 15.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "insulin_dietary", "flbl": "Insulin & Dietary (Info)", "urls": [], "ig": 1.349, "fa": 0.0, "gp": 0.122, "bl": 0.0, "ds": 0.0, "txt": "Incredible work! As a T1D I've been gathering as much data as possible (blood glucose, insulin-on-board, food consumed, heart rate, skin temperature, etc.) for exactly this purpose. Can't wait to dive in!\n\nBG forecasting and insulin response has always seemed to me to be such a personal thing (everyone has such a different response based on the various factors, and there are _so_ many factors) that the one-size-fits-all models in CGMs seemed the lowest common denominator. We live in an age where personal data collection is easier than ever (with wearable BLE hardware) and timeseries forecasting models are better than ever, making this research even more valuable.\n\nThanks so much for publishing your work!"}, {"id": 50496319, "au": "user_7832", "dom": 10, "sr": 5, "sc": 3.22, "ep": 3.22, "bs": 0.0, "d": 0, "age": 1.6, "grav": 10.0, "surf": 331.3, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 89, "qw": 0, "k": 4955, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "carbs_model", "flbl": "Carbs & Model (App)", "urls": [], "ig": 1.335, "fa": 0.0, "gp": 0.053, "bl": 0.0, "ds": 0.0, "txt": "Thanks for the post OP!\n\nIs there anyway way to use xdrip or nightscout or similar to move the data into your (android) app?\n\nI already use the official Freestyle Librelink app plus jugglucoNG (which btw is amazing if you don't use, has a lot of nice stats), and the latter can already export its data streams.\n\nSide note, I'm very happy to see more (diy) work in this field (ever since AAPS I think). \u0023wearenotwaiting !\n\n(Hashtag context for non T1Ds: diy software, unsurprisingly, has been leagues ahead in capabilities than \"official\" software.)"}, {"id": 50446288, "au": "ekg2", "dom": 12, "sr": 6, "sc": 3.05, "ep": 5.57, "bs": 2.52, "d": 0, "age": 88.53, "grav": 3328.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 135, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "carbs_model", "flbl": "Carbs & Model (App)", "urls": [], "ig": 1.439, "fa": 0.0, "gp": 1.51, "bl": 0.95, "ds": 0.0, "txt": "cool to find this project. I'm implementing literally the same thing recently. I'm using exact same insulins. My setup is a bit different and a bit behind you in terms of model quality. \nI run pretrained models on raspberry pi, so raspberry acts as server. I use dexcom, garmin mcp to gather all data. Android phone acts as dumb client. I have create a custom app to log carbs, insulin injections, predict insulin doses from a food photo.\nThere are also some nighty jobs to recalculate insulin sensitivity, retrain model, generate daily report.\nI started logging carbs and insulin doses few weeks ago, so currently there is not enough personal data to train prediction model. I use oref0 algorithm for predictions currently. As a starting point i have created prediction model solely on glucose values. Training on other people data, did not helped me to make predictions accurate."}, {"id": 50496725, "au": "andrewchilds", "dom": 17, "sr": 7, "sc": 2.91, "ep": 2.91, "bs": 0.0, "d": 2, "age": 0.47, "grav": 5.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 81, "qw": 0, "k": 538, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "insulin_dietary", "flbl": "Insulin & Dietary (Info)", "urls": [], "ig": 1.237, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I spent a long time trying to build predictive models that use complete and accurate carbs/protein/fat macronutrient data as well as insulin delivery. I found that there were enough non-linearities and other unmodelable factors at work in the BG data that led to very poor predictive ability. Considering protein & fat had a nil-to-negative effect on the models.\n\nIt's possible that accounting for heart rate as well as carbs & insulin might have better results, with enough data.\n\n0xdeadf1sh: good luck with your quest!"}, {"id": 50496907, "au": "0xdeadf1sh", "dom": 2, "sr": 8, "sc": 2.23, "ep": 3.02, "bs": 0.8, "d": 1, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 89, "qw": 0, "k": 57, "kpp": 6.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "carbs_model", "flbl": "Carbs & Model (App)", "urls": [], "ig": 1.286, "fa": 0.0, "gp": 0.0, "bl": 0.3, "ds": 0.0, "txt": "When I began this project my model was indeed being provided time-of-day features (they were sinusoidal like in the published literature). Then one day I decided to remove it to see what happens. The accuracy didn't degrade so I thought hmm maybe it's because the model can *infer* time-of-day from past blood sugar alone? So I attached a time-of-day head to test it and it worked!\n\nInterestingly I have noticed that I get sleepy when the model's predicted clock gets close to midnight rather than the actual clock when I travel between time zones."}, {"id": 50496165, "au": "tefkah", "dom": 8, "sr": 9, "sc": 1.95, "ep": 1.95, "bs": 0.0, "d": 0, "age": 2.04, "grav": 12.4, "surf": 269.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 27, "qw": 0, "k": 276, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "t1d_interesting", "flbl": "T1d & Interesting (Appreciate)", "urls": ["https://mistral.ai/news/timestral/"], "ig": 0.744, "fa": 0.0, "gp": 0.139, "bl": 0.0, "ds": 0.0, "txt": "Extremely interesting, thanks for sharing!\nHave you looked at Timestral at all by any chance?[0]\nI'm only dipping my toes into time series models, for somewhat similar reasons.\n\n[0]: https://mistral.ai/news/timestral/"}, {"id": 50495434, "au": "ddorian43", "dom": 26, "sr": 10, "sc": 1.92, "ep": 2.28, "bs": 0.0, "d": 0, "age": 4.24, "grav": 27.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 2474, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "carbs_model", "flbl": "Carbs & Model (App)", "urls": [], "ig": 0.971, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Have you ever thought about fixing the underlying issue instead? Maybe it makes this whole project obsolete. I know T1D can't be fixed, but using ketogenic diet should have much smaller peaks/lows & more stable blood glucose in all cases.\n\nRemoving carbs will remove most (not all) need for insulin."}, {"id": 50496854, "au": "viraptor", "dom": 1, "sr": 11, "sc": 1.87, "ep": 2.02, "bs": 0.0, "d": 0, "age": 0.11, "grav": 3.8, "surf": 882.5, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 48138, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "t1d_interesting", "flbl": "T1d & Interesting (Appreciate)", "urls": [], "ig": 0.835, "fa": 0.0, "gp": 0.037, "bl": 0.0, "ds": 0.0, "txt": "It's so cool. I appreciate the detailed architecture doc. I wonder why the time of day is getting predicted rather than provided in data. Did that perform worse? Or is it to explicitly account for people with uncommon schedules?"}, {"id": 50496796, "au": "0xdeadf1sh", "dom": 11, "sr": 12, "sc": 1.4, "ep": 2.78, "bs": 0.8, "d": 1, "age": 0.27, "grav": 4.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 76, "qw": 0, "k": 57, "kpp": 6.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "carbs_model", "flbl": "Carbs & Model (App)", "urls": [], "ig": 1.183, "fa": 0.0, "gp": 0.0, "bl": 0.3, "ds": 0.0, "txt": "Thanks for the comment!\n\nYou can copy the data from the app to nightscout, but I haven't added the reverse direction. My app allows me to read from multiple CGMs simultaneously (I did this because different CGM models have their own algorithms and you don't want your machine learning model to be fitted to one particular algorithm).\n\nI do a lot of reverse engineering to connect my app directly to the CGM sensors, bypassing official vendor solutions (they suck anyway)."}, {"id": 50496295, "au": "user_7832", "dom": 14, "sr": 13, "sc": 1.29, "ep": 1.44, "bs": 0.0, "d": 1, "age": 1.66, "grav": 10.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 4955, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "repo_training", "flbl": "Repo & Training (Hands)", "urls": [], "ig": 0.613, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Idk who flagged/downvoted you, T1D requires all the help it can get (and then some) - even if it's AI - so I vouched for your comment.\n\nDo you have a GitHub repo or something btw?"}, {"id": 50496816, "au": "0xdeadf1sh", "dom": 20, "sr": 14, "sc": 1.17, "ep": 1.97, "bs": 0.8, "d": 1, "age": 0.22, "grav": 4.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 57, "kpp": 6.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "repo_training", "flbl": "Repo & Training (Hands)", "urls": [], "ig": 0.837, "fa": 0.0, "gp": 0.0, "bl": 0.3, "ds": 0.0, "txt": "Helping hands are always needed. You can test the models on your own data locally and tell me how they work for you. I have 2 kinds of models in the repo: those trained on the metabonet dataset which consists mostly of AID, and mine which is MDI."}, {"id": 50496758, "au": "0xdeadf1sh", "dom": 4, "sr": 15, "sc": 1.02, "ep": 1.96, "bs": 0.8, "d": 1, "age": 0.37, "grav": 4.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 57, "kpp": 6.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "repo_training", "flbl": "Repo & Training (Hands)", "urls": [], "ig": 0.834, "fa": 0.0, "gp": 0.0, "bl": 0.3, "ds": 0.0, "txt": "Thanks, N=1 training is really the way to go. In my case training on large N >> 1 (i.e. metabonet dataset) actually hurt the performance of the models predicting my own blood sugar.\n\nYou don't even need a datacenter GPU. I trained all of my models on a laptop RTX 4070."}, {"id": 50446462, "au": "Bigchrome", "dom": 21, "sr": 16, "sc": 0.98, "ep": 3.71, "bs": 2.52, "d": 0, "age": 88.23, "grav": 3308.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 1, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "t1d_interesting", "flbl": "T1d & Interesting (Appreciate)", "urls": [], "ig": 0.458, "fa": 0.34, "gp": 1.15, "bl": 0.95, "ds": 0.0, "txt": "I achieved 100% TIR with my model. I'm not T1D, but same same.\n\nJK, as the spouse of someone with T1D I really appreciate seeing this!"}, {"id": 50496829, "au": "0xdeadf1sh", "dom": 18, "sr": 17, "sc": 0.9, "ep": 2.5, "bs": 0.8, "d": 3, "age": 0.17, "grav": 4.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 63, "qw": 0, "k": 57, "kpp": 6.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "carbs_model", "flbl": "Carbs & Model (App)", "urls": [], "ig": 1.063, "fa": 0.0, "gp": 0.0, "bl": 0.3, "ds": 0.0, "txt": "Yeah I was using the macro-nutrient approach as well, but then switched to simply providing GI (glycemic index) alongside the carbs in grams and found out that there was practically no difference between the two.\n\nDuring training I artificially wobble the carb amounts so they are more like guesstimates than true carbs. This also partially fixed the quantile bands (before that they were too narrow)."}, {"id": 50496773, "au": "0xdeadf1sh", "dom": 9, "sr": 18, "sc": 0.87, "ep": 1.81, "bs": 0.8, "d": 1, "age": 0.34, "grav": 4.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 57, "kpp": 6.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "repo_training", "flbl": "Repo & Training (Hands)", "urls": [], "ig": 0.772, "fa": 0.0, "gp": 0.0, "bl": 0.3, "ds": 0.0, "txt": "TSFMs are really really big. My motivation for training smaller models is because I want to run them locally on my smartphone. But yes, I plan to add TSFMs to the github repo soon."}, {"id": 50450689, "au": "0xdeadf1sh", "dom": 7, "sr": 19, "sc": 0.25, "ep": 1.56, "bs": 0.8, "d": 1, "age": 78.04, "grav": 2666.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 57, "kpp": 6.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "repo_training", "flbl": "Repo & Training (Hands)", "urls": [], "ig": 0.664, "fa": 0.0, "gp": 0.0, "bl": 0.3, "ds": 0.0, "txt": "Yeah I'm thinking of adding more (especially recent) models and compare their published metrics with those of mine to see how they hold up. Then I'll likely post about it here again. See you then!"}, {"id": 50452672, "au": "srdjanb", "dom": 15, "sr": 20, "sc": 0.14, "ep": 2.95, "bs": 2.52, "d": 0, "age": 73.02, "grav": 2372.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 1, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "insulin_dietary", "flbl": "Insulin & Dietary (Info)", "urls": [], "ig": 0.547, "fa": 0.0, "gp": 1.15, "bl": 0.95, "ds": 0.0, "txt": "This is cool. The accuracy looks good too, except for a few time windows. Do these models take into account dietary info, and if yes, how?"}, {"id": 50496804, "au": "0xdeadf1sh", "dom": 13, "sr": 21, "sc": -0.1, "ep": 1.86, "bs": 0.8, "d": 1, "age": 0.24, "grav": 4.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 57, "kpp": 6.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "carbs_model", "flbl": "Carbs & Model (App)", "urls": [], "ig": 0.793, "fa": 0.0, "gp": 0.0, "bl": 0.3, "ds": 0.0, "txt": "I also didn't have enough personal data to train on (transformers are very data-hungry), so I created a huge synthetic dataset to help me with that. I use that for pretraining and then plug in a LoRA that got trained using my personal data."}, {"id": 50496237, "au": "Jarmsy", "dom": 30, "sr": 22, "sc": -0.16, "ep": 1.42, "bs": 0.85, "d": 3, "age": 1.8, "grav": 11.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 449, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "t1d_interesting", "flbl": "T1d & Interesting (Appreciate)", "urls": [], "ig": 0.604, "fa": 0.0, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "I don't have experience of epilepsy so wouldn't assume about its challenges, but do have T1D. I've done some long periods of strict keto, and it does have some big positives, but I don't find it a great long term solution."}, {"id": 50496737, "au": "ddorian43", "dom": 31, "sr": 23, "sc": -1.23, "ep": 0.91, "bs": 1.7, "d": 4, "age": 0.44, "grav": 5.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 2474, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 5, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "insulin_dietary", "flbl": "Insulin & Dietary (Info)", "urls": [], "ig": 0.387, "fa": 0.0, "gp": 0.0, "bl": 0.64, "ds": 0.0, "txt": "Did you have less need for insulin and more stable blood glucose?\n\nWhat are the issues for long term?"}, {"id": 50453035, "au": "0xdeadf1sh", "dom": 16, "sr": 24, "sc": -1.93, "ep": 0.72, "bs": 1.99, "d": 1, "age": 72.32, "grav": 2333.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 57, "kpp": 6.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "insulin_dietary", "flbl": "Insulin & Dietary (Info)", "urls": [], "ig": 0.306, "fa": 0.0, "gp": 0.0, "bl": 0.75, "ds": 0.0, "txt": "Carbohydrates & insulin are both accounted for during inference. I'm not sure if that's what you meant by dietary info though."}, {"id": 50495697, "au": "Jarmsy", "dom": 28, "sr": 25, "sc": -2.25, "ep": 0.48, "bs": 1.19, "d": 1, "age": 3.41, "grav": 20.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 449, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "carbs_model", "flbl": "Carbs & Model (App)", "urls": [], "ig": 0.206, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Have you ever thought about not giving confident advice on a topic you don't actually have any useful insight on?"}, {"id": 50496865, "au": "0xdeadf1sh", "dom": 27, "sr": 26, "sc": -2.34, "ep": 0.53, "bs": 1.99, "d": 1, "age": 0.09, "grav": 3.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 57, "kpp": 6.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "insulin_dietary", "flbl": "Insulin & Dietary (Info)", "urls": [], "ig": 0.224, "fa": 0.0, "gp": 0.0, "bl": 0.75, "ds": 0.0, "txt": "Fixing the underlying issue requires something like stem cell therapy, which I'm not sure if I can do in a garage, but maybe one day."}, {"id": 50496849, "au": "0xdeadf1sh", "dom": 24, "sr": 27, "sc": -2.59, "ep": 0.49, "bs": 1.99, "d": 1, "age": 0.12, "grav": 3.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 57, "kpp": 6.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "carbs_model", "flbl": "Carbs & Model (App)", "urls": [], "ig": 0.21, "fa": 0.0, "gp": 0.0, "bl": 0.75, "ds": 0.0, "txt": "The model can easily learn when you want to chomp. It's much harder for it to predict how much you want to chomp."}, {"id": 50495576, "au": "WatchdogReset", "dom": 19, "sr": 28, "sc": -2.72, "ep": 0.92, "bs": 3.05, "d": 0, "age": 3.82, "grav": 23.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 154, "kpp": 8.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "repo_training", "flbl": "Repo & Training (Hands)", "urls": [], "ig": 0.329, "fa": 0.0, "gp": 0.1, "bl": 1.15, "ds": 0.0, "txt": "This is really cool, please share if you need more data or helping hands."}, {"id": 50495707, "au": "nurettin", "dom": 23, "sr": 29, "sc": -6.38, "ep": 0.22, "bs": 4.24, "d": 0, "age": 3.39, "grav": 20.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 4068, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "carbs_model", "flbl": "Carbs & Model (App)", "urls": [], "ig": 0.043, "fa": 0.0, "gp": 0.082, "bl": 1.6, "ds": 0.0, "txt": "So it knows when you want to chomp"}, {"id": 50450373, "au": "orasul", "dom": 25, "sr": 30, "sc": -9.97, "ep": 0.0, "bs": 9.41, "d": 0, "age": 78.86, "grav": 2715.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 1, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 1.15, "bl": 3.55, "ds": 0.0, "txt": "awesome"}, {"id": 50447791, "au": "zenpositive", "dom": 22, "sr": 31, "sc": -10.63, "ep": 0.0, "bs": 9.41, "d": 0, "age": 86.09, "grav": 3168.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 2, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "t1d_interesting", "flbl": "T1d & Interesting (Appreciate)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 1.15, "bl": 3.55, "ds": 0.0, "txt": "Very cool very nice work!"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      const jumpBtns = isPinned
+        ? `<button type="button" class="probe-inline-btn" data-probe-jump="1">Comment &darr;</button>` +
+          `<button type="button" class="probe-inline-btn" data-probe-clear="1">Clear &times;</button>`
+        : "";
+      probeEl.innerHTML =
+        `<strong>@${escHtml(hit.au)}</strong> | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})` +
+        jumpBtns +
+        `<br>"${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 60);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 50);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 50);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 50);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `Showing ${shown.length} of ${pool.length} matching comments (mode: ${activeMode})` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear selection</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeSelect = document.getElementById("modeSelect");
+  modeSelect.addEventListener("change", () => {
+    activeMode = modeSelect.value;
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

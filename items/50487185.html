@@ -1,0 +1,1257 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50487185 // After 600 experiments, here&No. x27;s what I discovered about JEPA world models — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      background: rgb(247, 247, 245);
+      color: rgb(13, 13, 13);
+      font: 15px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+    }
+    .sheet-top {
+      border-top: 3px solid rgb(13, 13, 13);
+      border-bottom: 1px solid rgb(13, 13, 13);
+      padding: 16px 0 26px;
+    }
+    .eyebrow {
+      font: 600 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .eyebrow strong { color: rgb(255, 51, 0); }
+    h1 {
+      font-size: clamp(36px, 5.2vw, 72px);
+      line-height: 0.96;
+      letter-spacing: -0.045em;
+      margin: 18px 0 14px;
+      font-weight: 800;
+    }
+    h1 .accent { color: rgb(255, 51, 0); }
+    .sublead {
+      max-width: 920px;
+      font-size: 16px;
+      color: rgb(52, 52, 50);
+      margin: 0;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      font: 700 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 24px;
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+    }
+    .kpi-cell {
+      padding: 16px 16px 14px;
+      border-right: 1px solid rgb(205, 205, 200);
+    }
+    .kpi-cell:last-child { border-right: 0; }
+    .kpi-label {
+      font: 600 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 8px 0 4px;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      font-size: 12px;
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      background: rgb(13, 15, 17);
+      color: rgb(228, 232, 236);
+      border: 2px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 6px;
+      corner-shape: bevel;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(156, 166, 176);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      background: rgb(9, 11, 13);
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(180, 188, 196);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 58px;
+      background: rgb(20, 24, 28);
+      border-left: 3px solid rgb(0, 230, 118);
+      font: 12px/19px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(220, 226, 232);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 38px;
+    }
+
+    /* Collapsible 03A / 03B Justification Drawer */
+    details.proof-drawer {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 12px 0;
+    }
+    details.proof-drawer > summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      font: 700 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      user-select: none;
+    }
+    details.proof-drawer > summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary:hover { border-color: rgb(255, 51, 0); }
+    details.proof-drawer > summary .toggle-pill {
+      flex-shrink: 0;
+      padding: 3px 8px;
+      background: rgb(13, 13, 13);
+      color: rgb(247, 247, 245);
+      font-size: 10px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 16px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: rgb(255, 255, 253);
+      border: 1px solid rgb(13, 13, 13);
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+    }
+    table.ablation th {
+      background: rgb(236, 236, 231);
+      font: 700 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgb(60, 60, 58);
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      font: 600 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+      color: rgb(13, 13, 13);
+      padding: 7px 11px;
+      font: 600 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      box-shadow: 0 2px 0 rgb(13, 13, 13);
+    }
+    button.tab-btn.active {
+      background: rgb(13, 13, 13);
+      color: rgb(247, 247, 245);
+    }
+    button.tab-btn:hover {
+      border-color: rgb(255, 51, 0);
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      padding: 8px 11px;
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+      font: 600 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { flex: 1; min-width: 220px; font-weight: 400; }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border: 1px solid rgb(216, 216, 206);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      border-top: 3px solid rgb(13, 13, 13);
+      padding-top: 14px;
+      margin-top: 36px;
+      font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        background: rgb(239, 239, 234);
+        border: 1px solid rgb(13, 13, 13);
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        font-size: 17px;
+        margin: 0;
+        white-space: normal;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        background: rgb(13, 13, 13);
+        color: rgb(247, 247, 245);
+        font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-] HIDE"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+] SHOW"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpi-cell { border-bottom: 1px solid rgb(205, 205, 200); }
+      .filter-bar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .filter-bar select.sel-in {
+        width: 100%;
+        font-size: 16px;
+        padding: 8px 9px;
+      }
+      .filter-bar input.search-in {
+        grid-column: span 2;
+        width: 100%;
+        min-width: 0;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="sheet-top">
+    <div class="eyebrow">
+      <span>NYX OBSERVATORY // <a class="ext-link" href="https://news.ycombinator.com/item?id=50487185">HN ITEM 50487185</a> // HADDYALCHAER.COM</span>
+      <span><strong>BULLSHIT: 88.9%</strong>
+    </div>
+    <h1>Bullshit vs. <span class="accent">Epistemic.</span></h1>
+    <p class="sublead">
+      <strong>45</strong> Hacker News comments on <a class="ext-link" href="https://haddyalchaer.com/jepa">After 600 experiments, here&No. x27;s what I discovered about JEPA world models (haddyalchaer.com)</a>.
+    </p>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary>
+      <span>01 // EVIDENCE</span>
+      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    </summary>
+    <p>
+      Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+      Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+    </p>
+    <div class="proof-body">
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">45</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 39 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">11.1%</div>
+          <div class="kpi-sub">5 comments (0 Gold / 0.0%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">88.9%</div>
+          <div class="kpi-sub">22 chatter &bull; 18 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">1</div>
+        <div class="kpi-sub">0% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.785</div>
+        <div class="kpi-sub">3 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">9</div>
+          <div class="kpi-sub">HN POS 3..11 (20.0% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="margin-top:10px;font:600 11px/1.5 ui-monospace,Menlo,monospace;color:rgb(70,70,68)"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary>
+      <span>02 // EXPLORE</span>
+      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / INTERACTIVE EQUATION</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p style="font-size:11.5px;line-height:1.42;color:rgb(85,85,82);margin:12px 0 0">
+              Drag any weight to watch the 45-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 45)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (0)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (5)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (22)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (18)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..45) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 25)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (@robotresearcher, 16.1h); largest subtree (@hazrmard) occupies 9 slots (HN POS 3..11).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="modeSelect" class="sel-in" aria-label="Ranking view">
+          <option value="hn_top40">HN Top 40</option>
+          <option value="top_signal">Epistemic Top 50</option>
+          <option value="buried_gems">Buried Gems (HN POS &gt; 25)</option>
+          <option value="bullshit_traps">High-Karma / URL Traps Caught</option>
+          <option value="mod_morgue">Mod Rebukes &amp; Downvoted Morgue</option>
+          <option value="c5a_rescues">c5A Heterodox Rescues</option>
+        </select>
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (45)</option>
+          <option value="jepa_text">Jepa &amp; Text (Based) (15)</option>
+          <option value="model_control">Model &amp; Control (Task) (13)</option>
+          <option value="novel_current">Novel &amp; Current (Discovery) (11)</option>
+          <option value="general_commentary">General Commentary (6)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, jepa, models, tasks, state, discovered...">
+      </div>
+      <div id="resultMeta" style="font:600 11px/1.4 ui-monospace,Menlo,monospace;color:rgb(90,90,88);margin-bottom:10px"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50487185 + HADDYALCHAER.COM + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50487185, "story_title": "After 600 experiments, here's what I discovered about JEPA world models", "story_url": "https://haddyalchaer.com/jepa", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50487185, "story_title": "After 600 experiments, here's what I discovered about JEPA world models", "story_url": "https://haddyalchaer.com/jepa", "points": 273, "story_author": "halcdev", "article_source": "fetched_url", "t1_ref_utc": "2026-11-14T11:41:07+00:00", "t2_ref_utc": "2026-11-14T11:41:07+00:00", "delta_minutes": 0.0, "story_anchors": ["jepa", "models", "tasks", "state", "discovered", "lewm", "test", "demonstration", "embedding", "states", "push-t", "model", "planning", "task", "experiments", "space", "action", "far", "training", "data", "learned", "useful", "page", "learning", "background"], "facet_labels": {"model_control": "Model & Control (Task)", "jepa_text": "Jepa & Text (Based)", "novel_current": "Novel & Current (Discovery)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "model_control", "label": "Model & Control (Task)", "count": 13, "top_terms": ["model", "control", "task", "learning"]}, {"slug": "jepa_text", "label": "Jepa & Text (Based)", "count": 15, "top_terms": ["jepa", "text", "based", "limitations"]}, {"slug": "novel_current", "label": "Novel & Current (Discovery)", "count": 11, "top_terms": ["novel", "current", "discovery", "paper"]}], "counts": {"total_comments": 45, "live_t2_comments": 45, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 39, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "74ca026748d60b4d184ac78cebe3befd11df87217dbb8a20ff1a5ea759be9fcb"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"grounded_analysis": 5, "crowd_chatter": 22, "bullshit_or_flamewar": 18}, "facets": {"model_control": 13, "novel_current": 11, "jepa_text": 15, "general_commentary": 6}, "facet_options": [{"slug": "jepa_text", "label": "Jepa & Text (Based)", "count": 15}, {"slug": "model_control", "label": "Model & Control (Task)", "count": 13}, {"slug": "novel_current", "label": "Novel & Current (Discovery)", "count": 11}, {"slug": "general_commentary", "label": "General Commentary", "count": 6}], "facet_diagnostics": [{"slug": "jepa_text", "label": "Jepa & Text (Based)", "count": 15, "useful": 1, "useful_pct": 6.7, "terms": "jepa, text, based, limitations"}, {"slug": "model_control", "label": "Model & Control (Task)", "count": 13, "useful": 3, "useful_pct": 23.1, "terms": "model, control, task, learning"}, {"slug": "novel_current", "label": "Novel & Current (Discovery)", "count": 11, "useful": 1, "useful_pct": 9.1, "terms": "novel, current, discovery, paper"}, {"slug": "general_commentary", "label": "General Commentary", "count": 6, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 3}, {"category": "code_repository", "count": 1}], "story_anchors": ["jepa", "models", "tasks", "state", "discovered", "lewm", "test", "demonstration", "embedding", "states", "push-t", "model", "planning", "task", "experiments", "space", "action", "far"], "largest_root": {"root_id": 50489425, "author": "hazrmard", "slots": 9, "start_dom": 3, "end_dom": 11, "share_pct": 20.0, "top_dom1_age": 16.1, "top_dom1_author": "robotresearcher"}, "buried_cutoff": 25, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50488606, "au": "robotresearcher", "dom": 1, "sr": 1, "sc": 6.91, "ep": 6.91, "bs": 0.0, "d": 0, "age": 16.07, "grav": 183.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 141, "qw": 37, "k": 10448, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "model_control", "flbl": "Model & Control (Task)", "urls": [], "ig": 1.352, "fa": 1.04, "gp": 0.53, "bl": 0.0, "ds": 0.0, "txt": "There’s a repeated theme here that I don’t understand. For example:\n\n> (3) That's where I decided to build a harder test, where each task takes its start from one demonstration and its goal from another\n\n> (4)  I also built an interactive demo where I could place the block anywhere and pick any goal. [but]\nThe goals in the harder test are frames from expert demonstrations\n\nWhy lean so hard on the demonstration examples? Surely the actual task here is to move between any two arbitrary poses.\n\nSo if the demonstration set is statistically strange in any way, you keep banging into that. And even if you get great results, you still haven’t shown that it generalizes to the generic system. And the one thing you know 100% about a physical robot system is that you will never encounter exactly the same situation twice.\n\nIs there actually a reason to pick eval examples from the demonstrations instead of independent samples from the underlying task?\n\nI’m pretty sure that the T-shoving problem doesn’t have goal reachability issues. And if it did, test 4 could run into them since the start pose is arbitrary."}, {"id": 50492072, "au": "kooi", "dom": 4, "sr": 2, "sc": 5.32, "ep": 5.32, "bs": 0.0, "d": 1, "age": 11.41, "grav": 106.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 155, "qw": 0, "k": 166, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "model_control", "flbl": "Model & Control (Task)", "urls": [], "ig": 1.413, "fa": 0.0, "gp": 1.38, "bl": 0.0, "ds": 0.0, "txt": "I think this is why it has a lot of potential. I'm also controls background, so I'm going to just throw stuff at the wall.\n\nI'm thinking it's both M and P. M for the reasons you've mentioned. Then there is P where a forward horizon prediction of both plant and the world.\n\nI think JEPA also touches on the perception tasks: What to do with sensor data? Classical control objectives are quite simple, drive the state to stable, follow a trajectory, stay safe. It's very deterministic: Sensor data is used to determine state. State is used to update dynamics, dynamics is used for the forward horizon.\n\nSo. MPC works for things like self-driving because the car model is fairly knowable and world model is predictable (rules of the road, knowable dynamics of other cars).\n\nJEPA seems like a fusion of control, sensing, world model into an embedding space where the learning that occurs is a model free approach to how these are all related to each other."}, {"id": 50489519, "au": "reasonabl_human", "dom": 14, "sr": 3, "sc": 4.94, "ep": 4.94, "bs": 0.0, "d": 2, "age": 14.77, "grav": 160.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 130, "qw": 0, "k": 311, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "novel_current", "flbl": "Novel & Current (Discovery)", "urls": [], "ig": 1.537, "fa": 0.34, "gp": 0.248, "bl": 0.0, "ds": 0.0, "txt": "Fair.  To clarify, I jumped in seeing this ranked \u00231 on HN which warped my expectations.\n\nThe root of my concern is the overall trend I'm seeing on HN:  Someone spends time iterating with a coding agent exploring a field that's new to them.  The agent's suggestions come from existing literature, but it rarely says \"this is Search on the Replay Buffer, here's the paper.\" So each new concept feels like a discovery and gets written up that way.  The enthusiastic tone of AI-assisted writing adds to this sensationalized effect.\n\nSo my concrete feedback would be a title like \"Learnings from 600 planning experiments with LeWM on Push-T\" since the current one suggests something novel about JEPA world models in general.  And cite techniques they've learned along the way so others can learn from source material too."}, {"id": 50489425, "au": "hazrmard", "dom": 3, "sr": 4, "sc": 4.81, "ep": 4.96, "bs": 0.0, "d": 0, "age": 14.89, "grav": 162.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 114, "qw": 0, "k": 477, "kpp": 5.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "model_control", "flbl": "Model & Control (Task)", "urls": [], "ig": 1.455, "fa": 0.0, "gp": 1.063, "bl": 0.0, "ds": 0.0, "txt": "JEPA is very similar to Model Predictive Control. Here, you swap the model of the system with black-box simulator (a neural net), apply some version of dynamic programming / Bellman equation to find the optimal action over planning horizon.\n\nIn the planning stage, by factoring out the optimization step from the rollout step, you can free the model to focus on learning the dynamics in latent space. (The other case, where the rollout+optimization happen in the learning loop, just becomes model-free RL.)\n\nMy background straddles classical & data-driven controls. This was the first similarity that popped out to me when I first started learning about world models.\n\nIs JEPA just MPC but where the \"M\" is a latent-space model?"}, {"id": 50488478, "au": "sashank_1509", "dom": 33, "sr": 5, "sc": 4.49, "ep": 4.49, "bs": 0.0, "d": 0, "age": 16.25, "grav": 186.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 39, "qw": 0, "k": 2543, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "jepa_text", "flbl": "Jepa & Text (Based)", "urls": ["https://www.pangram.com/history/2dd2b019-221a-4bee-bb6a-6b7e20cffe66?ucc=Z2lqra5aFN3&utm_source=pangram_share&utm_medium=copy_link"], "ig": 0.778, "fa": 0.62, "gp": 0.617, "bl": 0.0, "ds": 0.0, "txt": "AI; DR\n\nIf you’re going to use AI to generate text, keep it short and concise and meaty. I don’t hate reading AI, but I can’t read large walls of text for presumably some useful nugget of information in it.\n\nhttps://www.pangram.com/history/2dd2b019-221a-4bee-bb6a-6b7e..."}, {"id": 50488486, "au": "LarsDu88", "dom": 17, "sr": 6, "sc": 3.97, "ep": 3.97, "bs": 0.0, "d": 2, "age": 16.24, "grav": 186.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 143, "qw": 0, "k": 5418, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "jepa_text", "flbl": "Jepa & Text (Based)", "urls": [], "ig": 1.552, "fa": 0.0, "gp": 0.22, "bl": 0.0, "ds": 0.0, "txt": "JEPA can be applied to text as well in the sense you can use it to build text embedding models, freeze your JEPA text embedder, then train a decoder over the top of that.\n\nOF course your decoder model could end up doing a lot of the heavy lifting if your decoder loss was based on text reconstruction methods (which almost all LLMs use for eval purposes)\n\nFor certain tasks, you do need pixel/token level reconstruction fidelity to do a lot of things.  Like image generation or text generation.\n\nFor other tasks, having a coherent representation of the world that can be computed quickly and intuitively is more salient. I suspect the human mind works more like JEPA than like an autoregressive LLM. Human children train on far less data to achieve extreme fidelity on a lot of tasks generative reconstruction loss based AI/ML techniques struggle with."}, {"id": 50488724, "au": "rvz", "dom": 32, "sr": 7, "sc": 3.78, "ep": 3.78, "bs": 0.0, "d": 0, "age": 15.89, "grav": 179.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 53, "qw": 50, "k": 10590, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "novel_current", "flbl": "Novel & Current (Discovery)", "urls": [], "ig": 1.022, "fa": 0.42, "gp": 0.125, "bl": 0.0, "ds": 0.0, "txt": "We are doomed if most of the comments here are just talking about the website layout and not the contents of the article.\n\nAnyway:\n\n> The physics of pushing a block doesn't change if you shift, rotate or mirror the whole table. So when the graph has no states near a goal, it can take demonstration segments from elsewhere, transform them to fit the gap, and plan through those. With these transformed segments, success came back to 85%\n\nThis is an interesting technique to recover incomplete states or lost memories after demonstration. I'm guessing that the original LeWM does not have technique of transformative memories if I am correct?"}, {"id": 50488410, "au": "reasonabl_human", "dom": 12, "sr": 8, "sc": 3.54, "ep": 3.68, "bs": 0.0, "d": 0, "age": 16.35, "grav": 188.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 67, "qw": 0, "k": 311, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "model_control", "flbl": "Model & Control (Task)", "urls": [], "ig": 1.234, "fa": 0.0, "gp": 0.541, "bl": 0.0, "ds": 0.0, "txt": "Hands-on learning is an awesome thing - especially in the age of AI!\n\nBut maybe worth reframing away from “discovering” - hierarchical planning, sub-goals, action chunking etc. are well understood - this is more of a… transcript of your personal learning journey?\n\nWhich is still cool to see.  But I read through expecting there to be some kind of novel results.  We probably need to categorize these kinds of posts a bit better."}, {"id": 50489177, "au": "pj_mukh", "dom": 23, "sr": 9, "sc": 3.33, "ep": 3.48, "bs": 0.0, "d": 1, "age": 15.22, "grav": 167.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 33, "qw": 0, "k": 4582, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "jepa_text", "flbl": "Jepa & Text (Based)", "urls": ["https://en.wikipedia.org/wiki/Probabilistic_roadmap"], "ig": 0.728, "fa": 0.62, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Thanks for doing this!\n\nBasic question: couldn't something like probabilistic roadmaps [1] trivially solve this? Or am I missing something about the limitations of PRM's?\n\nAnd if so, is that the best test for JEPA?\n\n[1]:https://en.wikipedia.org/wiki/Probabilistic_roadmap"}, {"id": 50488423, "au": "bsaul", "dom": 16, "sr": 10, "sc": 2.62, "ep": 2.92, "bs": 0.0, "d": 1, "age": 16.33, "grav": 187.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 82, "qw": 0, "k": 9884, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "jepa_text", "flbl": "Jepa & Text (Based)", "urls": [], "ig": 1.174, "fa": 0.0, "gp": 0.108, "bl": 0.0, "ds": 0.0, "txt": "I knew close to nothing about JEPA before reading your post, but i was under the impression this was supposed to be a contender for LLM's limitations, a way to do things \"properly\".\n\nHowever, based on this article, i have the feeling that on the contrary, JEPA is filling a super niche problem, and is pretty much only trying to improve robotic motions in space.\n\nWhich of the two ideas is it ? Can JEPA technics be applied to a much more wide range of problems ? (like LLM and transformers)"}, {"id": 50489130, "au": "nightpool", "dom": 2, "sr": 11, "sc": 2.58, "ep": 2.94, "bs": 0.0, "d": 1, "age": 15.29, "grav": 169.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 117, "qw": 0, "k": 5325, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "model_control", "flbl": "Model & Control (Task)", "urls": [], "ig": 1.253, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Agreed, I don't know much about JEPA but i wish this article had explained / motivated the memory graph more. \"3. Fill gaps in memory with transformed memories\" in particular seemed really really damning for the models—when you removed the examples from the demonstration that were near the goal state, the model completely broke. It seems like the only way you could make the model work again would be to manually flip and transform the memories it did have so there was something in the vicinity of the goal location.\n\nThat seems like a really massive failure of the model to generalize? This doesn't seem like a new technique, it seems like you've discovered a pretty big issue with the fundamental setup"}, {"id": 50492210, "au": "ainch", "dom": 9, "sr": 12, "sc": 2.32, "ep": 3.05, "bs": 0.0, "d": 1, "age": 11.07, "grav": 102.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 72, "qw": 0, "k": 654, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "model_control", "flbl": "Model & Control (Task)", "urls": [], "ig": 1.299, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Yes absolutely. JEPA is far from the first approach to apply a learned dynamics model to MPC - it's just been well-marketed.\n\nIf you're interested, I'd recommend the TD-MPC series of papers, which also learn a latent world model, but achieves much better task performance in general. Unlike JEPA, TD-MPC learns to predict the task reward (what you'd call the cost in optimal control), so it's got a much better ability to rank trajectories during planning."}, {"id": 50494523, "au": "ghm2180", "dom": 24, "sr": 13, "sc": 2.06, "ep": 2.06, "bs": 0.0, "d": 0, "age": 5.38, "grav": 36.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 226, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "novel_current", "flbl": "Novel & Current (Discovery)", "urls": [], "ig": 0.797, "fa": 0.0, "gp": 0.13, "bl": 0.0, "ds": 0.0, "txt": "Did anyone notice the background of the page having an animation of colors diffusung. It's subtle and multiple color contours moving across the page.. it's really trippy!"}, {"id": 50488052, "au": "phoghed", "dom": 38, "sr": 14, "sc": 2.05, "ep": 2.05, "bs": 0.0, "d": 1, "age": 16.77, "grav": 195.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 1019, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "novel_current", "flbl": "Novel & Current (Discovery)", "urls": [], "ig": 0.776, "fa": 0.0, "gp": 0.157, "bl": 0.0, "ds": 0.0, "txt": "For anyone considering skipping because of this, it works flawlessly on my several year old iPhone.\n\nThere is a faint somewhat distracting background animation though I think…"}, {"id": 50488630, "au": "wilkystyle", "dom": 13, "sr": 15, "sc": 1.62, "ep": 2.13, "bs": 0.0, "d": 1, "age": 16.05, "grav": 182.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 59, "qw": 0, "k": 1746, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "novel_current", "flbl": "Novel & Current (Discovery)", "urls": [], "ig": 0.908, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Hm, I get your perspective, but completely disagree with your expectation. I'm not sure I would be entitled to expect a discovery that is novel with regard to current scientific knowledge unless I'm reading a paper. The fact that it is couched as \"I discovered\" and posted to a personal blog should be more than enough to convey that you might not find novel scientific discoveries within."}, {"id": 50495939, "au": "porridgeraisin", "dom": 10, "sr": 16, "sc": 1.51, "ep": 2.61, "bs": 0.0, "d": 2, "age": 0.85, "grav": 6.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 3418, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "model_control", "flbl": "Model & Control (Task)", "urls": [], "ig": 1.112, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It's a tradeoff, you either induce entirely general representations (e.g pure JEPA) or overly task specific ones (e.g TD-MPC).\n\nYou can operate midway at extra compute cost, by learning a general model, and then specializing that for the task at hand (by adding a reward head)."}, {"id": 50494585, "au": "light_hue_1", "dom": 30, "sr": 17, "sc": 1.31, "ep": 1.53, "bs": 0.0, "d": 0, "age": 5.14, "grav": 34.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 2719, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "jepa_text", "flbl": "Jepa & Text (Based)", "urls": [], "ig": 0.642, "fa": 0.0, "gp": 0.019, "bl": 0.0, "ds": 0.0, "txt": "This only works because on these simple tasks if you memorize you basically have the correct answer already. More or less testing on the training set."}, {"id": 50492671, "au": "nextaccountic", "dom": 5, "sr": 18, "sc": 1.16, "ep": 2.48, "bs": 0.0, "d": 2, "age": 10.02, "grav": 87.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 63, "qw": 0, "k": 6924, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "model_control", "flbl": "Model & Control (Task)", "urls": [], "ig": 0.953, "fa": 0.0, "gp": 0.166, "bl": 0.0, "ds": 0.0, "txt": "Yeah it looks like humans, other animals, and life in general are much more willing to instinctively control things in the transient regime, away from equilibrium\n\nI guess this is the new frontier. Rather than doing safe, predictable, boring control, push the envelope on what trajectories are possible, so that control becomes more lifelike and has a degree of autonomy to recover from error states"}, {"id": 50488923, "au": "kooi", "dom": 45, "sr": 19, "sc": 1.01, "ep": 1.45, "bs": 0.0, "d": 0, "age": 15.57, "grav": 174.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 166, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "jepa_text", "flbl": "Jepa & Text (Based)", "urls": [], "ig": 0.618, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I'm calling it: JEPA is what unlocks general robotics. In a autonomy stack, LLMs are only useful at the planning level and above."}, {"id": 50488353, "au": "dofm", "dom": 42, "sr": 20, "sc": 0.61, "ep": 2.39, "bs": 1.19, "d": 2, "age": 16.42, "grav": 189.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 4882, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "novel_current", "flbl": "Novel & Current (Discovery)", "urls": [], "ig": 0.726, "fa": 0.0, "gp": 0.474, "bl": 0.45, "ds": 0.0, "txt": "Older intel macs initially have quite large blank areas of scroll while the figures later in the page render.\n\nMuch better after scrolling through and then reloading."}, {"id": 50496095, "au": "barrkel", "dom": 34, "sr": 21, "sc": 0.59, "ep": 0.74, "bs": 0.0, "d": 1, "age": 0.35, "grav": 4.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 36301, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.315, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It's paraphrased Claudish. It's not as bad as it could be but you can see the Claudish sentence construction poking through, and the oddly bloodless / abstract way it described some approaches."}, {"id": 50491722, "au": "nsingh2", "dom": 11, "sr": 22, "sc": -0.15, "ep": 1.4, "bs": 0.0, "d": 1, "age": 12.06, "grav": 116.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 540, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "model_control", "flbl": "Model & Control (Task)", "urls": [], "ig": 0.594, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "In LLM parlance, I guess you could say MPC rollout and planning is the \"harness\" around a JEPA style world model."}, {"id": 50494966, "au": "andrewflnr", "dom": 35, "sr": 23, "sc": -0.21, "ep": 0.74, "bs": 0.0, "d": 1, "age": 3.85, "grav": 24.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 14980, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "jepa_text", "flbl": "Jepa & Text (Based)", "urls": [], "ig": 0.316, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I don't know. I'm an AI hater and I thought it was pretty readable. Maybe this is some of that actually good LLM prose they keep telling us we're going to get (or maybe I was just curious enough to plow through it)."}, {"id": 50488551, "au": "packeted", "dom": 29, "sr": 24, "sc": -0.26, "ep": 1.59, "bs": 1.19, "d": 0, "age": 16.15, "grav": 184.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 272, "kpp": 5.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "novel_current", "flbl": "Novel & Current (Discovery)", "urls": [], "ig": 0.386, "fa": 0.0, "gp": 0.472, "bl": 0.45, "ds": 0.0, "txt": "In a world where I'm increasingly being triggered by the fonts default Claude uses, I really liked the font used for the title here - it's Faculty Glyphic FYI."}, {"id": 50490496, "au": "cheesecompiler", "dom": 26, "sr": 25, "sc": -0.9, "ep": 1.4, "bs": 1.19, "d": 0, "age": 13.72, "grav": 142.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 261, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "model_control", "flbl": "Model & Control (Task)", "urls": [], "ig": 0.343, "fa": 0.0, "gp": 0.408, "bl": 0.45, "ds": 0.0, "txt": "The theme is really hard to read. Dont mean to be a dick, I love the article. I tried a few browsers and my eyes really strained."}, {"id": 50487874, "au": "Ohentis", "dom": 37, "sr": 26, "sc": -0.97, "ep": 1.4, "bs": 1.19, "d": 0, "age": 17.0, "grav": 200.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 57, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "jepa_text", "flbl": "Jepa & Text (Based)", "urls": [], "ig": 0.517, "fa": 0.0, "gp": 0.128, "bl": 0.45, "ds": 0.0, "txt": "Website is borderline unusable on my phone. I suspect because of the animations? Either way not a great state of affairs"}, {"id": 50488302, "au": "bsboxe", "dom": 40, "sr": 27, "sc": -1.67, "ep": 1.07, "bs": 1.19, "d": 1, "age": 16.5, "grav": 190.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 7, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "jepa_text", "flbl": "Jepa & Text (Based)", "urls": [], "ig": 0.359, "fa": 0.0, "gp": 0.154, "bl": 0.45, "ds": 0.0, "txt": "Works perfectly fine for me on iOS 27.3 (with the exception of some glitching that was solved by disabling adaptive dark mode)"}, {"id": 50493766, "au": "LdBaringSwallow", "dom": 6, "sr": 28, "sc": -2.42, "ep": 1.64, "bs": 2.52, "d": 2, "age": 7.66, "grav": 59.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": -4, "kpp": -0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "model_control", "flbl": "Model & Control (Task)", "urls": [], "ig": 0.699, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "Yeah not sure where the C comes from; models lack access to knobs and switches of the system they're on and taking over the OS isn't control over the hardware still since it can't upgrade its RAM, or GPU\n\nBut the M+P aspect def fits."}, {"id": 50490937, "au": "lossolo", "dom": 22, "sr": 29, "sc": -2.59, "ep": 0.94, "bs": 1.99, "d": 2, "age": 13.22, "grav": 134.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 26, "qw": 0, "k": 3506, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "jepa_text", "flbl": "Jepa & Text (Based)", "urls": ["https://haddyalchaer.com/stories/jepa/figures.js"], "ig": 0.398, "fa": 0.0, "gp": 0.0, "bl": 0.75, "ds": 0.0, "txt": "The animations use custom vanilla JS, Canvas 2D, SVG, and a WebGL shader.\n\nhttps://haddyalchaer.com/stories/jepa/figures.js\n\nBased on the colors and how it looks, it seems like Astra generated them."}, {"id": 50487186, "au": "halcdev", "dom": 15, "sr": 30, "sc": -3.31, "ep": 1.37, "bs": 4.24, "d": 0, "age": 17.76, "grav": 215.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 413, "kpp": 11.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.059, "fa": 0.0, "gp": 0.849, "bl": 1.6, "ds": 0.0, "txt": "Let me know if you have any questions!"}, {"id": 50488487, "au": "taikon", "dom": 27, "sr": 31, "sc": -3.8, "ep": 1.32, "bs": 4.24, "d": 0, "age": 16.23, "grav": 186.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 532, "kpp": 5.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "novel_current", "flbl": "Novel & Current (Discovery)", "urls": [], "ig": 0.272, "fa": 0.0, "gp": 0.468, "bl": 1.6, "ds": 0.0, "txt": "There's weird subtle moving rainbow color hues on this webpage on mobile"}, {"id": 50488370, "au": "freecodeio", "dom": 31, "sr": 32, "sc": -4.07, "ep": 1.27, "bs": 4.24, "d": 0, "age": 16.4, "grav": 189.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 346, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "novel_current", "flbl": "Novel & Current (Discovery)", "urls": [], "ig": 0.46, "fa": 0.0, "gp": 0.133, "bl": 1.6, "ds": 0.0, "txt": "as someone with an oled monitor that background effect gave me a small heart attack"}, {"id": 50488971, "au": "luisgvv", "dom": 28, "sr": 33, "sc": -4.15, "ep": 1.19, "bs": 4.24, "d": 0, "age": 15.52, "grav": 173.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 211, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "novel_current", "flbl": "Novel & Current (Discovery)", "urls": [], "ig": 0.216, "fa": 0.0, "gp": 0.47, "bl": 1.6, "ds": 0.0, "txt": "Whenever I read stuff like this, I wonder how could I get into this field?\n\nAwesome read!"}, {"id": 50488314, "au": "halcdev", "dom": 39, "sr": 34, "sc": -4.9, "ep": 0.88, "bs": 4.24, "d": 2, "age": 16.48, "grav": 190.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 413, "kpp": 11.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "jepa_text", "flbl": "Jepa & Text (Based)", "urls": [], "ig": 0.375, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Thanks! Glad to know it works for most people. I reduced the bg animation intensity."}, {"id": 50495997, "au": "_kulang", "dom": 7, "sr": 35, "sc": -5.25, "ep": 0.62, "bs": 5.43, "d": 1, "age": 0.66, "grav": 5.8, "surf": 20.1, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 292, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.261, "fa": 0.0, "gp": 0.003, "bl": 2.05, "ds": 0.0, "txt": "Yes to your last sentence and Le Cun knows it, he talked about it in an interview."}, {"id": 50488287, "au": "halcdev", "dom": 41, "sr": 36, "sc": -5.34, "ep": 0.44, "bs": 4.24, "d": 1, "age": 16.52, "grav": 191.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 413, "kpp": 11.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "model_control", "flbl": "Model & Control (Task)", "urls": [], "ig": 0.186, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Sorry about that- will investigate. What OS/browser are you using?"}, {"id": 50488475, "au": "Xenograph", "dom": 21, "sr": 37, "sc": -5.4, "ep": 0.39, "bs": 4.24, "d": 4, "age": 16.26, "grav": 186.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 259, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "novel_current", "flbl": "Novel & Current (Discovery)", "urls": [], "ig": 0.164, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "there's no webgl on the page though afaict?"}, {"id": 50488248, "au": "carlmr", "dom": 18, "sr": 38, "sc": -5.59, "ep": 0.2, "bs": 4.24, "d": 1, "age": 16.57, "grav": 192.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 7933, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "jepa_text", "flbl": "Jepa & Text (Based)", "urls": [], "ig": 0.083, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "I wanted to know how you made these animations, they look gorgeous!"}, {"id": 50488547, "au": "whiplash451", "dom": 25, "sr": 39, "sc": -9.45, "ep": 0.0, "bs": 6.89, "d": 0, "age": 16.15, "grav": 184.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 7, "qw": 0, "k": 1931, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "jepa_text", "flbl": "Jepa & Text (Based)", "urls": ["https://github.com/olivkoch/gumbel-mcts"], "ig": -0.95, "fa": 0.0, "gp": 0.534, "bl": 2.6, "ds": 0.0, "txt": "MCTS also solves push-T problems without training: https://github.com/olivkoch/gumbel-mcts"}, {"id": 50496208, "au": "cubefox", "dom": 8, "sr": 40, "sc": -9.56, "ep": 0.0, "bs": 6.89, "d": 2, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 8109, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Yeah, with Lex Fridman."}, {"id": 50494503, "au": "Ohentis", "dom": 43, "sr": 41, "sc": -9.78, "ep": 0.0, "bs": 6.89, "d": 2, "age": 5.43, "grav": 37.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 0, "k": 57, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Android and firefox"}, {"id": 50488226, "au": "Aboutplants", "dom": 44, "sr": 42, "sc": -10.31, "ep": 0.0, "bs": 6.89, "d": 1, "age": 16.59, "grav": 192.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 1880, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Looks perfectly fine for me"}, {"id": 50488368, "au": "halcdev", "dom": 20, "sr": 43, "sc": -10.66, "ep": 0.0, "bs": 6.89, "d": 3, "age": 16.4, "grav": 189.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 413, "kpp": 11.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "jepa_text", "flbl": "Jepa & Text (Based)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "javascript and webgl magic ;)"}, {"id": 50488698, "au": "prohackernewsus", "dom": 36, "sr": 44, "sc": -12.57, "ep": 0.0, "bs": 9.41, "d": 0, "age": 15.93, "grav": 180.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 1, "qw": 0, "k": 0, "kpp": 0.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "model_control", "flbl": "Model & Control (Task)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.114, "bl": 3.55, "ds": 0.0, "txt": "Cool"}, {"id": 50488307, "au": "orbis-tertius", "dom": 19, "sr": 45, "sc": -13.68, "ep": 0.0, "bs": 9.41, "d": 2, "age": 16.49, "grav": 190.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 41, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "jepa_text", "flbl": "Jepa & Text (Based)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.159, "bl": 3.55, "ds": 0.0, "txt": "Seconding that, gorgeous animations"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      const jumpBtns = isPinned
+        ? `<button type="button" class="probe-inline-btn" data-probe-jump="1">Comment &darr;</button>` +
+          `<button type="button" class="probe-inline-btn" data-probe-clear="1">Clear &times;</button>`
+        : "";
+      probeEl.innerHTML =
+        `<strong>@${escHtml(hit.au)}</strong> | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})` +
+        jumpBtns +
+        `<br>"${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 60);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 50);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 50);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 50);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `Showing ${shown.length} of ${pool.length} matching comments (mode: ${activeMode})` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear selection</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeSelect = document.getElementById("modeSelect");
+  modeSelect.addEventListener("change", () => {
+    activeMode = modeSelect.value;
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

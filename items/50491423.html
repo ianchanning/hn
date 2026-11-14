@@ -1,0 +1,1259 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50491423 // Terminal borders that don&No. x27;t cost a cell — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      background: rgb(247, 247, 245);
+      color: rgb(13, 13, 13);
+      font: 15px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+    }
+    .sheet-top {
+      border-top: 3px solid rgb(13, 13, 13);
+      border-bottom: 1px solid rgb(13, 13, 13);
+      padding: 16px 0 26px;
+    }
+    .eyebrow {
+      font: 600 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .eyebrow strong { color: rgb(255, 51, 0); }
+    h1 {
+      font-size: clamp(36px, 5.2vw, 72px);
+      line-height: 0.96;
+      letter-spacing: -0.045em;
+      margin: 18px 0 14px;
+      font-weight: 800;
+    }
+    h1 .accent { color: rgb(255, 51, 0); }
+    .sublead {
+      max-width: 920px;
+      font-size: 16px;
+      color: rgb(52, 52, 50);
+      margin: 0;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      font: 700 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 24px;
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+    }
+    .kpi-cell {
+      padding: 16px 16px 14px;
+      border-right: 1px solid rgb(205, 205, 200);
+    }
+    .kpi-cell:last-child { border-right: 0; }
+    .kpi-label {
+      font: 600 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 8px 0 4px;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      font-size: 12px;
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      background: rgb(13, 15, 17);
+      color: rgb(228, 232, 236);
+      border: 2px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 6px;
+      corner-shape: bevel;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(156, 166, 176);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      background: rgb(9, 11, 13);
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(180, 188, 196);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 58px;
+      background: rgb(20, 24, 28);
+      border-left: 3px solid rgb(0, 230, 118);
+      font: 12px/19px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(220, 226, 232);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 38px;
+    }
+
+    /* Collapsible 03A / 03B Justification Drawer */
+    details.proof-drawer {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 12px 0;
+    }
+    details.proof-drawer > summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      font: 700 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      user-select: none;
+    }
+    details.proof-drawer > summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary:hover { border-color: rgb(255, 51, 0); }
+    details.proof-drawer > summary .toggle-pill {
+      flex-shrink: 0;
+      padding: 3px 8px;
+      background: rgb(13, 13, 13);
+      color: rgb(247, 247, 245);
+      font-size: 10px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 16px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: rgb(255, 255, 253);
+      border: 1px solid rgb(13, 13, 13);
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+    }
+    table.ablation th {
+      background: rgb(236, 236, 231);
+      font: 700 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgb(60, 60, 58);
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      font: 600 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+      color: rgb(13, 13, 13);
+      padding: 7px 11px;
+      font: 600 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      box-shadow: 0 2px 0 rgb(13, 13, 13);
+    }
+    button.tab-btn.active {
+      background: rgb(13, 13, 13);
+      color: rgb(247, 247, 245);
+    }
+    button.tab-btn:hover {
+      border-color: rgb(255, 51, 0);
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      padding: 8px 11px;
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+      font: 600 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { flex: 1; min-width: 220px; font-weight: 400; }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border: 1px solid rgb(216, 216, 206);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      border-top: 3px solid rgb(13, 13, 13);
+      padding-top: 14px;
+      margin-top: 36px;
+      font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        background: rgb(239, 239, 234);
+        border: 1px solid rgb(13, 13, 13);
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        font-size: 17px;
+        margin: 0;
+        white-space: normal;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        background: rgb(13, 13, 13);
+        color: rgb(247, 247, 245);
+        font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-] HIDE"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+] SHOW"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpi-cell { border-bottom: 1px solid rgb(205, 205, 200); }
+      .filter-bar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .filter-bar select.sel-in {
+        width: 100%;
+        font-size: 16px;
+        padding: 8px 9px;
+      }
+      .filter-bar input.search-in {
+        grid-column: span 2;
+        width: 100%;
+        min-width: 0;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="sheet-top">
+    <div class="eyebrow">
+      <span>NYX OBSERVATORY // <a class="ext-link" href="https://news.ycombinator.com/item?id=50491423">HN ITEM 50491423</a> // JOSHKA.NET</span>
+      <span><strong>BULLSHIT: 83.3%</strong>
+    </div>
+    <h1>Bullshit vs. <span class="accent">Epistemic.</span></h1>
+    <p class="sublead">
+      <strong>144</strong> Hacker News comments on <a class="ext-link" href="https://www.joshka.net/cell-borders/">Terminal borders that don&No. x27;t cost a cell (joshka.net)</a>.
+    </p>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary>
+      <span>01 // EVIDENCE</span>
+      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    </summary>
+    <p>
+      Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+      Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+    </p>
+    <div class="proof-body">
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">144</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 95 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">16.7%</div>
+          <div class="kpi-sub">24 comments (6 Gold / 4.2%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">83.3%</div>
+          <div class="kpi-sub">73 chatter &bull; 47 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">6</div>
+        <div class="kpi-sub">13% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.914</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">26</div>
+          <div class="kpi-sub">HN POS 24..49 (18.1% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="margin-top:10px;font:600 11px/1.5 ui-monospace,Menlo,monospace;color:rgb(70,70,68)"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary>
+      <span>02 // EXPLORE</span>
+      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / INTERACTIVE EQUATION</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p style="font-size:11.5px;line-height:1.42;color:rgb(85,85,82);margin:12px 0 0">
+              Drag any weight to watch the 144-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 144)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (6)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (18)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (73)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (47)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..144) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 43)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (@joouha, 14.4h); largest subtree (@tptacek) occupies 26 slots (HN POS 24..49).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="modeSelect" class="sel-in" aria-label="Ranking view">
+          <option value="hn_top40">HN Top 40</option>
+          <option value="top_signal">Epistemic Top 50</option>
+          <option value="buried_gems">Buried Gems (HN POS &gt; 43)</option>
+          <option value="bullshit_traps">High-Karma / URL Traps Caught</option>
+          <option value="mod_morgue">Mod Rebukes &amp; Downvoted Morgue</option>
+          <option value="c5a_rescues">c5A Heterodox Rescues</option>
+        </select>
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (144)</option>
+          <option value="program_ssh">Program &amp; SSH (Etc) (28)</option>
+          <option value="hacks_web">Hacks &amp; Web (Design) (28)</option>
+          <option value="overstrike_text">Overstrike &amp; Text (Emulators) (27)</option>
+          <option value="app_ratatui">App &amp; Ratatui (Windows) (26)</option>
+          <option value="useful_tuis">Useful &amp; Tuis (Cost) (20)</option>
+          <option value="general_commentary">General Commentary (15)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, borders, cell, cells, terminal, line...">
+      </div>
+      <div id="resultMeta" style="font:600 11px/1.4 ui-monospace,Menlo,monospace;color:rgb(90,90,88);margin-bottom:10px"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50491423 + JOSHKA.NET + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50491423, "story_title": "Terminal borders that don't cost a cell", "story_url": "https://www.joshka.net/cell-borders/", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50491423, "story_title": "Terminal borders that don't cost a cell", "story_url": "https://www.joshka.net/cell-borders/", "points": 328, "story_author": "vinhnx", "article_source": "fetched_url", "t1_ref_utc": "2026-11-14T14:09:44+00:00", "t2_ref_utc": "2026-11-14T14:09:44+00:00", "delta_minutes": 0.0, "story_anchors": ["borders", "cell", "cells", "terminal", "line", "lines", "cost", "border", "edge", "background", "ghostty", "color", "whole", "text", "box", "app", "side", "spec", "tui", "screen", "instead", "mostly", "support", "commands", "terminals"], "facet_labels": {"overstrike_text": "Overstrike & Text (Emulators)", "hacks_web": "Hacks & Web (Design)", "program_ssh": "Program & SSH (Etc)", "useful_tuis": "Useful & Tuis (Cost)", "app_ratatui": "App & Ratatui (Windows)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "overstrike_text", "label": "Overstrike & Text (Emulators)", "count": 27, "top_terms": ["overstrike", "text", "emulators", "terminal"]}, {"slug": "hacks_web", "label": "Hacks & Web (Design)", "count": 28, "top_terms": ["hacks", "web", "design", "guis"]}, {"slug": "program_ssh", "label": "Program & SSH (Etc)", "count": 28, "top_terms": ["program", "ssh", "etc", "terminal"]}, {"slug": "useful_tuis", "label": "Useful & Tuis (Cost)", "count": 20, "top_terms": ["useful", "tuis", "cost", "monitor"]}, {"slug": "app_ratatui", "label": "App & Ratatui (Windows)", "count": 26, "top_terms": ["app", "ratatui", "windows", "borders"]}], "counts": {"total_comments": 144, "live_t2_comments": 144, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 95, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 1, "pages_fetched": 1}, "sha256": {"corpus.json": "42ba0d6ab8a552acb532a5a82623f3132ccff8be295145394ab060573a0bf115"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 6, "grounded_analysis": 18, "crowd_chatter": 73, "bullshit_or_flamewar": 47}, "facets": {"program_ssh": 28, "app_ratatui": 26, "overstrike_text": 27, "hacks_web": 28, "useful_tuis": 20, "general_commentary": 15}, "facet_options": [{"slug": "program_ssh", "label": "Program & SSH (Etc)", "count": 28}, {"slug": "hacks_web", "label": "Hacks & Web (Design)", "count": 28}, {"slug": "overstrike_text", "label": "Overstrike & Text (Emulators)", "count": 27}, {"slug": "app_ratatui", "label": "App & Ratatui (Windows)", "count": 26}, {"slug": "useful_tuis", "label": "Useful & Tuis (Cost)", "count": 20}, {"slug": "general_commentary", "label": "General Commentary", "count": 15}], "facet_diagnostics": [{"slug": "program_ssh", "label": "Program & SSH (Etc)", "count": 28, "useful": 6, "useful_pct": 21.4, "terms": "program, ssh, etc, terminal"}, {"slug": "hacks_web", "label": "Hacks & Web (Design)", "count": 28, "useful": 5, "useful_pct": 17.9, "terms": "hacks, web, design, guis"}, {"slug": "overstrike_text", "label": "Overstrike & Text (Emulators)", "count": 27, "useful": 2, "useful_pct": 7.4, "terms": "overstrike, text, emulators, terminal"}, {"slug": "app_ratatui", "label": "App & Ratatui (Windows)", "count": 26, "useful": 7, "useful_pct": 26.9, "terms": "app, ratatui, windows, borders"}, {"slug": "useful_tuis", "label": "Useful & Tuis (Cost)", "count": 20, "useful": 4, "useful_pct": 20.0, "terms": "useful, tuis, cost, monitor"}, {"slug": "general_commentary", "label": "General Commentary", "count": 15, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 10}, {"category": "github_artifact", "count": 3}, {"category": "code_repository", "count": 3}], "story_anchors": ["borders", "cell", "cells", "terminal", "line", "lines", "cost", "border", "edge", "background", "ghostty", "color", "whole", "text", "box", "app", "side", "spec"], "largest_root": {"root_id": 50491720, "author": "tptacek", "slots": 26, "start_dom": 24, "end_dom": 49, "share_pct": 18.1, "top_dom1_age": 14.4, "top_dom1_author": "joouha"}, "buried_cutoff": 43, "rescue_top_k": 29, "ablations": [], "tournament": [], "comments": [{"id": 50494177, "au": "kalaomer", "dom": 29, "sr": 1, "sc": 11.7, "ep": 11.7, "bs": 0.0, "d": 3, "age": 9.01, "grav": 75.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 198, "qw": 0, "k": 3, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": ["https://bateri.dev/pens", "https://github.com/bateri/pencere/blob/main/spec/draft/pencere.md"], "ig": 1.76, "fa": 2.35, "gp": 0.599, "bl": 0.0, "ds": 0.0, "txt": "I've been working on one version of this, if you want to see what it\nlooks like: https://bateri.dev/pens\n\nIt's narrower than replacing the cell grid. A program asks for a view\nthe way vim takes the alternate screen. If the terminal answers, the\nprogram hands it the view's files once, and from then on the two\nexchange six small messages inside the normal byte stream (APC frames,\nthe same trick kitty graphics uses). No port and no extra connection,\nso it works over plain ssh to a box with no GPU. When the program exits\nyou get your terminal back, and in a terminal that doesn't answer the\nprogram can fall back to plain text.\n\nA view is either a Lua script the terminal draws itself, in its own\nfont and theme, or a sandboxed web page. The second one is exactly the\n\"terminals are becoming browsers\" worry from upthread, and I don't\nthink that worry is wrong, which is why the native kind exists. Going\nthrough tmux is a non-goal: a multiplexer that doesn't pass the stream\nthrough untouched just means the program sees no host and falls back.\n\nThe only host so far is bateri, the macOS terminal I'm building, and\nthe spec is an early Apache-2.0 draft:\nhttps://github.com/bateri/pencere/blob/main/spec/draft/pence..."}, {"id": 50495725, "au": "tdgunes", "dom": 37, "sr": 2, "sc": 11.03, "ep": 11.18, "bs": 0.0, "d": 1, "age": 3.94, "grav": 24.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 236, "qw": 0, "k": 8, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": ["https://bateri.dev", "https://github.com/bateri/textpen", "https://github.com/bateri/dockerpen"], "ig": 1.787, "fa": 2.36, "gp": 0.174, "bl": 0.0, "ds": 0.0, "txt": "Whenever I use dumb terminals, I have the same feeling. I am also actively looking for a way to get a good developer experience while keeping more ownership of what gets generated with the new tools. My specific bottleneck is working in remote environments and not being able to have it , now that we have tools like Claude, Codex, and Gemini. (I find them safer to run them in virtual environments and working on them remotely is better than doing it locally.)\n\nI also don't like the fact that each TUI application (btop, for instance) comes with its own color palette. So, a friend of mine developed a terminal (https://bateri.dev, macOS only for now, but the plan is to port it to Linux later) and yet another protocol where terminal SPAs can communicate over standard SSH (inspired by X over SSH, but we didn't like its drawbacks). The SPA itself is a set of Lua scripts that runs in a sandbox inside the terminal. The application on the host that communicates with the SPA can be implemented in any language (preferably Lua to keep it simple). With this approach, all SPAs (plugins) adhere to the user's color palette preferences. (There are more details that can share if you are interested.)\n\nSo far, to stress test it and help with devex, he has built a text editor (https://github.com/bateri/textpen) and a Docker/task monitor (https://github.com/bateri/dockerpen). I am also working on a pl"}, {"id": 50494067, "au": "joshka", "dom": 140, "sr": 3, "sc": 10.96, "ep": 10.96, "bs": 0.0, "d": 1, "age": 9.29, "grav": 78.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 133, "qw": 0, "k": 2469, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "app_ratatui", "flbl": "App & Ratatui (Windows)", "urls": ["https://github.com/joshka/ratatui/blob/joshka/cell-borders/CELL-BORDERS.md\u0023screenshots"], "ig": 1.408, "fa": 2.35, "gp": 0.655, "bl": 0.0, "ds": 0.0, "txt": "This was intentional to highlight the borders more obviously.\n\nThe test app has a key to turn that off see https://github.com/joshka/ratatui/blob/joshka/cell-borders/C...\n\nThe side gaps were for for making it feel balanced in the screenshots and visualizations to be able to show where the borders line up with cells easily etc. It wouldn't be what I'd use in a real app.\n\nOne thing to note though is that some things which are \"wrong\" can be aesthetically pleasing to look at and may be the actual best UX in certain situations. There's a lot of new design principle work (especially in macOS / iOS) that is about things going past the edge, or being overlaid with floating things. Some of this is \"wrong\" some of it is wrong, and some of it sitting in in the useless gap beteen the two. ;)"}, {"id": 50492484, "au": "zokier", "dom": 120, "sr": 4, "sc": 10.16, "ep": 10.16, "bs": 0.0, "d": 3, "age": 12.93, "grav": 129.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 41, "qw": 0, "k": 19255, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": ["https://bugzilla.mozilla.org/show_bug.cgi?id=1688774"], "ig": 0.847, "fa": 2.35, "gp": 1.014, "bl": 0.0, "ds": 0.0, "txt": "Doing it through port forwarding is kinda bad though because generally access to network ports is not very well access controlled. Doing it through unix sockets (like x) would be much better but annoyingly browsers do not support http over uds\n\nhttps://bugzilla.mozilla.org/show_bug.cgi?id=1688774 etc"}, {"id": 50495439, "au": "timhh", "dom": 53, "sr": 5, "sc": 8.11, "ep": 8.11, "bs": 0.0, "d": 2, "age": 4.82, "grav": 31.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 210, "qw": 0, "k": 819, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": [], "ig": 1.737, "fa": 0.62, "gp": 1.561, "bl": 0.0, "ds": 0.0, "txt": "I have vibe coded a remote X/Wayland solution that actually works really well for this, at least as long as you are mainly interested in one machine (so good for people with remote work machines, not so good for network/infra engineers).\n\nYou just run `mycommand connect host` and it will connect via SSH, start a Wayland server with X support, set up the appropriate environment variables, and also automatically reconnect, so you only have to do this once.\n\nAfter that you can just run GUI commands via SSH and appear locally like you always wished they would. It uses a VNC-like image data protocol so the client works on any OS. And windows are seamless - no windows within windows nonsense. I haven't put much effort into the video protocol tbh but it's already better than Xpra and very usable with 100ms latency (London to NY) so that's good enough for me.\n\nI'll try to open source it.\n\nI think a better solution would be if SSH itself supported some GUI channel, but the only thing is the Kitty graphics protocol which kind of sucks tbh. I did try writing some tools using that for the GUI a while back but it's awkward because you have to use PNG, you're still stuck with the character grid for text, etc."}, {"id": 50495266, "au": "neomantra", "dom": 112, "sr": 6, "sc": 7.61, "ep": 7.61, "bs": 0.0, "d": 2, "age": 5.42, "grav": 36.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 145, "qw": 0, "k": 887, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "app_ratatui", "flbl": "App & Ratatui (Windows)", "urls": ["https://nimbleterminal.github.io/gloss/app.html?src=https%3A%2F%2Fraw.githubusercontent.com%2FNimbleTerminal%2Fgloss%2Fmain%2FREADME.md"], "ig": 1.938, "fa": 0.62, "gp": 0.889, "bl": 0.0, "ds": 0.0, "txt": "This funny to read!   I drive Codex TUI daily.  In the past, I paired it with VSCode for better code navigation and file reading; seems similar to what you are saying or do you also mean Source Level Debuggers, etc.?   But, I eventually worked on Kitty terminal typesetting instead and now reading the files with my gloss tool [1]; combined with Rex blocks it's really nice, easier on my eyes.\n\nThanks for Ratatui, which certainly has a top tier name, and also has had tons of great software written with it!  I've been inspired by much of that ecosystem, especially the charting libs.  The weird GUI stuff I'm doing with Kitty+Bubbletea, can certainly be done on Ratatui, in the spirit of Makepad.  IMO, Golang needs this more than Rust.\n\n[1] Viewing the gloss README in the Gloss web viewer (Golang WASM in a Ghostty frame), press 't' to typeset it.  Alpha release quality.\nhttps://nimbleterminal.github.io/gloss/app.html?src=https%3A..."}, {"id": 50491778, "au": "joouha", "dom": 1, "sr": 7, "sc": 7.33, "ep": 7.33, "bs": 0.0, "d": 0, "age": 14.45, "grav": 154.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 67, "qw": 0, "k": 239, "kpp": 5.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": ["https://github.com/mintty/mintty/wiki/CtrlSeqs\u0023overstrike"], "ig": 1.319, "fa": 0.62, "gp": 1.7, "bl": 0.0, "ds": 0.0, "txt": "A much better alternative to this would be to for more terminal emulators to implement overstrike mode (DECSET 20, as available on the VK100). That way you could just draw border characters over existing text cells to achieve the same thing.\n\nUnfortunately mintty is the only terminal emulator I'm aware of which supports overstrike [0], as this would open up a world of new possibilities for TUI apps if more widely supported.\n\n[0] https://github.com/mintty/mintty/wiki/CtrlSeqs\u0023overstrike"}, {"id": 50492286, "au": "orbital-decay", "dom": 134, "sr": 8, "sc": 5.82, "ep": 5.97, "bs": 0.0, "d": 1, "age": 13.36, "grav": 136.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 103, "qw": 0, "k": 7122, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": [], "ig": 1.802, "fa": 0.28, "gp": 0.648, "bl": 0.0, "ds": 0.0, "txt": "UI in a browser is a massive hack in itself, a clean design would be better. For example a compact semantic remote access protocol to use with UIs, something like SPICE but better optimized for networks, fully presentation-independent, and less janky. This would let everyone use a GUI framework of their choice with an adapter. But people building terminal GUIs are culturally not ready for this, they'd rather continue reinventing the wheel and piling up hacks in terminals. I wonder when they realize that proportional fonts are more readable when vertical alignment is handled separately, and introduce terminals with variable-width fonts. And the presentation layer (I suggest calling it CSS)."}, {"id": 50492197, "au": "unshavedyak", "dom": 33, "sr": 9, "sc": 5.72, "ep": 6.02, "bs": 0.0, "d": 1, "age": 13.56, "grav": 139.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 203, "qw": 0, "k": 2465, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": [], "ig": 1.911, "fa": 0.0, "gp": 1.052, "bl": 0.0, "ds": 0.0, "txt": "I actually am exploring exactly this. Ironically from the perspective of someone that was trying to leave the Terminal.\n\nHow i got here i find kinda interesting. Originally i was trying to leave the terminal. Using GPUI/etc frameworks. I kept running into the terminal though, because no matter how nice the UI is - the terminal still needs to work excellently.\n\nEventually i decided to try an abomination. To use a custom terminal which, not unlike Kitty images, allows generic apps to pass escape codes to control the UI components. Where the UI components have no restriction on \"dumb terminals\". So my text editor is a two part app, an editor and a tty to render the actual custom UI APC codes.\n\nThis paved the way for true smooth scrolling from within a terminal editor, as the editor effectively paginates but the tty scrolls within the buffered pages. It allows for different UI components to mix fonts and font sizes, eg popup docs being a different size than the other text, and .. well, anything i suppose.\n\nI have to say it's working excellently and is slowly becoming my daily driver. I won't link it though, it's a fully vibe coded and even claude designed horror.\n\nI'm surprised i've not seen more of this in the past to be honest."}, {"id": 50495559, "au": "nottorp", "dom": 60, "sr": 10, "sc": 5.62, "ep": 5.62, "bs": 0.0, "d": 0, "age": 4.45, "grav": 28.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 79, "qw": 0, "k": 14820, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "useful_tuis", "flbl": "Useful & Tuis (Cost)", "urls": [], "ig": 1.433, "fa": 0.34, "gp": 0.885, "bl": 0.0, "ds": 0.0, "txt": "What worries me is that TUI used to mean light on your hardware unless it's doing actual work that you demanded.\n\nWhat's the reality with these new frameworks? Whenever I see one i worry that it renders at 144 Hz in a loop instead of redrawing only when something changes, for one. And let's not mention redrawing only the areas that have changed [1].\n\nShould I ask about ram consumption too?\n\n[1] ... which is why vi is the best editor to use over slow, unreliable links."}, {"id": 50496325, "au": "cowlevel", "dom": 56, "sr": 11, "sc": 5.61, "ep": 5.76, "bs": 0.0, "d": 4, "age": 2.18, "grav": 13.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 100, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "app_ratatui", "flbl": "App & Ratatui (Windows)", "urls": [], "ig": 1.708, "fa": 0.28, "gp": 0.655, "bl": 0.0, "ds": 0.0, "txt": "ssh -X (or -Y) forwards your X11 connection automagically. It doesn't work for Wayland because Wayland was designed to be impossible to forward.\n\nHowever, most X11 apps will have utterly abysmal performance on WAN SSH connections. Ancient apps will be slow because they block waiting for every response (this is unavoidable in Xlib) and less than ancient apps will be slow because they send full pixel data. It is possible to write a reasonably performant remote X11 app (using XCB instead of Xlib and always being aware of latency), but there are very few such apps. This is why Wayland dropped the requirement."}, {"id": 50496516, "au": "nkmnz", "dom": 89, "sr": 12, "sc": 5.5, "ep": 5.5, "bs": 0.0, "d": 2, "age": 1.63, "grav": 10.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 71, "qw": 0, "k": 1179, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": [], "ig": 1.588, "fa": 0.34, "gp": 0.554, "bl": 0.0, "ds": 0.0, "txt": "This is true for all the other magic things I'm always reading about with the newest, hottest, terminal emulator tech XYZ, as in this article. People do amazing stuff with those tools. I'd already be very happy if the current line I'm writing in would have the convenience of a 1993 Mosaic input-element.\n\nAlso, selecting and replacing could be done without a a mouse. Quite often I want to select, copy, replace, paste somewhere else. Not possible without a mouse."}, {"id": 50493340, "au": "favori995749721", "dom": 142, "sr": 13, "sc": 5.29, "ep": 5.29, "bs": 0.0, "d": 0, "age": 11.07, "grav": 102.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 148, "qw": 0, "k": 2, "kpp": 0.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "app_ratatui", "flbl": "App & Ratatui (Windows)", "urls": [], "ig": 2.02, "fa": 0.0, "gp": 0.379, "bl": 0.0, "ds": 0.0, "txt": "One benefit worth calling out: the box-drawing fallback is worse than it looks for CJK users. U+2500-257F and the half/full block elements are East Asian \"Ambiguous\" in UAX \u002311, so in a terminal configured to render ambiguous as double width (xterm's cjkWidth, iTerm2's checkbox) every line glyph takes two cells and the whole frame lands in the wrong place. Cell borders aren't text, so that failure class just disappears.\n\nThe part I'd want specced early: borders are per-cell, but cells aren't per-grapheme. A CJK char owns two cells plus a continuation placeholder, and combining marks or ZWJ emoji sequences own zero-or-more depending on whose wcwidth table you ask, so app and terminal routinely disagree across Unicode versions. Today that shows up as a vertical bar one column off; with cell borders it becomes a line that stops short of the corner. Does the border attach to the cell or to the grapheme cluster?"}, {"id": 50492342, "au": "fc417fc802", "dom": 32, "sr": 14, "sc": 5.06, "ep": 5.5, "bs": 0.0, "d": 1, "age": 13.23, "grav": 134.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 108, "qw": 21, "k": 5664, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "useful_tuis", "flbl": "Useful & Tuis (Cost)", "urls": [], "ig": 1.076, "fa": 0.7, "gp": 0.672, "bl": 0.0, "ds": 0.0, "txt": "> a full monospaced information-dense UI framework, a terminal designed for user interfaces, rather than one designed to replicate the limitations of dumb terminals?\n\nI can only speak for myself but I use the CLI and TUIs specifically because of the limitations those modalities impose on software that uses them as the primary method for interfacing with the end user. If you want a full featured UI and all that comes with it why not just use QT or GTK or modern HTML or etc?\n\nI think the only \"improvements\" I'd like to see are thing such as metadata regarding what the different streams are for, an official way to communicate using structured data as opposed to raw bytes, that sort of thing. Spiritually in the same ballpark as the difference between HTML before and after CSS."}, {"id": 50492310, "au": "em-bee", "dom": 124, "sr": 15, "sc": 5.05, "ep": 5.57, "bs": 0.0, "d": 3, "age": 13.29, "grav": 135.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 174, "qw": 0, "k": 10562, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": [], "ig": 1.631, "fa": 0.28, "gp": 0.645, "bl": 0.0, "ds": 0.0, "txt": "the thing with X and wayland etc is, that they are low level. which is fine if you want full control over the presentation. what HTML was trying to do is to go higher level, send over some data and let the browser figure out how to present it. but it went wrong and people are abusing it as a low level presentation interface like X or wayland.\n\nwhat we are missing is a really high level protocol/system that takes really high level data and figures out the presentation on its own.\n\ntake a list of files for example. you can run ls -l in a terminal and it will attempt a crude text based formatting of the output. or you can run a full gui filemanager.\n\nwhat if there was a command that would produce ls output as a table data structure, run in a sort of terminal that knows how to format a table nicely without the ls command having to include any formatting instructions? this terminal would have support for all sorts of data types and structures to display all of them nicely."}, {"id": 50492355, "au": "joshka", "dom": 25, "sr": 16, "sc": 4.97, "ep": 5.41, "bs": 0.0, "d": 1, "age": 13.2, "grav": 134.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 189, "qw": 0, "k": 2469, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "useful_tuis", "flbl": "Useful & Tuis (Cost)", "urls": [], "ig": 1.887, "fa": 0.0, "gp": 0.67, "bl": 0.0, "ds": 0.0, "txt": "Yep,and I want to do that too :)\n\nI've written about it before, but in brief the mountain of standards is worth ripping out wholesale and doing write as a semantic protocol. It's needed to solve several things that work really poorly in terminals because their unit of compatibility is cells rather than a higher primitive. It's hard to bake something on top that works well.\n\nThe need is most strong in Accessibility, Text wrapping, Scrollback handling (i.e. making the scrollback editable and not dead text), and various other bits that make writing highly functional TUIs. Coding agents tend to find all those edge cases.\n\nThis often gets push back that it's easy, to which I can point nay sayers at the various many months long issues on things in Codex, Gemini, Claude etc. on flickering, scrolling, key handline, IME, ... doing anything moderately complex involves modeling a terminal in a terminal app effectively.\n\nGhostty and Rex sort of do the opposite bit. If you think of  it like a stack, they write a new layer underneath that transports the cells on a better multiplexer layer 0. I think a new semantic layer 2 is an approach that would be neat to work with."}, {"id": 50491720, "au": "tptacek", "dom": 24, "sr": 17, "sc": 4.74, "ep": 5.18, "bs": 0.0, "d": 0, "age": 14.54, "grav": 156.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 53, "qw": 0, "k": 426786, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": [], "ig": 1.154, "fa": 0.0, "gp": 1.7, "bl": 0.0, "ds": 0.0, "txt": "I love this work and everything else Ratatui does but I have to ask: if you're changing the terminal protocol and the terminal itself to do this, why not do something more ambitious; a full monospaced information-dense UI framework, a terminal designed for user interfaces, rather than one designed to replicate the limitations of dumb terminals?"}, {"id": 50495219, "au": "wpm", "dom": 84, "sr": 18, "sc": 4.73, "ep": 4.95, "bs": 0.0, "d": 1, "age": 5.57, "grav": 38.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 143, "qw": 0, "k": 3698, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "app_ratatui", "flbl": "App & Ratatui (Windows)", "urls": [], "ig": 1.819, "fa": 0.0, "gp": 0.464, "bl": 0.0, "ds": 0.0, "txt": "My thoughts exactly. Borders costing a cell means you are forced to be frugal with them, lest you run out of space or have to do ugly and clumsy \"pwease make ur window biggr :3\" messages\n\nOne of the top 5 \"smells\" of LLM generated websites that I can't stand is everything has to have its own round-rect. Everything in a box. Every button, label, header, subheader, so much fucking noise everywhere. You shouldn't need that many.\n\nAnother, of course, is the phrase \"The wire format\", included in this post. Oh yeah, its the format on the wire? What wire? The wire between my psuedo terminal and my kernel? What garbage. Cool exploration but, come on: \"The common path is a pen, held in the cursor like the current background color. Set it, print some text, and the printed cells get the borders:\" shit is not OK to post"}, {"id": 50493099, "au": "skydhash", "dom": 125, "sr": 19, "sc": 4.4, "ep": 5.28, "bs": 0.0, "d": 4, "age": 11.62, "grav": 110.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 60, "qw": 85, "k": 6709, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": [], "ig": 0.993, "fa": 0.7, "gp": 0.656, "bl": 0.0, "ds": 0.0, "txt": "> Take a list of files for example. you can run ls -l in a terminal and it will attempt a crude text based formatting of the output. or you can run a full gui filemanager.\n\nls's output (and a few other programs') are human facing. They're not meant to be machine readable.\n\n> what if there was a command that would produce ls output as a table data structure, run in a sort of terminal that knows how to format a table nicely without the ls command having to include any formatting instructions? this terminal would have support for all sorts of data types and structures to display all of them nicely.\n\nBecause that's just complexity for its own sake. What's simpler is to just create a shell alias for a particular view you want. The shell is for interactive usage, with some capabilities for automation. If something better is needed, you write a real program for it."}, {"id": 50493114, "au": "kccqzy", "dom": 41, "sr": 20, "sc": 4.3, "ep": 4.74, "bs": 0.0, "d": 1, "age": 11.59, "grav": 109.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 71, "qw": 0, "k": 19940, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": [], "ig": 1.691, "fa": 0.0, "gp": 0.526, "bl": 0.0, "ds": 0.0, "txt": "You can save all that effort and instead come up with a CSS framework that enforces monospaced fonts, uniform font sizes, encourage information-dense layouts, have borders that don’t take up a cell (border: solid 0.1rem black; padding: 0.5rem;). Pair it up with a small JavaScript framework that listens to keypresses and buffers them. Furthermore, the framework makes the user decide on fonts, whether to allow images, whether to adhere to a strict character grid etc."}, {"id": 50493290, "au": "TacticalCoder", "dom": 139, "sr": 21, "sc": 4.17, "ep": 4.31, "bs": 0.0, "d": 0, "age": 11.18, "grav": 103.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 177, "qw": 0, "k": 10539, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "useful_tuis", "flbl": "Useful & Tuis (Cost)", "urls": [], "ig": 1.543, "fa": 0.0, "gp": 0.474, "bl": 0.0, "ds": 0.0, "txt": "A pet peeve of mine is that most people / WM get \"useless gaps\" wrong. You do want a gap between two terminals because otherwise there are times where things can get really confusing (where you don't know what belong to which terminal / window).\n\nSo the \"borderless\" (0 pixels) / zero \"useless gaps\" simply are confusing and... Wrong.\n\nBut then people who do use useless gap, as in TFA, get it wrong too: they typically add gaps near the monitor's edges.\n\nYeah. But no. Sorry but my monitor's edge is a perfectly fine gap. I don't risk mistaking it for anything.\n\nSo I modified my WM (the Awesome WM) to do proper \"useless gaps\" computation and remove the ones that really are useless: and that'd be those near the monitor's physical border.\n\nI mean: nearly everybody gets it wrong, but it's not complicated to get it right, is it?\n\nP.S: even the terminology is wrong... People calling those \"useless gaps\" haven't got a clue: they are useful. The only useless ones are the one on the monitor's edge (if your monitor has physical edges, which it probably does)."}, {"id": 50493939, "au": "nixpulvis", "dom": 77, "sr": 22, "sc": 3.96, "ep": 4.4, "bs": 0.0, "d": 0, "age": 9.68, "grav": 83.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 73, "qw": 0, "k": 4681, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "app_ratatui", "flbl": "App & Ratatui (Windows)", "urls": [], "ig": 1.362, "fa": 0.0, "gp": 0.83, "bl": 0.0, "ds": 0.0, "txt": "Compatibility will always be the hard part with new standards like this. Given that most terminals already have some special handling of box drawing characters, I don't know if it's completely dead on arrival for implementors, but I don't love as an application author with ratatui, not knowing how the padding on my app will look. I might honestly rather disable this and know it'll be more consistent, than enable it and fragment my UI."}, {"id": 50492598, "au": "kodoman", "dom": 50, "sr": 23, "sc": 3.87, "ep": 4.39, "bs": 0.0, "d": 0, "age": 12.67, "grav": 125.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 57, "qw": 0, "k": 178, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": [], "ig": 1.157, "fa": 0.0, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "This is pretty cool but this does feel like we are just reinventing another GUI display at this point.\n\nI don't generally like TUI's and think one gets more flexibility with raw text interfaces and being able to glue things together is more important then them looking nice. I think less fancy out put is better to be honest."}, {"id": 50496910, "au": "user-error", "dom": 63, "sr": 24, "sc": 3.81, "ep": 6.54, "bs": 2.52, "d": 0, "age": 0.58, "grav": 5.5, "surf": 28.8, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 97, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "useful_tuis", "flbl": "Useful & Tuis (Cost)", "urls": [], "ig": 1.762, "fa": 0.62, "gp": 0.438, "bl": 0.95, "ds": 0.0, "txt": "Didn't read the post but two observations:\n\n1. The AI disclosure up front is very useful for cutting my blog filter time from 10 seconds down to 1, which is significant in the age of content overload. Hopefully disclosure becomes a point of pride for vibebloggers and they'll add it more often.\n\n2. While it makes sense that the popularity of TUIs (driven mostly by CLI coding agents) sees maintainers try and push more spec into emulators, I'm hoping this doesn't become the standard. The whole TUI mentality just runs counter to what makes terminals such sticky tech in the first place."}, {"id": 50492548, "au": "joshka", "dom": 114, "sr": 25, "sc": 3.68, "ep": 6.19, "bs": 1.85, "d": 1, "age": 12.76, "grav": 127.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 54, "qw": 0, "k": 2469, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "app_ratatui", "flbl": "App & Ratatui (Windows)", "urls": [], "ig": 1.493, "fa": 0.68, "gp": 0.516, "bl": 0.7, "ds": 0.0, "txt": "Nothing really - Ghostty has a bit of padding that's unused per cell - 16 bits. The implementation stores an ID into a lookup table with border combinations. If all of those were used and never cleaned up, 65535 at around 100 for each combination used, order of magnitude 25MB absolute worst case assuming no real optimization in place for this."}, {"id": 50495890, "au": "yonatan8070", "dom": 81, "sr": 26, "sc": 3.44, "ep": 3.44, "bs": 0.0, "d": 0, "age": 3.5, "grav": 21.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 67, "qw": 0, "k": 1209, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": [], "ig": 1.254, "fa": 0.0, "gp": 0.341, "bl": 0.0, "ds": 0.0, "txt": "I like this a lot, especially the ability to draw lines through graphs like in `btop`.\n\nSomthing I think could be intresting to go along with this is for the terminal to be able to distinguish sub-windows using these border, so if you've got a popup and try to select multiple lines in it, you'll actually select only the text in thr popup rather than the whole terminal-wide line."}, {"id": 50491891, "au": "hnlmorg", "dom": 8, "sr": 27, "sc": 3.24, "ep": 3.39, "bs": 0.0, "d": 1, "age": 14.25, "grav": 151.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 12488, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": [], "ig": 0.938, "fa": 0.0, "gp": 0.815, "bl": 0.0, "ds": 0.0, "txt": "I’m not against overstrike, but I can think of one drawback of that solution: it becomes significantly harder to have rounded corners with a filled interior.\n\nBut I’m not trying to argue for nor against either solution."}, {"id": 50491626, "au": "montroser", "dom": 83, "sr": 28, "sc": 3.21, "ep": 3.8, "bs": 0.0, "d": 0, "age": 14.71, "grav": 159.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 3620, "kpp": 5.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "useful_tuis", "flbl": "Useful & Tuis (Cost)", "urls": [], "ig": 0.98, "fa": 0.0, "gp": 1.031, "bl": 0.0, "ds": 0.0, "txt": "I appreciate the innovation happening with TUIs in these modern times.  But, aesthetically, I have to say, I like my borders to have some breathing room, which gets lost in this particular treatment."}, {"id": 50491858, "au": "hnlmorg", "dom": 97, "sr": 29, "sc": 3.17, "ep": 3.83, "bs": 0.0, "d": 0, "age": 14.31, "grav": 152.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 105, "qw": 0, "k": 12488, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": [], "ig": 1.277, "fa": 0.0, "gp": 0.572, "bl": 0.0, "ds": 0.0, "txt": "Why wouldn’t this work over tmux? The authors claims don’t make a whole lot of sense because if this were a cell property, like any other CSI, then it’ll get rendered in the terminal emulator exactly as intended. And we know this because none of the other CSI sequences get garbled over multiplextors.\n\nBut for there to be a dedicated section on how multiplexors wouldn’t work suggests to me that the authors already tried this via tmux.\n\nSo I’m left wondering what they’ve done with the implementation of this to make that a problem.\n\nI spotted they are using DCS sequences. But even that shouldn’t be an issue itself."}, {"id": 50495370, "au": "hobo123", "dom": 70, "sr": 30, "sc": 2.73, "ep": 3.61, "bs": 0.0, "d": 3, "age": 5.02, "grav": 33.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 101, "qw": 0, "k": 268, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": [], "ig": 1.536, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Exactly. Any GUI element is a \"window\" and composed of other sub-areas, also windows. You could create windows in the \"root window\", then the WM would manage then and draw window decorations, but in theory you could also just render a window in a certain area within another window (e.g. a full application, or even just a single view or editor of an application).\n\nI'm not too familiar with higher level frameworks like Qt or gtk, but I suspect since they just draw the whole thing, that they only use single X windows and don't compose them, so you wouldn't be able to render a subview of them inside a different context."}, {"id": 50493219, "au": "octoberfranklin", "dom": 39, "sr": 31, "sc": 2.68, "ep": 3.57, "bs": 0.0, "d": 1, "age": 11.38, "grav": 106.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 54, "qw": 0, "k": 1925, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": [], "ig": 1.245, "fa": 0.0, "gp": 0.441, "bl": 0.0, "ds": 0.0, "txt": "Because it will turn into the kitchen-sink mess that the Web is.\n\nTerminals work so well because there's a huge frictional cost to adding to the protocol.  That's what keeps the protocol simple, which is what keeps multiple implementations feasible.  Unlike the web, where unless you have GoogleBux you can't afford to implement it properly."}, {"id": 50494013, "au": "joshka", "dom": 78, "sr": 32, "sc": 2.66, "ep": 3.69, "bs": 0.0, "d": 1, "age": 9.46, "grav": 80.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 125, "qw": 0, "k": 2469, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "app_ratatui", "flbl": "App & Ratatui (Windows)", "urls": [], "ig": 1.569, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The ratatui change was a pure PoC, isolated branch, my own fork, not the ratatui repo even. This would likely never ship as a default approach as it would be way too breaking. I haven't really spent any time on making it hook into the current block border approaches - it's just at the cell level where this is opted in. That will never merge without much much more though into things.\n\nI used ratatui there mostly so that I could prove that it would work in real looking apps that do panels and similar stuff that benefits from borders.\n\nBut yeah, compat is key. It would probably go out to ghostty, rio, kitty pretty easily, terminal.app never, other terminals much slower. IDK about the windows / linux side of things."}, {"id": 50497103, "au": "codesnik", "dom": 62, "sr": 33, "sc": 2.61, "ep": 2.83, "bs": 0.0, "d": 0, "age": 0.12, "grav": 3.9, "surf": 41.2, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 1029, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": [], "ig": 1.157, "fa": 0.0, "gp": 0.076, "bl": 0.0, "ds": 0.0, "txt": "neat!\nbut, so, for borders around button text, rightmost border terminal sequence would have to be inserted before the last char, right?\n\n[background color, top, left, bottom]B[top, bottom only]UTTO[top, bottom, right]N[reset]"}, {"id": 50496338, "au": "Timon3", "dom": 61, "sr": 34, "sc": 2.4, "ep": 3.65, "bs": 0.0, "d": 1, "age": 2.14, "grav": 12.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 3011, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": [], "ig": 1.14, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I don't really see how these terminal borders would make any of these issues worse? You can build a wasteful 144Hz TUI using only dots and spaces. There's a tiny bit of overhead for the extra commands, but everything else seems to be an implementation detail, no?"}, {"id": 50495422, "au": "hnlmorg", "dom": 99, "sr": 35, "sc": 2.27, "ep": 3.51, "bs": 0.0, "d": 2, "age": 4.85, "grav": 31.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 85, "qw": 0, "k": 12488, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": [], "ig": 1.477, "fa": 0.0, "gp": 0.03, "bl": 0.0, "ds": 0.0, "txt": "Really? That surprises me. Not saying it’s untrue, just that I’m surprised. I’ve found tmux doesn’t drop CSI, OSC nor APC.\n\nI wouldn’t recommend APC because Apple Terminal doesn’t follow spec with APC parsing (one of the reasons I switched some of my custom sequences from APC to OSC).\n\nRegarding the extra state to be tracked, tmux wouldn’t handle that cell state. That would be down to the terminal emulator.\n\nSince these are cell properties, it does feel like CSI would be the right place (like Kittys undercurl)."}, {"id": 50492970, "au": "skydhash", "dom": 36, "sr": 36, "sc": 2.22, "ep": 3.1, "bs": 0.0, "d": 2, "age": 11.86, "grav": 113.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 34, "k": 6709, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": [], "ig": 0.811, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> To use a custom terminal which, not unlike Kitty images, allows generic apps to pass escape codes to control the UI components.\n\n> I'm surprised i've not seen more of this in the past to be honest.\n\nThis is what emacs is. It's a text buffer, but text can have properties like how to render, and custom values. then a bunch of commands to manipulate the buffer and it's contents."}, {"id": 50493702, "au": "eviks", "dom": 110, "sr": 37, "sc": 2.21, "ep": 3.02, "bs": 0.0, "d": 0, "age": 10.25, "grav": 91.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 6023, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": [], "ig": 1.201, "fa": 0.0, "gp": 0.133, "bl": 0.0, "ds": 0.0, "txt": "Thanks for that slop warning, on a general point: wondering whether there might be enough momentum to finally ditch the whole terminal garbage and use proper GUIs in spite of what the card-punching devils intended?"}, {"id": 50495851, "au": "tdgunes", "dom": 54, "sr": 38, "sc": 2.16, "ep": 3.7, "bs": 0.0, "d": 3, "age": 3.61, "grav": 22.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 8, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "app_ratatui", "flbl": "App & Ratatui (Windows)", "urls": [], "ig": 0.824, "fa": 0.62, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "100ms sounds good, but how about the consistency of the GUI (remote vs local) and HiDPI issues when it comes to this approach? (I assume latency would be higher when there are many applications running in many windows?)"}, {"id": 50494493, "au": "merelysounds", "dom": 102, "sr": 39, "sc": 2.14, "ep": 2.8, "bs": 0.0, "d": 0, "age": 7.95, "grav": 62.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 813, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "useful_tuis", "flbl": "Useful & Tuis (Cost)", "urls": [], "ig": 1.141, "fa": 0.0, "gp": 0.082, "bl": 0.0, "ds": 0.0, "txt": "Unpopular opinion: I’m not interested as a user.\n\nI like simple, predictable TUIs which i can operate with keyboard input only. I don’t like ui chrome or complex ux in TUI, i prefer GUI for that."}, {"id": 50496360, "au": "cowlevel", "dom": 71, "sr": 40, "sc": 2.11, "ep": 3.35, "bs": 0.0, "d": 4, "age": 2.09, "grav": 12.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 124, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "app_ratatui", "flbl": "App & Ratatui (Windows)", "urls": [], "ig": 1.428, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It's actually unusual for X11 apps to create a window per widget as it comes with a bunch of overhead. Only very old ones do that. However, it does work - windows can be used as widgets and they can cross-embed from other processes. This is very cool but rarely used. It allows you to run a casually sandboxed subprocess with GUI I/O.\n\nThey can also just draw on each other's windows and get input events on each other's windows. The connection between a window and its creator process is very weak: the window is automatically destroyed when the creator disconnects. And that's all. You can even turn that off, too. For every request that includes a window (or other resource) ID, nothing says that it has to be your window."}, {"id": 50492931, "au": "iainmerrick", "dom": 17, "sr": 41, "sc": 2.0, "ep": 2.96, "bs": 0.0, "d": 2, "age": 11.95, "grav": 114.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 6752, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": [], "ig": 1.035, "fa": 0.0, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "If you mean your proposal adds more things, that sounds like it might be over-complicated. To solve the problem of tightly-fitting boxes around terminal text -- if you consider that to be a real problem -- overstrike sounds like a really elegant solution."}, {"id": 50495394, "au": "hobo123", "dom": 105, "sr": 42, "sc": 1.98, "ep": 3.08, "bs": 0.0, "d": 2, "age": 4.94, "grav": 32.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 51, "qw": 0, "k": 268, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": [], "ig": 1.311, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Same here. Alas, it's the zeitgeist that everything runs along tribal or political lines these days, but it doesn't have to be that way.\n\nI like seeing different points of view, and maybe controversial topics should be discussed () more than others, not less.\n\n and discussed means fact-based, civil discourse, not piling on"}, {"id": 50492968, "au": "PeeMcGee", "dom": 131, "sr": 43, "sc": 1.95, "ep": 3.27, "bs": 0.0, "d": 2, "age": 11.86, "grav": 113.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 56, "qw": 17, "k": 212, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": [], "ig": 0.884, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> In this role, HTML is a pile of hacks upon hacks that was not originally intended for UIs.\n\nI get where you're going and am genuinely curious, what does a \"better\" system designed to do what HTML/JS have become actually look like? (or what would one look like?)\nThere has to be markup of some sort, and there has to be scriptable interactions of some sort, right? If not, how else would it work?"}, {"id": 50493960, "au": "joshka", "dom": 66, "sr": 44, "sc": 1.95, "ep": 3.35, "bs": 0.0, "d": 1, "age": 9.62, "grav": 82.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 92, "qw": 0, "k": 2469, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "app_ratatui", "flbl": "App & Ratatui (Windows)", "urls": [], "ig": 1.424, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "What I'd really love to see instead of all of this is an OS that has composable areas that can interact and have event loops of their own. E.g. ditch the app boundary and compose. We're getting there sorta with AI Canvas type things (e.g. github copilot app, some of the stuff in chatgpt visualizations), but all of this sort of work tends to devolve to browser type things instead of simpler components. This is mostly unrelated to the terminal side of things though from my perspective on this. But it's a fun thought experiment."}, {"id": 50493457, "au": "db48x", "dom": 141, "sr": 45, "sc": 1.78, "ep": 2.95, "bs": 0.0, "d": 1, "age": 10.8, "grav": 98.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 8465, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "useful_tuis", "flbl": "Useful & Tuis (Cost)", "urls": [], "ig": 0.845, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Man, I’d really like a monitor with no edges. One that just keeps going and going, past my window and the tree outside until it’s completely out of sight. 100% useful area."}, {"id": 50492587, "au": "joshka", "dom": 93, "sr": 46, "sc": 1.68, "ep": 4.63, "bs": 1.85, "d": 0, "age": 12.68, "grav": 125.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 75, "qw": 0, "k": 2469, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": [], "ig": 1.329, "fa": 0.22, "gp": 0.608, "bl": 0.7, "ds": 0.0, "txt": "The big thing to note on this is one last caveat. I don't care about the actual spec on this - happy for that to be whatever works. I care more about the capability than how it's done / implemented.\n\nThere's some bits that feel like they probably make sense to consider doing other ways, like how border placement works (inside, outside, on the border, etc.), and how the filling works - to make borders incorporate external or internal padding."}, {"id": 50496345, "au": "cowlevel", "dom": 88, "sr": 47, "sc": 1.67, "ep": 2.96, "bs": 0.27, "d": 1, "age": 2.12, "grav": 12.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": [], "ig": 1.258, "fa": 0.0, "gp": 0.0, "bl": 0.1, "ds": 0.0, "txt": "Because a terminal emulator is emulating 1970s technology and the mouse hadn't been invented yet. We do have a way for apps to accept mouse input, believe it or not, but it's usually done by avoiding the 1970s emulation layer. As a bonus, you get full control over your screen pixels too!"}, {"id": 50496374, "au": "jiehong", "dom": 90, "sr": 48, "sc": 1.53, "ep": 2.63, "bs": 0.0, "d": 0, "age": 2.03, "grav": 12.3, "surf": 12.9, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 1847, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": [], "ig": 1.076, "fa": 0.0, "gp": 0.072, "bl": 0.0, "ds": 0.0, "txt": "Looks very nice! But what about a terminal overlay in general?\n\nIt reminds me of video games overlays / layers (like the gameboy window layer) used to display HUDs."}, {"id": 50492734, "au": "kodoman", "dom": 34, "sr": 49, "sc": 1.52, "ep": 3.06, "bs": 0.0, "d": 2, "age": 12.35, "grav": 120.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 59, "qw": 0, "k": 178, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "useful_tuis", "flbl": "Useful & Tuis (Cost)", "urls": [], "ig": 1.091, "fa": 0.0, "gp": 0.342, "bl": 0.0, "ds": 0.0, "txt": "I am running ewm (not exwm) which makes emacs into a wayland compositor and it's fantastic, most of the primitives dissolve and you script it with elisp, wayland windows are just a special buffer and where applicable normal windowing and buffering rules can be applied.\n\nThe developer seems to have used AI heavily in the elisp code and it works very well."}, {"id": 50494092, "au": "nixpulvis", "dom": 79, "sr": 50, "sc": 1.5, "ep": 2.89, "bs": 0.0, "d": 2, "age": 9.21, "grav": 77.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 4681, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "app_ratatui", "flbl": "App & Ratatui (Windows)", "urls": [], "ig": 1.231, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I used to be an active maintainer for Alacritty. I expect uphill resistance to this there, though that won't surprise anyone who uses it.\n\nBTW, love ratatui. I've been building ratmark lately, for markdown rendering. But I really need link support ;)"}, {"id": 50495324, "au": "drdaeman", "dom": 132, "sr": 51, "sc": 1.45, "ep": 2.99, "bs": 0.0, "d": 3, "age": 5.19, "grav": 34.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 78, "qw": 0, "k": 8542, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": [], "ig": 1.272, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Well, yea, that was a remark about HTML's legacy. In pre-AI era, I preferred QML or GtkBuilder (when viable, of course) to HTML any time. Nowadays, to be honest, I don't know.\n\nThat said, yes: NeWS, XForms, rio, and many others have tried with arguably cleaner designs. Not without their own issues, but in comparison to HTML, driving GUIs was a design goal from day zero (not a direction shift), and they're a lot smaller and simpler (which has its pros and cons)."}, {"id": 50494001, "au": "josephg", "dom": 28, "sr": 52, "sc": 1.45, "ep": 2.99, "bs": 0.0, "d": 4, "age": 9.51, "grav": 81.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 68, "qw": 0, "k": 22366, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": [], "ig": 1.271, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "... Write up a more complete spec of the problem and I could be tempted to throw some tokens at it. But before I do, can you write up a more complete description of the problem with existing terminal protocols? I don't think I understand the issues well enough to make a good solution. Eg, can you give some examples of what apps are hard to build now? What prior art is worth looking at? Etc."}, {"id": 50496368, "au": "cowlevel", "dom": 74, "sr": 53, "sc": 1.42, "ep": 3.23, "bs": 0.27, "d": 3, "age": 2.06, "grav": 12.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 72, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "app_ratatui", "flbl": "App & Ratatui (Windows)", "urls": [], "ig": 0.96, "fa": 0.34, "gp": 0.0, "bl": 0.1, "ds": 0.0, "txt": "It is! OLE has to be one of my favourite abandoned technologies.\n\nIt does require a lot of deep coupling which is probably why it was abandoned, but also why it worked so well. You had things like passing menu subtree handles back and forth, so the host app and the embedded app could merge together their menus. This only worked because everyone on Windows was using the same menu subsystem, until Office 2007."}, {"id": 50495391, "au": "xixixao", "dom": 96, "sr": 54, "sc": 1.41, "ep": 2.51, "bs": 0.0, "d": 0, "age": 4.94, "grav": 32.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 1814, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": [], "ig": 0.971, "fa": 0.0, "gp": 0.159, "bl": 0.0, "ds": 0.0, "txt": "Terminal is tempting, but I encourage ppl on herdr to give T3 code a try, gui is so much nicer to use for prompting at the least."}, {"id": 50492657, "au": "kodoman", "dom": 116, "sr": 55, "sc": 1.39, "ep": 2.93, "bs": 0.0, "d": 1, "age": 12.53, "grav": 123.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 0, "k": 178, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": [], "ig": 1.169, "fa": 0.0, "gp": 0.128, "bl": 0.0, "ds": 0.0, "txt": "I think the other side of things is why have the graphic program run over ssh, just have raw text cli tools to manipulate what ever then have a program driving it. This for me is where emacs excels and some programs already fit well with this model and the fantastic (albeit hacky) tramp."}, {"id": 50491796, "au": "drdaeman", "dom": 122, "sr": 56, "sc": 1.39, "ep": 2.92, "bs": 0.0, "d": 1, "age": 14.42, "grav": 154.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 8, "k": 8542, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": [], "ig": 0.731, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> HTML\n\n> instead of hacks on top of hacks\n\nAfraid that’s a contradiction. In this role, HTML is a pile of hacks upon hacks that was not originally intended for UIs.\n\nBut, yeah, people are trying to reinvent GUIs. By layering hacks over TTYs. If only there’d be some protocol for widgets and events over a stream connection…"}, {"id": 50494291, "au": "acjohnson55", "dom": 51, "sr": 57, "sc": 1.39, "ep": 2.78, "bs": 0.0, "d": 1, "age": 8.67, "grav": 70.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 12547, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": [], "ig": 1.112, "fa": 0.0, "gp": 0.117, "bl": 0.0, "ds": 0.0, "txt": "I completely agree.\n\nIf we must embed 2D interfaces in terminals, I feel like we'd be better off putting in iframes or canvases that occupy a dedicated rectangle of cells."}, {"id": 50494800, "au": "joouha", "dom": 22, "sr": 58, "sc": 1.39, "ep": 2.73, "bs": 0.0, "d": 2, "age": 6.87, "grav": 50.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 239, "kpp": 5.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": [], "ig": 1.163, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "If it's not obvious how this could be achieved with overstrike, basically the idea is that you could draw text on a cell then overstrike the cell with 1/8 block characters for the 4 edges characters (U+2581 & friends) to create a border around the cell.\n\nEdit: HN stripped the characters in question from my comment"}, {"id": 50496268, "au": "korm", "dom": 87, "sr": 59, "sc": 1.39, "ep": 2.59, "bs": 0.0, "d": 1, "age": 2.31, "grav": 13.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 23, "qw": 0, "k": 345, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "app_ratatui", "flbl": "App & Ratatui (Windows)", "urls": ["https://github.com/microsoft/terminal"], "ig": 0.557, "fa": 0.45, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Windows Terminal allows moving the cursor by clicking. It's such a good terminal emulator that it's the thing I miss the most when I'm on Linux.\n\nhttps://github.com/microsoft/terminal"}, {"id": 50495499, "au": "hnlmorg", "dom": 10, "sr": 60, "sc": 1.39, "ep": 2.49, "bs": 0.0, "d": 3, "age": 4.63, "grav": 30.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 12488, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": [], "ig": 1.058, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Because the background colour isn’t bounded by the border colour using overstrike, but it can be when using borders.\n\nThis isn’t an issue if you want square borders. But the screenshots in the article showed fancy rounded corners."}, {"id": 50492060, "au": "hedgehog", "dom": 48, "sr": 61, "sc": 1.39, "ep": 2.42, "bs": 0.0, "d": 1, "age": 13.9, "grav": 145.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 4193, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": [], "ig": 1.029, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Text terminal with every keystroke round-tripped through the server is not a design that makes sense for any reason other than backwards compatibility. It's kind of annoying to design for and atrocious for performance."}, {"id": 50493180, "au": "octoberfranklin", "dom": 137, "sr": 62, "sc": 1.39, "ep": 2.4, "bs": 0.0, "d": 0, "age": 11.47, "grav": 107.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 1925, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "useful_tuis", "flbl": "Useful & Tuis (Cost)", "urls": [], "ig": 0.943, "fa": 0.0, "gp": 0.128, "bl": 0.0, "ds": 0.0, "txt": "Having markdown tables render with zero-cell spacing (use underlines for horizontal and different background shades for vertical) is just one of the billion reasons I will never, ever, ever go back to closed-source coding agents."}, {"id": 50493536, "au": "zem", "dom": 19, "sr": 63, "sc": 1.39, "ep": 2.39, "bs": 0.0, "d": 3, "age": 10.63, "grav": 96.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 10668, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": [], "ig": 1.018, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "cell borders sound even more elegant imo, they are a targeted, precise fix for a useful feature. overstrike sounds messy to me though I can see where it has a lot of uses."}, {"id": 50496336, "au": "Timon3", "dom": 82, "sr": 64, "sc": 1.39, "ep": 2.25, "bs": 0.0, "d": 1, "age": 2.14, "grav": 12.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 3011, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": [], "ig": 0.958, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "That would be awesome! IIRC zellij supports this, but that only works as long as it intercepts all selection inputs. Having a more universal standard that terminal emulators can support would be great."}, {"id": 50493993, "au": "pkulak", "dom": 95, "sr": 65, "sc": 1.39, "ep": 2.18, "bs": 0.0, "d": 0, "age": 9.54, "grav": 81.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 12735, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "app_ratatui", "flbl": "App & Ratatui (Windows)", "urls": [], "ig": 0.717, "fa": 0.0, "gp": 0.342, "bl": 0.0, "ds": 0.0, "txt": "I kinda like the examples without the native borders…\n\nThe charm of the terminal is that you can do whatever you want, as long as it fits in one cell."}, {"id": 50493012, "au": "tptacek", "dom": 26, "sr": 66, "sc": 1.39, "ep": 2.14, "bs": 0.0, "d": 2, "age": 11.77, "grav": 112.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 426786, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "app_ratatui", "flbl": "App & Ratatui (Windows)", "urls": [], "ig": 0.48, "fa": 0.0, "gp": 0.699, "bl": 0.0, "ds": 0.0, "txt": "I think I mostly just want to see someone do it so I can see what it looks like; it just feels like something that should exist. You're taking baby steps towards it! :)"}, {"id": 50496706, "au": "ianberdin", "dom": 76, "sr": 67, "sc": 1.39, "ep": 2.13, "bs": 0.0, "d": 0, "age": 1.11, "grav": 7.7, "surf": 20.6, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 564, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": [], "ig": 0.828, "fa": 0.0, "gp": 0.128, "bl": 0.0, "ds": 0.0, "txt": "I used to not understand why there are so many little perks in the terminal - until I started spending quite a lot of hours a day in the terminal."}, {"id": 50492246, "au": "toast0", "dom": 49, "sr": 68, "sc": 1.39, "ep": 2.0, "bs": 0.0, "d": 2, "age": 13.46, "grav": 138.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 33017, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": [], "ig": 0.851, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Teletypes and dumb terminals managed to implement local echo. You don't need to round trip everything."}, {"id": 50496057, "au": "oblio", "dom": 31, "sr": 69, "sc": 1.39, "ep": 1.95, "bs": 0.0, "d": 3, "age": 2.92, "grav": 17.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 28103, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "useful_tuis", "flbl": "Useful & Tuis (Cost)", "urls": [], "ig": 0.417, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It's amusing that the flagship products of the post-2023 AI era can't fully handle 1972s teletype interfaces :-)"}, {"id": 50496044, "au": "oblio", "dom": 14, "sr": 70, "sc": 1.39, "ep": 1.88, "bs": 0.0, "d": 2, "age": 2.95, "grav": 17.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 28103, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "app_ratatui", "flbl": "App & Ratatui (Windows)", "urls": [], "ig": 0.799, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "This protocol would still be used for user interfaces, but it would use a completely different approach to rendering them, I guess we could call this approach \"graphical\"?"}, {"id": 50497160, "au": "alpaca128", "dom": 13, "sr": 71, "sc": 1.39, "ep": 1.86, "bs": 0.0, "d": 2, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 8736, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": [], "ig": 0.79, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Can you name one which is as lightweight and simple to use as terminal escape codes and supported by almost any platform with a screen and keyboard?"}, {"id": 50495492, "au": "NSPG911", "dom": 11, "sr": 72, "sc": 1.39, "ep": 3.77, "bs": 1.99, "d": 1, "age": 4.64, "grav": 30.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 36, "qw": 0, "k": 49, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": ["https://vtdn.dev/docs/sgr/sgr-overline"], "ig": 0.684, "fa": 0.62, "gp": 0.274, "bl": 0.75, "ds": 0.0, "txt": "Huh, I'm not sure whether it is the same protocol, I know of this: https://vtdn.dev/docs/sgr/sgr-overline\n\nThe syntax is:\n\nCSI 53 m    SGR 53 — Overlined\nCSI 55 m    SGR 55 — Not overlined\n\nwhich is much more different than mitty's Control Sequence, but supports much more emulators"}, {"id": 50495547, "au": "nottorp", "dom": 30, "sr": 73, "sc": 1.39, "ep": 1.78, "bs": 0.0, "d": 2, "age": 4.5, "grav": 29.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 9, "k": 14820, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": [], "ig": 0.758, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> Coding agents tend to find all those edge cases.\n\nDo they? Last time I checked you still couldn't select text via the keyboard in the Claude Code TUI."}, {"id": 50497037, "au": "Sharlin", "dom": 4, "sr": 74, "sc": 1.39, "ep": 1.68, "bs": 0.0, "d": 3, "age": 0.3, "grav": 4.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 22376, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "app_ratatui", "flbl": "App & Ratatui (Windows)", "urls": [], "ig": 0.716, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Yep. And actually you’d only need four codepoints (per line style) because you could just chain them to get a line on more than one edge."}, {"id": 50493473, "au": "CGamesPlay", "dom": 91, "sr": 75, "sc": 1.39, "ep": 1.63, "bs": 0.0, "d": 0, "age": 10.77, "grav": 97.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 8742, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": [], "ig": 0.407, "fa": 0.0, "gp": 0.468, "bl": 0.0, "ds": 0.0, "txt": "I am in general against the big push to fit GUI interfaces into the tty, but I have to say that this feature looks genuinely good. Vim will look great with this."}, {"id": 50496196, "au": "nkmnz", "dom": 86, "sr": 76, "sc": 1.39, "ep": 1.56, "bs": 0.0, "d": 0, "age": 2.52, "grav": 15.1, "surf": 10.5, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 1179, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": [], "ig": 0.577, "fa": 0.0, "gp": 0.144, "bl": 0.0, "ds": 0.0, "txt": "Interesting. All I wish I could do in a terminal is moving the cursor by clicking. And maybe selecting some text and replacing it with a single key stroke. Why is that not a thing?"}, {"id": 50495377, "au": "asymmetric", "dom": 6, "sr": 77, "sc": 1.39, "ep": 1.52, "bs": 0.0, "d": 2, "age": 5.0, "grav": 33.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 51, "qw": 0, "k": 1942, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": [], "ig": 0.647, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Hey, this was super cool!\n\nAges ago I had found a software that would convert an image to ascii-art, and then used another tool called posteriza to split the large image into several A4s, which I then taped together and hung on my wall. Would love to do something similar but with better tools."}, {"id": 50494336, "au": "oasisbob", "dom": 144, "sr": 78, "sc": 1.39, "ep": 1.52, "bs": 0.0, "d": 1, "age": 8.52, "grav": 69.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 3057, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": [], "ig": 0.646, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Normally I would too, but after reading the article, I really don't have any complaints. Disclosure is appreciated too.\n\nWhatever the author is doing works reasonably well to be readable and inoffensive."}, {"id": 50492651, "au": "joshka", "dom": 104, "sr": 79, "sc": 1.39, "ep": 1.47, "bs": 0.0, "d": 1, "age": 12.54, "grav": 123.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 97, "qw": 0, "k": 2469, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "useful_tuis", "flbl": "Useful & Tuis (Cost)", "urls": [], "ig": 0.626, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I upvote naysayers comments there as I don't think votes should be used to indicate (dis)agreement at least not without commenting why, more an indication that this is a useful thing to discuss. So if you see my comments not getting votes while every other one has a bump, that's my vote on them :)\n\nIt's kind of funny, I posted this here and there at similar times. Expected to be spam flagged there due to the anti-AI brigade, but my submission here was the one that actually got hit (likely because I disclosed AI use in the post body is my guess)."}, {"id": 50492475, "au": "joshka", "dom": 98, "sr": 80, "sc": 1.39, "ep": 3.26, "bs": 1.85, "d": 1, "age": 12.95, "grav": 130.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 55, "qw": 0, "k": 2469, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": [], "ig": 1.386, "fa": 0.0, "gp": 0.0, "bl": 0.7, "ds": 0.0, "txt": "Tmux drops DCS that it doesn't know like this. That aside, this is extra state per cell that needs to be tracked, handled, understood from a rendering perspective etc. It can work, but would require maybe a thousand lines of code or so to support storing and handling state, redraw etc. and all the various edge cases."}, {"id": 50493428, "au": "krautburglar", "dom": 107, "sr": 81, "sc": 1.39, "ep": 1.39, "bs": 0.0, "d": 0, "age": 10.86, "grav": 99.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 107, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": [], "ig": 0.502, "fa": 0.0, "gp": 0.144, "bl": 0.0, "ds": 0.0, "txt": "Why do you people have to ruin terminals?  If you wanted a web browser, we already have those, and they already have borders."}, {"id": 50494550, "au": "petesergeant", "dom": 52, "sr": 82, "sc": 1.18, "ep": 2.38, "bs": 1.19, "d": 1, "age": 7.76, "grav": 60.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 5630, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": [], "ig": 0.678, "fa": 0.0, "gp": 0.54, "bl": 0.45, "ds": 0.0, "txt": "Everyone has different priorities. For me, the main benefit of the TUI is the brain-dead ease in which I have windowed applications running over SSH."}, {"id": 50491755, "au": "0c3ca83", "dom": 115, "sr": 83, "sc": 1.17, "ep": 2.37, "bs": 1.19, "d": 0, "age": 14.49, "grav": 155.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 797, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": [], "ig": 0.535, "fa": 0.0, "gp": 0.766, "bl": 0.45, "ds": 0.0, "txt": "What if, dare I say it, we just served HTML over ssh, and let the browser render a proper UI, instead of layering hacks on top of hacks?"}, {"id": 50493981, "au": "joshka", "dom": 111, "sr": 84, "sc": 1.08, "ep": 2.94, "bs": 1.85, "d": 1, "age": 9.57, "grav": 82.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 48, "qw": 0, "k": 2469, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "useful_tuis", "flbl": "Useful & Tuis (Cost)", "urls": [], "ig": 1.251, "fa": 0.0, "gp": 0.0, "bl": 0.7, "ds": 0.0, "txt": "Sure - I use GUIs most of the time despite maintaining Ratatui. I much prefer them for coding agents as the amount of interactions and various things I want out of the interface are not handled by TUI well. GUIs are a vastly superior interface (I worked on the Codex TUI at OpenAI btw)."}, {"id": 50494858, "au": "fodkodrasz", "dom": 59, "sr": 85, "sc": 0.81, "ep": 2.0, "bs": 1.19, "d": 2, "age": 6.69, "grav": 49.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 1393, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": [], "ig": 0.852, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "ssh -Y worked well for me. That usecase should be revived in a bandwidth efficient manner (eg. RDP does bearable over crappy links, eg. over the ocean) instead."}, {"id": 50492291, "au": "arboles", "dom": 130, "sr": 86, "sc": 0.68, "ep": 1.88, "bs": 1.19, "d": 5, "age": 13.34, "grav": 136.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 190, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": [], "ig": 0.799, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "And for the ecosystem's sake, punish (harshly) GUI toolkit developers that use bitmap rendering (GTK4 and Qt Quick applications are slow on ssh -X)."}, {"id": 50495724, "au": "cowlevel", "dom": 12, "sr": 87, "sc": 0.65, "ep": 2.11, "bs": 1.46, "d": 1, "age": 3.94, "grav": 24.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": [], "ig": 0.532, "fa": 0.0, "gp": 0.59, "bl": 0.55, "ds": 0.0, "txt": "The better alternative to most of this is to use a different display protocol, one that gives you pixel-level control, if you want pixel-level control."}, {"id": 50494709, "au": "db48x", "dom": 100, "sr": 88, "sc": 0.59, "ep": 1.78, "bs": 1.19, "d": 0, "age": 7.18, "grav": 54.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 8465, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": [], "ig": 0.594, "fa": 0.0, "gp": 0.266, "bl": 0.45, "ds": 0.0, "txt": "I like this idea! Of course I might be biased, since it’s similar enough to one I’ve had myself. Good job getting an implementation going; I never did."}, {"id": 50495425, "au": "benterris", "dom": 9, "sr": 89, "sc": 0.34, "ep": 1.53, "bs": 1.19, "d": 2, "age": 4.84, "grav": 31.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 156, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": [], "ig": 0.653, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "How is it harder? If I understand correctly overstrike is a superset of the regluar 1-char-per-cell mode, so nothing is lost by going overstrike?"}, {"id": 50492427, "au": "joshka", "dom": 16, "sr": 90, "sc": 0.21, "ep": 2.07, "bs": 1.85, "d": 1, "age": 13.04, "grav": 131.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 2469, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": [], "ig": 0.641, "fa": 0.0, "gp": 0.386, "bl": 0.7, "ds": 0.0, "txt": "There's some downsides to this - I can't recall where I called this out off the top of my head, but this also adds a bunch more things that that wouldn't do that are covered in the spec."}, {"id": 50492405, "au": "echoangle", "dom": 119, "sr": 91, "sc": 0.16, "ep": 1.35, "bs": 1.19, "d": 2, "age": 13.09, "grav": 132.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 5303, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": [], "ig": 0.575, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "You mean serving html over SSH?\n\nIt can already port forward so you can basically already do this, I don’t think that’s insecure per se."}, {"id": 50495734, "au": "cowlevel", "dom": 40, "sr": 92, "sc": 0.04, "ep": 1.5, "bs": 1.46, "d": 1, "age": 3.92, "grav": 24.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": [], "ig": 0.62, "fa": 0.0, "gp": 0.029, "bl": 0.55, "ds": 0.0, "txt": "In other words you want a library that wraps X11 and displays a character grid in a monospaced font."}, {"id": 50495454, "au": "solyin", "dom": 55, "sr": 93, "sc": -0.03, "ep": 1.16, "bs": 1.19, "d": 3, "age": 4.77, "grav": 31.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 714, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "useful_tuis", "flbl": "Useful & Tuis (Cost)", "urls": [], "ig": 0.493, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Fwiw, openssh can be used as a proxy to shuffle TCP packets around. You're not strictly stuck to using a PTY. A modern xpra would be amazing!"}, {"id": 50493207, "au": "joshka", "dom": 18, "sr": 94, "sc": -0.17, "ep": 1.68, "bs": 1.85, "d": 3, "age": 11.41, "grav": 107.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 2469, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": [], "ig": 0.717, "fa": 0.0, "gp": 0.0, "bl": 0.7, "ds": 0.0, "txt": "Which things do you consider in your experience of writing tuis that are mentioned as being wanted in the blog post / rationale doc linked to be unnecessary?\n\nIf you want those things then overstrike is insufficient."}, {"id": 50495408, "au": "hobo123", "dom": 108, "sr": 95, "sc": -0.23, "ep": 0.96, "bs": 1.19, "d": 1, "age": 4.9, "grav": 32.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 268, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": [], "ig": 0.409, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "I think that's a fair question. It seems that people want more keyboard navigation and (sometimes) monospace UIs, but that should be perfectly feasible in a web UI."}, {"id": 50492324, "au": "arboles", "dom": 126, "sr": 96, "sc": -0.27, "ep": 0.92, "bs": 1.19, "d": 4, "age": 13.27, "grav": 135.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 55, "k": 190, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.391, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "> what if there was a command that would produce ls output as a table data structure, run in a sort of terminal that knows how to format a table nicely without the ls command having to include any formatting instructions? this terminal would have support for all sorts of data types and structures to display all of them nicely.\n\nSo, powershell? For some reason only IT jockeys on Microsoft's death grip remember and use its full capability after learning it."}, {"id": 50496371, "au": "cowlevel", "dom": 68, "sr": 97, "sc": -0.33, "ep": 1.13, "bs": 1.46, "d": 3, "age": 2.04, "grav": 12.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "app_ratatui", "flbl": "App & Ratatui (Windows)", "urls": [], "ig": 0.481, "fa": 0.0, "gp": 0.0, "bl": 0.55, "ds": 0.0, "txt": "Doing it within your office suite is the easy part. Independent apps make it nigh impossible."}, {"id": 50492454, "au": "0c3ca83", "dom": 121, "sr": 98, "sc": -0.36, "ep": 0.83, "bs": 1.19, "d": 2, "age": 12.99, "grav": 130.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 797, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": [], "ig": 0.354, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Ssh lets you forward arbitrary ports, and forward X11 directly. Why is HTML more of a problem?"}, {"id": 50492673, "au": "nmstoker", "dom": 106, "sr": 99, "sc": -0.4, "ep": 0.79, "bs": 1.19, "d": 0, "age": 12.5, "grav": 123.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 3921, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "app_ratatui", "flbl": "App & Ratatui (Windows)", "urls": [], "ig": 0.238, "fa": 0.0, "gp": 0.161, "bl": 0.45, "ds": 0.0, "txt": "Love this. And the people who like more space can opt for that (this doesn't look things in)."}, {"id": 50493929, "au": "joshka", "dom": 43, "sr": 100, "sc": -0.4, "ep": 1.45, "bs": 1.85, "d": 2, "age": 9.7, "grav": 83.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 2469, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "app_ratatui", "flbl": "App & Ratatui (Windows)", "urls": [], "ig": 0.618, "fa": 0.0, "gp": 0.0, "bl": 0.7, "ds": 0.0, "txt": "For a while in the 2000s I tried programming with Verdana in my IDE at the time. It wasn't all that bad. It would be in a terminal however - fun idea regardless."}, {"id": 50492520, "au": "drdexebtjl", "dom": 127, "sr": 101, "sc": -0.48, "ep": 0.71, "bs": 1.19, "d": 5, "age": 12.82, "grav": 128.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 1192, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.303, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "There are many problems with powershell, but to me the absolute worst, won't even touch it with a 10-feet pole, is UTF-16."}, {"id": 50492080, "au": "rvz", "dom": 118, "sr": 102, "sc": -0.54, "ep": 0.65, "bs": 1.19, "d": 1, "age": 13.85, "grav": 144.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 10590, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": [], "ig": 0.209, "fa": 0.0, "gp": 0.108, "bl": 0.45, "ds": 0.0, "txt": "Honestly why? It is not designed at all for that.\n\nIn fact it just makes it less secure."}, {"id": 50491909, "au": "ncruces", "dom": 128, "sr": 103, "sc": -0.68, "ep": 0.51, "bs": 1.19, "d": 3, "age": 14.22, "grav": 150.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 2574, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": [], "ig": 0.218, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "We could even use `ssh -X` to send it over SSH if that flag is otherwise unused."}, {"id": 50492433, "au": "muqsitnawaz", "dom": 23, "sr": 104, "sc": -0.72, "ep": 1.8, "bs": 2.52, "d": 1, "age": 13.03, "grav": 131.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": [], "ig": 0.766, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "Expecting Terminal Emulators to support overstrike is a high bar even many text editors don't even support strikethrough. Would love to see it though"}, {"id": 50495808, "au": "tripa", "dom": 101, "sr": 105, "sc": -0.92, "ep": 2.13, "bs": 3.05, "d": 0, "age": 3.72, "grav": 23.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 255, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": [], "ig": 0.88, "fa": 0.0, "gp": 0.04, "bl": 1.15, "ds": 0.0, "txt": "Before I clicked I interpreted the title as airport terminals whose border controls don't require a burner phone."}, {"id": 50496309, "au": "cowlevel", "dom": 58, "sr": 106, "sc": -1.12, "ep": 0.85, "bs": 1.97, "d": 2, "age": 2.2, "grav": 13.3, "surf": 3.7, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": [], "ig": 0.363, "fa": 0.0, "gp": 0.0, "bl": 0.743, "ds": 0.0, "txt": "Then we need a way to run GUI applications over SSH with the same ease.\n\nThere used to be one. It was called X forwarding. You'd run ash -X or ssh -Y and it magically worked."}, {"id": 50491642, "au": "cobychapple", "dom": 92, "sr": 107, "sc": -1.14, "ep": 1.91, "bs": 3.05, "d": 0, "age": 14.67, "grav": 158.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 1109, "kpp": 6.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "app_ratatui", "flbl": "App & Ratatui (Windows)", "urls": [], "ig": 0.43, "fa": 0.0, "gp": 0.618, "bl": 1.15, "ds": 0.0, "txt": "Would be cool to get borders and lines out of copy/paste"}, {"id": 50493761, "au": "matheusmoreira", "dom": 64, "sr": 108, "sc": -1.46, "ep": 2.78, "bs": 4.24, "d": 0, "age": 10.14, "grav": 89.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 29519, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": [], "ig": 0.441, "fa": 0.0, "gp": 1.203, "bl": 1.6, "ds": 0.0, "txt": "As awesome as this is, but I can't shake the feeling terminals are becoming lightweight browsers..."}, {"id": 50496297, "au": "__alexs", "dom": 15, "sr": 109, "sc": -1.46, "ep": 1.58, "bs": 3.05, "d": 1, "age": 2.23, "grav": 13.4, "surf": 9.8, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 3491, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": [], "ig": 0.654, "fa": 0.0, "gp": 0.032, "bl": 1.15, "ds": 0.0, "txt": "More terminal emulators should implement Tek4010 mode and just draw vectors everywhere."}, {"id": 50496059, "au": "eadler", "dom": 38, "sr": 110, "sc": -1.51, "ep": 1.54, "bs": 3.05, "d": 1, "age": 2.91, "grav": 17.6, "surf": 8.3, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 11, "qw": 0, "k": 460, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": ["https://www.destroyallsoftware.com/talks/a-whole-new-world"], "ig": 0.61, "fa": 0.0, "gp": 0.072, "bl": 1.15, "ds": 0.0, "txt": "You'd appreciate this talk on designing a whole new terminal from scratch \n https://www.destroyallsoftware.com/talks/a-whole-new-world"}, {"id": 50493184, "au": "joshka", "dom": 27, "sr": 111, "sc": -1.62, "ep": 1.09, "bs": 2.7, "d": 3, "age": 11.47, "grav": 107.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 2469, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "app_ratatui", "flbl": "App & Ratatui (Windows)", "urls": [], "ig": 0.363, "fa": 0.0, "gp": 0.161, "bl": 1.02, "ds": 0.0, "txt": "I kinda keep talking about it in the hopes that someone will be nerd sniped enough to throw tokens at it as an idea. Sort of what you're probably doing too I guess. ;)"}, {"id": 50494065, "au": "eviks", "dom": 45, "sr": 112, "sc": -1.88, "ep": 1.17, "bs": 3.05, "d": 3, "age": 9.29, "grav": 78.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 6023, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": [], "ig": 0.498, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Tried what? It's not supported now, everything is a fixed grid"}, {"id": 50494601, "au": "db48x", "dom": 21, "sr": 113, "sc": -1.96, "ep": 1.09, "bs": 3.05, "d": 1, "age": 7.56, "grav": 58.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 8465, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": [], "ig": 0.462, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Overstriking support might be nice, but it wouldn’t help much for this use–case."}, {"id": 50496788, "au": "Sharlin", "dom": 2, "sr": 114, "sc": -2.08, "ep": 2.16, "bs": 4.24, "d": 1, "age": 0.87, "grav": 6.7, "surf": 22.6, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 22376, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "useful_tuis", "flbl": "Useful & Tuis (Cost)", "urls": [], "ig": 0.89, "fa": 0.0, "gp": 0.05, "bl": 1.6, "ds": 0.0, "txt": "A considerably less archaic and more generally useful way would be for Unicode to add border-drawing given that the concept of composing several codepoints to the same glyph is already there and ubiquitous. You’d just need 2^4=16 new codepoints."}, {"id": 50496719, "au": "wg0", "dom": 85, "sr": 115, "sc": -2.71, "ep": 1.53, "bs": 4.24, "d": 0, "age": 1.06, "grav": 7.5, "surf": 21.1, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 4940, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "useful_tuis", "flbl": "Useful & Tuis (Cost)", "urls": [], "ig": 0.616, "fa": 0.0, "gp": 0.06, "bl": 1.6, "ds": 0.0, "txt": "I just wonder why Claud code to ever other CLI is still in JS? Why not Rust? I mean - how much effort it would be to port all the libraries? With AI?"}, {"id": 50494102, "au": "joshka", "dom": 80, "sr": 116, "sc": -2.95, "ep": 0.95, "bs": 3.9, "d": 3, "age": 9.18, "grav": 77.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 2469, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.403, "fa": 0.0, "gp": 0.0, "bl": 1.47, "ds": 0.0, "txt": "It should be coming soon. :) Sometime in the next couple of weeks is the vague handwavy forecast."}, {"id": 50492462, "au": "dead_hn_theory", "dom": 103, "sr": 117, "sc": -2.97, "ep": 1.27, "bs": 4.24, "d": 0, "age": 12.98, "grav": 130.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 78, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": [], "ig": 0.429, "fa": 0.0, "gp": 0.181, "bl": 1.6, "ds": 0.0, "txt": "There's a nice thread about this on lobsters, but the author is getting piled on."}, {"id": 50491874, "au": "masfuerte", "dom": 123, "sr": 118, "sc": -3.12, "ep": 1.12, "bs": 4.24, "d": 2, "age": 14.28, "grav": 151.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 2874, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": [], "ig": 0.374, "fa": 0.0, "gp": 0.164, "bl": 1.6, "ds": 0.0, "txt": "While we're figuring it out let's call this hypothetical protocol X."}, {"id": 50495933, "au": "mfld", "dom": 94, "sr": 119, "sc": -3.14, "ep": 1.1, "bs": 4.24, "d": 0, "age": 3.34, "grav": 20.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 762, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "app_ratatui", "flbl": "App & Ratatui (Windows)", "urls": [], "ig": 0.414, "fa": 0.0, "gp": 0.088, "bl": 1.6, "ds": 0.0, "txt": "I like it. As an analogy, borders are important features of spreadsheet tools as well."}, {"id": 50492263, "au": "ganelonhb", "dom": 109, "sr": 120, "sc": -3.17, "ep": 1.07, "bs": 4.24, "d": 0, "age": 13.42, "grav": 137.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 45, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "app_ratatui", "flbl": "App & Ratatui (Windows)", "urls": [], "ig": 0.329, "fa": 0.0, "gp": 0.201, "bl": 1.6, "ds": 0.0, "txt": "This is gorgeous and I need it in trunk for both kitty and ghostty"}, {"id": 50493248, "au": "inguz", "dom": 5, "sr": 121, "sc": -3.5, "ep": 1.53, "bs": 5.04, "d": 1, "age": 11.29, "grav": 105.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 10, "qw": 0, "k": 52, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": ["https://hughpyle.com/ASR33/"], "ig": 0.23, "fa": 0.0, "gp": 0.686, "bl": 1.9, "ds": 0.0, "txt": "Overstrike is underrated!\n\nI've really enjoyed using it on paper: https://hughpyle.com/ASR33/"}, {"id": 50493102, "au": "tcfhgj", "dom": 117, "sr": 122, "sc": -3.52, "ep": 0.72, "bs": 4.24, "d": 1, "age": 11.62, "grav": 110.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 1621, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": [], "ig": 0.252, "fa": 0.0, "gp": 0.085, "bl": 1.6, "ds": 0.0, "txt": "No, i really don't want to have electron level bloat as a terminal"}, {"id": 50493328, "au": "movingimage", "dom": 135, "sr": 123, "sc": -3.93, "ep": 1.63, "bs": 5.57, "d": 0, "age": 11.11, "grav": 102.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 5, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "useful_tuis", "flbl": "Useful & Tuis (Cost)", "urls": [], "ig": 0.608, "fa": 0.0, "gp": 0.141, "bl": 2.1, "ds": 0.0, "txt": "“….that don’t cost a cell.” How much do I hate AI hustle bro passive riddle writing."}, {"id": 50492132, "au": "cluckindan", "dom": 129, "sr": 124, "sc": -3.95, "ep": 0.29, "bs": 4.24, "d": 4, "age": 13.74, "grav": 142.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 2237, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.122, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "I think it would make sense if it had a client-server architecture."}, {"id": 50493319, "au": "movingimage", "dom": 138, "sr": 125, "sc": -4.37, "ep": 1.2, "bs": 5.57, "d": 0, "age": 11.12, "grav": 102.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 5, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "useful_tuis", "flbl": "Useful & Tuis (Cost)", "urls": [], "ig": 0.443, "fa": 0.0, "gp": 0.108, "bl": 2.1, "ds": 0.0, "txt": "“That don’t cost a cell.” Can’t stand AI bro speak."}, {"id": 50496783, "au": "tliltocatl", "dom": 65, "sr": 126, "sc": -4.61, "ep": 0.82, "bs": 5.43, "d": 1, "age": 0.9, "grav": 6.8, "surf": 12.2, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 1052, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": [], "ig": 0.351, "fa": 0.0, "gp": 0.0, "bl": 2.05, "ds": 0.0, "txt": "What's wrong with that? I mean, as awesome as plain VT-100 is, we need some way to have a richer text-oriented UI that is still lighter than Chromium."}, {"id": 50495441, "au": "solyin", "dom": 7, "sr": 127, "sc": -4.86, "ep": 0.17, "bs": 5.04, "d": 3, "age": 4.81, "grav": 31.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 8, "qw": 0, "k": 714, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://rasterbator.net/"], "ig": 0.074, "fa": 0.0, "gp": 0.0, "bl": 1.9, "ds": 0.0, "txt": "https://rasterbator.net/\n\nDamn, that's one from back in the day."}, {"id": 50494997, "au": "quadhome", "dom": 69, "sr": 128, "sc": -8.64, "ep": 0.0, "bs": 6.89, "d": 2, "age": 6.23, "grav": 44.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 0, "k": 1410, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "app_ratatui", "flbl": "App & Ratatui (Windows)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.332, "bl": 2.6, "ds": 0.0, "txt": "That was X11."}, {"id": 50492386, "au": "kevin_thibedeau", "dom": 113, "sr": 129, "sc": -8.85, "ep": 0.0, "bs": 6.89, "d": 0, "age": 13.13, "grav": 133.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 23589, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.19, "bl": 2.6, "ds": 0.0, "txt": "How much RAM does this use?"}, {"id": 50493715, "au": "eviks", "dom": 42, "sr": 130, "sc": -8.94, "ep": 0.0, "bs": 6.89, "d": 1, "age": 10.23, "grav": 90.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 6023, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.125, "bl": 2.6, "ds": 0.0, "txt": "Or even more ambitious - ditch the monospace"}, {"id": 50494041, "au": "lilbigdoot", "dom": 136, "sr": 131, "sc": -8.99, "ep": 0.0, "bs": 6.89, "d": 0, "age": 9.36, "grav": 79.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 169, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.091, "bl": 2.6, "ds": 0.0, "txt": "I like it"}, {"id": 50495250, "au": "thiht", "dom": 20, "sr": 132, "sc": -9.03, "ep": 0.0, "bs": 6.89, "d": 1, "age": 5.48, "grav": 37.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 4889, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "useful_tuis", "flbl": "Useful & Tuis (Cost)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.066, "bl": 2.6, "ds": 0.0, "txt": "What makes it much better?"}, {"id": 50496836, "au": "binarymax", "dom": 3, "sr": 133, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 0.72, "grav": 6.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 12576, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Oh like a diacritic? Good idea."}, {"id": 50494957, "au": "albertgoeswoof", "dom": 35, "sr": 134, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 6.36, "grav": 45.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 6, "qw": 0, "k": 5481, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://github.com/paul-oms/prompt"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "This is basically what I’m doing with https://github.com/paul-oms/prompt"}, {"id": 50494044, "au": "nepthar", "dom": 44, "sr": 135, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 9.35, "grav": 79.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 354, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Have you tried this? It’s awful"}, {"id": 50496687, "au": "dale_glass", "dom": 57, "sr": 136, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 5, "age": 1.16, "grav": 7.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 8176, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "program_ssh", "flbl": "Program & SSH (Etc)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "For Wayland forwarding, there's waypipe."}, {"id": 50494543, "au": "svachalek", "dom": 73, "sr": 137, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 7.78, "grav": 60.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 4856, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Isn't that Microsoft OLE?"}, {"id": 50492226, "au": "em-bee", "dom": 133, "sr": 138, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 13.51, "grav": 139.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 1, "qw": 0, "k": 10562, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "plan 9?"}, {"id": 50492857, "au": "charles_f", "dom": 143, "sr": 139, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 0, "age": 12.12, "grav": 117.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 10, "k": 7254, "kpp": 4.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "> If that bothers you, feel free to close the tab.\n\nI probably missed on something, but I stopped there"}, {"id": 50495827, "au": "peterfirefly", "dom": 67, "sr": 140, "sc": -10.81, "ep": 0.0, "bs": 8.88, "d": 2, "age": 3.68, "grav": 22.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 6, "qw": 0, "k": 1391, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "hacks_web", "flbl": "Hacks & Web (Design)", "urls": ["https://en.wikipedia.org/wiki/Framework_(office_suite)"], "ig": -0.95, "fa": 0.0, "gp": 0.208, "bl": 3.35, "ds": 0.0, "txt": "Like Framework?  But for independent apps?\n\nhttps://en.wikipedia.org/wiki/Framework_(office_suite)"}, {"id": 50495242, "au": "joshka", "dom": 75, "sr": 141, "sc": -10.98, "ep": 0.0, "bs": 8.74, "d": 3, "age": 5.5, "grav": 37.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 2469, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.3, "ds": 0.0, "txt": "Similar yes"}, {"id": 50495710, "au": "pamcake", "dom": 46, "sr": 142, "sc": -11.11, "ep": 0.0, "bs": 8.88, "d": 4, "age": 3.98, "grav": 25.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 0, "qw": 0, "k": 436, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://wiki.archlinux.org/title/Mlterm\u0023Using_variable_width_fonts"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.35, "ds": 0.0, "txt": "https://wiki.archlinux.org/title/Mlterm\u0023Using_variable_width..."}, {"id": 50493963, "au": "ant0ni", "dom": 47, "sr": 143, "sc": -11.64, "ep": 0.0, "bs": 9.41, "d": 1, "age": 9.62, "grav": 82.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 5, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "useful_tuis", "flbl": "Useful & Tuis (Cost)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.55, "ds": 0.0, "txt": "everyday we get closer to building emacs"}, {"id": 50496353, "au": "cowlevel", "dom": 72, "sr": 144, "sc": -14.83, "ep": 0.0, "bs": 12.59, "d": 2, "age": 2.1, "grav": 12.7, "surf": 4.8, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "overstrike_text", "flbl": "Overstrike & Text (Emulators)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 4.752, "ds": 0.0, "txt": "X11 supports this."}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      const jumpBtns = isPinned
+        ? `<button type="button" class="probe-inline-btn" data-probe-jump="1">Comment &darr;</button>` +
+          `<button type="button" class="probe-inline-btn" data-probe-clear="1">Clear &times;</button>`
+        : "";
+      probeEl.innerHTML =
+        `<strong>@${escHtml(hit.au)}</strong> | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})` +
+        jumpBtns +
+        `<br>"${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 60);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 50);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 50);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 50);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `Showing ${shown.length} of ${pool.length} matching comments (mode: ${activeMode})` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear selection</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeSelect = document.getElementById("modeSelect");
+  modeSelect.addEventListener("change", () => {
+    activeMode = modeSelect.value;
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

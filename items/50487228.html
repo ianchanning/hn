@@ -1,0 +1,1259 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50487228 // Show HN: Isometric SF – A pixel-art map of the SF Bay Area — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      background: rgb(247, 247, 245);
+      color: rgb(13, 13, 13);
+      font: 15px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+    }
+    .sheet-top {
+      border-top: 3px solid rgb(13, 13, 13);
+      border-bottom: 1px solid rgb(13, 13, 13);
+      padding: 16px 0 26px;
+    }
+    .eyebrow {
+      font: 600 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .eyebrow strong { color: rgb(255, 51, 0); }
+    h1 {
+      font-size: clamp(36px, 5.2vw, 72px);
+      line-height: 0.96;
+      letter-spacing: -0.045em;
+      margin: 18px 0 14px;
+      font-weight: 800;
+    }
+    h1 .accent { color: rgb(255, 51, 0); }
+    .sublead {
+      max-width: 920px;
+      font-size: 16px;
+      color: rgb(52, 52, 50);
+      margin: 0;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      font: 700 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 24px;
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+    }
+    .kpi-cell {
+      padding: 16px 16px 14px;
+      border-right: 1px solid rgb(205, 205, 200);
+    }
+    .kpi-cell:last-child { border-right: 0; }
+    .kpi-label {
+      font: 600 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 8px 0 4px;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      font-size: 12px;
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      background: rgb(13, 15, 17);
+      color: rgb(228, 232, 236);
+      border: 2px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 6px;
+      corner-shape: bevel;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(156, 166, 176);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      background: rgb(9, 11, 13);
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(180, 188, 196);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 58px;
+      background: rgb(20, 24, 28);
+      border-left: 3px solid rgb(0, 230, 118);
+      font: 12px/19px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(220, 226, 232);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 38px;
+    }
+
+    /* Collapsible 03A / 03B Justification Drawer */
+    details.proof-drawer {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 12px 0;
+    }
+    details.proof-drawer > summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      font: 700 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      user-select: none;
+    }
+    details.proof-drawer > summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary:hover { border-color: rgb(255, 51, 0); }
+    details.proof-drawer > summary .toggle-pill {
+      flex-shrink: 0;
+      padding: 3px 8px;
+      background: rgb(13, 13, 13);
+      color: rgb(247, 247, 245);
+      font-size: 10px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 16px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: rgb(255, 255, 253);
+      border: 1px solid rgb(13, 13, 13);
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+    }
+    table.ablation th {
+      background: rgb(236, 236, 231);
+      font: 700 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgb(60, 60, 58);
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      font: 600 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+      color: rgb(13, 13, 13);
+      padding: 7px 11px;
+      font: 600 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      box-shadow: 0 2px 0 rgb(13, 13, 13);
+    }
+    button.tab-btn.active {
+      background: rgb(13, 13, 13);
+      color: rgb(247, 247, 245);
+    }
+    button.tab-btn:hover {
+      border-color: rgb(255, 51, 0);
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      padding: 8px 11px;
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+      font: 600 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { flex: 1; min-width: 220px; font-weight: 400; }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border: 1px solid rgb(216, 216, 206);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      border-top: 3px solid rgb(13, 13, 13);
+      padding-top: 14px;
+      margin-top: 36px;
+      font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        background: rgb(239, 239, 234);
+        border: 1px solid rgb(13, 13, 13);
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        font-size: 17px;
+        margin: 0;
+        white-space: normal;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        background: rgb(13, 13, 13);
+        color: rgb(247, 247, 245);
+        font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-] HIDE"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+] SHOW"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpi-cell { border-bottom: 1px solid rgb(205, 205, 200); }
+      .filter-bar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .filter-bar select.sel-in {
+        width: 100%;
+        font-size: 16px;
+        padding: 8px 9px;
+      }
+      .filter-bar input.search-in {
+        grid-column: span 2;
+        width: 100%;
+        min-width: 0;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="sheet-top">
+    <div class="eyebrow">
+      <span>NYX OBSERVATORY // <a class="ext-link" href="https://news.ycombinator.com/item?id=50487228">HN ITEM 50487228</a> // ISOMETRICSF.COM</span>
+      <span><strong>BULLSHIT: 82.2%</strong>
+    </div>
+    <h1>Bullshit vs. <span class="accent">Epistemic.</span></h1>
+    <p class="sublead">
+      <strong>73</strong> Hacker News comments on <a class="ext-link" href="https://isometricsf.com/">Show HN: Isometric SF – A pixel-art map of the SF Bay Area (isometricsf.com)</a>.
+    </p>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary>
+      <span>01 // EVIDENCE</span>
+      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    </summary>
+    <p>
+      Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+      Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+    </p>
+    <div class="proof-body">
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">73</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 56 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">17.8%</div>
+          <div class="kpi-sub">13 comments (1 Gold / 1.4%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">82.2%</div>
+          <div class="kpi-sub">28 chatter &bull; 32 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">1</div>
+        <div class="kpi-sub">3% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.986</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">17</div>
+          <div class="kpi-sub">HN POS 30..46 (23.3% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="margin-top:10px;font:600 11px/1.5 ui-monospace,Menlo,monospace;color:rgb(70,70,68)"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary>
+      <span>02 // EXPLORE</span>
+      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / INTERACTIVE EQUATION</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p style="font-size:11.5px;line-height:1.42;color:rgb(85,85,82);margin:12px 0 0">
+              Drag any weight to watch the 73-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 73)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (1)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (12)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (28)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (32)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..73) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 25)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (@fwipsy, 15.8h); largest subtree (@drayfield) occupies 17 slots (HN POS 30..46).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="modeSelect" class="sel-in" aria-label="Ranking view">
+          <option value="hn_top40">HN Top 40</option>
+          <option value="top_signal">Epistemic Top 50</option>
+          <option value="buried_gems">Buried Gems (HN POS &gt; 25)</option>
+          <option value="bullshit_traps">High-Karma / URL Traps Caught</option>
+          <option value="mod_morgue">Mod Rebukes &amp; Downvoted Morgue</option>
+          <option value="c5a_rescues">c5A Heterodox Rescues</option>
+        </select>
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (73)</option>
+          <option value="art_pixel">Art &amp; Pixel (Games) (20)</option>
+          <option value="google_tiles">Google &amp; Tiles (API) (15)</option>
+          <option value="generation_map">Generation &amp; Map (Left) (10)</option>
+          <option value="rotate_thanks">Rotate &amp; Thanks (North) (10)</option>
+          <option value="images_square">Images &amp; Square (Project) (9)</option>
+          <option value="general_commentary">General Commentary (9)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, bay, isometric, map, area, sf...">
+      </div>
+      <div id="resultMeta" style="font:600 11px/1.4 ui-monospace,Menlo,monospace;color:rgb(90,90,88);margin-bottom:10px"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50487228 + ISOMETRICSF.COM + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50487228, "story_title": "Show HN: Isometric SF – A pixel-art map of the SF Bay Area", "story_url": "https://isometricsf.com/", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50487228, "story_title": "Show HN: Isometric SF – A pixel-art map of the SF Bay Area", "story_url": "https://isometricsf.com/", "points": 231, "story_author": "juscha1", "article_source": "fetched_url", "t1_ref_utc": "2026-11-14T13:28:11+00:00", "t2_ref_utc": "2026-11-14T13:28:11+00:00", "delta_minutes": 0.0, "story_anchors": ["bay", "isometric", "map", "area", "sf", "tiles", "maps", "google", "art", "search", "pixel-art", "show", "pixel", "captured", "process", "zoom", "data", "fun", "places", "project", "style", "angle", "image", "instead", "north"], "facet_labels": {"art_pixel": "Art & Pixel (Games)", "google_tiles": "Google & Tiles (API)", "rotate_thanks": "Rotate & Thanks (North)", "images_square": "Images & Square (Project)", "generation_map": "Generation & Map (Left)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "art_pixel", "label": "Art & Pixel (Games)", "count": 20, "top_terms": ["art", "pixel", "games", "term"]}, {"slug": "google_tiles", "label": "Google & Tiles (API)", "count": 15, "top_terms": ["google", "tiles", "api", "per"]}, {"slug": "rotate_thanks", "label": "Rotate & Thanks (North)", "count": 10, "top_terms": ["rotate", "thanks", "north", "etc"]}, {"slug": "images_square", "label": "Images & Square (Project)", "count": 9, "top_terms": ["images", "square", "project", "zoom"]}, {"slug": "generation_map", "label": "Generation & Map (Left)", "count": 10, "top_terms": ["generation", "map", "left", "buildings"]}], "counts": {"total_comments": 73, "live_t2_comments": 73, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 56, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 1, "pages_fetched": 1}, "sha256": {"corpus.json": "a4a6a17111fae7df3e06940678034ba269adb5a46aedabdd299a2013d8148d01"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 1, "grounded_analysis": 12, "crowd_chatter": 28, "bullshit_or_flamewar": 32}, "facets": {"generation_map": 10, "google_tiles": 15, "rotate_thanks": 10, "images_square": 9, "art_pixel": 20, "general_commentary": 9}, "facet_options": [{"slug": "art_pixel", "label": "Art & Pixel (Games)", "count": 20}, {"slug": "google_tiles", "label": "Google & Tiles (API)", "count": 15}, {"slug": "generation_map", "label": "Generation & Map (Left)", "count": 10}, {"slug": "rotate_thanks", "label": "Rotate & Thanks (North)", "count": 10}, {"slug": "images_square", "label": "Images & Square (Project)", "count": 9}, {"slug": "general_commentary", "label": "General Commentary", "count": 9}], "facet_diagnostics": [{"slug": "art_pixel", "label": "Art & Pixel (Games)", "count": 20, "useful": 4, "useful_pct": 20.0, "terms": "art, pixel, games, term"}, {"slug": "google_tiles", "label": "Google & Tiles (API)", "count": 15, "useful": 2, "useful_pct": 13.3, "terms": "google, tiles, api, per"}, {"slug": "generation_map", "label": "Generation & Map (Left)", "count": 10, "useful": 1, "useful_pct": 10.0, "terms": "generation, map, left, buildings"}, {"slug": "rotate_thanks", "label": "Rotate & Thanks (North)", "count": 10, "useful": 2, "useful_pct": 20.0, "terms": "rotate, thanks, north, etc"}, {"slug": "images_square", "label": "Images & Square (Project)", "count": 9, "useful": 4, "useful_pct": 44.4, "terms": "images, square, project, zoom"}, {"slug": "general_commentary", "label": "General Commentary", "count": 9, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 14}, {"category": "code_repository", "count": 1}], "story_anchors": ["bay", "isometric", "map", "area", "sf", "tiles", "maps", "google", "art", "search", "pixel-art", "show", "pixel", "captured", "process", "zoom", "data", "fun"], "largest_root": {"root_id": 50489230, "author": "drayfield", "slots": 17, "start_dom": 30, "end_dom": 46, "share_pct": 23.3, "top_dom1_age": 15.8, "top_dom1_author": "fwipsy"}, "buried_cutoff": 25, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50489743, "au": "dllu", "dom": 21, "sr": 1, "sc": 10.22, "ep": 10.22, "bs": 0.0, "d": 0, "age": 16.25, "grav": 186.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 92, "qw": 0, "k": 2174, "kpp": 6.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "generation_map", "flbl": "Generation & Map (Left)", "urls": ["https://i.dllu.net/2018-04-14-23-31-28_DSC04018_6201e8e3a21598fb3a21a1f3f33a62282e46558a_4b2e5cb4aee9a1e2.jpg"], "ig": 1.409, "fa": 1.57, "gp": 1.683, "bl": 0.0, "ds": 0.0, "txt": "Here's a 7388 x 5097 photo I took from a friend's Cessna of the Mission from a similar angle in 2018 which provides a nice point of reference for comparing the fine details:\n\nhttps://i.dllu.net/2018-04-14-23-31-28_DSC04018_6201e8e3a215...\n\nYou can see some buildings, like 350 Treat Ave, which is a white warehouse in the middle of the photo, are blended from two colors in this isometric viewer. It's yellow on the left and grey on the right, when in fact it is uniformly white throughout. This is probably due to image generation running separately on two tiles and then blending them together.\n\nStill, from a distance, this looks great."}, {"id": 50488197, "au": "mlmonkey", "dom": 2, "sr": 2, "sc": 7.31, "ep": 7.31, "bs": 0.0, "d": 0, "age": 18.4, "grav": 227.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 37, "qw": 0, "k": 1496, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "google_tiles", "flbl": "Google & Tiles (API)", "urls": ["https://developers.google.com/maps/documentation/tile/3d-tiles"], "ig": 1.113, "fa": 0.96, "gp": 1.348, "bl": 0.0, "ds": 0.0, "txt": "OP didn't mention it (or maybe I missed it), but the underlying imagery comes from the Google 3D photorealistic tiles API: https://developers.google.com/maps/documentation/tile/3d-til...\n\nThey offer a generous 1000 API calls per month for free, in case anyone is interested in replicating this."}, {"id": 50490455, "au": "ubasu", "dom": 25, "sr": 3, "sc": 6.7, "ep": 6.7, "bs": 0.0, "d": 0, "age": 15.55, "grav": 173.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 53, "qw": 0, "k": 2885, "kpp": 6.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "rotate_thanks", "flbl": "Rotate & Thanks (North)", "urls": [], "ig": 1.487, "fa": 0.34, "gp": 1.541, "bl": 0.0, "ds": 0.0, "txt": "This misses large parts of the Bay Area, which is nine counties: Alameda, Contra Costa, Marin, Napa, San Mateo, Santa Clara, Solano, Sonoma, and San Francisco. Here, pretty much everything east of 680 and north of the Richmond Bridge is missing. No Mt. Diablo, no Livermore, only bits of Dublin, Pleasanton, San Ramon etc."}, {"id": 50490413, "au": "AntonyGarand", "dom": 20, "sr": 4, "sc": 6.56, "ep": 6.56, "bs": 0.0, "d": 0, "age": 15.6, "grav": 174.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 39, "qw": 0, "k": 596, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "images_square", "flbl": "Images & Square (Project)", "urls": ["https://news.ycombinator.com/item?id=49149966"], "ig": 1.178, "fa": 0.62, "gp": 1.396, "bl": 0.0, "ds": 0.0, "txt": "I thought I already saw that project few months ago, but turns out it's a similar submission under the same concept: \"Isopolis – Isometric pixel map of SF \"!\n\nLooks great, I love the style you chose, it was enjoyable to move around and explore\n\n[0]: https://news.ycombinator.com/item?id=49149966"}, {"id": 50488244, "au": "vunderba", "dom": 9, "sr": 5, "sc": 6.5, "ep": 6.5, "bs": 0.0, "d": 2, "age": 18.36, "grav": 226.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 205, "qw": 0, "k": 9490, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "images_square", "flbl": "Images & Square (Project)", "urls": ["https://imgpb.com/ePXki"], "ig": 1.745, "fa": 0.62, "gp": 0.437, "bl": 0.0, "ds": 0.0, "txt": "I mention this a lot: the two basic post-processing steps you have to do, at a minimum, to give genai images even a semblance of pixel art are palette reduction and square grid alignment.\n\nUnfortunately, the definition of \"pixel art\" like \"vibe coding\" has been diluted to the point of almost being meaningless.\n\nIf you have a project like this with tens of thousands of tiles, you have to run them all through square grid alignment. That process tries to pick an optimal square grid and then reduce the image to a discrete set of pixels, with each square resolved to a single color.\n\nIt's similar to what you do when you shrink an image using nearest-neighbor scaling. As a result, you mitigate a lot of the irritating high-frequency noise and fringing that occur in these higher-resolution pixel art images from generative AIs.\n\nApplying it to a project with tens of thousands of images still requires a lot of manual intervention. This is what makes separates good pixel art from bad pixel art: even at a low resolution of 16x16 or 32x32, it's still recognizable.\n\nTry taking any of the 512x512 tiles from this particular isometric city project (or any of the other dozen variants) and feed'em into Spritefusion and you'll quickly see what I mean.\n\nhttps://imgpb.com/ePXki"}, {"id": 50492273, "au": "vunderba", "dom": 37, "sr": 6, "sc": 5.67, "ep": 5.67, "bs": 0.0, "d": 2, "age": 12.7, "grav": 126.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 40, "qw": 0, "k": 9490, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "art_pixel", "flbl": "Art & Pixel (Games)", "urls": ["https://www.spriters-resource.com/nes/mm2", "https://www.yachtclubgames.com/blog/breaking-the-nes"], "ig": 1.263, "fa": 0.62, "gp": 0.641, "bl": 0.0, "ds": 0.0, "txt": "For old-school pixel art, try looking through the sprite sheet assets of old 8-bit NES games on The Spriters Resource.\n\nFor contemporary pixel art, Yacht Club Games, makers of Shovel Knight and Mina the Hollower, is an absolute gold standard.\n\nhttps://www.spriters-resource.com/nes/mm2\n\nhttps://www.yachtclubgames.com/blog/breaking-the-nes"}, {"id": 50489031, "au": "simlevesque", "dom": 7, "sr": 7, "sc": 5.57, "ep": 5.71, "bs": 0.0, "d": 1, "age": 17.22, "grav": 204.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 45, "qw": 26, "k": 4080, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "art_pixel", "flbl": "Art & Pixel (Games)", "urls": ["https://news.ycombinator.com/item?id=46721802", "https://news.ycombinator.com/item?id=50448289", "https://news.ycombinator.com/item?id=50163735"], "ig": 1.104, "fa": 1.04, "gp": 0.107, "bl": 0.0, "ds": 0.0, "txt": "Search for \"pixel art\" in HN's search and you'll see most of the last submissions are the same fake pixel art.\n\n\"pixel art\" NYC: https://news.ycombinator.com/item?id=46721802\n\n\"pixel art\" Rio: https://news.ycombinator.com/item?id=50448289\n\n\"pixel art\" London: https://news.ycombinator.com/item?id=50163735\n\n\"pixel art\" Valencia: https://news.ycombinator.com/item?id=50441518\n\n\"pixel art\" world: https://news.ycombinator.com/item?id=49674973\n\nThere's almost a hundred of them and I'm not exagerating:\n\n> https://isometriccities.com/ Since Isometric NYC, makers around the world have been rebuilding their hometowns as giant SimCity-style maps. We collect every one of them. 98 maps"}, {"id": 50492756, "au": "pfg_", "dom": 39, "sr": 8, "sc": 5.04, "ep": 9.03, "bs": 3.84, "d": 2, "age": 11.61, "grav": 109.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 155, "qw": 0, "k": 251, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "images_square", "flbl": "Images & Square (Project)", "urls": ["https://media.geeksforgeeks.org/wp-content/uploads/20230720100012/Anti-aliasing-768.png", "https://www.slynyrd.com/blog/2022/11/28/pixelblog-41-isometric-pixel-art", "https://www.behance.net/gallery/18524751/Pixel-Art-City"], "ig": 1.586, "fa": 1.52, "gp": 0.669, "bl": 1.45, "ds": 0.0, "txt": "Pixel art is generally made out of well-defined pixels that are all on the same grid in the same scale. When you zoom in, the pixels look sharp. Pixel art usually rarely has anti-aliased lines, whereas every line in Isometric SF is anti-aliased.\n\nComparison of how lines look with vs without anti-aliasing:\n\n- https://media.geeksforgeeks.org/wp-content/uploads/202307201...\n\nExamples of \"real\" pixel art:\n\n- https://www.slynyrd.com/blog/2022/11/28/pixelblog-41-isometr...\n\n- https://www.behance.net/gallery/18524751/Pixel-Art-City\n\n- https://platform.theverge.com/wp-content/uploads/sites/2/cho... (this may look blurry if you zoom in or have a monitor display scale other than 1x, but when viewed properly the pixels are sharp)\n\n- https://retrodiffusion.ai/explore/5818 (AI generated, but the output was constrained to make it have pixels, instead of having downscaled smooth lines that look anti-aliased)\n\nExamples of \"fake\" pixel art:\n\n- https://media.easy-peasy.ai/61515f6c-78d2-4786-95ec-ccada6e5... (the pixels vary in size and shape, and are blurry)\n\n- https://media.easy-peasy.ai/c558c867-167c-4f11-afed-c9f85f2a... (same issue)\n\n- https://easy-peasy.ai/ai-image-generator/images/pixel-art-of... (you can see at the very bottom of the apple, the pixels are half the height they are supposed to be)\n\n- https://www.reddit.com/r/midjourney/comments/1ifcul5/pixel_a...\n\n- https://pixelartvillage."}, {"id": 50487887, "au": "cmdoptesc", "dom": 28, "sr": 9, "sc": 5.02, "ep": 5.02, "bs": 0.0, "d": 0, "age": 18.76, "grav": 235.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 54, "qw": 0, "k": 104, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "rotate_thanks", "flbl": "Rotate & Thanks (North)", "urls": [], "ig": 1.429, "fa": 0.0, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "Hi Justin, great writeup!\n\nI really appreciate your human-written documentation because it's nice to read your thought process instead of LLM marketing soundbites.\n\nre: orientation. I know it's creator's choice, but for me, it's either north or west towards the ocean. East makes me want to hold shift to rotate. :)\n\nThanks for making and sharing this!"}, {"id": 50487812, "au": "leugim", "dom": 17, "sr": 10, "sc": 4.88, "ep": 4.88, "bs": 0.0, "d": 0, "age": 18.86, "grav": 236.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 28, "qw": 0, "k": 273, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "google_tiles", "flbl": "Google & Tiles (API)", "urls": ["https://www.tinyvalencia.com"], "ig": 0.617, "fa": 0.62, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "How much it cost you paint per km2 after training the model? I did (and publish here) https://www.tinyvalencia.com and got to 0.4$ per km2 after training the model (for 15$ or so)."}, {"id": 50490489, "au": "armcat", "dom": 24, "sr": 11, "sc": 4.54, "ep": 4.54, "bs": 0.0, "d": 0, "age": 15.51, "grav": 173.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 53, "qw": 0, "k": 2773, "kpp": 6.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "images_square", "flbl": "Images & Square (Project)", "urls": [], "ig": 1.224, "fa": 0.0, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "I've done something similar with generating pixel-style images of Stockholm. Unfortunately imagegen models are quite bad at localised details. It looks good on the surface, but when you look closer or zoom in you see structurally things that don't make sense, like windows disappearing, or walls just not making any sense at all."}, {"id": 50487765, "au": "dnlzro", "dom": 22, "sr": 12, "sc": 4.28, "ep": 4.28, "bs": 0.0, "d": 0, "age": 18.91, "grav": 238.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 65, "qw": 0, "k": 633, "kpp": 7.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "art_pixel", "flbl": "Art & Pixel (Games)", "urls": [], "ig": 1.112, "fa": 0.0, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "I've been seeing a lot of these kinds of projects make the rounds on Twitter lately. Yours is just as good as the best of them, so great job making it more efficient without loss of quality!\n\nBut... I'm always disappointed when I zoom in and see that it's not actually pixel art, and it's full of the kinds of artifacts that are typical of any AI-generated imagery :("}, {"id": 50488050, "au": "shrinks99", "dom": 8, "sr": 13, "sc": 4.04, "ep": 4.34, "bs": 0.0, "d": 1, "age": 18.55, "grav": 230.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 17, "qw": 0, "k": 278, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "art_pixel", "flbl": "Art & Pixel (Games)", "urls": ["https://github.com/Hugo-Dz/spritefusion-pixel-snapper"], "ig": 0.713, "fa": 0.75, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "Yeah.  I'm surprised this technique hasn't yet caught on among people doing generative visuals with \"pixel art\" aesthetics: https://github.com/Hugo-Dz/spritefusion-pixel-snapper"}, {"id": 50488534, "au": "modeless", "dom": 49, "sr": 14, "sc": 3.78, "ep": 3.78, "bs": 0.0, "d": 0, "age": 17.96, "grav": 218.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 45924, "kpp": 6.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_tiles", "flbl": "Google & Tiles (API)", "urls": [], "ig": 0.897, "fa": 0.0, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "This style seems achievable while retaining 3D rendering if the tiles are preprocessed in 3D instead of 2D and some clever shaders are used."}, {"id": 50488784, "au": "gojomo", "dom": 47, "sr": 15, "sc": 3.64, "ep": 3.64, "bs": 0.0, "d": 0, "age": 17.58, "grav": 211.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 30216, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "rotate_thanks", "flbl": "Rotate & Thanks (North)", "urls": [], "ig": 0.837, "fa": 0.0, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "Is there any way to rotate the perspective, as in Google Maps with 2-finger gestures (touchscreens) or shift-drags (mice/etc)?\n\n(I couldn't find it, if it already exists.)"}, {"id": 50489341, "au": "nphardon", "dom": 13, "sr": 16, "sc": 3.61, "ep": 3.61, "bs": 0.0, "d": 0, "age": 16.79, "grav": 196.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 296, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "rotate_thanks", "flbl": "Rotate & Thanks (North)", "urls": [], "ig": 0.827, "fa": 0.0, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "this is really cool, but I wish it was oriented north south (maybe thats not as pleasing re the isometry?), just because that's how I think about the city and navigating it, so this makes me like, instinctually rotate my head."}, {"id": 50489691, "au": "Conscat", "dom": 26, "sr": 17, "sc": 3.53, "ep": 3.53, "bs": 0.0, "d": 0, "age": 16.3, "grav": 187.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 1028, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "generation_map", "flbl": "Generation & Map (Left)", "urls": [], "ig": 0.791, "fa": 0.0, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "Wow, it captured the pool in my apartment complex. I love this! I was a bit disoriented by north being left."}, {"id": 50487941, "au": "jeffbee", "dom": 65, "sr": 18, "sc": 3.09, "ep": 3.31, "bs": 0.0, "d": 0, "age": 18.69, "grav": 233.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 55, "qw": 0, "k": 24584, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "images_square", "flbl": "Images & Square (Project)", "urls": [], "ig": 1.271, "fa": 0.0, "gp": 0.221, "bl": 0.0, "ds": 0.0, "txt": "Not bad. I feel like instead of using an image-mode model, it would be better to use a code model that generates the scene. Reason I think this is that the image generators aren't respecting the rules of \"pixel art\". Straight lines and flat planes are straight and flat in pixel art. These images are wavy and irregular."}, {"id": 50489116, "au": "30minAdayHN", "dom": 16, "sr": 19, "sc": 3.03, "ep": 3.03, "bs": 0.0, "d": 0, "age": 17.09, "grav": 202.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 218, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_tiles", "flbl": "Google & Tiles (API)", "urls": [], "ig": 0.579, "fa": 0.0, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "This is so beautiful! Something soothing and ultra clean about it. Maybe all the maps should have this rendered version as default."}, {"id": 50490242, "au": "fwipsy", "dom": 1, "sr": 20, "sc": 3.03, "ep": 3.25, "bs": 0.0, "d": 0, "age": 15.77, "grav": 177.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 1638, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "art_pixel", "flbl": "Art & Pixel (Games)", "urls": [], "ig": 0.671, "fa": 0.0, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "This is neat but maybe we could call it \"pixel-art-styled?\" Pixel art is all about attention to detail; this is more like applying a shader (though I see some AI artifacts in there too.)"}, {"id": 50488192, "au": "juscha1", "dom": 29, "sr": 21, "sc": 2.74, "ep": 2.89, "bs": 0.0, "d": 1, "age": 18.41, "grav": 227.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 48, "qw": 0, "k": 78, "kpp": 11.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "generation_map", "flbl": "Generation & Map (Left)", "urls": ["https://www.justinchavez.com/blog/isometric-sf/"], "ig": 0.478, "fa": 0.62, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Thank you! I tried to get Fable to take a stab at writing the technicals in the original reflection post, but I really didn't like it and sought to rewrite it myself. Took a week longer, but I'm way happier with the result.\n\nTechnicals written by Fable at the end of this post: https://www.justinchavez.com/blog/isometric-sf/"}, {"id": 50488348, "au": "larodi", "dom": 12, "sr": 22, "sc": 2.69, "ep": 3.13, "bs": 0.0, "d": 2, "age": 18.21, "grav": 224.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 68, "qw": 0, "k": 1966, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "generation_map", "flbl": "Generation & Map (Left)", "urls": [], "ig": 0.991, "fa": 0.28, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Why does anyone need to publish anything like this snapper, the person doing pixelart, if he understands pixelart, should know to do it himself! this is the third map published here in apparent diffusionart which is absolutely not a pixelart. besides for buildings - pixelart artists would choose repeating stuff that diffusion models would never be able to reproduce, at least for the FP errors that pile while it happens."}, {"id": 50489230, "au": "drayfield", "dom": 30, "sr": 23, "sc": 2.54, "ep": 3.27, "bs": 0.0, "d": 0, "age": 16.94, "grav": 199.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 411, "kpp": 9.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "art_pixel", "flbl": "Art & Pixel (Games)", "urls": [], "ig": 0.682, "fa": 0.0, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "Sorry to be a downer, but this looks really bad to me. It completely lacks the sumptuous precision of real pixel art."}, {"id": 50493625, "au": "fwipsy", "dom": 33, "sr": 24, "sc": 2.14, "ep": 2.8, "bs": 0.0, "d": 3, "age": 9.72, "grav": 84.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 1638, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_tiles", "flbl": "Google & Tiles (API)", "urls": [], "ig": 1.193, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Yep. You can see Google Earth-style photogrammetry artifacts (e.g. around power lines and pylons,) with AI artifacts layered on top, and also the edges of different tiles don't always align so sometimes you get a \"double vision\" effect.\n\n(I still like it overall)"}, {"id": 50491029, "au": "elxr", "dom": 10, "sr": 25, "sc": 1.64, "ep": 2.74, "bs": 0.0, "d": 3, "age": 14.89, "grav": 162.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 16, "k": 389, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "art_pixel", "flbl": "Art & Pixel (Games)", "urls": [], "ig": 0.657, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> Unfortunately, the definition of \"pixel art\" has been diluted to the point of almost being meaningless.\n\nNah, people who enjoy pixel art games, and pixel-artists have complete clarity on what pixel art means. There is zero dilution to that term among people who actually have pixel art drawing talent."}, {"id": 50487714, "au": "NeuraCryption", "dom": 58, "sr": 26, "sc": 1.47, "ep": 1.91, "bs": 0.0, "d": 0, "age": 18.96, "grav": 239.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 16, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_tiles", "flbl": "Google & Tiles (API)", "urls": [], "ig": 0.643, "fa": 0.0, "gp": 0.279, "bl": 0.0, "ds": 0.0, "txt": "This is amazing and is 1:1 global map. Did you use google maps API to build this or UE5?"}, {"id": 50493575, "au": "kccqzy", "dom": 54, "sr": 27, "sc": 1.37, "ep": 2.25, "bs": 0.0, "d": 0, "age": 9.83, "grav": 85.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 19940, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "art_pixel", "flbl": "Art & Pixel (Games)", "urls": [], "ig": 0.878, "fa": 0.0, "gp": 0.128, "bl": 0.0, "ds": 0.0, "txt": "I wouldn’t really call it pixel art but nevertheless looks cool. And there are way fewer cars than in real life: most of the major highways seem suspiciously empty."}, {"id": 50490534, "au": "juscha1", "dom": 69, "sr": 28, "sc": 1.36, "ep": 1.58, "bs": 0.0, "d": 1, "age": 15.47, "grav": 172.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 20, "qw": 0, "k": 78, "kpp": 11.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "rotate_thanks", "flbl": "Rotate & Thanks (North)", "urls": ["https://isometricsf.com/v/9/451.8/-123.1"], "ig": 0.674, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "https://isometricsf.com/v/9/451.8/-123.1\n\nYou can search by lat lon to find places not listed. Will add this one though thanks for pointing out!"}, {"id": 50492801, "au": "xp84", "dom": 27, "sr": 29, "sc": 0.9, "ep": 1.49, "bs": 0.0, "d": 1, "age": 11.53, "grav": 108.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 9789, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "rotate_thanks", "flbl": "Rotate & Thanks (North)", "urls": [], "ig": 0.632, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It did a great job of my former places I lived in the Bay as well. And also, same disorientation from this choice of angle. But all the same it’s fun."}, {"id": 50493741, "au": "vunderba", "dom": 41, "sr": 30, "sc": 0.74, "ep": 2.28, "bs": 0.0, "d": 4, "age": 9.47, "grav": 80.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 76, "qw": 0, "k": 9490, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "art_pixel", "flbl": "Art & Pixel (Games)", "urls": [], "ig": 0.703, "fa": 0.22, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It also depends on the system.\n\nBack in the day running something like Super Mario 3 often meant composite video going through RF hookup and the TV \"recovering\" and decoding. I'm sure that accounted for a bit of the blurriness.\n\nContrast this with a game like Commander Keen for DOS running in 16-color graphics on a VGA CRT monitor which sends separate R, G, B signals. I remember Keen being very crisp even as a kid who practically pressed their face against the glass when playing."}, {"id": 50492468, "au": "quacker", "dom": 32, "sr": 31, "sc": 0.71, "ep": 1.81, "bs": 0.0, "d": 2, "age": 12.28, "grav": 119.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 18, "qw": 0, "k": 805, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_tiles", "flbl": "Google & Tiles (API)", "urls": ["https://www.justinchavez.com/blog/isometric-sf/"], "ig": 0.771, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Not jpeg artifacts. It’s an AI attempt at pixelating real photos (or “Google renders”), per the blog post[1].\n\n1. https://www.justinchavez.com/blog/isometric-sf/"}, {"id": 50496352, "au": "e_y_", "dom": 4, "sr": 32, "sc": 0.44, "ep": 1.47, "bs": 0.0, "d": 1, "age": 1.41, "grav": 9.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 435, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_tiles", "flbl": "Google & Tiles (API)", "urls": [], "ig": 0.624, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Just for fun you might be able to get away with it, but it's likely that this violates the Maps API terms of service."}, {"id": 50493833, "au": "frogulis", "dom": 43, "sr": 33, "sc": 0.36, "ep": 1.9, "bs": 0.0, "d": 3, "age": 9.26, "grav": 78.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 728, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "art_pixel", "flbl": "Art & Pixel (Games)", "urls": [], "ig": 0.81, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Not pixel art. If the polygons visible when completely zoomed in are any indication, it's 3D rendered. Don't let that detract from how utterly gorgeous and intricately made it is though!"}, {"id": 50489051, "au": "va3ndf", "dom": 56, "sr": 34, "sc": 0.22, "ep": 1.64, "bs": 1.19, "d": 0, "age": 17.18, "grav": 203.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 32, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "generation_map", "flbl": "Generation & Map (Left)", "urls": [], "ig": 0.566, "fa": 0.0, "gp": 0.21, "bl": 0.45, "ds": 0.0, "txt": "This is my favorite one yet! I used to live in SoMa and this captured my apartment and the nearby Caltrain wonderfully!"}, {"id": 50493648, "au": "fwipsy", "dom": 40, "sr": 35, "sc": 0.19, "ep": 1.74, "bs": 0.0, "d": 3, "age": 9.67, "grav": 83.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 1638, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "art_pixel", "flbl": "Art & Pixel (Games)", "urls": [], "ig": 0.738, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Agree except: pixels aren't always sharp. It's before my time, but I'm told pixel art on CRTs looks pretty fuzzy."}, {"id": 50489263, "au": "weego", "dom": 31, "sr": 36, "sc": 0.14, "ep": 1.68, "bs": 0.0, "d": 1, "age": 16.89, "grav": 198.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 6119, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "art_pixel", "flbl": "Art & Pixel (Games)", "urls": [], "ig": 0.617, "fa": 0.0, "gp": 0.159, "bl": 0.0, "ds": 0.0, "txt": "I was going to post the same, zooming in it's jpg artifacts and ghosting, I assume it was pixel perfect at some point in the process but isn't now."}, {"id": 50490456, "au": "thot_experiment", "dom": 52, "sr": 37, "sc": 0.0, "ep": 2.3, "bs": 1.19, "d": 0, "age": 15.55, "grav": 173.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 5110, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_tiles", "flbl": "Google & Tiles (API)", "urls": [], "ig": 0.267, "fa": 0.0, "gp": 1.15, "bl": 0.45, "ds": 0.0, "txt": "It's always heartening to see stuff like this because it really throws into stark illumination just how much AI just can't make up for a lack of taste."}, {"id": 50487884, "au": "juscha1", "dom": 59, "sr": 38, "sc": -0.1, "ep": 1.15, "bs": 0.0, "d": 1, "age": 18.77, "grav": 235.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 78, "kpp": 11.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_tiles", "flbl": "Google & Tiles (API)", "urls": [], "ig": 0.488, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I used the Google 3D Photorealistic Tiles API then rendered the tiles in three.js to capture them at the angle I wanted"}, {"id": 50493818, "au": "elxr", "dom": 38, "sr": 39, "sc": -0.15, "ep": 1.39, "bs": 0.0, "d": 2, "age": 9.29, "grav": 78.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 389, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "art_pixel", "flbl": "Art & Pixel (Games)", "urls": [], "ig": 0.525, "fa": 0.0, "gp": 0.106, "bl": 0.0, "ds": 0.0, "txt": "Stardew valley uses super polished pixel art.\n\nSea of stars (another rpg) is about as good as pixel art gets."}, {"id": 50488981, "au": "packeted", "dom": 23, "sr": 40, "sc": -0.69, "ep": 3.02, "bs": 3.05, "d": 0, "age": 17.28, "grav": 205.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 272, "kpp": 5.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "rotate_thanks", "flbl": "Rotate & Thanks (North)", "urls": [], "ig": 0.576, "fa": 0.0, "gp": 1.15, "bl": 1.15, "ds": 0.0, "txt": "Found my house in East Bay and it looks accurate, cool."}, {"id": 50490981, "au": "elxr", "dom": 46, "sr": 41, "sc": -0.76, "ep": 0.78, "bs": 0.0, "d": 1, "age": 14.95, "grav": 163.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 389, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "art_pixel", "flbl": "Art & Pixel (Games)", "urls": [], "ig": 0.33, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It's straight up not \"pixel art\".\n\nMaybe a \"close enough\" emulation of pixel art, if we're being generous."}, {"id": 50492480, "au": "cobychapple", "dom": 61, "sr": 42, "sc": -1.06, "ep": 2.43, "bs": 3.05, "d": 0, "age": 12.25, "grav": 119.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 1109, "kpp": 6.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "images_square", "flbl": "Images & Square (Project)", "urls": [], "ig": 0.569, "fa": 0.34, "gp": 0.088, "bl": 1.15, "ds": 0.0, "txt": "finally Bay Area land for $0.09 per square mile."}, {"id": 50488950, "au": "modeless", "dom": 51, "sr": 43, "sc": -1.58, "ep": 0.86, "bs": 1.19, "d": 2, "age": 17.32, "grav": 206.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 45924, "kpp": 6.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "google_tiles", "flbl": "Google & Tiles (API)", "urls": [], "ig": 0.366, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "I'm pretty sure that re-rendering the tiles to 2D and rehosting them on your own website is also forbidden. So no difference there."}, {"id": 50488844, "au": "JeremyHerrman", "dom": 50, "sr": 44, "sc": -2.33, "ep": 1.45, "bs": 3.05, "d": 1, "age": 17.48, "grav": 209.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 693, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "generation_map", "flbl": "Generation & Map (Left)", "urls": [], "ig": 0.619, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "unfortunate that google explicitly forbids 3D model generation from their map data"}, {"id": 50489418, "au": "juscha1", "dom": 14, "sr": 45, "sc": -2.53, "ep": 1.54, "bs": 3.05, "d": 1, "age": 16.68, "grav": 194.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 78, "kpp": 11.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "rotate_thanks", "flbl": "Rotate & Thanks (North)", "urls": [], "ig": 0.657, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Thanks! I choose this orientation to highlight the coast of the SF Bay area more."}, {"id": 50495442, "au": "throwaway2025_1", "dom": 5, "sr": 46, "sc": -2.6, "ep": 1.31, "bs": 2.52, "d": 1, "age": 4.12, "grav": 26.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 1, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "google_tiles", "flbl": "Google & Tiles (API)", "urls": [], "ig": 0.557, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "From the article about 8 'paragraphs' in.\n\n\"Capturing the Renders\n...\nFirst, the data. It comes from Google's Photorealistic 3D Tiles. Each tile is a 3D box, ...\""}, {"id": 50488928, "au": "juscha1", "dom": 48, "sr": 47, "sc": -2.99, "ep": 0.86, "bs": 3.05, "d": 1, "age": 17.35, "grav": 207.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 78, "kpp": 11.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "generation_map", "flbl": "Generation & Map (Left)", "urls": [], "ig": 0.368, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Not at the moment. It's captured at a fixed angle."}, {"id": 50489720, "au": "Conscat", "dom": 11, "sr": 48, "sc": -3.05, "ep": 1.54, "bs": 3.05, "d": 3, "age": 16.27, "grav": 186.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 1028, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "art_pixel", "flbl": "Art & Pixel (Games)", "urls": [], "ig": 0.655, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Mixels and incoherent palettes had confused the term pixel art long before genAI imo."}, {"id": 50492235, "au": "gofreddygo", "dom": 35, "sr": 49, "sc": -3.51, "ep": 1.08, "bs": 3.05, "d": 1, "age": 12.8, "grav": 127.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 1167, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "art_pixel", "flbl": "Art & Pixel (Games)", "urls": [], "ig": 0.236, "fa": 0.0, "gp": 0.36, "bl": 1.15, "ds": 0.0, "txt": "I'd love examples of good pixel art to constrast this against ?"}, {"id": 50490486, "au": "ex-aws-dude", "dom": 68, "sr": 50, "sc": -3.61, "ep": 0.78, "bs": 4.24, "d": 0, "age": 15.52, "grav": 173.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 1138, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.257, "fa": 0.0, "gp": 0.119, "bl": 1.6, "ds": 0.0, "txt": "Can't seem to find Computer History Museum\n\nAnyone able to?"}, {"id": 50493779, "au": "citizenkeen", "dom": 55, "sr": 51, "sc": -3.62, "ep": 0.62, "bs": 4.24, "d": 0, "age": 9.43, "grav": 80.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 37, "k": 1787, "kpp": 4.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.217, "fa": 0.0, "gp": 0.079, "bl": 1.6, "ds": 0.0, "txt": "> I came up with product ideas like the share button, caught edge cases like a bridge being drawn as water, and when the agents needed more compute, or more SSDs to hold all the data, I went and got them.\n\nThis is even less than I would have assumed, and I assumed very little human involvement."}, {"id": 50489708, "au": "xixixao", "dom": 62, "sr": 52, "sc": -4.03, "ep": 0.87, "bs": 4.24, "d": 0, "age": 16.28, "grav": 186.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 1814, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "images_square", "flbl": "Images & Square (Project)", "urls": [], "ig": 0.264, "fa": 0.0, "gp": 0.174, "bl": 1.6, "ds": 0.0, "txt": "Awesome. Next step: Make the trains and cars move!"}, {"id": 50490773, "au": "EarlKing", "dom": 73, "sr": 53, "sc": -4.4, "ep": 0.72, "bs": 4.24, "d": 0, "age": 15.2, "grav": 167.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 1422, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "generation_map", "flbl": "Generation & Map (Left)", "urls": [], "ig": 0.307, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Grossly inaccurate due to lack of pixelized piles of human feces."}, {"id": 50492394, "au": "iJohnDoe", "dom": 67, "sr": 54, "sc": -4.59, "ep": 0.53, "bs": 4.24, "d": 0, "age": 12.42, "grav": 122.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 1083, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "images_square", "flbl": "Images & Square (Project)", "urls": [], "ig": 0.171, "fa": 0.0, "gp": 0.088, "bl": 1.6, "ds": 0.0, "txt": "I think this is really cool. Has a retro feel to it."}, {"id": 50489782, "au": "nphardon", "dom": 15, "sr": 55, "sc": -4.91, "ep": 0.72, "bs": 4.24, "d": 2, "age": 16.22, "grav": 185.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 296, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "rotate_thanks", "flbl": "Rotate & Thanks (North)", "urls": [], "ig": 0.307, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "That's cool! The coast really frames it nicely."}, {"id": 50494125, "au": "JLO64", "dom": 34, "sr": 56, "sc": -4.91, "ep": 0.62, "bs": 4.24, "d": 4, "age": 8.44, "grav": 68.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 563, "kpp": 4.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "google_tiles", "flbl": "Google & Tiles (API)", "urls": [], "ig": 0.266, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Another good place spot those artifacts is on the CalTrain tracks."}, {"id": 50487747, "au": "kenferry", "dom": 6, "sr": 57, "sc": -7.46, "ep": 0.0, "bs": 6.89, "d": 0, "age": 18.92, "grav": 238.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 2111, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "art_pixel", "flbl": "Art & Pixel (Games)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 1.15, "bl": 2.6, "ds": 0.0, "txt": "…not actually pixel art though, no?"}, {"id": 50487783, "au": "scosman", "dom": 19, "sr": 58, "sc": -7.46, "ep": 0.0, "bs": 6.89, "d": 0, "age": 18.89, "grav": 237.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 4, "qw": 0, "k": 4265, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "images_square", "flbl": "Images & Square (Project)", "urls": ["https://iso.sloptoronto.ca/\u0023v=3&x=102672&y=64255&z=0.262"], "ig": -0.95, "fa": 0.0, "gp": 1.15, "bl": 2.6, "ds": 0.0, "txt": "Also see isometric Toronto: https://iso.sloptoronto.ca/\u0023v=3&x=102672&y=64255&z=0.262"}, {"id": 50496858, "au": "ffaccount2", "dom": 3, "sr": 59, "sc": -7.97, "ep": 0.51, "bs": 8.48, "d": 1, "age": 0.05, "grav": 3.6, "surf": 7.2, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 26, "k": 98, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.193, "fa": 0.0, "gp": 0.04, "bl": 3.2, "ds": 0.0, "txt": "I guess they edited it, because OP starts with\n\n>Hi HN! Showcasing this fun project. I took 1300 square miles of the SF Bay Area from Google Photorealistic 3D Tiles and transformed them into a cohesive pixel map"}, {"id": 50496703, "au": "Lucasoato", "dom": 53, "sr": 60, "sc": -8.2, "ep": 0.28, "bs": 8.48, "d": 0, "age": 0.42, "grav": 4.9, "surf": 48.6, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 2156, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "generation_map", "flbl": "Generation & Map (Left)", "urls": [], "ig": 0.115, "fa": 0.0, "gp": 0.003, "bl": 3.2, "ds": 0.0, "txt": "The only safe way to see Tenderloin or Mission."}, {"id": 50487635, "au": "yboris", "dom": 64, "sr": 61, "sc": -8.83, "ep": 0.0, "bs": 6.89, "d": 0, "age": 19.04, "grav": 240.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 7837, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "art_pixel", "flbl": "Art & Pixel (Games)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.199, "bl": 2.6, "ds": 0.0, "txt": "Impressive! And the aesthetics look great!"}, {"id": 50489153, "au": "blobbers", "dom": 63, "sr": 62, "sc": -8.85, "ep": 0.0, "bs": 6.89, "d": 0, "age": 17.03, "grav": 201.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 1743, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.188, "bl": 2.6, "ds": 0.0, "txt": "Just wanted to say... this is beautiful!"}, {"id": 50492511, "au": "tarballing", "dom": 57, "sr": 63, "sc": -8.92, "ep": 0.0, "bs": 6.89, "d": 0, "age": 12.15, "grav": 117.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 9, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "art_pixel", "flbl": "Art & Pixel (Games)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.141, "bl": 2.6, "ds": 0.0, "txt": "Pixel art this ain't"}, {"id": 50491861, "au": "kristopolous", "dom": 66, "sr": 64, "sc": -8.95, "ep": 0.0, "bs": 6.89, "d": 0, "age": 13.61, "grav": 140.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 18619, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "rotate_thanks", "flbl": "Rotate & Thanks (North)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.117, "bl": 2.6, "ds": 0.0, "txt": "lat/lng mapping would be great"}, {"id": 50493723, "au": "tptacek", "dom": 44, "sr": 65, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 3, "age": 9.53, "grav": 81.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 1, "qw": 0, "k": 426786, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Whoah."}, {"id": 50492621, "au": "mightysashiman", "dom": 45, "sr": 66, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 11.92, "grav": 114.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 24, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "SimCity assets"}, {"id": 50487845, "au": "leugim", "dom": 60, "sr": 67, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 18.82, "grav": 236.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 0, "k": 273, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "google_tiles", "flbl": "Google & Tiles (API)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Google 3D tiles."}, {"id": 50490592, "au": "ex-aws-dude", "dom": 70, "sr": 68, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 15.4, "grav": 170.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 1138, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "generation_map", "flbl": "Generation & Map (Left)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "ah nice"}, {"id": 50490874, "au": "elxr", "dom": 72, "sr": 69, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 0, "age": 15.08, "grav": 165.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 389, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "art_pixel", "flbl": "Art & Pixel (Games)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Not pixel art. Downvoted"}, {"id": 50494324, "au": "abcd_f", "dom": 36, "sr": 70, "sc": -10.99, "ep": 0.0, "bs": 8.88, "d": 2, "age": 7.87, "grav": 61.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 0, "qw": 0, "k": 2642, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://x.com/84Aleha"], "ig": -0.95, "fa": 0.0, "gp": 0.082, "bl": 3.35, "ds": 0.0, "txt": "https://x.com/84Aleha"}, {"id": 50493293, "au": "mertd", "dom": 42, "sr": 71, "sc": -11.11, "ep": 0.0, "bs": 8.88, "d": 2, "age": 10.49, "grav": 94.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 0, "qw": 0, "k": 2492, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://x.com/fractalistanbul"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.35, "ds": 0.0, "txt": "https://x.com/fractalistanbul"}, {"id": 50491325, "au": "bastiilling", "dom": 71, "sr": 72, "sc": -11.49, "ep": 0.0, "bs": 9.41, "d": 0, "age": 14.52, "grav": 155.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.106, "bl": 3.55, "ds": 0.0, "txt": "Looks great!"}, {"id": 50488106, "au": "juscha1", "dom": 18, "sr": 73, "sc": -12.43, "ep": 1.75, "bs": 14.18, "d": 1, "age": 18.49, "grav": 229.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 78, "kpp": 11.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "google_tiles", "flbl": "Google & Tiles (API)", "urls": [], "ig": 0.333, "fa": 0.34, "gp": 0.0, "bl": 5.35, "ds": 0.0, "txt": "It cost around $0.09 per km2 after training the model"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      const jumpBtns = isPinned
+        ? `<button type="button" class="probe-inline-btn" data-probe-jump="1">Comment &darr;</button>` +
+          `<button type="button" class="probe-inline-btn" data-probe-clear="1">Clear &times;</button>`
+        : "";
+      probeEl.innerHTML =
+        `<strong>@${escHtml(hit.au)}</strong> | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})` +
+        jumpBtns +
+        `<br>"${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 60);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 50);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 50);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 50);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `Showing ${shown.length} of ${pool.length} matching comments (mode: ${activeMode})` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear selection</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeSelect = document.getElementById("modeSelect");
+  modeSelect.addEventListener("change", () => {
+    activeMode = modeSelect.value;
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

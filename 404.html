@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN Epistemic Observatory // Item Router</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 8px;
+      background: rgb(247, 247, 245);
+      color: rgb(13, 13, 13);
+      font: 15px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .shell {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      padding: 16px 0 26px;
+      border-top: 3px solid rgb(13, 13, 13);
+      border-bottom: 1px solid rgb(13, 13, 13);
+    }
+    .eyebrow {
+      font: 600 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgb(255, 51, 0);
+      margin-bottom: 10px;
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 32px;
+      letter-spacing: -0.035em;
+      line-height: 1.05;
+    }
+    p { color: rgb(55, 55, 52); margin: 8px 0 16px; }
+    code, pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12.5px;
+    }
+    pre {
+      background: rgb(13, 15, 17);
+      color: rgb(228, 232, 236);
+      padding: 12px 14px;
+      overflow-x: auto;
+      border: 1px solid rgb(35, 38, 42);
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    a.btn {
+      display: inline-block;
+      padding: 8px 14px;
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(13, 13, 13);
+      color: rgb(247, 247, 245);
+      text-decoration: none;
+      font: 600 12px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    a.btn.alt {
+      background: rgb(255, 255, 253);
+      color: rgb(13, 13, 13);
+    }
+  </style>
+</head>
+<body>
+<div class="shell" id="routerStatus">
+  <div class="eyebrow">NYX OBSERVATORY // HN URI MIRROR</div>
+  <h1 id="statusTitle">Loading Hacker News Observatory...</h1>
+  <p id="statusBody">Resolving <code>/item?id=...</code> from static observatory archive.</p>
+</div>
+<script id="routerConfig" type="application/json">{"repo": "ianchanning/hn", "actions_url": "https://github.com/ianchanning/hn/actions/workflows/hn-observatory-pages.yml", "workflow_file": "hn-observatory-pages.yml"}</script>
+<script>
+(async () => {
+  const CFG = JSON.parse(document.getElementById("routerConfig").textContent);
+  const params = new URLSearchParams(window.location.search);
+  let rawId = (params.get("id") || "").trim();
+
+  // Also accept full HN URL passed in ?id= or path /item/<id>
+  if (rawId && !/^\d+$/.test(rawId)) {
+    const m = rawId.match(/[?&]id=(\d+)/) || rawId.match(/(\d+)/);
+    rawId = m ? m[1] : "";
+  }
+  if (!rawId) {
+    const pm = window.location.pathname.match(/\/item(?:s)?\/(\d+)(?:\.html|\/)?$/);
+    if (pm) rawId = pm[1];
+  }
+
+  const siteBase = window.location.pathname
+    .replace(/\/item(?:\.html|\/)?$/, "")
+    .replace(/\/items\/\d+(?:\.html|\/)?$/, "")
+    .replace(/\/404\.html$/, "")
+    .replace(/\/$/, "");
+  const indexHref = (siteBase || ".") + "/";
+
+  const titleEl = document.getElementById("statusTitle");
+  const bodyEl = document.getElementById("statusBody");
+  const shellEl = document.getElementById("routerStatus");
+
+  if (!rawId || !/^\d+$/.test(rawId)) {
+    titleEl.textContent = "Missing or Invalid Hacker News Item ID";
+    bodyEl.innerHTML =
+      "Append <code>?id=50472038</code> just like Hacker News (<code>/item?id=50472038</code>), or browse the published index.";
+    const bar = document.createElement("div");
+    bar.className = "actions";
+    bar.innerHTML = `<a class="btn" href="${indexHref}">Open Published Index</a>`;
+    shellEl.appendChild(bar);
+    return;
+  }
+
+  const artifactUrl = `${siteBase}/items/${encodeURIComponent(rawId)}.html`;
+  try {
+    const resp = await fetch(artifactUrl, { cache: "no-cache" });
+    if (resp.ok) {
+      const htmlText = await resp.text();
+      document.open();
+      document.write(htmlText);
+      document.close();
+      return;
+    }
+  } catch (_err) {
+    // Fall through to helpful not-yet-built view
+  }
+
+  const hnUrl = `https://news.ycombinator.com/item?id=${encodeURIComponent(rawId)}`;
+  titleEl.textContent = `HN Item ${rawId} Not Yet Built`;
+  bodyEl.innerHTML =
+    `No pre-built observatory was found at <code>/items/${rawId}.html</code>. ` +
+    `Trigger the GitHub Actions workflow with item ID <code>${rawId}</code> to publish <code>/item?id=${rawId}</code>:`;
+
+  const pre = document.createElement("pre");
+  pre.textContent =
+    `gh workflow run ${CFG.workflow_file} -f target=${rawId}\n` +
+    `uv run --no-project python hn-comments/cli.py ${rawId} --open`;
+  shellEl.appendChild(pre);
+
+  const bar = document.createElement("div");
+  bar.className = "actions";
+  const btns = [];
+  if (CFG.actions_url) {
+    btns.push(`<a class="btn" href="${CFG.actions_url}">Run GitHub Workflow</a>`);
+  }
+  btns.push(`<a class="btn alt" href="${hnUrl}">View Original HN Thread</a>`);
+  btns.push(`<a class="btn alt" href="${indexHref}">Published Index</a>`);
+  bar.innerHTML = btns.join("");
+  shellEl.appendChild(bar);
+})();
+</script>
+</body>
+</html>
