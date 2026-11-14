@@ -43,6 +43,19 @@ def _safe_no_hash(text: str) -> str:
     return html.escape(str(text), quote=True).replace("#", "No. ")
 
 
+def _format_utc_stamp(raw_utc: str) -> str:
+    """Format an ISO timestamp as `YYYY-MM-DD HH:MM UTC` (zero `#` characters)."""
+    cleaned = str(raw_utc or "").strip()
+    if cleaned:
+        try:
+            dt = datetime.fromisoformat(cleaned.replace("Z", "+00:00"))
+            dt_utc = dt.astimezone(UTC) if dt.tzinfo else dt.replace(tzinfo=UTC)
+            return dt_utc.strftime("%Y-%m-%d %H:%M UTC")
+        except ValueError:
+            return f"{_safe_no_hash(cleaned[:16].replace('T', ' '))} UTC"
+    return datetime.now(tz=UTC).strftime("%Y-%m-%d %H:%M UTC")
+
+
 def _safe_url_no_hash(url: str) -> str:
     """Sanitize an external http(s) URL and strip `#fragment` for zero-hash HTML."""
     raw = str(url or "").split("#", 1)[0].strip()
@@ -443,6 +456,7 @@ def render_index_html(
     workflow_file: str,
     frontpage_ids: Sequence[int] = (),
     frontpage_synced_utc: str = "",
+    updated_utc: str = "",
 ) -> str:
     """Build zero-hash Hacker News style front-page index (`news.ycombinator.com` layout)."""
     actions_url = (
@@ -452,14 +466,8 @@ def render_index_html(
     )
     by_id = {int(it["story_id"]): it for it in items}
     fp_ordered = [by_id[int(sid)] for sid in frontpage_ids if int(sid) in by_id]
-    fp_id_set = {int(it["story_id"]) for it in fp_ordered}
 
     main_items = fp_ordered if fp_ordered else list(items)
-    past_items = (
-        [it for it in items if int(it["story_id"]) not in fp_id_set]
-        if fp_ordered
-        else []
-    )
 
     if main_items:
         main_rows_html = "\n          ".join(
@@ -468,17 +476,13 @@ def render_index_html(
         )
     else:
         main_rows_html = (
-            '<tr><td colspan="3" class="empty-msg">No stories built yet. '
+            '<tr><td colspan="2" class="empty-msg">No stories built yet. '
             "Run the GitHub Actions frontpage workflow or paste an item ID below.</td></tr>"
         )
 
-    sync_label = (
-        f"Synced {_safe_no_hash(frontpage_synced_utc[:16].replace('T', ' '))} UTC"
-        if frontpage_synced_utc
-        else "08:00 London &amp; 08:00 SF"
-    )
+    utc_stamp = _format_utc_stamp(updated_utc or frontpage_synced_utc)
 
-    footer_bits = [sync_label, f"{len(items)} published"]
+    footer_bits = ["08:00 London &amp; 08:00 SF", f"{len(items)} published"]
     if actions_url:
         footer_bits.append(
             f'<a href="{_safe_no_hash(actions_url)}" target="_blank" rel="noopener">run workflow</a>'
@@ -685,7 +689,8 @@ def render_index_html(
     @media (max-width: 750px) {{
       body {{ margin: 0; }}
       .hnmain {{ width: 100%; }}
-      .topbar {{ padding: 4px 6px; }}
+      .topbar {{ padding: 4px 6px; flex-wrap: wrap; }}
+      .topbar-right {{ font-size: 8pt; padding-right: 2px; }}
       td.title {{ font-size: 11pt; line-height: 15pt; }}
       td.subtext {{ font-size: 8.5pt; line-height: 13pt; }}
       tr.spacer td {{ height: 7px; }}
@@ -700,6 +705,7 @@ def render_index_html(
       <a class="hnname" href="./">Epistemic News</a>
       <span class="pagetop"><a href="https://news.ycombinator.com/" target="_blank" rel="noopener">hn</a></span>
     </div>
+    <div class="topbar-right">Updated {utc_stamp}</div>
   </div>
 
   <div class="list-pad">
@@ -727,14 +733,6 @@ document.getElementById("jumpForm").addEventListener("submit", (ev) => {{
     window.location.href = `./item?id=${{encodeURIComponent(m[1])}}`;
   }}
 }});
-const pastBtn = document.getElementById("openPastBtn");
-const pastDrawer = document.getElementById("pastDrawer");
-if (pastBtn && pastDrawer) {{
-  pastBtn.addEventListener("click", () => {{
-    pastDrawer.open = true;
-    pastDrawer.scrollIntoView({{ behavior: "smooth", block: "start" }});
-  }});
-}}
 </script>
 </body>
 </html>
@@ -896,6 +894,13 @@ def build_pages_site(
     (site_dir / "item.html").write_text(router_html, encoding="utf-8")
     (site_dir / "404.html").write_text(router_html, encoding="utf-8")
 
+    last_updated_utc = (
+        resolved_fp_utc or ref_now.isoformat()
+        if frontpage_ids is not None
+        else ref_now.isoformat()
+        if forced
+        else resolved_fp_utc or ref_now.isoformat()
+    )
     index_html = render_index_html(
         summaries,
         repo=repo,
@@ -903,6 +908,7 @@ def build_pages_site(
         workflow_file=workflow_file,
         frontpage_ids=resolved_fp_ids,
         frontpage_synced_utc=resolved_fp_utc,
+        updated_utc=last_updated_utc,
     )
     (site_dir / "index.html").write_text(index_html, encoding="utf-8")
 

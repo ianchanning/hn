@@ -293,30 +293,31 @@ class TestGitHubPagesMirror(unittest.TestCase):
             idx_html = (site_dir / "index.html").read_text(encoding="utf-8")
             self.assertNotIn("#", idx_html)
             self.assertIn('class="hnmain"', idx_html)
+            self.assertIn("Epistemic News", idx_html)
+            self.assertIn('<div class="topbar-right">Updated 2026-11-14 16:00 UTC</div>', idx_html)
             self.assertIn(">blog.rust-lang.org</a>)", idx_html)
             self.assertIn("342 points by steveklabnik", idx_html)
             self.assertIn("35% bullshit", idx_html)
-            self.assertNotIn('id="pastDrawer"', idx_html)
             # Rank 1 (`50400001`) appears before Rank 2 (`50499999`) despite smaller numeric ID
             self.assertLess(idx_html.index("50400001"), idx_html.index("50499999"))
 
-            # Subsequent single-story run without frontpage_ids preserves frontpage.json & tucks manual item into Past
+            # Subsequent single-story run without frontpage_ids preserves frontpage.json, publishes item, & updates UTC stamp
             (src_dir / "show-me-hn-50511111.html").write_text(
                 _mk_item(50511111, "Manual Single Dispatch", "2026-11-14T17:00:00+00:00"),
                 encoding="utf-8",
             )
+            later_now = datetime(2026, 11, 14, 17, 5, tzinfo=UTC)
             res2 = build_pages_site(
                 site_dir=site_dir,
                 source_dir=src_dir,
                 force_ids={50511111},
-                now_utc=ref_now,
+                now_utc=later_now,
             )
             self.assertEqual(res2["frontpage_ids"], [50400001, 50499999])
+            self.assertTrue((site_dir / "items" / "50511111.html").is_file())
             idx_html2 = (site_dir / "index.html").read_text(encoding="utf-8")
             self.assertNotIn("#", idx_html2)
-            self.assertIn('id="pastDrawer"', idx_html2)
-            self.assertIn("past (1)", idx_html2)
-            self.assertIn("50511111", idx_html2)
+            self.assertIn('<div class="topbar-right">Updated 2026-11-14 17:05 UTC</div>', idx_html2)
 
     def test_workflow_yaml_exists_and_avoids_shell_injection(self) -> None:
         """Ensure workflow_dispatch passes inputs strictly via env vars rather than inline run interpolation."""
