@@ -447,10 +447,7 @@ def build_html(
     </div>
   </details>"""
     else:
-        eyebrow_right = (
-            f"<span><strong>TOP-20 DIVERSITY: {top20_div:.3f}</strong> "
-            f"&bull; {primary_sourced_cnt} PRIMARY-SOURCED COMMENTS</span>"
-        )
+        eyebrow_right = f"<span><strong>BULLSHIT: {noise_pct:.1f}%</strong>"
         snap_sub = f"{pages_fetched} HTML page(s) &bull; {authors_profiled:,} cached/live authors"
         kpi_4_5_html = f"""
       <div class="kpi-cell">
@@ -466,9 +463,37 @@ def build_html(
         drawer_html = f"""
   <details class="proof-drawer" id="proofDrawer">
     <summary>
-      <span>01 // UNSUPERVISED CORPUS TELEMETRY: 01A AUTO-LABELED TOPIC CLUSTERS &amp; 01B CROSS-DOMAIN SOURCE REGISTRY (DIVERSITY {top20_div:.3f} &bull; {len(anchors)} ANCHORS)</span>
+      <span>01 // EVIDENCE</span>
       <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
     </summary>
+    <p>
+      Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+      Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+    </p>
+    <div class="proof-body">
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">{total_cnt:,}</div>
+          <div class="kpi-sub">{snap_sub}</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">{useful_pct:.1f}%</div>
+          <div class="kpi-sub">{useful_cnt} comments ({tiers.get("epistemic_gold", 0)} Gold / {gold_pct:.1f}%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">{noise_pct:.1f}%</div>
+          <div class="kpi-sub">{tiers.get("crowd_chatter", 0)} chatter &bull; {tiers.get("bullshit_or_flamewar", 0)} BS &bull; {tiers.get("downvoted_sink", 0)} faded</div>
+        </div>{kpi_4_5_html}
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">{largest_root["slots"]}</div>
+          <div class="kpi-sub">HN POS {largest_root["start_dom"]}..{largest_root["end_dom"]} ({largest_root["share_pct"]:.1f}% of thread)</div>
+        </div>
+      </div>
+    </div>
     <div class="proof-body grid-12">
       <div class="col-7">
         <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
@@ -1066,47 +1091,14 @@ def build_html(
     </div>
     <h1>Bullshit vs. <span class="accent">Epistemic.</span></h1>
     <p class="sublead">
-      Empirical autopsy of all <strong>{total_cnt:,}</strong> Hacker News comments on {story_link_html}.
-      Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
-      Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      <strong>{total_cnt:,}</strong> Hacker News comments on {story_link_html}.
     </p>
   </header>
-
-  <details class="proof-drawer" id="kpiDrawer">
-    <summary>
-      <span>00 // CORPUS SUMMARY ({total_cnt:,} COMMENTS &bull; {useful_pct:.1f}% USEFUL SIGNAL &bull; {tiers.get("epistemic_gold", 0)} GOLD &bull; MAX SUBTREE {largest_root["slots"]} SLOTS)</span>
-      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
-    </summary>
-    <div class="proof-body">
-      <div class="kpi-strip">
-        <div class="kpi-cell">
-          <div class="kpi-label">Corpus Audited</div>
-          <div class="kpi-val">{total_cnt:,}</div>
-          <div class="kpi-sub">{snap_sub}</div>
-        </div>
-        <div class="kpi-cell">
-          <div class="kpi-label">Actual Useful Signal</div>
-          <div class="kpi-val ok">{useful_pct:.1f}%</div>
-          <div class="kpi-sub">{useful_cnt} comments ({tiers.get("epistemic_gold", 0)} Gold / {gold_pct:.1f}%)</div>
-        </div>
-        <div class="kpi-cell">
-          <div class="kpi-label">Chatter &amp; Bullshit</div>
-          <div class="kpi-val hi">{noise_pct:.1f}%</div>
-          <div class="kpi-sub">{tiers.get("crowd_chatter", 0)} chatter &bull; {tiers.get("bullshit_or_flamewar", 0)} BS &bull; {tiers.get("downvoted_sink", 0)} faded</div>
-        </div>{kpi_4_5_html}
-        <div class="kpi-cell">
-          <div class="kpi-label">Largest Root Monopoly</div>
-          <div class="kpi-val hi">{largest_root["slots"]}</div>
-          <div class="kpi-sub">HN POS {largest_root["start_dom"]}..{largest_root["end_dom"]} ({largest_root["share_pct"]:.1f}% of thread)</div>
-        </div>
-      </div>
-    </div>
-  </details>
 {drawer_html}
 
   <details class="proof-drawer" id="labDrawer">
     <summary>
-      <span>02 // EPISTEMIC PHASE PLANE, NEWS.ARC GRAVITY &amp; LIVE WEIGHT TUNER (TAP TO INSPECT N = {total_cnt:,})</span>
+      <span>02 // EXPLORE</span>
       <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
     </summary>
     <div class="proof-body grid-12">
@@ -1115,7 +1107,7 @@ def build_html(
           <summary class="graph-summary">
             <div class="graph-title-group">
               <div class="sec-tag">02A / INTERACTIVE EQUATION</div>
-              <h2>Live Epistemic Tuner</h2>
+              <h2>Epistemic Tuner</h2>
             </div>
             <span class="mob-graph-pill"></span>
           </summary>
@@ -1142,7 +1134,6 @@ def build_html(
             </div>
             <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
             <p style="font-size:11.5px;line-height:1.42;color:rgb(85,85,82);margin:12px 0 0">
-              <strong>Live Feedback Loop:</strong><br>
               Drag any weight to watch the {total_cnt:,}-point phase plane and comment ranking re-solve instantaneously.<br>
               &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
               &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
@@ -1156,14 +1147,14 @@ def build_html(
           <details class="graph-drawer" id="phaseDrawer" open>
             <summary class="graph-summary">
               <div class="graph-title-group">
-                <div class="sec-tag">03 / EPISTEMIC PHASE PLANE</div>
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
                 <h2>Crowd Chatter vs. Grounded Signal</h2>
               </div>
               <span class="mob-graph-pill"></span>
             </summary>
             <div class="oled-bay">
               <div class="oled-head">
-                <span>X: Epistemic Potential // Y: Bullshit &amp; Sink</span>
+                <span>Y: Bullshit // X: Epistemic</span>
                 <span class="sig">TAP POINT (N = {total_cnt:,})</span>
               </div>
               <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
@@ -1181,14 +1172,14 @@ def build_html(
           <details class="graph-drawer" id="gravityDrawer">
             <summary class="graph-summary">
               <div class="graph-title-group">
-                <div class="sec-tag">04 / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
                 <h2>Why Live HN Buried Primary Evidence</h2>
               </div>
               <span class="mob-graph-pill"></span>
             </summary>
             <div class="oled-bay">
               <div class="oled-head">
-                <span>X: Age (Hours) // Y: Live HN POS (1..{live_cnt:,})</span>
+                <span>Y: HN POS (1..{live_cnt:,}) // X: Age (Hours)</span>
                 <span class="sig">(T + 2)^1.8</span>
               </div>
               <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
@@ -1207,16 +1198,14 @@ def build_html(
 
   <section class="band grid-12" id="explorerSection" style="padding-top:16px">
     <div class="col-12">
-      <div class="sec-tag">05 / CORPUS EXPLORER ({total_cnt:,} COMMENTS)</div>
-      <h2>Signal Rank vs. Live Hacker News</h2>
       <div class="filter-bar">
         <select id="modeSelect" class="sel-in" aria-label="Ranking view">
-          <option value="top_signal">View: Epistemic Top 50</option>
-          <option value="buried_gems">View: Buried Gems (HN POS &gt; {buried_cutoff})</option>
-          <option value="hn_top40">View: Live HN Top 40 Autopsy</option>
-          <option value="c5a_rescues">View: c5A Heterodox Rescues</option>
-          <option value="bullshit_traps">View: High-Karma / URL Traps Caught</option>
-          <option value="mod_morgue">View: Mod Rebukes &amp; Downvoted Morgue</option>
+          <option value="hn_top40">HN Top 40</option>
+          <option value="top_signal">Epistemic Top 50</option>
+          <option value="buried_gems">Buried Gems (HN POS &gt; {buried_cutoff})</option>
+          <option value="bullshit_traps">High-Karma / URL Traps Caught</option>
+          <option value="mod_morgue">Mod Rebukes &amp; Downvoted Morgue</option>
+          <option value="c5a_rescues">c5A Heterodox Rescues</option>
         </select>
         <select id="facetSelect" class="sel-in" aria-label="Topic facet">
           {facet_select_html}
@@ -1249,7 +1238,7 @@ def build_html(
     bp: DEFAULT_W.bullshit_penalty,
     dp: DEFAULT_W.downvote_penalty
   }};
-  let activeMode = "top_signal";
+  let activeMode = "hn_top40";
   let selectedId = null;
 
   function escHtml(s) {{
@@ -1593,7 +1582,7 @@ def build_html(
       }} else if (activeMode === "buried_gems") {{
         pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
       }} else if (activeMode === "hn_top40") {{
-        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 45);
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
       }} else if (activeMode === "c5a_rescues") {{
         pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
       }} else if (activeMode === "bullshit_traps") {{
