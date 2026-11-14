@@ -20,7 +20,9 @@ import build_dashboard
 import cli
 import corpus_science
 from ingest import (
+    build_api_fallback_html,
     extract_readable_article_text,
+    fetch_frontpage_story_ids,
     fetch_hn_html_pages,
     fetch_story_article,
     parse_hn_item_id,
@@ -283,6 +285,108 @@ class TestGeneralizationPipeline(unittest.TestCase):
             self.assertIn('<details class="proof-drawer" id="labDrawer">', html_text)
             self.assertIn('<details class="graph-drawer" id="tunerDrawer">', html_text)
             self.assertEqual(res["top"][0]["id"], 777010)
+
+
+    def test_api_fallback_html_when_hn_blocks_datacenter_ip_419(self) -> None:
+        """Synthesize exact news.arc DOM order from Algolia + Firebase `kids` when HTML returns HTTP 419."""
+        alg_tree = {
+            "id": 888000,
+            "title": "Zero-Copy Kernel Ring Buffers",
+            "url": "https://lwn.net/Articles/888000/",
+            "points": 410,
+            "author": "corbet",
+            "created_at_i": 1_794_500_000,
+            "children": [
+                {
+                    "id": 888001,
+                    "author": "early_poster",
+                    "created_at_i": 1_794_500_100,
+                    "text": "Older comment listed first in Algolia.",
+                    "children": [],
+                },
+                {
+                    "id": 888002,
+                    "author": "top_voted",
+                    "created_at_i": 1_794_500_900,
+                    "text": "Higher-ranked comment according to Firebase kids.",
+                    "children": [
+                        {
+                            "id": 888003,
+                            "author": "child_reply",
+                            "created_at_i": 1_794_501_200,
+                            "text": "Nested reply with <a href='https://arxiv.org/abs/2601.00001'>arXiv</a>.",
+                            "children": [],
+                        }
+                    ],
+                },
+            ],
+        }
+        fb_records = {
+            888000: {"id": 888000, "kids": [888002, 888001], "score": 410, "by": "corbet"},
+        }
+        synth_html = build_api_fallback_html(
+            888000,
+            alg_tree,
+            firebase_fetcher=lambda iid: fb_records.get(iid),
+        )
+        rows, _ref_ts, meta = parse_live_html_pages([synth_html], story_id=888000)
+        self.assertEqual(meta["story_title"], "Zero-Copy Kernel Ring Buffers")
+        # Firebase `kids` order [888002, 888001] overrides Algolia's chronological order
+        self.assertEqual([r["id"] for r in rows], [888002, 888003, 888001])
+        self.assertEqual([r["live_dom_rank"] for r in rows], [1, 2, 3])
+        self.assertEqual(rows[1]["parent_id"], 888002)
+        self.assertEqual(rows[1]["root_id"], 888002)
+
+    def test_frontpage_story_ids_skips_jobs_and_zero_comment_batch_isolation(self) -> None:
+        """Filter YC jobs/dead items from topstories, build 0-comment posts, and isolate batch errors."""
+        fb_meta = {
+            901: {"id": 901, "type": "story", "title": "Story One"},
+            902: {"id": 902, "type": "job", "title": "Startup (YC W26) Is Hiring"},
+            903: {"id": 903, "type": "story", "dead": True, "title": "Flagged Post"},
+            904: {"id": 904, "type": "story", "title": "Brand New Zero Comment Post"},
+        }
+        ids = fetch_frontpage_story_ids(
+            limit=2,
+            top_ids_fetcher=lambda: [901, 902, 903, 904, 905],
+            item_fetcher=lambda sid: fb_meta.get(sid, {"id": sid, "type": "story"}),
+        )
+        self.assertEqual(ids, [901, 904])
+
+        zero_comment_html = (
+            '<html op="item"><head><title>Fresh Launch | Hacker News</title></head><body>'
+            '<table class="fatitem"><tr class="athing submission" id="904">'
+            '<td class="title"><span class="titleline"><a href="https://example.org/fresh">Fresh Launch</a></span></td>'
+            '</tr></table><table class="comment-tree"></table></body></html>'
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            data_dir = tmp_path / "data"
+            out_dir = tmp_path / "out"
+            fp_manifest = tmp_path / "frontpage_manifest.json"
+            item_dir = data_dir / "items" / "904"
+            item_dir.mkdir(parents=True)
+            (item_dir / "live_p1.html").write_text(zero_comment_html, encoding="utf-8")
+            (item_dir / "algolia.json").write_text(json.dumps({"id": 904, "children": []}), encoding="utf-8")
+            (item_dir / "story_article.txt").write_text("Fresh Launch system notes.", encoding="utf-8")
+
+            # Story 904 succeeds (0 comments, zero-hash HTML); missing offline story 999999 is isolated
+            summary = cli.run_frontpage_batch(
+                limit=2,
+                data_dir=data_dir,
+                out_dir=out_dir,
+                frontpage_manifest=fp_manifest,
+                offline=True,
+                refresh=False,
+                story_ids=[904, 999999],
+                emit_stdout=False,
+            )
+            self.assertEqual(summary["built_ids"], [904])
+            self.assertEqual(summary["frontpage_ids"], [904])
+            self.assertEqual(summary["error_count"], 1)
+            self.assertTrue(fp_manifest.is_file())
+            built_html = (out_dir / "show-me-hn-904.html").read_text(encoding="utf-8")
+            self.assertNotIn("#", built_html)
+            self.assertIn("Fresh Launch", built_html)
 
 
 if __name__ == "__main__":

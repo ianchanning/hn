@@ -1,5 +1,6 @@
 """Tests for the `/item?id=<id>` GitHub Pages site builder and workflow security."""
 
+from datetime import UTC, datetime
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import json
@@ -16,7 +17,7 @@ REPO_ROOT = HERE.parent
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 
-from build_pages_site import build_pages_site
+from build_pages_site import build_pages_site, evaluate_schedule_window
 
 
 class _QuietHandler(SimpleHTTPRequestHandler):
@@ -185,13 +186,132 @@ class TestGitHubPagesMirror(unittest.TestCase):
             by_id2 = {x["story_id"]: x for x in cat2["items"]}
             self.assertEqual(by_id2[50472038]["total_comments"], 720)
 
+    def test_dst_schedule_window_london_and_sf_year_round(self) -> None:
+        """Fire at exact 08:00 London and 08:00 San Francisco across GMT/BST, PST/PDT, and runner delays."""
+        # 1. Winter (Nov 14: London GMT UTC+0, SF PST UTC-8), including a 75-minute delayed 07:00 UTC job
+        winter_delayed_07 = datetime(2026, 11, 14, 8, 15, tzinfo=UTC)
+        self.assertFalse(evaluate_schedule_window("0 7 * * *", now_utc=winter_delayed_07)["should_run"])
+        w_lon = evaluate_schedule_window("0 8 * * *", now_utc=datetime(2026, 11, 14, 8, 12, tzinfo=UTC))
+        self.assertTrue(w_lon["should_run"])
+        self.assertEqual(w_lon["matched_slot"], "london_0800")
+        self.assertFalse(
+            evaluate_schedule_window("0 15 * * *", now_utc=datetime(2026, 11, 14, 15, 5, tzinfo=UTC))["should_run"]
+        )
+        w_sf = evaluate_schedule_window("0 16 * * *", now_utc=datetime(2026, 11, 14, 16, 22, tzinfo=UTC))
+        self.assertTrue(w_sf["should_run"])
+        self.assertEqual(w_sf["matched_slot"], "sf_0800")
+
+        # 2. Summer (Jul 14: London BST UTC+1, SF PDT UTC-7)
+        s_lon = evaluate_schedule_window("0 7 * * *", now_utc=datetime(2026, 7, 14, 7, 4, tzinfo=UTC))
+        self.assertTrue(s_lon["should_run"])
+        self.assertEqual(s_lon["matched_slot"], "london_0800")
+        self.assertFalse(
+            evaluate_schedule_window("0 8 * * *", now_utc=datetime(2026, 7, 14, 8, 4, tzinfo=UTC))["should_run"]
+        )
+        s_sf = evaluate_schedule_window("0 15 * * *", now_utc=datetime(2026, 7, 14, 15, 9, tzinfo=UTC))
+        self.assertTrue(s_sf["should_run"])
+        self.assertEqual(s_sf["matched_slot"], "sf_0800")
+        self.assertFalse(
+            evaluate_schedule_window("0 16 * * *", now_utc=datetime(2026, 7, 14, 16, 9, tzinfo=UTC))["should_run"]
+        )
+
+        # 3. Asymmetric March transition week (Mar 15, 2026: UK still GMT UTC+0, US already PDT UTC-7)
+        self.assertTrue(
+            evaluate_schedule_window("0 8 * * *", now_utc=datetime(2026, 3, 15, 8, 1, tzinfo=UTC))["should_run"]
+        )
+        self.assertTrue(
+            evaluate_schedule_window("0 15 * * *", now_utc=datetime(2026, 3, 15, 15, 1, tzinfo=UTC))["should_run"]
+        )
+
+    def test_frontpage_ranking_persistence_and_archive_pruning(self) -> None:
+        """Render exact Front Page 1..N order, persist frontpage.json, and prune >90d unpinned items when over threshold."""
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            src_dir = tmp_path / "src"
+            site_dir = tmp_path / "site"
+            src_dir.mkdir()
+            (site_dir / "items").mkdir(parents=True)
+
+            def _mk_item(sid: int, title: str, ts_iso: str, pad_chars: int = 800) -> str:
+                payload = json.dumps(
+                    {
+                        "story_id": sid,
+                        "story_title": title,
+                        "manifest": {"t2_ref_utc": ts_iso},
+                        "tiers": {"epistemic_gold": 5, "grounded_analysis": 8},
+                        "comments": [{"id": 1}],
+                        "pad": "x" * pad_chars,
+                    }
+                )
+                return f'<!doctype html><script id="observatoryData" type="application/json">{payload}</script>'
+
+            # Old >90d unpinned item on gh-pages + two current front-page items
+            (site_dir / "items" / "49000001.html").write_text(
+                _mk_item(49000001, "Ancient Archived Story", "2026-06-01T08:00:00+00:00", pad_chars=2400),
+                encoding="utf-8",
+            )
+            (site_dir / "items" / "50400001.html").write_text(
+                _mk_item(50400001, "Lower ID But Rank 1 On HN", "2026-11-14T08:00:00+00:00"),
+                encoding="utf-8",
+            )
+            (site_dir / "items" / "50499999.html").write_text(
+                _mk_item(50499999, "Higher ID But Rank 2 On HN", "2026-11-14T08:00:00+00:00"),
+                encoding="utf-8",
+            )
+
+            ref_now = datetime(2026, 11, 14, 16, 0, tzinfo=UTC)
+            res = build_pages_site(
+                site_dir=site_dir,
+                source_dir=src_dir,
+                frontpage_ids=[50400001, 50499999],
+                frontpage_synced_utc="2026-11-14T16:00:00+00:00",
+                prune_older_than_days=90,
+                prune_trigger_mb=0.001,  # ~1 KB trigger to exercise >90d retention check
+                max_site_mb=10.0,
+                now_utc=ref_now,
+            )
+            self.assertEqual(res["pruned_ids"], [49000001])
+            self.assertFalse((site_dir / "items" / "49000001.html").exists())
+            self.assertEqual(res["frontpage_ids"], [50400001, 50499999])
+
+            idx_html = (site_dir / "index.html").read_text(encoding="utf-8")
+            self.assertNotIn("#", idx_html)
+            self.assertIn("Current HN Front Page (2)", idx_html)
+            # Rank 1 (`50400001`) appears before Rank 2 (`50499999`) despite smaller numeric ID
+            self.assertLess(idx_html.index("50400001"), idx_html.index("50499999"))
+
+            # Subsequent single-story run without frontpage_ids preserves frontpage.json & Front Page table
+            (src_dir / "show-me-hn-50511111.html").write_text(
+                _mk_item(50511111, "Manual Single Dispatch", "2026-11-14T17:00:00+00:00"),
+                encoding="utf-8",
+            )
+            res2 = build_pages_site(
+                site_dir=site_dir,
+                source_dir=src_dir,
+                force_ids={50511111},
+                now_utc=ref_now,
+            )
+            self.assertEqual(res2["frontpage_ids"], [50400001, 50499999])
+            idx_html2 = (site_dir / "index.html").read_text(encoding="utf-8")
+            self.assertNotIn("#", idx_html2)
+            self.assertIn("Current HN Front Page (2)", idx_html2)
+            self.assertIn("50511111", idx_html2)
+
     def test_workflow_yaml_exists_and_avoids_shell_injection(self) -> None:
         """Ensure workflow_dispatch passes inputs strictly via env vars rather than inline run interpolation."""
         local_wf = HERE / ".github" / "workflows" / "hn-observatory-pages.yml"
-        wf_path = local_wf if local_wf.is_file() else (REPO_ROOT / ".github" / "workflows" / "hn-observatory-pages.yml")
+        root_wf = REPO_ROOT / ".github" / "workflows" / "hn-observatory-pages.yml"
+        wf_path = local_wf if local_wf.is_file() else root_wf
         self.assertTrue(wf_path.is_file())
         wf_text = wf_path.read_text(encoding="utf-8")
+        if local_wf.is_file() and root_wf.is_file():
+            self.assertEqual(local_wf.read_text(encoding="utf-8"), root_wf.read_text(encoding="utf-8"))
 
+        self.assertIn("schedule:", wf_text)
+        self.assertIn('cron: "0 7 * * *"', wf_text)
+        self.assertIn('cron: "0 8 * * *"', wf_text)
+        self.assertIn('cron: "0 15 * * *"', wf_text)
+        self.assertIn('cron: "0 16 * * *"', wf_text)
         self.assertIn("workflow_dispatch:", wf_text)
         self.assertIn("target:", wf_text)
         self.assertIn("build_pages_site.py", wf_text)
@@ -199,7 +319,7 @@ class TestGitHubPagesMirror(unittest.TestCase):
 
         # Extract all `run: |` blocks and verify `${{ inputs.` never appears directly inside shell scripts
         run_blocks = re.findall(r"run:\s*\|\n((?: {10,}.*\n|\n)+)", wf_text)
-        self.assertGreaterEqual(len(run_blocks), 3)
+        self.assertGreaterEqual(len(run_blocks), 4)
         for block in run_blocks:
             self.assertNotIn("${{ inputs.", block)
             self.assertNotIn("${{ github.event.inputs.", block)

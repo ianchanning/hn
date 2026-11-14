@@ -60,7 +60,12 @@ def _compute_top20_diversity(top20: list[dict[str, Any]]) -> float:
             pairs += 1
     mean_sim = (sim_sum / pairs) if pairs > 0 else 0.0
     unique_roots = len({c.get("root_id") or c["id"] for c in top20}) / n
-    return round(0.45 * norm_entropy + 0.35 * (1.0 - mean_sim) + 0.20 * min(1.0, unique_roots / 0.75), 4)
+    return round(
+        0.45 * norm_entropy
+        + 0.35 * (1.0 - mean_sim)
+        + 0.20 * min(1.0, unique_roots / 0.75),
+        4,
+    )
 
 
 def _compute_largest_root(comments: list[dict[str, Any]]) -> dict[str, Any]:
@@ -75,6 +80,7 @@ def _compute_largest_root(comments: list[dict[str, Any]]) -> dict[str, Any]:
             "end_dom": 1,
             "share_pct": 0.0,
             "top_dom1_age": 0.0,
+            "top_dom1_author": "none",
         }
     by_id = {c["id"]: c for c in comments}
     by_root: dict[int, list[int]] = {}
@@ -128,8 +134,12 @@ def build_html(
     if use_frozen_50467087:
         import ablation
 
-        corpus = json.loads((resolved_data_dir / "corpus_v2.json").read_text(encoding="utf-8"))
-        manifest = json.loads((resolved_data_dir / "manifest_v2.json").read_text(encoding="utf-8"))
+        corpus = json.loads(
+            (resolved_data_dir / "corpus_v2.json").read_text(encoding="utf-8")
+        )
+        manifest = json.loads(
+            (resolved_data_dir / "manifest_v2.json").read_text(encoding="utf-8")
+        )
         ablations = ablation.run_ablations()
         judge_proc = subprocess.run(
             [sys.executable, str(JUDGE_SCRIPT), str(HERE)],
@@ -143,7 +153,9 @@ def build_html(
             tourney_history = json.loads(tourney_path.read_text(encoding="utf-8"))
     elif corpus is None or manifest is None:
         item_corpus_path = resolved_data_dir / "items" / str(story_id) / "corpus.json"
-        item_manifest_path = resolved_data_dir / "items" / str(story_id) / "manifest.json"
+        item_manifest_path = (
+            resolved_data_dir / "items" / str(story_id) / "manifest.json"
+        )
         if item_corpus_path.is_file() and item_manifest_path.is_file():
             corpus = json.loads(item_corpus_path.read_text(encoding="utf-8"))
             manifest = json.loads(item_manifest_path.read_text(encoding="utf-8"))
@@ -167,7 +179,11 @@ def build_html(
         or ("Jensen Huang resigns" if story_id == 50467087 else f"HN Item {story_id}")
     )
     story_url = str(manifest.get("story_url") or "")
-    story_host = urlparse(story_url).netloc.lower().removeprefix("www.") if story_url else "news.ycombinator.com"
+    story_host = (
+        urlparse(story_url).netloc.lower().removeprefix("www.")
+        if story_url
+        else "news.ycombinator.com"
+    )
     counts = manifest.get("counts") or {}
     authors_profiled = int(counts.get("unique_authors_profiled") or 0)
     pages_fetched = int(counts.get("pages_fetched") or 1)
@@ -192,21 +208,35 @@ def build_html(
         facet_options.append(
             {
                 "slug": "general_commentary",
-                "label": raw_facet_labels.get("general_commentary", "General Commentary"),
+                "label": raw_facet_labels.get(
+                    "general_commentary", "General Commentary"
+                ),
                 "count": facets.get("general_commentary", 0),
             }
         )
 
     total_cnt = len(ranked)
-    live_cnt = sum(1 for c in ranked if c.get("live_dom_rank") is not None) or max(1, total_cnt)
-    buried_cutoff = min(500, max(25, int(round(0.30 * live_cnt)))) if live_cnt < 1600 else 500
-    rescue_top_k = min(80, max(20, int(round(0.20 * live_cnt)))) if live_cnt < 1600 else 80
+    live_cnt = sum(1 for c in ranked if c.get("live_dom_rank") is not None) or max(
+        1, total_cnt
+    )
+    buried_cutoff = (
+        min(500, max(25, int(round(0.30 * live_cnt)))) if live_cnt < 1600 else 500
+    )
+    rescue_top_k = (
+        min(80, max(20, int(round(0.20 * live_cnt)))) if live_cnt < 1600 else 80
+    )
 
     largest_root = _compute_largest_root(ranked)
     top20_div = _compute_top20_diversity(ranked[:20])
     primary_sourced_cnt = sum(1 for c in ranked if int(c.get("url_tier", 0)) >= 2)
     top30_slice = ranked[: min(30, max(1, total_cnt))]
-    top30_sourced_pct = 100.0 * sum(1 for c in top30slice if int(c.get("url_tier", 0)) >= 2) / max(1, len(top30_slice)) if (top30slice := top30_slice) else 0.0
+    top30_sourced_pct = (
+        100.0
+        * sum(1 for c in top30slice if int(c.get("url_tier", 0)) >= 2)
+        / max(1, len(top30_slice))
+        if (top30slice := top30_slice)
+        else 0.0
+    )
 
     # Source registry breakdown for live diagnostics drawer
     cat_counts: Counter[str] = Counter()
@@ -233,7 +263,9 @@ def build_html(
     for opt in facet_options:
         f_slug = opt["slug"]
         f_rows = [c for c in ranked if c.get("facet") == f_slug]
-        f_useful = sum(1 for c in f_rows if c["tier"] in ("epistemic_gold", "grounded_analysis"))
+        f_useful = sum(
+            1 for c in f_rows if c["tier"] in ("epistemic_gold", "grounded_analysis")
+        )
         top_t = cluster_terms_map.get(f_slug) or f_slug.split("_")
         facet_diagnostics.append(
             {
@@ -281,13 +313,20 @@ def build_html(
                 "meme": c["meme_hits"],
                 "tier": c["tier"],
                 "facet": c["facet"],
-                "flbl": raw_facet_labels.get(c["facet"]) or c["facet"].replace("_", " "),
+                "flbl": raw_facet_labels.get(c["facet"])
+                or c["facet"].replace("_", " "),
                 "urls": [u for u in c["urls"] if not u.startswith("item?id=")][:3],
                 "ig": round(comp["info_gain"] / max(0.01, w["info_gain"]), 3),
                 "fa": round(comp["falsifiability"] / max(0.01, w["falsifiability"]), 3),
-                "gp": round(comp["gravity_progeny"] / max(0.01, w["gravity_progeny"]), 3),
-                "bl": round(-comp["bullshit_load"] / max(0.01, w["bullshit_penalty"]), 3),
-                "ds": round(-comp["downvote_sink"] / max(0.01, w["downvote_penalty"]), 3),
+                "gp": round(
+                    comp["gravity_progeny"] / max(0.01, w["gravity_progeny"]), 3
+                ),
+                "bl": round(
+                    -comp["bullshit_load"] / max(0.01, w["bullshit_penalty"]), 3
+                ),
+                "ds": round(
+                    -comp["downvote_sink"] / max(0.01, w["downvote_penalty"]), 3
+                ),
                 "txt": c["text"][:1400],
             }
         )
@@ -304,7 +343,9 @@ def build_html(
         "facets": dict(facets),
         "facet_options": facet_options,
         "facet_diagnostics": facet_diagnostics,
-        "source_categories": [{"category": k, "count": v} for k, v in cat_counts.most_common()],
+        "source_categories": [
+            {"category": k, "count": v} for k, v in cat_counts.most_common()
+        ],
         "story_anchors": anchors[:18],
         "largest_root": largest_root,
         "buried_cutoff": buried_cutoff,
@@ -337,9 +378,9 @@ def build_html(
 
     if judge_res is not None:
         eyebrow_right = (
-            f'<span><strong>JUDGE v{_safe_html_no_hash(judge_res["judge_version"])}: '
-            f'{judge_res["score"]:.2f} / 100</strong> '
-            f'(LIVE HN: {judge_res["hn_live_baseline_score"]:.2f})</span>'
+            f"<span><strong>JUDGE v{_safe_html_no_hash(judge_res['judge_version'])}: "
+            f"{judge_res['score']:.2f} / 100</strong> "
+            f"(LIVE HN: {judge_res['hn_live_baseline_score']:.2f})</span>"
         )
         snap_sub = (
             f"t1 + t2 (+{delta_min}m) &bull; {authors_profiled:,} authors"
@@ -407,8 +448,8 @@ def build_html(
   </details>"""
     else:
         eyebrow_right = (
-            f'<span><strong>TOP-20 DIVERSITY: {top20_div:.3f}</strong> '
-            f'&bull; {primary_sourced_cnt} PRIMARY-SOURCED COMMENTS</span>'
+            f"<span><strong>TOP-20 DIVERSITY: {top20_div:.3f}</strong> "
+            f"&bull; {primary_sourced_cnt} PRIMARY-SOURCED COMMENTS</span>"
         )
         snap_sub = f"{pages_fetched} HTML page(s) &bull; {authors_profiled:,} cached/live authors"
         kpi_4_5_html = f"""
@@ -470,7 +511,7 @@ def build_html(
         [f'<option value="all">All Facets ({total_cnt:,})</option>']
         + [
             f'<option value="{_safe_html_no_hash(opt["slug"])}">'
-            f'{_safe_html_no_hash(opt["label"])} ({opt["count"]})</option>'
+            f"{_safe_html_no_hash(opt['label'])} ({opt['count']})</option>"
             for opt in facet_options
         ]
     )
@@ -1025,7 +1066,7 @@ def build_html(
     </div>
     <h1>Bullshit vs. <span class="accent">Epistemic.</span></h1>
     <p class="sublead">
-      Empirical autopsy of <strong>{total_cnt:,}</strong> Hacker News comments on {story_link_html}.
+      Empirical autopsy of all <strong>{total_cnt:,}</strong> Hacker News comments on {story_link_html}.
       Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
       Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
     </p>
@@ -1127,11 +1168,11 @@ def build_html(
               </div>
               <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
               <div class="legend-row">
-                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold ({tiers.get("epistemic_gold",0)})</span>
-                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded ({tiers.get("grounded_analysis",0)})</span>
-                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter ({tiers.get("crowd_chatter",0)})</span>
-                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme ({tiers.get("meme_or_snark",0)})</span>
-                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS ({tiers.get("bullshit_or_flamewar",0)})</span>
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold ({tiers.get("epistemic_gold", 0)})</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded ({tiers.get("grounded_analysis", 0)})</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter ({tiers.get("crowd_chatter", 0)})</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme ({tiers.get("meme_or_snark", 0)})</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS ({tiers.get("bullshit_or_flamewar", 0)})</span>
               </div>
               <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
             </div>
@@ -1687,7 +1728,9 @@ def build_html(
 </body>
 </html>
 """
-    assert "#" not in html_doc, f"Zero-hash mandate violated at index {html_doc.find('#')}!"
+    assert "#" not in html_doc, (
+        f"Zero-hash mandate violated at index {html_doc.find('#')}!"
+    )
     resolved_out = out_path or (HERE / f"show-me-hn-{story_id}.html")
     resolved_out.write_text(html_doc, encoding="utf-8")
     return resolved_out

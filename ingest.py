@@ -32,6 +32,9 @@ BROWSER_UA = (
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
 )
 
+# Remember within a batch process if news.ycombinator.com blocks datacenter IPs (HTTP 403/419/429)
+_HN_HTML_BLOCKED_IN_PROCESS = False
+
 
 def parse_hn_item_id(target: str | int) -> int:
     """Extract positive integer HN item ID from bare ID, HN URL, or `item?id=` query string.
@@ -113,6 +116,9 @@ def fetch_hn_html_pages(
     cur_page = 1
 
     def _default_fetch(sid: int, p: int) -> str:
+        global _HN_HTML_BLOCKED_IN_PROCESS
+        if _HN_HTML_BLOCKED_IN_PROCESS:
+            return ""
         url = f"https://news.ycombinator.com/item?id={sid}&p={p}"
         for attempt in range(3):
             try:
@@ -120,7 +126,10 @@ def fetch_hn_html_pages(
                 return raw_bytes.decode("utf-8", errors="replace")
             except urllib.error.HTTPError as exc:
                 # Fail fast on datacenter IP blocks (403/419/429) so Algolia+Firebase fallback runs immediately
-                if exc.code in (403, 419, 429) or attempt == 2:
+                if exc.code in (403, 419, 429):
+                    _HN_HTML_BLOCKED_IN_PROCESS = True
+                    raise
+                if attempt == 2:
                     raise
                 time.sleep(0.5 * (attempt + 1))
             except Exception:
@@ -351,6 +360,80 @@ def build_api_fallback_html(
 
     fb_items = fetch_firebase_items_batch(parent_ids, item_fetcher=firebase_fetcher)
     return synthesize_hn_html_from_api(story_id, algolia_data, firebase_items=fb_items)
+
+
+def fetch_frontpage_story_ids(
+    limit: int = 30,
+    *,
+    skip_jobs: bool = True,
+    top_ids_fetcher: Callable[[], list[int]] | None = None,
+    item_fetcher: Callable[[int], dict[str, Any] | None] | None = None,
+) -> list[int]:
+    """Fetch the live Hacker News Front Page story IDs (`1..limit`) via Firebase v0 + Algolia fallback.
+
+    Filters out deleted/dead items and YC job postings (`type == "job"`, which have no comment
+    threads) while preserving exact live HN front-page ordering.
+    """
+    target_limit = max(1, int(limit))
+    candidate_ids: list[int] = []
+
+    if top_ids_fetcher is not None:
+        candidate_ids = [int(x) for x in top_ids_fetcher() if int(x) > 0]
+    else:
+        try:
+            raw_bytes, _ = fetch_url_bytes(
+                "https://hacker-news.firebaseio.com/v0/topstories.json",
+                timeout=15.0,
+                max_bytes=2_000_000,
+                accept="application/json",
+            )
+            parsed = json.loads(raw_bytes.decode("utf-8", errors="replace"))
+            if isinstance(parsed, list):
+                candidate_ids = [int(x) for x in parsed if isinstance(x, int) and x > 0]
+        except Exception:
+            candidate_ids = []
+
+        if not candidate_ids:
+            try:
+                alg_bytes, _ = fetch_url_bytes(
+                    f"https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage={max(30, target_limit + 10)}",
+                    timeout=15.0,
+                    max_bytes=4_000_000,
+                    accept="application/json",
+                )
+                alg_json = json.loads(alg_bytes.decode("utf-8", errors="replace"))
+                for hit in alg_json.get("hits") or []:
+                    oid = str(hit.get("objectID") or "")
+                    if oid.isdigit() and int(oid) > 0:
+                        candidate_ids.append(int(oid))
+            except Exception:
+                candidate_ids = []
+
+    if not candidate_ids:
+        return []
+
+    # Probe slightly beyond `target_limit` so skipping 1-2 YC job ads still yields a full Top 30
+    probe_slice = candidate_ids[: target_limit + (12 if skip_jobs else 0)]
+    if not skip_jobs and item_fetcher is None:
+        return probe_slice[:target_limit]
+
+    fb_meta = fetch_firebase_items_batch(probe_slice, max_workers=16, item_fetcher=item_fetcher)
+    selected: list[int] = []
+    seen: set[int] = set()
+    for sid in probe_slice:
+        if sid in seen:
+            continue
+        seen.add(sid)
+        meta = fb_meta.get(sid)
+        if isinstance(meta, dict):
+            if meta.get("deleted") or meta.get("dead"):
+                continue
+            if skip_jobs and str(meta.get("type") or "story").lower() == "job":
+                continue
+        selected.append(sid)
+        if len(selected) >= target_limit:
+            break
+    return selected
 
 
 def extract_readable_article_text(raw_html: str, max_chars: int = 32_000) -> str:

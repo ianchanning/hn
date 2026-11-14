@@ -28,13 +28,16 @@ Requires **Python 3.11+** (zero third-party packages; works with `python3` or `u
 uv run --no-project python cli.py 50472038 --open
 uv run --no-project python cli.py "https://news.ycombinator.com/item?id=50471731" --open
 
-# 2. Rank comments in the terminal (or pass --json for structured output)
+# 2. Build all 30 stories currently on the live HN Front Page
+uv run --no-project python cli.py frontpage --limit 30 --refresh
+
+# 3. Rank comments in the terminal (or pass --json for structured output)
 uv run --no-project python cli.py rank 50472038 --top 15
 
-# 3. Rebuild offline from cached snapshots + 7-day SQLite author cache
+# 4. Rebuild offline from cached snapshots + 7-day SQLite author cache
 uv run --no-project python cli.py 50472038 --offline
 
-# 4. Run the full unit, contract, and generalization test suite
+# 5. Run the full unit, contract, and generalization test suite
 uv run --no-project python -m unittest discover -s tests -v
 ```
 
@@ -52,10 +55,16 @@ The included GitHub Actions workflow (`.github/workflows/hn-observatory-pages.ym
 | **GitHub Enterprise Pages** | `https://pages.<ghes-host>/<owner>/<repo>/item?id=50472038` |
 | **Published Directory Index** | `https://<pages-base>/` |
 
-### Triggering a Pages Build
+### Scheduled Front-Page Sync & On-Demand Builds
+
+- **Automatic twice-daily Front-Page sync:** Runs automatically at **08:00 London (`Europe/London`, GMT/BST)** and **08:00 San Francisco (`America/Los_Angeles`, PST/PDT)** year-round via a DST-aware `zoneinfo` schedule gate (`build_pages_site.py --check-schedule`), building/updating all **30 live HN Front Page stories** (`v0/topstories.json`, skipping YC job ads) and pinning them in live `FP 01..30` order at the top of `index.html`.
+- **Safe `< 1 GB` archive retention:** Keeps all published `/item?id=<id>` pages until `items/` reaches `500 MB`, then prunes unpinned items older than `90` days (and caps total archive size at `750 MB`) while squashing `gh-pages` into a single commit so Git history never bloats.
 
 ```bash
-# Trigger by item ID or full HN URL
+# Sync all 30 live Front Page stories on demand (default target)
+gh workflow run hn-observatory-pages.yml -f target=frontpage
+
+# Or build/refresh a single HN item ID or URL
 gh workflow run hn-observatory-pages.yml -f target=50472038
 gh workflow run hn-observatory-pages.yml -f target="https://news.ycombinator.com/item?id=50471731"
 ```
@@ -98,17 +107,22 @@ Finally, **Hinged Greedy Submodular MMR** reranks the top candidate pool across 
 ## CLI Reference
 
 ```text
-python3 cli.py [build|ingest|rank] <item_id_or_url> [options]
+python3 cli.py [build|frontpage|ingest|rank] [<item_id_or_url>] [options]
 
-Positional:
-  target              HN item ID (50472038) or URL (https://news.ycombinator.com/item?id=50472038)
+Positional (for build / ingest / rank):
+  target              HN item ID (50472038), URL, or `frontpage`
 
 Subcommands (defaults to `build` when omitted):
   build               Ingest, extract scientific features, rank, and emit show-me-hn-<id>.html
+  frontpage           Fetch all live HN Front Page stories (Top 30) and build observatories
   ingest              Fetch ?p=1..N HTML, Algolia tree, article prose, and SQLite author profiles
   rank                Print top-ranked epistemic comments vs. Live HN positions in terminal
 
 Options:
+  --limit N           Max front-page stories for `frontpage` (default: 30)
+  --out-dir DIR       Output directory for `frontpage` HTML builds (default: .)
+  --frontpage-manifest PATH
+                      Write JSON manifest of synced front-page IDs for `build_pages_site.py`
   --open              Open generated show-me-hn-<id>.html in default browser
   --offline           Build from local snapshots and SQLite cache without network calls
   --refresh           Force live re-fetch of HTML pages, Algolia JSON, and linked article
