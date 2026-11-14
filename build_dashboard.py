@@ -557,7 +557,7 @@ def build_html(
       :root {{ interpolate-size: allow-keywords; }}
     }}
     body {{
-      margin: 0;
+      margin: 8px;
       background: rgb(247, 247, 245);
       color: rgb(13, 13, 13);
       font: 15px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
