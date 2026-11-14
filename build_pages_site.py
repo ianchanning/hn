@@ -240,8 +240,8 @@ def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -
       background: rgb(255, 255, 253);
     }}
     .eyebrow {{
-      font: 700 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
-      letter-spacing: 0.12em;
+      font: 600 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
       color: rgb(255, 51, 0);
       margin-bottom: 10px;
