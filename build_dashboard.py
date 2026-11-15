@@ -1161,6 +1161,7 @@ def build_html(
       padding: 2px 6px;
       background: rgb(236, 236, 228);
       border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
       color: rgb(35, 35, 35);
     }}
     .badge.rank-sig {{ background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }}
