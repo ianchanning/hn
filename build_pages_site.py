@@ -39,8 +39,9 @@ OBS_JSON_RE = re.compile(
 
 
 def _safe_no_hash(text: str) -> str:
-    """Escape HTML entities and ensure zero literal `#` characters."""
-    return html.escape(str(text), quote=True).replace("#", "No. ")
+    """Escape HTML entities and ensure zero literal `#` characters without mangling quotes."""
+    clean = html.unescape(str(text or "")).replace("#", "No. ")
+    return html.escape(clean, quote=False).replace('"', "&quot;")
 
 
 def _format_utc_stamp(raw_utc: str) -> str:
@@ -64,7 +65,8 @@ def _safe_url_no_hash(url: str) -> str:
     parsed = urlparse(raw)
     if parsed.scheme not in ("http", "https") or not parsed.netloc:
         return ""
-    return html.escape(raw, quote=True).replace("#", "")
+    clean = html.unescape(raw).replace("#", "")
+    return html.escape(clean, quote=False).replace('"', "&quot;")
 
 
 def _format_hn_sitebit(url: str) -> str:

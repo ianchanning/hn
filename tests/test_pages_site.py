@@ -37,19 +37,19 @@ class TestGitHubPagesMirror(unittest.TestCase):
             src_dir.mkdir()
             (site_dir / "items").mkdir(parents=True)
 
-            # Simulate an already-published item on gh-pages from an earlier workflow run
+            # Simulate an already-published item on gh-pages from an earlier workflow run with quotes and '#'
             prior_payload = json.dumps(
                 {
                     "story_id": 50000001,
-                    "story_title": "Prior Published Thread",
+                    "story_title": "Don't Miss Wendy's #1 Launch",
                     "story_url": "https://example.org/prior",
-                    "manifest": {"story_title": "Prior Published Thread"},
+                    "manifest": {"story_title": "Don't Miss Wendy's #1 Launch"},
                     "tiers": {"epistemic_gold": 4, "grounded_analysis": 9},
                     "comments": [{"id": 1}, {"id": 2}],
                 }
             )
             (site_dir / "items" / "50000001.html").write_text(
-                f'<!doctype html><script id="observatoryData" type="application/json">{prior_payload}</script>',
+                f'<!doctype html><script id="observatoryData" type="application/json">{prior_payload.replace("#", "\\u0023")}</script>',
                 encoding="utf-8",
             )
 
@@ -90,6 +90,9 @@ class TestGitHubPagesMirror(unittest.TestCase):
             index_txt = (site_dir / "index.html").read_text(encoding="utf-8")
             self.assertIn("./item?id=50472038", index_txt)
             self.assertIn("./item?id=50000001", index_txt)
+            self.assertIn("Don't Miss Wendy's No. 1 Launch", index_txt)
+            self.assertNotIn("&No. x27;", index_txt)
+            self.assertNotIn("&#x27;", index_txt)
 
             # Serve static tree over local HTTP to verify router & item artifact resolution
             handler = partial(_QuietHandler, directory=str(site_dir))

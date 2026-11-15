@@ -238,9 +238,9 @@ class TestGeneralizationPipeline(unittest.TestCase):
     def test_zero_hash_dashboard_and_cli_on_synthetic_story(self) -> None:
         """Build parameterized zero-hash HTML when title, URLs, and prose contain `#` characters."""
         raw_page = """
-        <html op="item"><head><title>RFC #9110 HTTP Semantics | Hacker News</title></head><body>
+        <html op="item"><head><title>RFC #9110 Fielding's HTTP Semantics | Hacker News</title></head><body>
         <table class="fatitem"><tr class="athing submission" id="777001">
-          <td class="title"><span class="titleline"><a href="https://datatracker.ietf.org/doc/html/rfc9110#section-9">RFC #9110 HTTP Semantics</a></span></td>
+          <td class="title"><span class="titleline"><a href="https://datatracker.ietf.org/doc/html/rfc9110#section-9">RFC #9110 Fielding's HTTP Semantics</a></span></td>
         </tr></table>
         <table class="comment-tree">
           <tr class="athing comtr" id="777010"><td><table><tr><td class="ind" indent="0"></td><td>
@@ -278,6 +278,9 @@ class TestGeneralizationPipeline(unittest.TestCase):
             self.assertTrue(res["zero_hash_verified"])
             html_text = out_html.read_text(encoding="utf-8")
             self.assertNotIn("#", html_text)
+            self.assertIn("Fielding's", html_text)
+            self.assertNotIn("&No. x27;", html_text)
+            self.assertNotIn("&#x27;", html_text)
             self.assertIn('id="modeSelect"', html_text)
             self.assertNotIn('id="presetBar"', html_text)
             self.assertIn('<details class="proof-drawer" id="proofDrawer">', html_text)

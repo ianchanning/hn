@@ -33,14 +33,16 @@ LEGACY_FACET_LABELS: dict[str, str] = {
 
 
 def _safe_html_no_hash(text: str) -> str:
-    """Escape HTML special characters and guarantee zero literal `#` characters."""
-    return html.escape(str(text), quote=True).replace("#", "No. ")
+    """Escape HTML special characters and guarantee zero literal `#` characters without mangling quotes."""
+    clean = html.unescape(str(text or "")).replace("#", "No. ")
+    return html.escape(clean, quote=False).replace('"', "&quot;")
 
 
 def _safe_url_no_hash(url: str) -> str:
     """Strip `#fragment` from a static HTML href attribute and escape safely."""
-    clean = str(url or "").split("#", 1)[0].strip()
-    return html.escape(clean, quote=True)
+    raw = str(url or "").split("#", 1)[0].strip()
+    clean = html.unescape(raw).replace("#", "")
+    return html.escape(clean, quote=False).replace('"', "&quot;")
 
 
 def _format_age_hours(hours: float) -> str:
