@@ -508,7 +508,7 @@ def render_index_html(
     }}
     .topbar {{
       background: rgb(255, 102, 0);
-      padding: 2px 4px;
+      padding: 2px;
       display: flex;
       align-items: center;
       justify-content: space-between;
