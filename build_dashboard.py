@@ -1312,19 +1312,6 @@ def build_html(
       <div class="topbar-left">
         <a href="https://news.ycombinator.com" class="hn-logo">E</a>
         <b class="hnname"><a href="https://news.ycombinator.com">Epistemic News</a></b>
-        <span class="pagetop">
-          <a href="https://news.ycombinator.com/newest">new</a> |
-          <a href="https://news.ycombinator.com/threads">threads</a> |
-          <a href="https://news.ycombinator.com/front">past</a> |
-          <a href="https://news.ycombinator.com/newcomments">comments</a> |
-          <a href="https://news.ycombinator.com/ask">ask</a> |
-          <a href="https://news.ycombinator.com/show">show</a> |
-          <a href="https://news.ycombinator.com/jobs">jobs</a> |
-          <a href="https://news.ycombinator.com/submit">submit</a>
-        </span>
-      </div>
-      <div class="topbar-right">
-        <span class="pagetop"><a href="https://news.ycombinator.com/user?id=icc97">icc97</a> (2859) | <a href="https://news.ycombinator.com">logout</a></span>
       </div>
     </div>
     <div class="fatitem-box">
