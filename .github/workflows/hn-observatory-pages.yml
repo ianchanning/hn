@@ -30,10 +30,7 @@ on:
     branches:
       - main
     paths:
-      - "hn-comments/show-me-hn-*.html"
-      - "hn-comments/build_pages_site.py"
-      - "show-me-hn-*.html"
-      - "build_pages_site.py"
+      - "**.py"
       - ".github/workflows/hn-observatory-pages.yml"
 
 permissions:
@@ -74,7 +71,6 @@ jobs:
             hn-author-cache-${{ runner.os }}-
 
       - name: Build observatory (single story or Front Page Top 30)
-        if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
         id: build_item
         env:
           EVENT_NAME: ${{ github.event_name }}
@@ -97,7 +93,7 @@ jobs:
           refresh_on = os.environ.get("HN_REFRESH", "true").lower() != "false"
           out_path = pathlib.Path(os.environ["GITHUB_OUTPUT"])
 
-          is_frontpage = event_name == "schedule" or raw_target.lower() in ("", "frontpage", "front-page", "topstories")
+          is_frontpage = event_name in ("schedule", "push") or raw_target.lower() in ("", "frontpage", "front-page", "topstories")
           if is_frontpage:
               fp_manifest = pathlib.Path("_frontpage_manifest.json").resolve()
               cmd = [
