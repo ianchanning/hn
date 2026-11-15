@@ -238,10 +238,58 @@ def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -
     * {{ box-sizing: border-box; }}
     body {{
       margin: 8px;
-      background: rgb(247, 247, 245);
-      color: rgb(13, 13, 13);
-      font: 15px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
-      -webkit-font-smoothing: antialiased;
+      padding: 0;
+      background: rgb(255, 255, 255);
+      color: rgb(0, 0, 0);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+    }}
+    .hnmain {{
+      width: 85%;
+      max-width: 1240px;
+      margin: 0 auto;
+      background: rgb(246, 246, 239);
+    }}
+    .topbar {{
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }}
+    .topbar-left {{
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }}
+    .hn-logo {{
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }}
+    a.hnname {{
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+    }}
+    .pagetop, .pagetop a, .topbar-right, .topbar-right a {{
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      text-decoration: none;
     }}
     .shell {{
       max-width: 1240px;
@@ -298,6 +346,14 @@ def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -
   </style>
 </head>
 <body>
+<div class="hnmain">
+  <div class="topbar">
+    <div class="topbar-left">
+      <a class="hn-logo" href="./">E</a>
+      <a class="hnname" href="./">Epistemic News</a>
+    </div>
+  </div>
+</div>
 <!--<div class="shell" id="routerStatus">
   <div class="eyebrow">NYX OBSERVATORY // HN URI MIRROR</div>
   <h1 id="statusTitle">Loading Hacker News Observatory...</h1>
