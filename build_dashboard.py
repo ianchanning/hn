@@ -583,15 +583,11 @@ def build_html(
         <div class="kpi-val">{top20_div:.3f}</div>
         <div class="kpi-sub">{len(non_general_facets)} auto-discovered TF-IDF facets</div>
       </div>"""
-        sec1_headline = (
-            f"{noise_pct:.1f}% bullshit"
-        )
         drawer_html = f"""
   <details class="proof-drawer" id="proofDrawer">
     <summary class="hn-summary">
       <span class="hn-comhead">
         <span class="hn-user">01 // EVIDENCE</span>
-        <span class="sec-headline">{sec1_headline}</span>
         <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
       </span>
     </summary>
@@ -823,15 +819,13 @@ def build_html(
       padding: 24px 0;
     }}
     .sec-tag {{
-      font: 700 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
-      letter-spacing: 0.12em;
       text-transform: uppercase;
       color: rgb(255, 51, 0);
       margin-bottom: 6px;
     }}
     h2 {{
-      font-size: 16px;
-      letter-spacing: -0.03em;
+      font-size: 12px;
+      font-weight: normal;
       line-height: 1.12;
       margin: 0 0 10px;
     }}
@@ -892,7 +886,7 @@ def build_html(
       white-space: nowrap;
       margin-bottom: 10px;
       font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
-      color: rgb(156, 166, 176);
+      color: rgb(35, 35, 35);
       text-transform: uppercase;
       letter-spacing: 0.08em;
     }}
@@ -908,7 +902,6 @@ def build_html(
       min-width: 0;
       height: 300px;
       display: block;
-      background: rgb(9, 11, 13);
       border: 1px solid rgb(42, 47, 54);
       cursor: crosshair;
       flex-shrink: 0;
@@ -922,7 +915,7 @@ def build_html(
       overflow: hidden;
       margin-top: 10px;
       font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
-      color: rgb(180, 188, 196);
+      color: rgb(35, 35, 35);
     }}
     .dot {{
       display: inline-block;
@@ -935,9 +928,8 @@ def build_html(
     .probe-box {{
       margin-top: 10px;
       padding: 10px 12px;
-      height: 58px;
-      border-left: 3px solid rgb(0, 230, 118);
-      font: 12px/19px ui-monospace, SFMono-Regular, Menlo, monospace;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
       color: rgb(35, 35, 35);
       overflow: hidden;
     }}
@@ -946,7 +938,7 @@ def build_html(
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
-      max-height: 38px;
+      max-height: 60px;
     }}
 
     /* Collapsible Sections Styled as HN Collapsed Comments */
@@ -956,7 +948,6 @@ def build_html(
       margin: 4px 0 6px 0;
     }}
     details.proof-drawer[open] {{
-      border-bottom: 1px solid rgb(216, 216, 206);
       padding-bottom: 16px;
       margin-bottom: 14px;
     }}
@@ -1082,24 +1073,30 @@ def build_html(
       align-items: center;
     }}
     input.search-in, select.sel-in {{
-      border-width: 1px;
+      background: rgb(255, 255, 253);
       border-color: rgb(129, 127, 132);
       border-radius: 4px;
-      background: rgb(255, 255, 253);
-      font: 600 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      border-width: 1px;
       color: rgb(13, 13, 13);
       min-width: 0;
     }}
-    input.search-in {{ flex: 1; min-width: 220px; font-weight: 400; }}
+    input.search-in {{ 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }}
     .probe-inline-btn {{
       appearance: none;
       border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
       background: rgba(0, 230, 118, 0.14);
       color: rgb(0, 230, 118);
       padding: 1px 7px;
       margin-left: 6px;
       font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
       cursor: pointer;
+      text-transform: lowercase;
     }}
 
     /* Comment Cards — Authentic Hacker News Surface & Typography */
@@ -1251,15 +1248,10 @@ def build_html(
         justify-content: space-between;
         align-items: center;
         gap: 12px;
-        padding: 10px 12px;
-        background: rgb(239, 239, 234);
-        border: 1px solid rgb(13, 13, 13);
         user-select: none;
       }}
       summary.graph-summary h2 {{
-        font-size: 17px;
-        margin: 0;
-        white-space: normal;
+        display: none;
       }}
       details.graph-drawer[open] > .oled-bay,
       details.graph-drawer[open] > .control-panel {{
@@ -1269,13 +1261,12 @@ def build_html(
         display: inline-block;
         flex-shrink: 0;
         padding: 4px 8px;
-        background: rgb(13, 13, 13);
-        color: rgb(247, 247, 245);
-        font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
         letter-spacing: 0.06em;
       }}
-      details.graph-drawer[open] > summary .mob-graph-pill::before {{ content: "[-] HIDE"; }}
-      details.graph-drawer:not([open]) > summary .mob-graph-pill::before {{ content: "[+] SHOW"; }}
+      details.graph-drawer[open] > summary .mob-graph-pill::before {{ content: "[-]"; }}
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before {{ content: "[+]"; }}
       .kpi-strip {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
       .kpi-cell {{ border-bottom: 1px solid rgb(205, 205, 200); }}
       .filter-bar {{
@@ -1286,15 +1277,21 @@ def build_html(
       }}
       .filter-bar select.sel-in {{
         width: 100%;
-        font-size: 16px;
-        padding: 8px 9px;
       }}
       .filter-bar input.search-in {{
         grid-column: span 2;
         width: 100%;
         min-width: 0;
-        font-size: 16px;
       }}
+    }}
+    @media (max-width: 750px) {{
+      body {{ margin: 0; }}
+      .wrap {{ width: 100%; }}
+      .topbar {{ padding: 4px 6px; flex-wrap: wrap; }}
+      .topbar-right {{ font-size: 8pt; padding-right: 2px; }}
+      td.title {{ font-size: 11pt; line-height: 15pt; }}
+      td.subtext {{ font-size: 8.5pt; line-height: 13pt; }}
+      tr.spacer td {{ height: 7px; }}
     }}
   </style>
 </head>
@@ -1314,7 +1311,7 @@ def build_html(
       </div>
       <div class="subtext">
         <span class="subline">
-          <span class="score">{points} points</span> by <a href="https://news.ycombinator.com/user?id={safe_story_author}">{safe_story_author}</a> <span class="age" title="{safe_story_created_iso}"><a href="{hn_item_href}">{age_str}</a></span> | <a href="https://news.ycombinator.com/flag?id={story_id}">flag</a> | <a href="https://news.ycombinator.com/hide?id={story_id}">hide</a> | <a href="{safe_past_url}" class="hnpast">past</a> | <a href="https://news.ycombinator.com/fave?id={story_id}">favorite</a> | <a href="{hn_item_href}">{comment_count_str}</a>
+          <span class="score">{points} points</span> by <a href="https://news.ycombinator.com/user?id={safe_story_author}">{safe_story_author}</a> <span class="age" title="{safe_story_created_iso}"><a href="{hn_item_href}">{age_str}</a></span> | <a href="{hn_item_href}">{comment_count_str}</a> | {noise_pct:.1f}% bullshit
         </span>
       </div>
       {toptext_html_block}
@@ -1361,7 +1358,7 @@ def build_html(
               <input type="range" id="sl_dp" min="0" max="5" step="0.05">
             </div>
             <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
-            <p style="line-height:1.42;color:rgb(85,85,82);margin:12px 0 0">
+            <p>
               Drag any weight to watch the {total_cnt:,}-point phase plane and comment ranking re-solve instantaneously.<br>
               &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
               &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
@@ -1416,7 +1413,7 @@ def build_html(
                 <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
                 <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
               </div>
-              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (@{_safe_html_no_hash(largest_root["top_dom1_author"])}, {largest_root["top_dom1_age"]}h); largest subtree (@{_safe_html_no_hash(largest_root["author"])}) occupies {largest_root["slots"]} slots (HN POS {largest_root["start_dom"]}..{largest_root["end_dom"]}).</div></div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot ({_safe_html_no_hash(largest_root["top_dom1_author"])}, {largest_root["top_dom1_age"]}h); largest subtree (@{_safe_html_no_hash(largest_root["author"])}) occupies {largest_root["slots"]} slots (HN POS {largest_root["start_dom"]}..{largest_root["end_dom"]}).</div></div>
             </div>
           </details>
         </div>
@@ -1746,14 +1743,8 @@ def build_html(
       const delta = hit.dom - hit.liveRank;
       const dStr = delta >= 0 ? `+${{delta}}` : `${{delta}}`;
       const snippet = escHtml(hit.txt.slice(0, 88).replace(/\\s+/g, " "));
-      const jumpBtns = isPinned
-        ? `<button type="button" class="probe-inline-btn" data-probe-jump="1">Comment &darr;</button>` +
-          `<button type="button" class="probe-inline-btn" data-probe-clear="1">Clear &times;</button>`
-        : "";
       probeEl.innerHTML =
-        `<strong>@${{escHtml(hit.au)}}</strong> | Signal ${{hit.liveRank}} vs HN ${{hit.dom}} (${{dStr}})` +
-        jumpBtns +
-        `<br>"${{snippet}}..."`;
+        `<div class="hn-comhead">${{escHtml(hit.au)}} | Signal ${{hit.liveRank}} vs HN ${{hit.dom}} (${{dStr}})</div>${{snippet}}..."`;
       const jBtn = probeEl.querySelector("[data-probe-jump]");
       if (jBtn) {{
         jBtn.addEventListener("click", () => {{
@@ -1835,7 +1826,7 @@ def build_html(
     const metaEl = document.getElementById("resultMeta");
     metaEl.innerHTML =
       `Showing ${{shown.length}} of ${{pool.length}} matching comments (mode: ${{activeMode}})` +
-      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear selection</button>` : "");
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
     const clrBtn = document.getElementById("clearFilterBtn");
     if (clrBtn) {{
       clrBtn.addEventListener("click", clearSelectedPoint);
