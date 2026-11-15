@@ -584,14 +584,13 @@ def build_html(
         <div class="kpi-sub">{len(non_general_facets)} auto-discovered TF-IDF facets</div>
       </div>"""
         sec1_headline = (
-            f"01 // EVIDENCE &bull; {total_cnt:,} comments audited "
-            f"({useful_pct:.1f}% useful signal, {noise_pct:.1f}% noise)"
+            f"{noise_pct:.1f}% bullshit"
         )
         drawer_html = f"""
   <details class="proof-drawer" id="proofDrawer">
     <summary class="hn-summary">
       <span class="hn-comhead">
-        <span class="hn-user">observatory</span>
+        <span class="hn-user">01 // EVIDENCE</span>
         <span class="age">{age_str}</span>
         <span class="com-pipe">|</span>
         <span class="sec-headline">{sec1_headline}</span>
@@ -999,13 +998,10 @@ def build_html(
     }}
     details.proof-drawer > summary .toggle-pill {{
       color: rgb(130, 130, 130);
-      font-size: 8pt;
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
       background: transparent;
       padding: 0;
       margin-left: 2px;
-    }}
-    details.proof-drawer > summary:hover .toggle-pill {{
-      text-decoration: underline;
     }}
     details.proof-drawer[open] > summary .toggle-pill::before {{ content: attr(data-hide); }}
     details.proof-drawer:not([open]) > summary .toggle-pill::before {{ content: attr(data-show); }}
@@ -1313,6 +1309,7 @@ def build_html(
         <a href="https://news.ycombinator.com" class="hn-logo">E</a>
         <b class="hnname"><a href="https://news.ycombinator.com">Epistemic News</a></b>
       </div>
+      <div class="topbar-right">&nbsp;</div>
     </div>
     <div class="fatitem-box">
       <div class="story-titleline">
@@ -1331,10 +1328,7 @@ def build_html(
   <details class="proof-drawer" id="labDrawer">
     <summary class="hn-summary">
       <span class="hn-comhead">
-        <span class="hn-user">observatory</span>
-        <span class="age">{age_str}</span>
-        <span class="com-pipe">|</span>
-        <span class="sec-headline">02 // EXPLORE &bull; epistemic tuner &amp; dual phase-plane / gravity plots</span>
+        <span class="hn-user">02 // EXPLORE</span>
         <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
       </span>
     </summary>
