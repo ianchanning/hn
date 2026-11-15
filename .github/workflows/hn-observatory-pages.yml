@@ -2,8 +2,8 @@ name: HN Epistemic Observatory Pages
 
 on:
   schedule:
-    # Hourly
-    - cron: "0 * * * *"
+    # Hourly at :23 UTC to avoid top-of-hour (:00) queue congestion/drops
+    - cron: "23 * * * *"
   workflow_dispatch:
     inputs:
       target:
@@ -21,11 +21,6 @@ on:
         required: false
         default: true
         type: boolean
-      runs_on:
-        description: "Runner label (default: ubuntu-latest; override for self-hosted GHES runners)"
-        required: false
-        default: "ubuntu-latest"
-        type: string
   push:
     branches:
       - main
@@ -35,8 +30,7 @@ on:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
+  pages: read
 
 concurrency:
   group: hn-observatory-gh-pages
@@ -45,22 +39,23 @@ concurrency:
 jobs:
   publish-observatory:
     name: Build & Publish /item?id= Mirror
-    runs-on: ${{ inputs.runs_on || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     outputs:
       story_id: ${{ steps.meta.outputs.story_id }}
       hn_uri: ${{ steps.meta.outputs.hn_uri }}
       pages_url: ${{ steps.meta.outputs.pages_url }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
       - name: Restore 7-day SQLite author cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         continue-on-error: true
         with:
           path: |
@@ -185,7 +180,7 @@ jobs:
             else
               MSG="chore(pages): publish HN observatory ${STORY_ID:-catalog}"
             fi
-            # Squash gh-pages into a single root commit so twice-daily runs never bloat git history
+            # Squash gh-pages into a single root commit so hourly runs never bloat git history
             SINGLE_SHA=$(git -C _gh_pages commit-tree "$(git -C _gh_pages write-tree)" -m "$MSG")
             if ! git -C _gh_pages push --force origin "$SINGLE_SHA:refs/heads/gh-pages"; then
               git -C _gh_pages commit -m "$MSG"
@@ -198,6 +193,7 @@ jobs:
         env:
           STORY_ID: ${{ steps.build_item.outputs.story_id }}
           BUILD_MODE: ${{ steps.build_item.outputs.mode }}
+          SCHED_SLOT: ${{ github.event_name }}
           GH_REPO: ${{ github.repository }}
           GH_OWNER: ${{ github.repository_owner }}
           GH_SERVER_URL: ${{ github.server_url }}
