@@ -298,10 +298,11 @@ def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -
   </style>
 </head>
 <body>
-<div class="shell" id="routerStatus">
+  <p>Resolving <code>/item?id=...</code> from static observatory archive.</p>-->
+<!--<div class="shell" id="routerStatus">
   <div class="eyebrow">NYX OBSERVATORY // HN URI MIRROR</div>
   <h1 id="statusTitle">Loading Hacker News Observatory...</h1>
-  <p id="statusBody">Resolving <code>/item?id=...</code> from static observatory archive.</p>
+  <p id="statusBody">Resolving <code>/item?id=...</code> from static observatory archive.</p>-->
 </div>
 <script id="routerConfig" type="application/json">{cfg_json}</script>
 <script>
@@ -497,7 +498,7 @@ def render_index_html(
       padding: 0;
       background: rgb(255, 255, 255);
       color: rgb(0, 0, 0);
-      font: 10pt/1.35 Verdana, Geneva, sans-serif;
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
     }}
     .hnmain {{
       width: 85%;
@@ -525,9 +526,9 @@ def render_index_html(
     }}
     .hn-logo {{
       display: inline-block;
-      width: 18px;
-      height: 18px;
-      line-height: 16px;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
       text-align: center;
       border: 1px solid rgb(255, 255, 255);
       color: rgb(255, 255, 255);
