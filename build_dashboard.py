@@ -591,8 +591,6 @@ def build_html(
     <summary class="hn-summary">
       <span class="hn-comhead">
         <span class="hn-user">01 // EVIDENCE</span>
-        <span class="age">{age_str}</span>
-        <span class="com-pipe">|</span>
         <span class="sec-headline">{sec1_headline}</span>
         <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
       </span>
@@ -733,8 +731,6 @@ def build_html(
       font-size: 13px;
       text-decoration: none;
       flex-shrink: 0;
-      background: rgb(255, 102, 0);
-      margin-right: 2px;
     }}
     .hnname, .hnname a {{
       color: rgb(0, 0, 0);
@@ -872,9 +868,9 @@ def build_html(
 
     /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
     .oled-bay {{
-      background: rgb(13, 15, 17);
-      color: rgb(228, 232, 236);
-      border: 2px solid rgb(35, 38, 42);
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
       padding: 16px;
       position: relative;
       border-radius: 6px;
@@ -940,10 +936,9 @@ def build_html(
       margin-top: 10px;
       padding: 10px 12px;
       height: 58px;
-      background: rgb(20, 24, 28);
       border-left: 3px solid rgb(0, 230, 118);
       font: 12px/19px ui-monospace, SFMono-Regular, Menlo, monospace;
-      color: rgb(220, 226, 232);
+      color: rgb(35, 35, 35);
       overflow: hidden;
     }}
     .probe-clamp {{
@@ -1047,6 +1042,8 @@ def build_html(
     .control-panel {{
       background: rgb(239, 239, 234);
       border: 1px solid rgb(13, 13, 13);
+      border-radius: 6px;
+      corner-shape: bevel;
       padding: 16px;
     }}
     .slider-row {{
@@ -1307,7 +1304,7 @@ def build_html(
     <div class="topbar">
       <div class="topbar-left">
         <a href="https://news.ycombinator.com" class="hn-logo">E</a>
-        <b class="hnname"><a href="https://news.ycombinator.com">Epistemic News</a></b>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
       </div>
       <div class="topbar-right">&nbsp;</div>
     </div>
@@ -1337,7 +1334,7 @@ def build_html(
         <details class="graph-drawer" id="tunerDrawer">
           <summary class="graph-summary">
             <div class="graph-title-group">
-              <div class="sec-tag">02A / INTERACTIVE EQUATION</div>
+              <div class="sec-tag">02A / CALIBRATE</div>
               <h2>Epistemic Tuner</h2>
             </div>
             <span class="mob-graph-pill"></span>
@@ -1364,7 +1361,7 @@ def build_html(
               <input type="range" id="sl_dp" min="0" max="5" step="0.05">
             </div>
             <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
-            <p style="font-size:11.5px;line-height:1.42;color:rgb(85,85,82);margin:12px 0 0">
+            <p style="line-height:1.42;color:rgb(85,85,82);margin:12px 0 0">
               Drag any weight to watch the {total_cnt:,}-point phase plane and comment ranking re-solve instantaneously.<br>
               &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
               &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
