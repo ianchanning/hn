@@ -2,6 +2,7 @@
 
 from collections import Counter
 import copy
+from datetime import UTC, datetime
 import html
 import json
 import math
@@ -9,7 +10,7 @@ from pathlib import Path
 import subprocess
 import sys
 from typing import Any
-from urllib.parse import urlparse
+from urllib.parse import quote_plus, urlparse
 
 HERE = Path(__file__).resolve().parent
 JUDGE_SCRIPT = HERE / "judge" / "judge_v1_1.py"
@@ -18,6 +19,7 @@ if str(HERE) not in sys.path:
 
 import corpus_science
 from ingest import parse_hn_item_id
+from parse_corpus import extract_story_metadata_from_html
 import ranker
 
 LEGACY_FACET_LABELS: dict[str, str] = {
@@ -39,6 +41,27 @@ def _safe_url_no_hash(url: str) -> str:
     """Strip `#fragment` from a static HTML href attribute and escape safely."""
     clean = str(url or "").split("#", 1)[0].strip()
     return html.escape(clean, quote=True)
+
+
+def _format_age_hours(hours: float) -> str:
+    """Format age in hours to HN-style 'X hours ago' or 'X minutes ago'."""
+    h = max(0.0, float(hours))
+    if h < 1.0:
+        mins = max(1, int(round(h * 60.0)))
+        return f"{mins} minute{'s' if mins != 1 else ''} ago"
+    if h < 24.0:
+        val = int(round(h))
+        return f"{val} hour{'s' if val != 1 else ''} ago"
+    days = int(round(h / 24.0))
+    return f"{days} day{'s' if days != 1 else ''} ago"
+
+
+def _sanitize_toptext_html(raw_html: str) -> str:
+    """Clean toptext HTML, unescape numeric entities to avoid `#`, and ensure zero `#` characters."""
+    if not raw_html:
+        return ""
+    unescaped = html.unescape(str(raw_html))
+    return unescaped.replace("#", "No. ")
 
 
 def _compute_top20_diversity(top20: list[dict[str, Any]]) -> float:
@@ -174,16 +197,106 @@ def build_html(
         else ranker.rank_comments(copy.deepcopy(corpus))
     )
 
+    # Load extended story metadata (points, author, created timestamp, toptext)
+    story_meta: dict[str, Any] = {}
+    meta_json_path = resolved_data_dir / "items" / str(story_id) / "story_meta.json"
+    if meta_json_path.is_file():
+        try:
+            story_meta = json.loads(meta_json_path.read_text(encoding="utf-8"))
+        except Exception:
+            story_meta = {}
+
+    if story_id == 50467087:
+        fb_json_path = resolved_data_dir / "hn_50467087_firebase.json"
+        if fb_json_path.is_file():
+            try:
+                fb_data = json.loads(fb_json_path.read_text(encoding="utf-8"))
+                for k, v in [
+                    ("story_title", fb_data.get("title")),
+                    ("story_url", fb_data.get("url")),
+                    ("points", fb_data.get("score")),
+                    ("story_author", fb_data.get("by")),
+                    ("story_unix_ts", fb_data.get("time")),
+                    ("toptext_html", fb_data.get("text")),
+                    ("descendants", fb_data.get("descendants")),
+                ]:
+                    if v and not story_meta.get(k):
+                        story_meta[k] = v
+            except Exception:
+                pass
+
+    live_html_path = resolved_data_dir / "items" / str(story_id) / "live_p1.html"
+    if not live_html_path.is_file() and story_id == 50467087:
+        live_html_path = resolved_data_dir / "hn_50467087_live.html"
+    if live_html_path.is_file():
+        if not story_meta.get("points") or not story_meta.get("story_author") or not story_meta.get("toptext_html"):
+            try:
+                raw_live = live_html_path.read_text(encoding="utf-8")
+                extracted = extract_story_metadata_from_html(raw_live, default_story_id=story_id)
+                for k, v in extracted.items():
+                    if v and not story_meta.get(k):
+                        story_meta[k] = v
+            except Exception:
+                pass
+
     story_title = str(
         manifest.get("story_title")
+        or story_meta.get("story_title")
         or ("Jensen Huang resigns" if story_id == 50467087 else f"HN Item {story_id}")
     )
-    story_url = str(manifest.get("story_url") or "")
+    story_url = str(manifest.get("story_url") or story_meta.get("story_url") or "")
     story_host = (
         urlparse(story_url).netloc.lower().removeprefix("www.")
         if story_url
         else "news.ycombinator.com"
     )
+    points = int(manifest.get("points") or story_meta.get("points") or 0)
+    story_author = str(manifest.get("story_author") or story_meta.get("story_author") or "author")
+    story_created_iso = str(story_meta.get("story_created_iso") or "")
+    story_unix_ts = float(story_meta.get("story_unix_ts") or 0.0)
+
+    # Compute story age relative to ref timestamp or max comment age
+    ref_iso = str(manifest.get("t2_ref_utc") or "")
+    if story_unix_ts > 0.0 and ref_iso:
+        try:
+            ref_dt = datetime.fromisoformat(ref_iso.replace("Z", "+00:00"))
+            ref_ts = ref_dt.timestamp()
+            diff_hours = max(0.0, (ref_ts - story_unix_ts) / 3600.0)
+            age_str = _format_age_hours(diff_hours)
+        except Exception:
+            age_str = _format_age_hours(max((float(c.get("age_hours") or 0.0) for c in ranked), default=1.0))
+    else:
+        max_comm_age = max((float(c.get("age_hours") or 0.0) for c in ranked), default=1.0)
+        age_str = _format_age_hours(max_comm_age)
+
+    # Comments count
+    comment_count = int(
+        story_meta.get("descendants")
+        or (manifest.get("counts") or {}).get("total_comments")
+        or len(ranked)
+    )
+    comment_count_str = f"{comment_count:,}&nbsp;comments" if comment_count != 1 else "1&nbsp;comment"
+
+    # Toptext block
+    toptext_html_raw = str(story_meta.get("toptext_html") or "")
+    toptext_sanitized = _sanitize_toptext_html(toptext_html_raw)
+    toptext_html_block = f'<div class="toptext">{toptext_sanitized}</div>' if toptext_sanitized else ""
+
+    hn_item_href = f"https://news.ycombinator.com/item?id={story_id}"
+    safe_title = _safe_html_no_hash(story_title)
+    safe_host = _safe_html_no_hash(story_host)
+    if story_url and story_host and story_host != "news.ycombinator.com":
+        sitebit_html = f' <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site={_safe_url_no_hash(story_host)}"><span class="sitestr">{safe_host}</span></a>)</span>'
+        story_href = _safe_url_no_hash(story_url)
+    else:
+        sitebit_html = ""
+        story_href = hn_item_href
+
+    safe_story_author = _safe_html_no_hash(story_author)
+    safe_story_created_iso = _safe_html_no_hash(story_created_iso)
+    safe_past_query = quote_plus(story_title).replace("#", "")
+    safe_past_url = f"https://hn.algolia.com/?query={safe_past_query}&sort=byDate&dateRange=all&type=story"
+
     counts = manifest.get("counts") or {}
     authors_profiled = int(counts.get("unique_authors_profiled") or 0)
     pages_fetched = int(counts.get("pages_fetched") or 1)
@@ -398,11 +511,21 @@ def build_html(
         <div class="kpi-val">{judge_res["holdout_score"]:.2f}</div>
         <div class="kpi-sub">Dev {judge_res["dev_score"]:.2f} &bull; Adv Traps {100 * judge_res["full_metrics"]["adversarial_acc"]:.1f}%</div>
       </div>"""
+        sec1_headline = (
+            f"01 // SCIENTIFIC JUSTIFICATION &bull; Judge v{_safe_html_no_hash(judge_res['judge_version'])}: "
+            f"{judge_res['score']:.2f} / 100 (Live HN: {judge_res['hn_live_baseline_score']:.2f}) "
+            f"&bull; Holdout {judge_res['holdout_score']:.2f}"
+        )
         drawer_html = f"""
   <details class="proof-drawer" id="proofDrawer">
-    <summary>
-      <span>01 // SCIENTIFIC JUSTIFICATION: 01A ABLATION MATRIX &amp; 01B FORGET-TEAM TOURNAMENT LEDGER (CHAMPION {judge_res["score"]:.2f} VS LIVE HN {judge_res["hn_live_baseline_score"]:.2f} &bull; HOLDOUT {judge_res["holdout_score"]:.2f})</span>
-      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">observatory</span>
+        <span class="age">{age_str}</span>
+        <span class="com-pipe">|</span>
+        <span class="sec-headline">{sec1_headline}</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
     </summary>
     <div class="proof-body grid-12">
       <div class="col-7">
@@ -460,17 +583,26 @@ def build_html(
         <div class="kpi-val">{top20_div:.3f}</div>
         <div class="kpi-sub">{len(non_general_facets)} auto-discovered TF-IDF facets</div>
       </div>"""
+        sec1_headline = (
+            f"01 // EVIDENCE &bull; {total_cnt:,} comments audited "
+            f"({useful_pct:.1f}% useful signal, {noise_pct:.1f}% noise)"
+        )
         drawer_html = f"""
   <details class="proof-drawer" id="proofDrawer">
-    <summary>
-      <span>01 // EVIDENCE</span>
-      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">observatory</span>
+        <span class="age">{age_str}</span>
+        <span class="com-pipe">|</span>
+        <span class="sec-headline">{sec1_headline}</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
     </summary>
-    <p>
-      Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
-      Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
-    </p>
     <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
       <div class="kpi-strip">
         <div class="kpi-cell">
           <div class="kpi-label">Corpus Audited</div>
@@ -557,8 +689,8 @@ def build_html(
       :root {{ interpolate-size: allow-keywords; }}
     }}
     body {{
-      margin: 8px;
-      background: rgb(247, 247, 245);
+      margin: 8px 0;
+      background: rgb(246, 246, 239);
       color: rgb(13, 13, 13);
       font: 15px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
       -webkit-font-smoothing: antialiased;
@@ -567,36 +699,110 @@ def build_html(
       max-width: 1240px;
       margin: 0 auto;
       width: 85%;
+      background: rgb(246, 246, 239);
     }}
-    .sheet-top {{
-      border-top: 3px solid rgb(13, 13, 13);
-      border-bottom: 1px solid rgb(13, 13, 13);
-      padding: 16px 0 26px;
+    .hn-header {{
+      background: rgb(246, 246, 239);
     }}
-    .eyebrow {{
-      font: 600 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: rgb(90, 90, 88);
+    .topbar {{
+      background: rgb(255, 102, 0);
+      padding: 2px 4px;
       display: flex;
+      align-items: center;
       justify-content: space-between;
-      flex-wrap: wrap;
       gap: 8px;
+      min-height: 24px;
     }}
-    .eyebrow strong {{ color: rgb(255, 51, 0); }}
-    h1 {{
-      font-size: clamp(36px, 5.2vw, 72px);
-      line-height: 0.96;
-      letter-spacing: -0.045em;
-      margin: 18px 0 14px;
-      font-weight: 800;
+    .topbar-left {{
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
     }}
-    h1 .accent {{ color: rgb(255, 51, 0); }}
-    .sublead {{
-      max-width: 920px;
-      font-size: 16px;
-      color: rgb(52, 52, 50);
-      margin: 0;
+    .hn-logo {{
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      line-height: 16px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+      background: rgb(255, 102, 0);
+      margin-right: 2px;
+    }}
+    .hnname, .hnname a {{
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }}
+    .pagetop, .pagetop a {{
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      text-decoration: none;
+    }}
+    .pagetop a:hover, .topbar-right a:hover {{
+      text-decoration: underline;
+    }}
+    .topbar-right {{
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+    }}
+    .fatitem-box {{
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }}
+    .story-titleline {{
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }}
+    a.story-title {{
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }}
+    a.story-title:visited {{
+      color: rgb(130, 130, 130);
+    }}
+    .sitebit, .sitebit a {{
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }}
+    .sitebit a:hover, .subtext a:hover {{
+      text-decoration: underline;
+    }}
+    .subtext {{
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }}
+    .subtext a {{
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }}
+    .toptext {{
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }}
+    .toptext a {{
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
     }}
     .grid-12 {{
       display: grid;
@@ -748,39 +954,62 @@ def build_html(
       max-height: 38px;
     }}
 
-    /* Collapsible 03A / 03B Justification Drawer */
+    /* Collapsible Sections Styled as HN Collapsed Comments */
     details.proof-drawer {{
-      border-bottom: 1px solid rgb(195, 195, 190);
-      padding: 12px 0;
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
     }}
-    details.proof-drawer > summary {{
+    details.proof-drawer[open] {{
+      border-bottom: 1px solid rgb(216, 216, 206);
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }}
+    details.proof-drawer > summary.hn-summary {{
       list-style: none;
       cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 14px;
-      background: rgb(239, 239, 234);
-      border: 1px solid rgb(13, 13, 13);
-      font: 700 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      display: block;
+      padding: 2px 0;
+      margin: 0;
+      background: transparent;
+      border: 0;
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
       user-select: none;
     }}
-    details.proof-drawer > summary::-webkit-details-marker {{ display: none; }}
-    details.proof-drawer > summary:hover {{ border-color: rgb(255, 51, 0); }}
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker {{ display: none; }}
+    details.proof-drawer > summary.hn-summary:hover {{
+      color: rgb(34, 34, 34);
+    }}
+    details.proof-drawer > summary .hn-comhead {{
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }}
+    details.proof-drawer > summary .hn-user {{
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }}
+    details.proof-drawer > summary .sec-headline {{
+      color: rgb(100, 100, 100);
+    }}
     details.proof-drawer > summary .toggle-pill {{
-      flex-shrink: 0;
-      padding: 3px 8px;
-      background: rgb(13, 13, 13);
-      color: rgb(247, 247, 245);
-      font-size: 10px;
+      color: rgb(130, 130, 130);
+      font-size: 8pt;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }}
+    details.proof-drawer > summary:hover .toggle-pill {{
+      text-decoration: underline;
     }}
     details.proof-drawer[open] > summary .toggle-pill::before {{ content: attr(data-hide); }}
     details.proof-drawer:not([open]) > summary .toggle-pill::before {{ content: attr(data-show); }}
     .proof-body {{
-      padding-top: 16px;
+      padding-top: 10px;
     }}
 
     /* Scientific Ablation Table */
@@ -1083,22 +1312,49 @@ def build_html(
 </head>
 <body>
 <div class="wrap">
-  <header class="sheet-top">
-    <div class="eyebrow">
-      <span>NYX OBSERVATORY // <a class="ext-link" href="{hn_item_href}">HN ITEM {story_id}</a> // {safe_host.upper()}</span>
-      {eyebrow_right}
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">Y</a>
+        <b class="hnname"><a href="https://news.ycombinator.com">Hacker News</a></b>
+        <span class="pagetop">
+          <a href="https://news.ycombinator.com/newest">new</a> |
+          <a href="https://news.ycombinator.com/threads">threads</a> |
+          <a href="https://news.ycombinator.com/front">past</a> |
+          <a href="https://news.ycombinator.com/newcomments">comments</a> |
+          <a href="https://news.ycombinator.com/ask">ask</a> |
+          <a href="https://news.ycombinator.com/show">show</a> |
+          <a href="https://news.ycombinator.com/jobs">jobs</a> |
+          <a href="https://news.ycombinator.com/submit">submit</a>
+        </span>
+      </div>
+      <div class="topbar-right">
+        <span class="pagetop"><a href="https://news.ycombinator.com/user?id=icc97">icc97</a> (2859) | <a href="https://news.ycombinator.com">logout</a></span>
+      </div>
     </div>
-    <h1>Bullshit vs. <span class="accent">Epistemic.</span></h1>
-    <p class="sublead">
-      <strong>{total_cnt:,}</strong> Hacker News comments on {story_link_html}.
-    </p>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="{story_href}">{safe_title}</a>{sitebit_html}
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">{points} points</span> by <a href="https://news.ycombinator.com/user?id={safe_story_author}">{safe_story_author}</a> <span class="age" title="{safe_story_created_iso}"><a href="{hn_item_href}">{age_str}</a></span> | <a href="https://news.ycombinator.com/flag?id={story_id}">flag</a> | <a href="https://news.ycombinator.com/hide?id={story_id}">hide</a> | <a href="{safe_past_url}" class="hnpast">past</a> | <a href="https://news.ycombinator.com/fave?id={story_id}">favorite</a> | <a href="{hn_item_href}">{comment_count_str}</a>
+        </span>
+      </div>
+      {toptext_html_block}
+    </div>
   </header>
 {drawer_html}
 
   <details class="proof-drawer" id="labDrawer">
-    <summary>
-      <span>02 // EXPLORE</span>
-      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">observatory</span>
+        <span class="age">{age_str}</span>
+        <span class="com-pipe">|</span>
+        <span class="sec-headline">02 // EXPLORE &bull; epistemic tuner &amp; dual phase-plane / gravity plots</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
     </summary>
     <div class="proof-body grid-12">
       <div class="col-3">
