@@ -689,10 +689,10 @@ def build_html(
       :root {{ interpolate-size: allow-keywords; }}
     }}
     body {{
-      margin: 8px 0;
-      background: rgb(246, 246, 239);
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
       color: rgb(13, 13, 13);
-      font: 15px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
       -webkit-font-smoothing: antialiased;
     }}
     .wrap {{
@@ -706,7 +706,7 @@ def build_html(
     }}
     .topbar {{
       background: rgb(255, 102, 0);
-      padding: 2px 4px;
+      padding: 2px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -724,9 +724,9 @@ def build_html(
     }}
     .hn-logo {{
       display: inline-block;
-      width: 18px;
-      height: 18px;
-      line-height: 16px;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
       text-align: center;
       border: 1px solid rgb(255, 255, 255);
       color: rgb(255, 255, 255);
@@ -748,6 +748,7 @@ def build_html(
       color: rgb(0, 0, 0);
       font-size: 10pt;
       font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
       text-decoration: none;
     }}
     .pagetop a:hover, .topbar-right a:hover {{
@@ -834,7 +835,7 @@ def build_html(
       margin-bottom: 6px;
     }}
     h2 {{
-      font-size: 24px;
+      font-size: 16px;
       letter-spacing: -0.03em;
       line-height: 1.12;
       margin: 0 0 10px;
@@ -1058,7 +1059,6 @@ def build_html(
     .slider-lbl {{
       display: flex;
       justify-content: space-between;
-      font: 600 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
       margin-bottom: 3px;
     }}
     input[type="range"] {{
@@ -1073,31 +1073,25 @@ def build_html(
     }}
     button.tab-btn {{
       appearance: none;
-      border: 1px solid rgb(13, 13, 13);
-      background: rgb(255, 255, 253);
+      border-radius: 4px;
+      border-width: 1px;
       color: rgb(13, 13, 13);
-      padding: 7px 11px;
-      font: 600 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
       cursor: pointer;
-      box-shadow: 0 2px 0 rgb(13, 13, 13);
-    }}
-    button.tab-btn.active {{
-      background: rgb(13, 13, 13);
-      color: rgb(247, 247, 245);
-    }}
-    button.tab-btn:hover {{
-      border-color: rgb(255, 51, 0);
+      text-decoration: ;
+      text-transform: lowercase;
     }}
     .filter-bar {{
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
+      padding: 0 8px;
       margin-bottom: 12px;
       align-items: center;
     }}
     input.search-in, select.sel-in {{
-      padding: 8px 11px;
-      border: 1px solid rgb(13, 13, 13);
+      border-width: 1px;
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
       background: rgb(255, 255, 253);
       font: 600 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
       color: rgb(13, 13, 13);
@@ -1295,6 +1289,7 @@ def build_html(
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 8px;
+        padding: 0 8px;
       }}
       .filter-bar select.sel-in {{
         width: 100%;
@@ -1315,8 +1310,8 @@ def build_html(
   <header class="hn-header">
     <div class="topbar">
       <div class="topbar-left">
-        <a href="https://news.ycombinator.com" class="hn-logo">Y</a>
-        <b class="hnname"><a href="https://news.ycombinator.com">Hacker News</a></b>
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <b class="hnname"><a href="https://news.ycombinator.com">Epistemic News</a></b>
         <span class="pagetop">
           <a href="https://news.ycombinator.com/newest">new</a> |
           <a href="https://news.ycombinator.com/threads">threads</a> |
@@ -1467,7 +1462,7 @@ def build_html(
         </select>
         <input type="search" id="searchInput" class="search-in" placeholder="{safe_placeholder}">
       </div>
-      <div id="resultMeta" style="font:600 11px/1.4 ui-monospace,Menlo,monospace;color:rgb(90,90,88);margin-bottom:10px"></div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
       <div id="cardContainer" class="card-list"></div>
     </div>
   </section>
