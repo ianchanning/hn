@@ -1119,7 +1119,6 @@ def build_html(
     }}
     article.c-card {{
       background: rgb(246, 246, 239);
-      border: 1px solid rgb(216, 216, 206);
       border-left: 4px solid rgb(255, 102, 0);
       padding: 11px 15px 10px;
     }}
