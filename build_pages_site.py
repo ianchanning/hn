@@ -545,7 +545,7 @@ def render_index_html(
 
     utc_stamp = _format_utc_stamp(updated_utc or frontpage_synced_utc)
 
-    footer_bits = ["08:00 London &amp; 08:00 SF", f"{len(items)} published"]
+    footer_bits = ["Hourly updates", f"{len(items)} published"]
     footer_bits.append(
         '<a href="https://news.ycombinator.com/">news.ycombinator.com</a>'
     )
