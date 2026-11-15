@@ -343,6 +343,15 @@ def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -
       background: rgb(255, 255, 253);
       color: rgb(13, 13, 13);
     }}
+    @media (max-width: 750px) {{
+      body {{ margin: 0; }}
+      .hnmain {{ width: 100%; }}
+      .topbar {{ padding: 4px 6px; flex-wrap: wrap; }}
+      .topbar-right {{ font-size: 8pt; padding-right: 2px; }}
+      td.title {{ font-size: 11pt; line-height: 15pt; }}
+      td.subtext {{ font-size: 8.5pt; line-height: 13pt; }}
+      tr.spacer td {{ height: 7px; }}
+    }}
   </style>
 </head>
 <body>
