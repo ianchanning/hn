@@ -298,12 +298,11 @@ def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -
   </style>
 </head>
 <body>
-  <p>Resolving <code>/item?id=...</code> from static observatory archive.</p>-->
 <!--<div class="shell" id="routerStatus">
   <div class="eyebrow">NYX OBSERVATORY // HN URI MIRROR</div>
   <h1 id="statusTitle">Loading Hacker News Observatory...</h1>
-  <p id="statusBody">Resolving <code>/item?id=...</code> from static observatory archive.</p>-->
-</div>
+  <p id="statusBody">Resolving <code>/item?id=...</code> from static observatory archive.</p>
+</div>-->
 <script id="routerConfig" type="application/json">{cfg_json}</script>
 <script>
 (async () => {{
