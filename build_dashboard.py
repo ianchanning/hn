@@ -1063,8 +1063,33 @@ def build_html(
       border-width: 1px;
       color: rgb(13, 13, 13);
       cursor: pointer;
-      text-decoration: ;
       text-transform: lowercase;
+    }}
+    .mode-tabs {{
+      display: flex;
+      gap: 6px;
+      padding: 0 8px;
+      margin-bottom: 8px;
+    }}
+    button.mode-tab {{
+      appearance: none;
+      border: 1px solid rgb(180, 180, 175);
+      border-radius: 4px;
+      background: rgb(255, 255, 253);
+      color: rgb(70, 70, 68);
+      cursor: pointer;
+      font: 600 12px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      padding: 6px 14px;
+      transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+    }}
+    button.mode-tab:hover {{
+      background: rgb(240, 240, 235);
+      color: rgb(13, 13, 13);
+    }}
+    button.mode-tab.active {{
+      background: rgb(255, 102, 0);
+      border-color: rgb(255, 102, 0);
+      color: rgb(255, 255, 255);
     }}
     .filter-bar {{
       display: flex;
@@ -1271,17 +1296,25 @@ def build_html(
       details.graph-drawer:not([open]) > summary .mob-graph-pill::before {{ content: "[+]"; }}
       .kpi-strip {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
       .kpi-cell {{ border-bottom: 1px solid rgb(205, 205, 200); }}
+      .mode-tabs {{
+        display: flex;
+        gap: 6px;
+        padding: 0 8px;
+        margin-bottom: 8px;
+      }}
+      .mode-tabs button.mode-tab {{
+        flex: 1;
+        text-align: center;
+        padding: 7px 8px;
+      }}
       .filter-bar {{
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        display: flex;
+        flex-direction: column;
         gap: 8px;
         padding: 0 8px;
       }}
-      .filter-bar select.sel-in {{
-        width: 100%;
-      }}
+      .filter-bar select.sel-in,
       .filter-bar input.search-in {{
-        grid-column: span 2;
         width: 100%;
         min-width: 0;
       }}
@@ -1425,15 +1458,11 @@ def build_html(
 
   <section class="band grid-12" id="explorerSection" style="padding-top:16px">
     <div class="col-12">
+      <div class="mode-tabs" id="modeTabs" role="tablist" aria-label="Ranking view">
+        <button type="button" class="mode-tab active" data-mode="hn_top40" role="tab" aria-selected="true">HN Top 40</button>
+        <button type="button" class="mode-tab" data-mode="top_signal" role="tab" aria-selected="false">Epistemic Top 50</button>
+      </div>
       <div class="filter-bar">
-        <select id="modeSelect" class="sel-in" aria-label="Ranking view">
-          <option value="hn_top40">HN Top 40</option>
-          <option value="top_signal">Epistemic Top 50</option>
-          <option value="buried_gems">Buried Gems (HN POS &gt; {buried_cutoff})</option>
-          <option value="bullshit_traps">High-Karma / URL Traps Caught</option>
-          <option value="mod_morgue">Mod Rebukes &amp; Downvoted Morgue</option>
-          <option value="c5a_rescues">c5A Heterodox Rescues</option>
-        </select>
         <select id="facetSelect" class="sel-in" aria-label="Topic facet">
           {facet_select_html}
         </select>
@@ -1888,14 +1917,23 @@ def build_html(
     }}
   }}
 
-  const modeSelect = document.getElementById("modeSelect");
-  modeSelect.addEventListener("change", () => {{
-    activeMode = modeSelect.value;
-    selectedId = null;
-    document.getElementById("searchInput").value = "";
-    drawPhaseCanvas();
-    drawGravityCanvas();
-    renderCards();
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {{
+    tab.addEventListener("click", () => {{
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {{
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      }});
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    }});
   }});
   document.getElementById("searchInput").addEventListener("input", renderCards);
   document.getElementById("facetSelect").addEventListener("change", renderCards);

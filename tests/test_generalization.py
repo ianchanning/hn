@@ -281,7 +281,7 @@ class TestGeneralizationPipeline(unittest.TestCase):
             self.assertIn("Fielding's", html_text)
             self.assertNotIn("&No. x27;", html_text)
             self.assertNotIn("&#x27;", html_text)
-            self.assertIn('id="modeSelect"', html_text)
+            self.assertIn('id="modeTabs"', html_text)
             self.assertNotIn('id="presetBar"', html_text)
             self.assertIn('<details class="proof-drawer" id="proofDrawer">', html_text)
             self.assertIn('<details class="proof-drawer" id="labDrawer">', html_text)
