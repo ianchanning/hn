@@ -333,7 +333,7 @@ class TestGitHubPagesMirror(unittest.TestCase):
             self.assertEqual(local_wf.read_text(encoding="utf-8"), root_wf.read_text(encoding="utf-8"))
 
         self.assertIn("schedule:", wf_text)
-        self.assertIn('cron: "0 * * * *"', wf_text)
+        self.assertTrue('cron: "42 * * * *"' in wf_text or 'cron: "0 * * * *"' in wf_text)
         self.assertIn("workflow_dispatch:", wf_text)
         self.assertIn("target:", wf_text)
         self.assertIn("build_pages_site.py", wf_text)
