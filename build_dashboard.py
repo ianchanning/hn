@@ -1458,7 +1458,7 @@ def build_html(
     <div class="col-12">
       <div class="mode-tabs" id="modeTabs" role="tablist" aria-label="Ranking view">
         <button type="button" class="mode-tab active" data-mode="hn_top40" role="tab" aria-selected="true">HN Top 40</button>
-        <button type="button" class="mode-tab" data-mode="top_signal" role="tab" aria-selected="false">Epistemic Top 50</button>
+        <button type="button" class="mode-tab" data-mode="top_signal" role="tab" aria-selected="false">Epistemic Top 40</button>
       </div>
       <div class="filter-bar">
         <select id="facetSelect" class="sel-in" aria-label="Topic facet">
@@ -1826,7 +1826,7 @@ def build_html(
       );
     }} else {{
       if (activeMode === "top_signal") {{
-        pool = pool.slice(0, 60);
+        pool = pool.slice(0, 40);
       }} else if (activeMode === "buried_gems") {{
         pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
       }} else if (activeMode === "hn_top40") {{
