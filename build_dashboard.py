@@ -1073,12 +1073,11 @@ def build_html(
     }}
     button.mode-tab {{
       appearance: none;
-      border: 1px solid rgb(180, 180, 175);
+      border-width: 0px;
       border-radius: 4px;
-      background: rgb(255, 255, 253);
-      color: rgb(70, 70, 68);
+      background: rgb(246, 246, 239);
+      color: rgb(130, 130, 130);
       cursor: pointer;
-      font: 600 12px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
       padding: 6px 14px;
       transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
     }}
@@ -1087,9 +1086,8 @@ def build_html(
       color: rgb(13, 13, 13);
     }}
     button.mode-tab.active {{
-      background: rgb(255, 102, 0);
-      border-color: rgb(255, 102, 0);
-      color: rgb(255, 255, 255);
+      background: rgb(246, 246, 239);
+      color: rgb(13, 13, 13);
     }}
     .filter-bar {{
       display: flex;
