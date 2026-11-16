@@ -1066,7 +1066,6 @@ def build_html(
       text-transform: lowercase;
     }}
     .mode-tabs {{
-      display: flex;
       gap: 6px;
       padding: 0 8px;
       margin-bottom: 8px;
@@ -1294,12 +1293,6 @@ def build_html(
       details.graph-drawer:not([open]) > summary .mob-graph-pill::before {{ content: "[+]"; }}
       .kpi-strip {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
       .kpi-cell {{ border-bottom: 1px solid rgb(205, 205, 200); }}
-      .mode-tabs {{
-        display: flex;
-        gap: 6px;
-        padding: 0 8px;
-        margin-bottom: 8px;
-      }}
       .mode-tabs button.mode-tab {{
         flex: 1;
         text-align: center;
@@ -1840,9 +1833,9 @@ def build_html(
           (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
           (c.lu > 0 && c.urls.length > 0) ||
           (c.dom <= topCeil && c.liveRank > demoteFloor)
-        ).slice(0, 50);
+        ).slice(0, 40);
       }} else if (activeMode === "mod_morgue") {{
-        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 50);
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
       }}
     }}
 
@@ -1851,10 +1844,10 @@ def build_html(
     }}
 
     const prevScrollY = window.scrollY;
-    const shown = pool.slice(0, 50);
+    const shown = pool.slice(0, 40);
     const metaEl = document.getElementById("resultMeta");
     metaEl.innerHTML =
-      `Showing ${{shown.length}} of ${{pool.length}} matching comments (mode: ${{activeMode}})` +
+      `${{shown.length}} of ${{pool.length}} comments` +
       (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
     const clrBtn = document.getElementById("clearFilterBtn");
     if (clrBtn) {{
