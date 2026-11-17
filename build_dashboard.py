@@ -834,23 +834,16 @@ def build_html(
     .kpi-strip {{
       display: grid;
       grid-template-columns: repeat(6, minmax(0, 1fr));
-      border: 1px solid rgb(13, 13, 13);
-      background: rgb(255, 255, 253);
     }}
     .kpi-cell {{
       padding: 16px 16px 14px;
-      border-right: 1px solid rgb(205, 205, 200);
     }}
-    .kpi-cell:last-child {{ border-right: 0; }}
     .kpi-label {{
-      font: 600 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: rgb(90, 90, 88);
     }}
     .kpi-val {{
-      font-size: 34px;
-      font-weight: 800;
       letter-spacing: -0.04em;
       line-height: 1.05;
       margin: 8px 0 4px;
@@ -858,7 +851,6 @@ def build_html(
     .kpi-val.hi {{ color: rgb(255, 51, 0); }}
     .kpi-val.ok {{ color: rgb(0, 138, 75); }}
     .kpi-sub {{
-      font-size: 12px;
       color: rgb(90, 90, 88);
     }}
 
@@ -1001,9 +993,6 @@ def build_html(
     table.ablation {{
       width: 100%;
       border-collapse: collapse;
-      font-size: 13px;
-      background: rgb(255, 255, 253);
-      border: 1px solid rgb(13, 13, 13);
     }}
     table.ablation th, table.ablation td {{
       padding: 9px 11px;
@@ -1013,15 +1002,11 @@ def build_html(
     }}
     table.ablation th:first-child, table.ablation td:first-child {{
       text-align: left;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 12px;
     }}
     table.ablation th {{
-      background: rgb(236, 236, 231);
-      font: 700 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: rgb(60, 60, 58);
+      font-weight: normal;
     }}
     table.ablation tr.winner {{
       background: rgba(0, 230, 118, 0.11);
@@ -1292,7 +1277,6 @@ def build_html(
       details.graph-drawer[open] > summary .mob-graph-pill::before {{ content: "[-]"; }}
       details.graph-drawer:not([open]) > summary .mob-graph-pill::before {{ content: "[+]"; }}
       .kpi-strip {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
-      .kpi-cell {{ border-bottom: 1px solid rgb(205, 205, 200); }}
       .mode-tabs button.mode-tab {{
         flex: 1;
         text-align: center;
