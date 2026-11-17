@@ -822,6 +822,7 @@ def build_html(
     }}
     .sec-tag {{
       text-transform: uppercase;
+      letter-spacing: 0.1em;
       color: rgb(255, 51, 0);
       margin-bottom: 6px;
     }}
@@ -836,7 +837,7 @@ def build_html(
       grid-template-columns: repeat(6, minmax(0, 1fr));
     }}
     .kpi-cell {{
-      padding: 16px 16px 14px;
+      padding: 8px 0;
     }}
     .kpi-label {{
       letter-spacing: 0.1em;
@@ -881,7 +882,7 @@ def build_html(
       font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
       color: rgb(35, 35, 35);
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
     }}
     .oled-head > span:first-child {{
       min-width: 0;
@@ -1004,7 +1005,7 @@ def build_html(
     }}
     table.ablation th {{
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
       font-weight: normal;
     }}
     table.ablation tr.winner {{
