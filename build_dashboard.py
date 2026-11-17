@@ -653,7 +653,7 @@ def build_html(
             </thead>
             <tbody id="sourceCatBody"></tbody>
           </table>
-          <div id="anchorListBox" style="margin-top:10px;font:600 11px/1.5 ui-monospace,Menlo,monospace;color:rgb(70,70,68)"></div>
+          <div id="anchorListBox" style="color: rgb(90, 90, 88); margin-top: 16px;"></div>
         </div>
       </div>
     </div>
@@ -853,10 +853,7 @@ def build_html(
     .kpi-sub {{
       color: rgb(90, 90, 88);
     }}
-    #anchorListBox {{
-      color: rgb(90, 90, 88);
-      margin-top: 16px;
-    }}
+
     /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
     .oled-bay {{
       color: rgb(35, 35, 35);
