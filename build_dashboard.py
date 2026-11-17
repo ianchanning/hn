@@ -846,14 +846,17 @@ def build_html(
     .kpi-val {{
       letter-spacing: -0.04em;
       line-height: 1.05;
-      margin: 8px 0 4px;
+      margin: 4px 0;
     }}
     .kpi-val.hi {{ color: rgb(255, 51, 0); }}
     .kpi-val.ok {{ color: rgb(0, 138, 75); }}
     .kpi-sub {{
       color: rgb(90, 90, 88);
     }}
-
+    #anchorListBox {{
+      color: rgb(90, 90, 88);
+      margin-top: 16px;
+    }}
     /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
     .oled-bay {{
       color: rgb(35, 35, 35);
@@ -1204,14 +1207,10 @@ def build_html(
       text-underline-offset: 3px;
     }}
     footer.sheet-foot {{
-      border-top: 3px solid rgb(13, 13, 13);
-      padding-top: 14px;
-      margin-top: 36px;
-      font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+      padding: 14px;
       color: rgb(90, 90, 88);
       display: flex;
       justify-content: space-between;
-      flex-wrap: wrap;
       gap: 10px;
     }}
 
