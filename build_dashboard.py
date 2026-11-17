@@ -589,7 +589,7 @@ def build_html(
   <details class="proof-drawer" id="proofDrawer">
     <summary class="hn-summary">
       <span class="hn-comhead">
-        <span class="hn-user">01 // EVIDENCE</span>
+        <span class="hn-user">Evidence</span>
         <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
       </span>
     </summary>
@@ -864,8 +864,7 @@ def build_html(
       border: 1px solid rgb(35, 38, 42);
       padding: 16px;
       position: relative;
-      border-radius: 6px;
-      corner-shape: bevel;
+      border-radius: 4px;
       display: flex;
       flex-direction: column;
       flex: 1;
@@ -1023,8 +1022,7 @@ def build_html(
     .control-panel {{
       background: rgb(239, 239, 234);
       border: 1px solid rgb(13, 13, 13);
-      border-radius: 6px;
-      corner-shape: bevel;
+      border-radius: 4px;
       padding: 16px;
     }}
     .slider-row {{
@@ -1331,7 +1329,7 @@ def build_html(
   <details class="proof-drawer" id="labDrawer">
     <summary class="hn-summary">
       <span class="hn-comhead">
-        <span class="hn-user">02 // EXPLORE</span>
+        <span class="hn-user">Explore</span>
         <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
       </span>
     </summary>
