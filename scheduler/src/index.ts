@@ -28,7 +28,7 @@ export default {
    * Cloudflare fires this automatically per the `[triggers] crons` configuration.
    */
   async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
-    const cronExpr = event.cron || "42 * * * *";
+    const cronExpr = event.cron || "15,45 * * * *";
     console.log(`[cron] Scheduled trigger fired at ${new Date(event.scheduledTime).toISOString()} (cron: ${cronExpr})`);
     
     ctx.waitUntil(
@@ -64,7 +64,7 @@ export default {
         target_repo: repo,
         workflow_file: workflow,
         workflow_ref: ref,
-        schedule: "42 * * * * (hourly at :42 UTC)",
+        schedule: "15,45 * * * * (at :15 and :45 UTC every hour)",
         help: hasToken
           ? "To manually trigger: POST or GET /trigger"
           : "Missing GITHUB_TOKEN. Run: wrangler secret put GITHUB_TOKEN",

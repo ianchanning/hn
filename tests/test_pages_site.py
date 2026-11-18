@@ -332,8 +332,8 @@ class TestGitHubPagesMirror(unittest.TestCase):
         if local_wf.is_file() and root_wf.is_file():
             self.assertEqual(local_wf.read_text(encoding="utf-8"), root_wf.read_text(encoding="utf-8"))
 
-        self.assertIn("schedule:", wf_text)
-        self.assertTrue('cron: "42 * * * *"' in wf_text or 'cron: "0 * * * *"' in wf_text)
+        # Workflow schedule is handled by Cloudflare Worker scheduler, not GitHub Actions cron
+        self.assertNotIn("schedule:", wf_text)
         self.assertIn("workflow_dispatch:", wf_text)
         self.assertIn("target:", wf_text)
         self.assertIn("build_pages_site.py", wf_text)

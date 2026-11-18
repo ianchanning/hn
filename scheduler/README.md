@@ -11,7 +11,7 @@ Cloudflare Cron Triggers execute deterministically within milliseconds of the sc
 
 ## Architecture
 
-- **Trigger:** Cloudflare Cron Trigger at minute 42 every hour (`42 * * * *`).
+- **Trigger:** Cloudflare Cron Trigger at minute 15 and 45 every hour (`15,45 * * * *`).
 - **Action:** `POST https://api.github.com/repos/ianchanning/hn/actions/workflows/hn-observatory-pages.yml/dispatches`
 - **Inputs:** `target=frontpage`, `frontpage_limit=30`, `refresh=true`
 - **Manual Trigger:** `GET /trigger` or `POST /trigger` allows instant verification or ad-hoc runs.
