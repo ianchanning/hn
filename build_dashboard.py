@@ -520,7 +520,7 @@ def build_html(
         )
         drawer_html = f"""
   <details class="proof-drawer" id="proofDrawer">
-    <summary class="hn-summary">
+    <summary class="hn-summary" style="display:none">
       <span class="hn-comhead">
         <span class="hn-user">observatory</span>
         <span class="age">{age_str}</span>
@@ -587,7 +587,7 @@ def build_html(
       </div>"""
         drawer_html = f"""
   <details class="proof-drawer" id="proofDrawer">
-    <summary class="hn-summary">
+    <summary class="hn-summary" style="display:none">
       <span class="hn-comhead">
         <span class="hn-user">Evidence</span>
         <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
@@ -947,18 +947,10 @@ def build_html(
       padding-bottom: 16px;
       margin-bottom: 14px;
     }}
-    details.proof-drawer > summary.hn-summary {{
-      list-style: none;
-      cursor: pointer;
-      display: block;
-      padding: 2px 0;
-      margin: 0;
-      background: transparent;
-      border: 0;
-      font: 8pt/1.35 Verdana, Geneva, sans-serif;
-      color: rgb(130, 130, 130);
-      user-select: none;
+    details.proof-drawer:not([open]) {{
+      display: none;
     }}
+    details.proof-drawer > summary.hn-summary,
     details.proof-drawer > summary {{
       display: none;
     }}
@@ -1334,7 +1326,7 @@ def build_html(
 {drawer_html}
 
   <details class="proof-drawer" id="labDrawer">
-    <summary class="hn-summary">
+    <summary class="hn-summary" style="display:none">
       <span class="hn-comhead">
         <span class="hn-user">Explore</span>
         <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
