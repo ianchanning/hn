@@ -957,6 +957,9 @@ def build_html(
       color: rgb(130, 130, 130);
       user-select: none;
     }}
+    details.proof-drawer > summary {{
+      display: none;
+    }}
     details.proof-drawer > summary.hn-summary::-webkit-details-marker {{ display: none; }}
     details.proof-drawer > summary.hn-summary:hover {{
       color: rgb(34, 34, 34);
@@ -1049,28 +1052,35 @@ def build_html(
       cursor: pointer;
       text-transform: lowercase;
     }}
-    .mode-tabs {{
-      gap: 6px;
-      padding: 0 8px;
-      margin-bottom: 8px;
-    }}
-    button.mode-tab {{
+    button.nav-btn,
+    button.mode-tab,
+    button.topbar-toggle {{
       appearance: none;
-      border-width: 0px;
-      border-radius: 4px;
-      background: rgb(246, 246, 239);
-      color: rgb(130, 130, 130);
+      -webkit-appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: rgb(0, 0, 0);
       cursor: pointer;
-      padding: 6px 14px;
-      transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+      text-decoration: none;
+      line-height: inherit;
+      vertical-align: baseline;
+      transition: color 0.12s ease;
     }}
-    button.mode-tab:hover {{
-      background: rgb(240, 240, 235);
-      color: rgb(13, 13, 13);
+    button.nav-btn:hover,
+    button.nav-btn.active,
+    button.mode-tab:hover,
+    button.mode-tab.active,
+    button.topbar-toggle:hover,
+    button.topbar-toggle.active {{
+      color: rgb(255, 255, 255);
+      text-decoration: none;
     }}
-    button.mode-tab.active {{
-      background: rgb(246, 246, 239);
-      color: rgb(13, 13, 13);
+    button.topbar-toggle .toggle-pill {{
+      font: inherit;
+      color: inherit;
     }}
     .filter-bar {{
       display: flex;
@@ -1272,11 +1282,6 @@ def build_html(
       details.graph-drawer[open] > summary .mob-graph-pill::before {{ content: "[-]"; }}
       details.graph-drawer:not([open]) > summary .mob-graph-pill::before {{ content: "[+]"; }}
       .kpi-strip {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
-      .mode-tabs button.mode-tab {{
-        flex: 1;
-        text-align: center;
-        padding: 7px 8px;
-      }}
       .filter-bar {{
         display: flex;
         flex-direction: column;
@@ -1292,7 +1297,7 @@ def build_html(
     @media (max-width: 750px) {{
       body {{ margin: 0; }}
       .wrap {{ width: 100%; }}
-      .topbar {{ padding: 4px 6px; flex-wrap: wrap; }}
+      .topbar {{ padding: 4px 6px; flex-wrap: wrap; row-gap: 4px; }}
       .topbar-right {{ font-size: 8pt; padding-right: 2px; }}
       td.title {{ font-size: 11pt; line-height: 15pt; }}
       td.subtext {{ font-size: 8.5pt; line-height: 13pt; }}
@@ -1307,8 +1312,13 @@ def build_html(
       <div class="topbar-left">
         <a href="https://news.ycombinator.com" class="hn-logo">E</a>
         <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+        <span class="pagetop" id="modeTabs">
+          <button type="button" class="nav-btn mode-tab active" data-mode="top_signal" role="tab" aria-selected="true">Top 40</button> | <button type="button" class="nav-btn mode-tab" data-mode="hn_top40" role="tab" aria-selected="false">HN Top 40</button>
+        </span>
       </div>
-      <div class="topbar-right">&nbsp;</div>
+      <div class="topbar-right">
+        <button type="button" class="nav-btn topbar-toggle" id="exploreToggleBtn" aria-expanded="false">Explore <span class="toggle-pill" id="explorePill">[+]</span></button> | <button type="button" class="nav-btn topbar-toggle" id="evidenceToggleBtn" aria-expanded="false">Evidence <span class="toggle-pill" id="evidencePill">[+]</span></button>
+      </div>
     </div>
     <div class="fatitem-box">
       <div class="story-titleline">
@@ -1428,10 +1438,6 @@ def build_html(
 
   <section class="band grid-12" id="explorerSection" style="padding-top:16px">
     <div class="col-12">
-      <div class="mode-tabs" id="modeTabs" role="tablist" aria-label="Ranking view">
-        <button type="button" class="mode-tab active" data-mode="hn_top40" role="tab" aria-selected="true">HN Top 40</button>
-        <button type="button" class="mode-tab" data-mode="top_signal" role="tab" aria-selected="false">Epistemic Top 40</button>
-      </div>
       <div class="filter-bar">
         <select id="facetSelect" class="sel-in" aria-label="Topic facet">
           {facet_select_html}
@@ -1464,7 +1470,7 @@ def build_html(
     bp: DEFAULT_W.bullshit_penalty,
     dp: DEFAULT_W.downvote_penalty
   }};
-  let activeMode = "hn_top40";
+  let activeMode = "top_signal";
   let selectedId = null;
 
   function escHtml(s) {{
@@ -1909,6 +1915,36 @@ def build_html(
   document.getElementById("facetSelect").addEventListener("change", renderCards);
 
   const labDrawer = document.getElementById("labDrawer");
+  const proofDrawer = document.getElementById("proofDrawer");
+  const expBtn = document.getElementById("exploreToggleBtn");
+  const expPill = document.getElementById("explorePill");
+  const eviBtn = document.getElementById("evidenceToggleBtn");
+  const eviPill = document.getElementById("evidencePill");
+
+  if (expBtn && labDrawer) {{
+    expBtn.addEventListener("click", () => {{
+      labDrawer.open = !labDrawer.open;
+    }});
+    labDrawer.addEventListener("toggle", () => {{
+      const isOpen = labDrawer.open;
+      if (expPill) expPill.textContent = isOpen ? "[-]" : "[+]";
+      expBtn.classList.toggle("active", isOpen);
+      expBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    }});
+  }}
+
+  if (eviBtn && proofDrawer) {{
+    eviBtn.addEventListener("click", () => {{
+      proofDrawer.open = !proofDrawer.open;
+    }});
+    proofDrawer.addEventListener("toggle", () => {{
+      const isOpen = proofDrawer.open;
+      if (eviPill) eviPill.textContent = isOpen ? "[-]" : "[+]";
+      eviBtn.classList.toggle("active", isOpen);
+      eviBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    }});
+  }}
+
   const tunerDrawer = document.getElementById("tunerDrawer");
   const phaseDrawer = document.getElementById("phaseDrawer");
   const gravityDrawer = document.getElementById("gravityDrawer");
