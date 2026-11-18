@@ -1081,13 +1081,6 @@ def build_html(
       color: rgb(255, 255, 255);
       text-decoration: none;
     }}
-    button.topbar-toggle .toggle-pill {{
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      display: inline-block;
-      width: 3ch;
-      text-align: center;
-      color: inherit;
-    }}
     .filter-bar {{
       display: flex;
       flex-wrap: wrap;
@@ -1323,7 +1316,7 @@ def build_html(
         </span>
       </div>
       <div class="topbar-right">
-        <button type="button" class="nav-btn topbar-toggle" id="exploreToggleBtn" aria-expanded="false">Explore <span class="toggle-pill" id="explorePill">[+]</span></button> | <button type="button" class="nav-btn topbar-toggle" id="evidenceToggleBtn" aria-expanded="false">Evidence <span class="toggle-pill" id="evidencePill">[+]</span></button>
+        <button type="button" class="nav-btn topbar-toggle" id="exploreToggleBtn" aria-expanded="false">explore</button> | <button type="button" class="nav-btn topbar-toggle" id="evidenceToggleBtn" aria-expanded="false">evidence</button>
       </div>
     </div>
     <div class="fatitem-box">
@@ -1923,9 +1916,7 @@ def build_html(
   const labDrawer = document.getElementById("labDrawer");
   const proofDrawer = document.getElementById("proofDrawer");
   const expBtn = document.getElementById("exploreToggleBtn");
-  const expPill = document.getElementById("explorePill");
   const eviBtn = document.getElementById("evidenceToggleBtn");
-  const eviPill = document.getElementById("evidencePill");
 
   if (expBtn && labDrawer) {{
     expBtn.addEventListener("click", () => {{
@@ -1933,7 +1924,6 @@ def build_html(
     }});
     labDrawer.addEventListener("toggle", () => {{
       const isOpen = labDrawer.open;
-      if (expPill) expPill.textContent = isOpen ? "[-]" : "[+]";
       expBtn.classList.toggle("active", isOpen);
       expBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
     }});
@@ -1945,7 +1935,6 @@ def build_html(
     }});
     proofDrawer.addEventListener("toggle", () => {{
       const isOpen = proofDrawer.open;
-      if (eviPill) eviPill.textContent = isOpen ? "[-]" : "[+]";
       eviBtn.classList.toggle("active", isOpen);
       eviBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
     }});
