@@ -743,6 +743,7 @@ def build_html(
       font-family: Verdana, Geneva, sans-serif;
       line-height: 12px;
       text-decoration: none;
+      text-transform: lowercase;
     }}
     .pagetop a:hover, .topbar-right a:hover {{
       text-decoration: underline;
@@ -753,6 +754,7 @@ def build_html(
       font-size: 10pt;
       font-family: Verdana, Geneva, sans-serif;
       color: rgb(0, 0, 0);
+      text-transform: lowercase;
     }}
     .fatitem-box {{
       padding: 10px 8px 8px 8px;
@@ -1068,6 +1070,7 @@ def build_html(
       line-height: inherit;
       vertical-align: baseline;
       transition: color 0.12s ease;
+      text-transform: lowercase;
     }}
     button.nav-btn:hover,
     button.nav-btn.active,
@@ -1079,7 +1082,10 @@ def build_html(
       text-decoration: none;
     }}
     button.topbar-toggle .toggle-pill {{
-      font: inherit;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      display: inline-block;
+      width: 3ch;
+      text-align: center;
       color: inherit;
     }}
     .filter-bar {{
