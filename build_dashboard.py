@@ -1289,7 +1289,7 @@ def build_html(
       body {{ margin: 0; }}
       .wrap {{ width: 100%; }}
       .topbar {{ padding: 4px 6px; flex-wrap: wrap; row-gap: 4px; }}
-      .topbar-right {{ font-size: 8pt; padding-right: 2px; }}
+      .topbar-right {{ padding-right: 2px; }}
       td.title {{ font-size: 11pt; line-height: 15pt; }}
       td.subtext {{ font-size: 8.5pt; line-height: 13pt; }}
       tr.spacer td {{ height: 7px; }}
