@@ -235,7 +235,7 @@ def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HN Epistemic Observatory // Item Router</title>
+  <title>Item Router // Better Signal News</title>
   <style>
     * {{ box-sizing: border-box; }}
     body {{
@@ -360,14 +360,14 @@ def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -
 <div class="hnmain">
   <div class="topbar">
     <div class="topbar-left">
-      <a class="hn-logo" href="./">E</a>
-      <a class="hnname" href="./">Epistemic News</a>
+      <a class="hn-logo" href="./">BS</a>
+      <a class="hnname" href="./">Better Signal News</a>
     </div>
   </div>
 </div>
 <!--<div class="shell" id="routerStatus">
   <div class="eyebrow">NYX OBSERVATORY // HN URI MIRROR</div>
-  <h1 id="statusTitle">Loading Hacker News Observatory...</h1>
+  <h1 id="statusTitle">Loading Better Signal News...</h1>
   <p id="statusBody">Resolving <code>/item?id=...</code> from static observatory archive.</p>
 </div>-->
 <script id="routerConfig" type="application/json">{cfg_json}</script>
@@ -556,7 +556,7 @@ def render_index_html(
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Hacker News // Bullshit vs. Epistemic.</title>
+  <title>Better Signal News</title>
   <style>
     * {{ box-sizing: border-box; }}
     body {{
@@ -761,7 +761,7 @@ def render_index_html(
   <div class="topbar">
     <div class="topbar-left">
       <a class="hn-logo" href="./">E</a>
-      <a class="hnname" href="./">Epistemic News</a>
+      <a class="hnname" href="./">Better Signal News</a>
     </div>
     <div class="topbar-right">Updated {utc_stamp}</div>
   </div>
