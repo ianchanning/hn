@@ -760,7 +760,7 @@ def render_index_html(
 <div class="hnmain">
   <div class="topbar">
     <div class="topbar-left">
-      <a class="hn-logo" href="./">E</a>
+      <a class="hn-logo" href="./">BS</a>
       <a class="hnname" href="./">Better Signal News</a>
     </div>
     <div class="topbar-right">Updated {utc_stamp}</div>
