@@ -75,10 +75,6 @@ viewHeader model payload =
         modes =
             [ ( TopSignal, "Top 40" )
             , ( HnTop40, "HN Top 40" )
-            , ( BuriedGems, "Buried Gems" )
-            , ( C5aRescues, "c5A Rescues" )
-            , ( BullshitTraps, "Bullshit Traps" )
-            , ( ModMorgue, "Mod Morgue" )
             ]
 
         renderTab ( mode, label ) isLast =
