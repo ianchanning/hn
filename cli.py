@@ -13,6 +13,7 @@ if str(HN_COMMENTS_DIR) not in sys.path:
     sys.path.insert(0, str(HN_COMMENTS_DIR))
 
 from cli import main, run_cli  # noqa: E402
+from ingest import parse_hn_item_id  # noqa: E402
 
 if __name__ == "__main__":
     run_cli()

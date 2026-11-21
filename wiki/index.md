@@ -12,4 +12,4 @@ Persistent knowledge base for the Elm rewrite of the HN Epistemic Observatory di
 - [[Payload-Hydration]] - Python emits JSON in `<script>` tag; Elm reads via `Browser.element` flags + `Json.Decode.Value`.
 - [[Elm-Tuples-Max-Three]] - Elm only supports 2- and 3-tuples; use records for 4+ items.
 - [[Elm-Details-Summary-And-CSS-Parity]] - Hidden summary requirement on details drawers, button hover rules, and automated parity differ.
-- [[Monorepo-Architecture]] - Elm UI, Python pipeline, and scheduler unified via npm workspaces.
+- [[Monorepo-Architecture]] - Elm UI, Python pipeline, and scheduler unified under a monorepo root.

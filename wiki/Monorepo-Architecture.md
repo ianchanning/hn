@@ -24,6 +24,6 @@ Clear separation into distinct monorepo workspaces and canonical packages:
 - `scheduler/` — Cloudflare Worker cron scheduler
 - `judge/` — Canonical External Judge v1.1.0 suite and fixtures
 - `archive/` — Quarantined pre-Elm legacy templates and HTML outputs
-- Root `package.json` — npm workspaces orchestrating all targets (`npm test`, `npm run build`)
+- Root `package.json` — npm orchestrator scripts (`npm test`, `npm run build`, `npm run validate`)
 - Root `pyproject.toml` — Modern PEP 621 Python toolchain with zero-dependency runtime
 - Root `cli.py` — Transparent forwarder to `hn-comments/cli.py` for root command ergonomics

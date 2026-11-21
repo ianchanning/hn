@@ -98,7 +98,7 @@ jobs:
           python3 - <<'PY'
           import os, pathlib, subprocess, sys
 
-          app_dir = pathlib.Path(".") if pathlib.Path("cli.py").is_file() else pathlib.Path("hn-comments")
+          app_dir = pathlib.Path("hn-comments") if (pathlib.Path("hn-comments") / "cli.py").is_file() else pathlib.Path(".")
           sys.path.insert(0, str(app_dir))
           from ingest import parse_hn_item_id
 
@@ -163,9 +163,9 @@ jobs:
           FP_MANIFEST: ${{ steps.build_item.outputs.frontpage_manifest }}
         run: |
           set -euo pipefail
-          APP_DIR="."
-          if [ ! -f "build_pages_site.py" ]; then
-            APP_DIR="hn-comments"
+          APP_DIR="hn-comments"
+          if [ ! -d "hn-comments" ]; then
+            APP_DIR="."
           fi
           EXTRA_ARGS=()
           if [ -n "${STORY_ID:-}" ]; then
