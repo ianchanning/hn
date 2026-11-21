@@ -37,6 +37,12 @@ const payload = JSON.parse(rawPayloadJson);
 writeFileSync(join(staticDir, "fixture.json"), rawPayloadJson, "utf-8");
 console.log(`✓ Wrote elm/static/fixture.json (${(Buffer.byteLength(rawPayloadJson) / 1024).toFixed(1)} KB)`);
 
+// Copy canvas-iife.js into static/ so static file server serves it directly
+const canvasIifePath = join(elmDir, "js", "canvas-iife.js");
+const canvasIifeContent = readFileSync(canvasIifePath, "utf-8");
+writeFileSync(join(staticDir, "canvas-iife.js"), canvasIifeContent, "utf-8");
+console.log("✓ Copied elm/js/canvas-iife.js -> elm/static/canvas-iife.js");
+
 // Common dev header navigation
 const devNav = `
   <div style="background: rgb(246, 246, 239); border-bottom: 1px solid rgb(255, 102, 0); padding: 6px 12px; font-family: monospace; font-size: 12px; display: flex; gap: 14px; align-items: center; z-index: 9999; position: relative;">
@@ -87,7 +93,7 @@ ${rawPayloadJson}
   </script>
 
   <script src="elm.js"></script>
-  <script src="../js/canvas-iife.js"></script>
+  <script src="canvas-iife.js"></script>
 ${devBootScript}
 </body>
 </html>
