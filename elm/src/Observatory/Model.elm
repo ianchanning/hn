@@ -1,4 +1,4 @@
-module Observatory.Model exposing (Flags, Model, init, recomputeLiveList)
+module Observatory.Model exposing (Flags, Model, init, initFromPayload, recomputeLiveList)
 
 {-| Application model and initialisation.
 -}
@@ -34,29 +34,7 @@ init : Flags -> ( Model, Cmd Msg )
 init flags =
     case Decode.decodeValue ObsDecode.payloadDecoder flags of
         Ok payload ->
-            let
-                cw =
-                    weightsToCurrentWeights payload.weights
-
-                live =
-                    recomputeLiveList cw payload.comments
-
-                m =
-                    { payload = Just payload
-                    , currentWeights = cw
-                    , activeMode = TopSignal
-                    , searchQuery = ""
-                    , selectedFacet = "all"
-                    , selectedCommentId = Nothing
-                    , liveList = live
-                    , proofDrawerOpen = False
-                    , labDrawerOpen = False
-                    , tunerDrawerOpen = True
-                    , viewport = Desktop
-                    , error = Nothing
-                    }
-            in
-            ( m, Ports.sendPlots m )
+            initFromPayload payload
 
         Err err ->
             ( { payload = Nothing
@@ -74,6 +52,35 @@ init flags =
               }
             , Cmd.none
             )
+
+
+{-| Initialize directly from an already decoded ObservatoryPayload.
+-}
+initFromPayload : ObservatoryPayload -> ( Model, Cmd Msg )
+initFromPayload payload =
+    let
+        cw =
+            weightsToCurrentWeights payload.weights
+
+        live =
+            recomputeLiveList cw payload.comments
+
+        m =
+            { payload = Just payload
+            , currentWeights = cw
+            , activeMode = TopSignal
+            , searchQuery = ""
+            , selectedFacet = "all"
+            , selectedCommentId = Nothing
+            , liveList = live
+            , proofDrawerOpen = False
+            , labDrawerOpen = False
+            , tunerDrawerOpen = True
+            , viewport = Desktop
+            , error = Nothing
+            }
+    in
+    ( m, Ports.sendPlots m )
 
 
 {-| Recompute live scores and ranks from current slider weights.

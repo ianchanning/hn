@@ -10,3 +10,4 @@ Persistent knowledge base for the Elm rewrite of the HN Epistemic Observatory di
 - [[Elm-Min-Max-Ambiguity]] - Qualify Attr.min/Attr.max to avoid collision with Basics prelude.
 - [[Elm-Port-Module-Declaration]] - Only modules actually declaring ports can use `port module`.
 - [[Payload-Hydration]] - Python emits JSON in `<script>` tag; Elm reads via `Browser.element` flags + `Json.Decode.Value`.
+- [[Elm-Tuples-Max-Three]] - Elm only supports 2- and 3-tuples; use records for 4+ items.
