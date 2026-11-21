@@ -1,0 +1,1387 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>50559719 // Making 8-page foldable zines from a single A4 sheet in the browser - Better Signal News</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+      text-transform: lowercase;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      text-transform: lowercase;
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .kpi-cell {
+      padding: 8px 0;
+    }
+    .kpi-label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 4px 0;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer:not([open]) {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary,
+    details.proof-drawer > summary {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+    }
+    table.ablation th {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: normal;
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    button.nav-btn,
+    button.mode-tab,
+    button.topbar-toggle {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: rgb(0, 0, 0);
+      cursor: pointer;
+      text-decoration: none;
+      line-height: inherit;
+      vertical-align: baseline;
+      transition: color 0.12s ease;
+      text-transform: lowercase;
+    }
+    button.nav-btn:hover,
+    button.nav-btn.active,
+    button.mode-tab:hover,
+    button.mode-tab.active,
+    button.topbar-toggle:hover,
+    button.topbar-toggle.active {
+      color: rgb(255, 255, 255);
+      text-decoration: none;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      padding: 14px;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; row-gap: 4px; }
+      .topbar-right { padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">BS</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Better Signal News</a>
+        <span class="pagetop" id="modeTabs">
+          <button type="button" class="nav-btn mode-tab active" data-mode="top_signal" role="tab" aria-selected="true">Top 40</button> | <button type="button" class="nav-btn mode-tab" data-mode="hn_top40" role="tab" aria-selected="false">HN Top 40</button>
+        </span>
+      </div>
+      <div class="topbar-right">
+        <button type="button" class="nav-btn topbar-toggle" id="exploreToggleBtn" aria-expanded="false">explore</button> | <button type="button" class="nav-btn topbar-toggle" id="evidenceToggleBtn" aria-expanded="false">evidence</button>
+      </div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://krthr.co/paper-folds-and-whats-new-in-fanzines-app/">Making 8-page foldable zines from a single A4 sheet in the browser</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=krthr.co"><span class="sitestr">krthr.co</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">308 points</span> by <a href="https://news.ycombinator.com/user?id=krthr">krthr</a> <span class="age" title="2026-11-19T13:18:11.000Z"><a href="https://news.ycombinator.com/item?id=50559719">16 hours ago</a></span> | <a href="https://news.ycombinator.com/item?id=50559719">61&nbsp;comments</a> | 77.0% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Evidence</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">61</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 51 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">23.0%</div>
+          <div class="kpi-sub">14 comments (4 Gold / 6.6%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">77.0%</div>
+          <div class="kpi-sub">32 chatter &bull; 13 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">5</div>
+        <div class="kpi-sub">13% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.972</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">8</div>
+          <div class="kpi-sub">HN POS 6..13 (13.1% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="color: rgb(90, 90, 88); margin-top: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Explore</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">CALIBRATE</div>
+              <h2>Signal Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 61-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Bullshit (Y) // Signal (X) </span>
+                <span class="sig">TAP POINT (N = 61)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (4)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (10)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (32)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (2)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (13)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>HN POS (1..61) (Y) // Age (Hours) (X)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 25)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (staplung, 13.3h); largest subtree (@addled) occupies 8 slots (HN POS 6..13).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (61)</option>
+          <option value="thanks_add">Thanks &amp; Add (Color) (15)</option>
+          <option value="paper_tools">Paper &amp; Tools (Pages) (14)</option>
+          <option value="zine_kids">Zine &amp; Kids (Fold) (13)</option>
+          <option value="editor_page">Editor &amp; Page (Count) (9)</option>
+          <option value="area_notes">Area &amp; Notes (Card) (7)</option>
+          <option value="general_commentary">General Commentary (3)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, a4, sheet, browser, single, page...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT</span>
+    <span>SOURCE: HN 50559719 + KRTHR.CO + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50559719, "story_title": "Making 8-page foldable zines from a single A4 sheet in the browser", "story_url": "https://krthr.co/paper-folds-and-whats-new-in-fanzines-app/", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50559719, "story_title": "Making 8-page foldable zines from a single A4 sheet in the browser", "story_url": "https://krthr.co/paper-folds-and-whats-new-in-fanzines-app/", "points": 308, "story_author": "krthr", "article_source": "fetched_url", "t1_ref_utc": "2026-11-20T05:45:13+00:00", "t2_ref_utc": "2026-11-20T05:45:13+00:00", "delta_minutes": 0.0, "story_anchors": ["a4", "sheet", "browser", "single", "page", "app", "paper", "pages", "zine", "margins", "fold", "8-page", "zines", "printing", "cut", "text", "folded", "folds", "spanish", "print", "foldable", "editor", "thanks", "simple", "cool"], "facet_labels": {"paper_tools": "Paper & Tools (Pages)", "thanks_add": "Thanks & Add (Color)", "zine_kids": "Zine & Kids (Fold)", "area_notes": "Area & Notes (Card)", "editor_page": "Editor & Page (Count)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "paper_tools", "label": "Paper & Tools (Pages)", "count": 14, "top_terms": ["paper", "tools", "pages", "fold"]}, {"slug": "thanks_add", "label": "Thanks & Add (Color)", "count": 15, "top_terms": ["thanks", "add", "color", "sharing"]}, {"slug": "zine_kids", "label": "Zine & Kids (Fold)", "count": 13, "top_terms": ["zine", "kids", "fold", "per"]}, {"slug": "area_notes", "label": "Area & Notes (Card)", "count": 7, "top_terms": ["area", "notes", "card", "technique"]}, {"slug": "editor_page", "label": "Editor & Page (Count)", "count": 9, "top_terms": ["editor", "page", "count", "upload"]}], "counts": {"total_comments": 61, "live_t2_comments": 61, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 51, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 1, "pages_fetched": 1}, "sha256": {"corpus.json": "121a6427129504e23e77d3200c47121f8c91a70e86fde30be65619e6a96e631f"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 4, "grounded_analysis": 10, "crowd_chatter": 32, "bullshit_or_flamewar": 13, "meme_or_snark": 2}, "facets": {"zine_kids": 13, "thanks_add": 15, "area_notes": 7, "general_commentary": 3, "paper_tools": 14, "editor_page": 9}, "facet_options": [{"slug": "thanks_add", "label": "Thanks & Add (Color)", "count": 15}, {"slug": "paper_tools", "label": "Paper & Tools (Pages)", "count": 14}, {"slug": "zine_kids", "label": "Zine & Kids (Fold)", "count": 13}, {"slug": "editor_page", "label": "Editor & Page (Count)", "count": 9}, {"slug": "area_notes", "label": "Area & Notes (Card)", "count": 7}, {"slug": "general_commentary", "label": "General Commentary", "count": 3}], "facet_diagnostics": [{"slug": "thanks_add", "label": "Thanks & Add (Color)", "count": 15, "useful": 3, "useful_pct": 20.0, "terms": "thanks, add, color, sharing"}, {"slug": "paper_tools", "label": "Paper & Tools (Pages)", "count": 14, "useful": 2, "useful_pct": 14.3, "terms": "paper, tools, pages, fold"}, {"slug": "zine_kids", "label": "Zine & Kids (Fold)", "count": 13, "useful": 5, "useful_pct": 38.5, "terms": "zine, kids, fold, per"}, {"slug": "editor_page", "label": "Editor & Page (Count)", "count": 9, "useful": 0, "useful_pct": 0.0, "terms": "editor, page, count, upload"}, {"slug": "area_notes", "label": "Area & Notes (Card)", "count": 7, "useful": 3, "useful_pct": 42.9, "terms": "area, notes, card, technique"}, {"slug": "general_commentary", "label": "General Commentary", "count": 3, "useful": 1, "useful_pct": 33.3, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 11}, {"category": "code_repository", "count": 4}, {"category": "primary_technical_doc", "count": 1}], "story_anchors": ["a4", "sheet", "browser", "single", "page", "app", "paper", "pages", "zine", "margins", "fold", "8-page", "zines", "printing", "cut", "text", "folded", "folds"], "largest_root": {"root_id": 50560567, "author": "addled", "slots": 8, "start_dom": 6, "end_dom": 13, "share_pct": 13.1, "top_dom1_age": 13.3, "top_dom1_author": "staplung"}, "buried_cutoff": 25, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50561772, "au": "zserge", "dom": 42, "sr": 1, "sc": 10.0, "ep": 10.0, "bs": 0.0, "d": 0, "age": 13.8, "grav": 143.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 53, "qw": 0, "k": 587, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "zine_kids", "flbl": "Zine & Kids (Fold)", "urls": ["https://github.com/zserge/zine"], "ig": 1.176, "fa": 2.08, "gp": 0.906, "bl": 0.0, "ds": 0.0, "txt": "Some time ago I was making a non-visual zine builder: you write HTML, and in a preview you see pages normally in the browser, but when printed they are re-arranged into a foldable zine. Non-visual because to me putting things into a CSS grid felt more intuitive than dragging them visually. And, indeed, it was inspired by pocketmod.\n\nhttps://github.com/zserge/zine"}, {"id": 50562739, "au": "krthr", "dom": 41, "sr": 2, "sc": 9.07, "ep": 9.07, "bs": 0.0, "d": 1, "age": 12.73, "grav": 126.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 42, "qw": 0, "k": 165, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "thanks_add", "flbl": "Thanks & Add (Color)", "urls": ["https://github.com/krthr/fanzines.app"], "ig": 1.091, "fa": 2.08, "gp": 0.4, "bl": 0.0, "ds": 0.0, "txt": "Hey, thanks! Yeah, this is the repo: https://github.com/krthr/fanzines.app\n\nI didn't add the link to the repo in the website because i think it's not ready for external contributions. But I'll add more docs and clean a little bit.\n\nAny contribution / feature / idea / bug report is welcome!"}, {"id": 50569684, "au": "so-cal-schemer", "dom": 36, "sr": 3, "sc": 9.03, "ep": 9.03, "bs": 0.0, "d": 0, "age": 2.59, "grav": 15.5, "surf": 10.4, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 61, "qw": 0, "k": 256, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "area_notes", "flbl": "Area & Notes (Card)", "urls": ["https://github.com/sarabander/sicp-pocket"], "ig": 1.281, "fa": 2.08, "gp": 0.063, "bl": 0.0, "ds": 0.0, "txt": "Last year I came across an imposition of SICP (a Show HN from long ago?), that I printed, cut, folded, and bound to create a pocket sized book. I carried individual chapters around in my shirt pocket, and intended to print more to give out.\n\nI'll have to look for the link, but in the meantime there is this:\n\nhttps://github.com/sarabander/sicp-pocket\n\n(perhaps someone would like to recreate it)"}, {"id": 50560151, "au": "WillAdams", "dom": 26, "sr": 4, "sc": 7.5, "ep": 7.5, "bs": 0.0, "d": 1, "age": 15.83, "grav": 178.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 11, "qw": 0, "k": 5594, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://tug.org/texshowcase/onetype.pdf"], "ig": 0.199, "fa": 2.35, "gp": 0.234, "bl": 0.0, "ds": 0.0, "txt": "I used to do it in drawing programs or (La)TeX.\n\nSee:\n\nhttps://tug.org/texshowcase/onetype.pdf"}, {"id": 50560343, "au": "baud9600", "dom": 14, "sr": 5, "sc": 6.64, "ep": 6.64, "bs": 0.0, "d": 0, "age": 15.58, "grav": 174.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 30, "qw": 0, "k": 55, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "paper_tools", "flbl": "Paper & Tools (Pages)", "urls": ["https://pocketmod.com/"], "ig": 0.837, "fa": 0.96, "gp": 1.338, "bl": 0.0, "ds": 0.0, "txt": "I’m bothered that this piece doesnt mention pocketmod, which I think is where the folding idea came from? The fold image looks very similar! I used this 20 years ago and still do sometimes:\n\nhttps://pocketmod.com/"}, {"id": 50562196, "au": "staplung", "dom": 1, "sr": 6, "sc": 6.56, "ep": 6.56, "bs": 0.0, "d": 0, "age": 13.32, "grav": 135.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 68, "qw": 0, "k": 2446, "kpp": 6.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "zine_kids", "flbl": "Zine & Kids (Fold)", "urls": ["https://momijizukamori.github.io/bookbinder-js/"], "ig": 1.19, "fa": 0.62, "gp": 1.374, "bl": 0.0, "ds": 0.0, "txt": "For the curious, the generalized process of reordering and potentially rotating pages so that when printed and folded (and optionally gathered into signatures) is called impositioning. There is specialized software with a variety of options that will do this for an input document.\n\nBookbinder JS is a nice web-based tool that will do this for you too, though I'm not sure it covers the exact folding algorithm described in this article.\n\nhttps://momijizukamori.github.io/bookbinder-js/"}, {"id": 50560927, "au": "WillAdams", "dom": 15, "sr": 7, "sc": 6.17, "ep": 6.32, "bs": 0.0, "d": 1, "age": 14.84, "grav": 161.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 65, "qw": 0, "k": 5594, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "area_notes", "flbl": "Area & Notes (Card)", "urls": ["https://www.goodreads.com/book/show/4632687-how-to-fold", "https://www.goodreads.com/book/show/5731642-how-to-fold"], "ig": 1.379, "fa": 0.96, "gp": 0.238, "bl": 0.0, "ds": 0.0, "txt": "It is a _very_ old technique, which ISTR was mentioned in Clifford Burke's _Printing It_ from 1972 (or some other text which I read around that time frame) as a traditional technique.\n\nFor more folding options there are entire books dedicated to this, notably Larry Withers' multiple volume, _How to Fold_\n\nhttps://www.goodreads.com/book/show/4632687-how-to-fold\n\nhttps://www.goodreads.com/book/show/5731642-how-to-fold\n\nGoodreads doesn't have Vol. 3, but the ISBN is 0-88108-219-8 and the publisher was \"Art Direction Book Co.\""}, {"id": 50561247, "au": "raudette", "dom": 7, "sr": 8, "sc": 5.41, "ep": 5.41, "bs": 0.0, "d": 1, "age": 14.41, "grav": 154.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 68, "qw": 0, "k": 142, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "thanks_add", "flbl": "Thanks & Add (Color)", "urls": [], "ig": 1.369, "fa": 0.28, "gp": 0.962, "bl": 0.0, "ds": 0.0, "txt": "I had a friend who spoke of using different colors of ink and color filters, so you could write twice in the same space.\n\nI loved the whole idea of the 'cheat sheet', and seeing my kids put them together - I'm not in education, but I suspect the value of the cheat sheet is having the students make them, its essentially material review (vs say for example \"open book\" or \"supplied formula sheet\")."}, {"id": 50565636, "au": "ggm", "dom": 38, "sr": 9, "sc": 5.13, "ep": 5.13, "bs": 0.0, "d": 0, "age": 9.58, "grav": 82.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 113, "qw": 0, "k": 30775, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "paper_tools", "flbl": "Paper & Tools (Pages)", "urls": [], "ig": 1.563, "fa": 0.34, "gp": 0.332, "bl": 0.0, "ds": 0.0, "txt": "Done properly, for a signature to work you need different in-page offsets from the binding point for the left and right faces of \"outside\" and the innermost \"inside and outside\" sheets: the thickness of the paper affects the folding and so affects the offset of the page edge from the actual paper edge after guillotineing.\n\nI fell down this rabbit hole about 3 decades ago playing with the various postscript n-up tools, and looking at the outcome. I was working with an A3 printer and hitting alignment problems on 16 page signatures. I do not think I worked out how to fix it, other than heuristical sub-adjustments.\n\nAfter 8 pages, the bend radius difference is probably 1-2mm so it's definitely visible."}, {"id": 50561777, "au": "ratchetclank", "dom": 40, "sr": 10, "sc": 5.0, "ep": 5.15, "bs": 0.0, "d": 0, "age": 13.79, "grav": 143.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 82, "qw": 0, "k": 23, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "thanks_add", "flbl": "Thanks & Add (Color)", "urls": [], "ig": 1.532, "fa": 0.28, "gp": 0.515, "bl": 0.0, "ds": 0.0, "txt": "Hi, really nice app, love the no staple just one cut and some folds, I'll probably try to use it to do some informational booklets.\n\nDo you have a git somewhere where we can submit feature idea and/or improvement pull request ?\n\nFrom first usage I see those few ideas : \n- local browser auto save to not loose everything on reload\n- document import/export, maybe as a json to edit a previous document days/weeks later\n- a color picker option for text color\n- simple shapes (line, square, circle)"}, {"id": 50560567, "au": "addled", "dom": 6, "sr": 11, "sc": 4.7, "ep": 4.85, "bs": 0.0, "d": 0, "age": 15.3, "grav": 169.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 86, "qw": 0, "k": 292, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "area_notes", "flbl": "Area & Notes (Card)", "urls": [], "ig": 1.25, "fa": 0.0, "gp": 1.316, "bl": 0.0, "ds": 0.0, "txt": "My high school geometry teacher would let us use an index card of notes during exams.\n\nShe had a student years prior show her this folding technique and asked if he could use it for the test.  Not only did she allow it, but she taught it to every class going forward for those that wanted to put in the extra effort.\n\nMy buddies and I spent so much time trying to come up with modifications to use more area of the page.  Some of them even worked!"}, {"id": 50560177, "au": "knlb", "dom": 21, "sr": 12, "sc": 4.62, "ep": 4.62, "bs": 0.0, "d": 0, "age": 15.79, "grav": 177.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 28, "qw": 0, "k": 226, "kpp": 9.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "zine_kids", "flbl": "Zine & Kids (Fold)", "urls": ["https://dirtylittlezine.com/"], "ig": 0.78, "fa": 0.62, "gp": 0.702, "bl": 0.0, "ds": 0.0, "txt": "I first saw this here: https://dirtylittlezine.com/. I actually use this to make easily disposable custom pocket notebooks these days, inverting the fold when I fill it up to use the other side."}, {"id": 50562790, "au": "verdverm", "dom": 53, "sr": 13, "sc": 4.5, "ep": 4.5, "bs": 0.0, "d": 0, "age": 12.67, "grav": 125.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 40, "qw": 0, "k": 11185, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "zine_kids", "flbl": "Zine & Kids (Fold)", "urls": ["https://drive.google.com/drive/folders/1jjp8fOn1fsQ0vvix84dmoPRChPeW_NTw", "https://main.verdverm.workers.dev/zines"], "ig": 0.985, "fa": 0.62, "gp": 0.291, "bl": 0.0, "ds": 0.0, "txt": "There is a better way to fold 1x8 zines, such that you get 2 per page (two-sided, half as much paper), as well as easier to fold and print. Templates for Affinity Publisher and examples here:\n\nhttps://drive.google.com/drive/folders/1jjp8fOn1fsQ0vvix84dm...\n\nMy zine stack: https://main.verdverm.workers.dev/zines (unpublished website revamp)"}, {"id": 50564478, "au": "xorcist", "dom": 35, "sr": 14, "sc": 3.99, "ep": 3.99, "bs": 0.0, "d": 0, "age": 10.85, "grav": 99.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 108, "qw": 0, "k": 9227, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "paper_tools", "flbl": "Paper & Tools (Pages)", "urls": [], "ig": 1.347, "fa": 0.0, "gp": 0.568, "bl": 0.0, "ds": 0.0, "txt": "Isn't this what something like psnup (or pdfbook or similar tools) does, which you probably already have at your command line, at least if you've printed things like man pages or latex documents? It was pretty normal to use and saved lots of paper when you could print your documentation 8-up, but it let you rotate, scale and place each page arbitrarily.\n\nI believe users of the more GUI-oriented operating systems like Windows or Mac eventually got it integrated in their printing dialog, at least I know KDE did, so the command line tools weren't needed much anymore. It surprises me that these specialized tools apparently are needed again."}, {"id": 50564208, "au": "bthallplz", "dom": 43, "sr": 15, "sc": 3.97, "ep": 3.97, "bs": 0.0, "d": 0, "age": 11.12, "grav": 102.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 59, "qw": 0, "k": 453, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "editor_page", "flbl": "Editor & Page (Count)", "urls": [], "ig": 1.172, "fa": 0.22, "gp": 0.405, "bl": 0.0, "ds": 0.0, "txt": "I really love this form factor and how inexpensive it could be to print small books.\n\nDoes anyone have any suggestions for ways to estimate how many words could fit per page while still being decently readable, depending on different fonts a person uses?\n\nA step further: a markdown editor with a preview of how the printed out document would read would be nice."}, {"id": 50561283, "au": "otherme123", "dom": 25, "sr": 16, "sc": 3.94, "ep": 4.3, "bs": 0.0, "d": 1, "age": 14.37, "grav": 153.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 33, "qw": 0, "k": 2733, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "zine_kids", "flbl": "Zine & Kids (Fold)", "urls": ["https://www.pdfimpose.it/"], "ig": 0.896, "fa": 0.62, "gp": 0.297, "bl": 0.0, "ds": 0.0, "txt": "I had used this to make a A6 book printing 4 pages per side per A4 sheet: https://www.pdfimpose.it/\n\nNote that they also offer the full code at the bottom, so you can tweak even more the results."}, {"id": 50560093, "au": "echoangle", "dom": 23, "sr": 17, "sc": 3.38, "ep": 3.67, "bs": 0.0, "d": 0, "age": 15.91, "grav": 180.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 59, "qw": 0, "k": 5303, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "editor_page", "flbl": "Editor & Page (Count)", "urls": [], "ig": 1.068, "fa": 0.0, "gp": 0.802, "bl": 0.0, "ds": 0.0, "txt": "This makes me think that there should be a simple CLI or browser tool to upload a pdf and have the pages combined to print in this layout.\nYou only need to combine 8 pages into one in a specific orientation, I don’t think you really need an entirely separate editor for that.\n\nStill a cool project though if people want the complete editor experience!"}, {"id": 50563563, "au": "xgulfie", "dom": 57, "sr": 18, "sc": 3.35, "ep": 3.35, "bs": 0.0, "d": 0, "age": 11.74, "grav": 111.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 59, "qw": 0, "k": 544, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "thanks_add", "flbl": "Thanks & Add (Color)", "urls": [], "ig": 1.266, "fa": 0.0, "gp": 0.261, "bl": 0.0, "ds": 0.0, "txt": "I'm working on a comic zine right now and I'm just doing Krita file for each page -> export all the images in one click with Krita comic manager -> place the images in Affinity suite. The Affinity resource manager will automatically pull in the new images when I export and has a nice print dialog. And then I can tweak margins, add cut lines or whatever."}, {"id": 50566338, "au": "meowvia", "dom": 44, "sr": 19, "sc": 3.3, "ep": 5.96, "bs": 2.52, "d": 1, "age": 8.68, "grav": 71.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 112, "qw": 0, "k": 1, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "editor_page", "flbl": "Editor & Page (Count)", "urls": [], "ig": 1.65, "fa": 0.56, "gp": 0.336, "bl": 0.95, "ds": 0.0, "txt": "A fixed words-per-page number is hard because it swings a lot with type size, leading, margins, and how many headings or images break up the text. At 10pt with normal margins, each A6-ish page in this layout holds roughly 180-220 words of plain prose, but that's a rough guide, not a layout rule.\n\nFor the markdown editor idea, I'd find a per-section word count more useful than a single estimate: split the draft at headings, show the running count against the page it will land on, and flag sections that overflow. That way you keep the estimate tied to the actual text, and the preview stays honest when a heading or a short paragraph pushes content onto the next page."}, {"id": 50570619, "au": "burningChrome", "dom": 8, "sr": 20, "sc": 3.21, "ep": 3.51, "bs": 0.0, "d": 2, "age": 0.05, "grav": 3.6, "surf": 40.5, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 120, "qw": 0, "k": 2255, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "area_notes", "flbl": "Area & Notes (Card)", "urls": [], "ig": 1.394, "fa": 0.0, "gp": 0.159, "bl": 0.0, "ds": 0.0, "txt": "Its interesting, I worked as a TA in the early aughts helping teach what was an intro to anthropology class. When I allowed a double sided 4X6 notecard, students did reliably well. When you didn't allow the 'cheat sheet' I would still find scraps of paper that had notes on them after tests. A majority of the time, the notes just had bad or incorrect information on them.\n\nI just figured the students who scored well when I allowed the cheatsheet took their time rehashing and reviewing the information for the test so it stuck with them better. When students were just trying to cheat and rushing to get what they thought was going to be on the test, it was almost always wrong.\n\nInteresting experience for sure."}, {"id": 50568630, "au": "danbolt", "dom": 34, "sr": 21, "sc": 3.13, "ep": 3.35, "bs": 0.0, "d": 0, "age": 5.14, "grav": 34.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 58, "qw": 0, "k": 2948, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "thanks_add", "flbl": "Thanks & Add (Color)", "urls": [], "ig": 1.277, "fa": 0.0, "gp": 0.24, "bl": 0.0, "ds": 0.0, "txt": "It would be an expensive nightmare, but as a Canadian I’ve always longed for A4 paper’s charming qualities. If I acquire a loose sheet while out on my day, it can be folded efficiently into a postcard-sized A6 plastic envelope.\n\nGiven the country’s geography and economy, it’s not exactly the most sensible decision to switch off US Letter though. I can only dream!"}, {"id": 50560437, "au": "loloquwowndueo", "dom": 49, "sr": 22, "sc": 3.03, "ep": 3.03, "bs": 0.0, "d": 0, "age": 15.45, "grav": 171.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 6955, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "paper_tools", "flbl": "Paper & Tools (Pages)", "urls": [], "ig": 1.066, "fa": 0.0, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "Nice. The actual app’s page could use less AI slop but it works well. Feature request: US Letter paper support. DIN sizes are not easy to find in the paper size standards wasteland that is Mexico, the US and Canada."}, {"id": 50563061, "au": "stronglikedan", "dom": 16, "sr": 23, "sc": 2.99, "ep": 3.29, "bs": 0.0, "d": 1, "age": 12.33, "grav": 120.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 9, "k": 7628, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "editor_page", "flbl": "Editor & Page (Count)", "urls": [], "ig": 0.778, "fa": 0.42, "gp": 0.181, "bl": 0.0, "ds": 0.0, "txt": "> which I think is where the folding idea came from?\n\nI wouldn't count on it. It likely came from something much, much older. Like around the time of the invention of paper. Besides, that pocketmod site isn't very good as saying what it's for, so I'd wager it wasn't even considered when this was thought of."}, {"id": 50559967, "au": "mysterydip", "dom": 29, "sr": 24, "sc": 2.96, "ep": 3.4, "bs": 0.0, "d": 0, "age": 16.08, "grav": 183.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 8162, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "zine_kids", "flbl": "Zine & Kids (Fold)", "urls": [], "ig": 0.97, "fa": 0.0, "gp": 0.772, "bl": 0.0, "ds": 0.0, "txt": "I love stuff like this. My kids are always making little stories in tiny books they put together with tape or staples. This seems like a good solution to that."}, {"id": 50566687, "au": "gavmor", "dom": 37, "sr": 25, "sc": 2.55, "ep": 2.77, "bs": 0.0, "d": 0, "age": 8.23, "grav": 65.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 1009, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "editor_page", "flbl": "Editor & Page (Count)", "urls": [], "ig": 1.008, "fa": 0.0, "gp": 0.279, "bl": 0.0, "ds": 0.0, "txt": "After many years of 8-part pocketmods, I've upgraded to needle-and-thread 2-up bookbinding—it's not as hard as it looks.\n\nI should revisit 8-page foldables, though. They're a very conference-friendly format. I'll try this tool!"}, {"id": 50565444, "au": "compiler-guy", "dom": 3, "sr": 26, "sc": 2.29, "ep": 2.66, "bs": 0.0, "d": 1, "age": 9.78, "grav": 84.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 7969, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "paper_tools", "flbl": "Paper & Tools (Pages)", "urls": [], "ig": 1.133, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Similarly, the term printers use for a sheet that has been printed after imposition is a \"signature\". Sometimes called a \"sig\" for short.\n\nThe result of the imposition here would be considered an \"eight-up sig\", because you get eight usable pages on one side.\n\nBooks and magazines are typically bound from several signatures."}, {"id": 50566060, "au": "quirino", "dom": 20, "sr": 27, "sc": 1.99, "ep": 2.87, "bs": 0.0, "d": 1, "age": 9.05, "grav": 75.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 1057, "kpp": 5.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "paper_tools", "flbl": "Paper & Tools (Pages)", "urls": [], "ig": 1.221, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Pocketmod is great.\n\nTip: ask your AI of choice to generate a template for you using Typst.\n\nI have a daily one with my personal task/scheduling system. Also some fun things, like a page with random numbers as a source of entropy. Just because I like randomness. You could add a daily Sudoku or similar."}, {"id": 50566284, "au": "staplung", "dom": 39, "sr": 28, "sc": 1.72, "ep": 2.53, "bs": 0.0, "d": 1, "age": 8.77, "grav": 72.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 2446, "kpp": 6.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "paper_tools", "flbl": "Paper & Tools (Pages)", "urls": [], "ig": 1.076, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "This phenomenon is called \"creep\" and high-end imposition software will usually have an option to control it, either manually or automatically after inputting the paper thickness and signature size. Some of the free/online tools don't have any creep control though."}, {"id": 50568022, "au": "drunkboxer", "dom": 2, "sr": 29, "sc": 1.71, "ep": 2.66, "bs": 0.0, "d": 1, "age": 6.36, "grav": 45.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 20, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "zine_kids", "flbl": "Zine & Kids (Fold)", "urls": [], "ig": 1.09, "fa": 0.0, "gp": 0.069, "bl": 0.0, "ds": 0.0, "txt": "Bookbinder js is the best. I use it to print multi-page booklets for my kids often.\n\nIt does cover this exact folding algorithm as well. It's called \"Single Sheet Zine - 8 per side (one sided printed page foldup)\" and links to instructions that are better than the OP."}, {"id": 50568555, "au": "verdverm", "dom": 55, "sr": 30, "sc": 1.68, "ep": 2.27, "bs": 0.0, "d": 2, "age": 5.3, "grav": 35.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 11185, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "thanks_add", "flbl": "Thanks & Add (Color)", "urls": [], "ig": 0.964, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "the methods differ in wastefulness of time during folding and cutting, that's the bigger advantage to the dual method\n\nmy zine template is pretty easy to remember once you have a few down, it's only two half folds and a simple cut after, but no, no visual instructions"}, {"id": 50560936, "au": "ohlookcake", "dom": 10, "sr": 31, "sc": 1.65, "ep": 2.31, "bs": 0.0, "d": 1, "age": 14.83, "grav": 161.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 74, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "area_notes", "flbl": "Area & Notes (Card)", "urls": [], "ig": 0.602, "fa": 0.0, "gp": 0.619, "bl": 0.0, "ds": 0.0, "txt": "How did folding allow access to more area of the page? Unless I've misunderstood something, it should just be the same area folded up in booklet form?"}, {"id": 50561915, "au": "WillAdams", "dom": 22, "sr": 32, "sc": 1.47, "ep": 2.49, "bs": 0.0, "d": 1, "age": 13.64, "grav": 141.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 5594, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "paper_tools", "flbl": "Paper & Tools (Pages)", "urls": [], "ig": 1.062, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Similarly, I would fold a legal-sized sheet of paper so that it would fit in a small leather notepad case I use as a pocket blotter --- it's very handy and a lot less expensive than custom notecards or even an equivalent of index cards."}, {"id": 50560068, "au": "krthr", "dom": 33, "sr": 33, "sc": 1.35, "ep": 1.94, "bs": 0.0, "d": 1, "age": 15.94, "grav": 180.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 165, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "editor_page", "flbl": "Editor & Page (Count)", "urls": [], "ig": 0.823, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Thanks! Honestly, cutting and folding fanzines is really fun and, for me, relaxing... not to mention giving them away!\n\nI hope the app proves very useful to you <3"}, {"id": 50560533, "au": "krthr", "dom": 50, "sr": 34, "sc": 1.17, "ep": 1.98, "bs": 0.0, "d": 1, "age": 15.33, "grav": 169.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 165, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "thanks_add", "flbl": "Thanks & Add (Color)", "urls": [], "ig": 0.842, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Thanks! Yeah, right now I'm focused on reducing the AI slop look and copy.\n\nI didn't think about US Letter size, btw. I'll add it. Thanks for the feedback"}, {"id": 50570221, "au": "tomcatfish", "dom": 46, "sr": 35, "sc": 0.71, "ep": 1.81, "bs": 0.0, "d": 1, "age": 1.17, "grav": 8.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 361, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "paper_tools", "flbl": "Paper & Tools (Pages)", "urls": [], "ig": 0.772, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The initial folding step *must* fold the end pages over each other, and then the accordion *must* fold more pages over. If you want to use all the pages, you have to do something like the sewing of distinct signatures you see in books."}, {"id": 50566681, "au": "AmazingEveryDay", "dom": 17, "sr": 36, "sc": 0.42, "ep": 1.96, "bs": 0.0, "d": 2, "age": 8.24, "grav": 65.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 135, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "paper_tools", "flbl": "Paper & Tools (Pages)", "urls": [], "ig": 0.834, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Absurd thinking the idea came from some website. I wonder though, could \"AI\" come up with some novel cool folding (not involving thousands of steps)"}, {"id": 50567924, "au": "hettygreen", "dom": 60, "sr": 37, "sc": 0.3, "ep": 1.4, "bs": 0.0, "d": 0, "age": 6.52, "grav": 47.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 690, "kpp": 5.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "paper_tools", "flbl": "Paper & Tools (Pages)", "urls": [], "ig": 0.598, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "What in the hell is an A4 sheet?\n\nUse an 8.5x11\" letter size piece of paper like god intended."}, {"id": 50564247, "au": "mbrd", "dom": 32, "sr": 38, "sc": 0.25, "ep": 1.65, "bs": 0.0, "d": 1, "age": 11.09, "grav": 102.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 155, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "paper_tools", "flbl": "Paper & Tools (Pages)", "urls": [], "ig": 0.702, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I've taught my daughter this 8-page pattern and she makes books/zines and copies them on the printer for her friends!"}, {"id": 50561583, "au": "HWR_14", "dom": 9, "sr": 39, "sc": 0.08, "ep": 1.4, "bs": 0.0, "d": 2, "age": 14.03, "grav": 147.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 10842, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "thanks_add", "flbl": "Thanks & Add (Color)", "urls": [], "ig": 0.595, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "There's also an aspect of \"anything that fits on that sheet is trivial to look up and incidental to the learning\". Do you need to memorize Hubble's constant? Or is it important you  know that's what you need to look up and how to apply it."}, {"id": 50569043, "au": "wvlia5", "dom": 45, "sr": 40, "sc": -0.0, "ep": 1.03, "bs": 0.0, "d": 0, "age": 4.19, "grav": 26.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 465, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "zine_kids", "flbl": "Zine & Kids (Fold)", "urls": [], "ig": 0.4, "fa": 0.0, "gp": 0.06, "bl": 0.0, "ds": 0.0, "txt": "Is there a way to fold/cut a zine with sheet printed in both sides?\n(so you get 16-page zine of the same size)"}, {"id": 50564134, "au": "meatmanek", "dom": 52, "sr": 41, "sc": -0.28, "ep": 0.68, "bs": 0.0, "d": 2, "age": 11.19, "grav": 103.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 1183, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "editor_page", "flbl": "Editor & Page (Count)", "urls": [], "ig": 0.287, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Is that first infographic (the one in Spanish) AI-generated? 1, 2, 3, 6, 5, 8 is an odd way to count to 8."}, {"id": 50568255, "au": "CrociDB", "dom": 61, "sr": 42, "sc": -0.39, "ep": 0.86, "bs": 0.0, "d": 1, "age": 5.92, "grav": 41.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 21, "qw": 0, "k": 173, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "paper_tools", "flbl": "Paper & Tools (Pages)", "urls": ["https://en.wikipedia.org/wiki/International_standard_paper_sizes"], "ig": 0.366, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "You'd be surprised that your country is pretty much the only one that doesn't use the international standard for paper size: https://en.wikipedia.org/wiki/International_standard_paper_s..."}, {"id": 50569317, "au": "GarnetFloride", "dom": 13, "sr": 43, "sc": -0.73, "ep": 0.81, "bs": 0.0, "d": 1, "age": 3.55, "grav": 21.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 427, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "thanks_add", "flbl": "Thanks & Add (Color)", "urls": [], "ig": 0.347, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It's a great trick. Giving them limited space is making them actually study to figure out what they want to put down.\n\nNow making a way to cheat, is given them incentive to do it even more."}, {"id": 50561372, "au": "kevin_thibedeau", "dom": 28, "sr": 44, "sc": -1.58, "ep": 0.94, "bs": 1.19, "d": 1, "age": 14.28, "grav": 151.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 23647, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "editor_page", "flbl": "Editor & Page (Count)", "urls": [], "ig": 0.398, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "This can be done with Ghostscript in a short shell script. An LLM can whip it up for you."}, {"id": 50567055, "au": "wy35", "dom": 54, "sr": 45, "sc": -1.71, "ep": 0.88, "bs": 1.19, "d": 1, "age": 7.75, "grav": 60.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 507, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "zine_kids", "flbl": "Zine & Kids (Fold)", "urls": [], "ig": 0.374, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Was looking for something like this, I don't like how wasteful the single-sided method is.\n\nMaybe they're there and I'm missing them, but are there instructions for folding/cutting?"}, {"id": 50560060, "au": "mrroryflint", "dom": 30, "sr": 46, "sc": -2.09, "ep": 1.44, "bs": 1.99, "d": 1, "age": 15.96, "grav": 181.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 16, "qw": 0, "k": 220, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "paper_tools", "flbl": "Paper & Tools (Pages)", "urls": ["https://gooddaysbymarina.substack.com/p/not-quite-a-zine-making-tutorial"], "ig": 0.486, "fa": 0.0, "gp": 0.206, "bl": 0.75, "ds": 0.0, "txt": "Can also recommend this: \nhttps://gooddaysbymarina.substack.com/p/not-quite-a-zine-mak...\n\nMore advanced but lots of cool ideas of varying degrees of difficulty"}, {"id": 50563023, "au": "remyp", "dom": 4, "sr": 47, "sc": -2.13, "ep": 0.6, "bs": 1.19, "d": 1, "age": 12.36, "grav": 121.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 1125, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "thanks_add", "flbl": "Thanks & Add (Color)", "urls": [], "ig": 0.256, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Thanks, I had no idea it was called that.  I guess you could say I didn't expect the imposition."}, {"id": 50562748, "au": "sirrice", "dom": 59, "sr": 48, "sc": -2.23, "ep": 1.92, "bs": 3.05, "d": 0, "age": 12.72, "grav": 126.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 14, "qw": 0, "k": 20, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "editor_page", "flbl": "Editor & Page (Count)", "urls": ["https://make-a-zine.github.io/"], "ig": 0.64, "fa": 0.0, "gp": 0.286, "bl": 1.15, "ds": 0.0, "txt": "Yet another one.   single page app: https://make-a-zine.github.io/\nupload an 8 page pdf, set the margins, done."}, {"id": 50567085, "au": "noumenon1111", "dom": 5, "sr": 49, "sc": -2.47, "ep": 1.02, "bs": 3.05, "d": 2, "age": 7.7, "grav": 59.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 50, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.435, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Especially since OP's first language is Spanish. Nobody expects the Spanish imposition..."}, {"id": 50560878, "au": "cheapcheerful", "dom": 48, "sr": 50, "sc": -3.21, "ep": 0.93, "bs": 3.05, "d": 0, "age": 14.9, "grav": 162.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 5, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "zine_kids", "flbl": "Zine & Kids (Fold)", "urls": [], "ig": 0.174, "fa": 0.0, "gp": 0.36, "bl": 1.15, "ds": 0.0, "txt": "My kids will love this, thanks for posting."}, {"id": 50561595, "au": "eyelidlessness", "dom": 12, "sr": 51, "sc": -3.56, "ep": 1.69, "bs": 4.37, "d": 3, "age": 14.02, "grav": 147.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 43, "qw": 0, "k": 12251, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "area_notes", "flbl": "Area & Notes (Card)", "urls": [], "ig": 0.721, "fa": 0.0, "gp": 0.0, "bl": 1.65, "ds": 0.0, "txt": "It was allowed after the fact. It sounds like the teacher appreciated and rewarded the student’s initiative to get more out of the class. It’s also possible the index card rule may not have been conceived as a strict ceiling in the first place."}, {"id": 50560930, "au": "cheapcheerful", "dom": 51, "sr": 52, "sc": -3.81, "ep": 1.07, "bs": 3.05, "d": 2, "age": 14.84, "grav": 161.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 5, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "thanks_add", "flbl": "Thanks & Add (Color)", "urls": [], "ig": 0.345, "fa": 0.0, "gp": 0.177, "bl": 1.15, "ds": 0.0, "txt": "The app page looks great to me mate! Super cool, thanks for posting."}, {"id": 50561277, "au": "SoftTalker", "dom": 11, "sr": 53, "sc": -4.1, "ep": 1.38, "bs": 4.37, "d": 2, "age": 14.38, "grav": 153.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 26857, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "area_notes", "flbl": "Area & Notes (Card)", "urls": [], "ig": 0.586, "fa": 0.0, "gp": 0.0, "bl": 1.65, "ds": 0.0, "txt": "All I can think is that a larger page was folded down to the size of an index card. Which doesn't make a lot of sense, why not just say you can use one standard page of notes?"}, {"id": 50563011, "au": "bloggie", "dom": 18, "sr": 54, "sc": -4.76, "ep": 1.02, "bs": 4.24, "d": 1, "age": 12.38, "grav": 121.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 465, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "thanks_add", "flbl": "Thanks & Add (Color)", "urls": [], "ig": 0.329, "fa": 0.0, "gp": 0.169, "bl": 1.6, "ds": 0.0, "txt": "I remember this being available in Broderbund's The Print Shop!"}, {"id": 50570165, "au": "aimor", "dom": 47, "sr": 55, "sc": -4.9, "ep": 0.73, "bs": 4.24, "d": 1, "age": 1.29, "grav": 8.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 1597, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "zine_kids", "flbl": "Zine & Kids (Fold)", "urls": [], "ig": 0.312, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "You can print on both sides and refold when you want to flip the magazine."}, {"id": 50560402, "au": "krthr", "dom": 19, "sr": 56, "sc": -4.9, "ep": 0.62, "bs": 4.24, "d": 1, "age": 15.5, "grav": 172.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 165, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "thanks_add", "flbl": "Thanks & Add (Color)", "urls": [], "ig": 0.112, "fa": 0.0, "gp": 0.248, "bl": 1.6, "ds": 0.0, "txt": "Thanks for sharing! I didn’t know about pocketmod, but I’ll take a look"}, {"id": 50569090, "au": "wvlia5", "dom": 56, "sr": 57, "sc": -4.9, "ep": 0.49, "bs": 4.24, "d": 3, "age": 4.07, "grav": 25.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 465, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "zine_kids", "flbl": "Zine & Kids (Fold)", "urls": [], "ig": 0.211, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Please, we need the instructions. Haven't found anywhere"}, {"id": 50561059, "au": "mkesper", "dom": 24, "sr": 58, "sc": -8.84, "ep": 0.0, "bs": 6.89, "d": 1, "age": 14.68, "grav": 158.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 1, "qw": 0, "k": 3737, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://github.com/quarkscript/booklet", "https://github.com/jenom/pdfbook2", "https://alexcwatt.com/booklet/"], "ig": -0.95, "fa": 0.0, "gp": 0.197, "bl": 2.6, "ds": 0.0, "txt": "https://github.com/quarkscript/booklet\n\nhttps://github.com/jenom/pdfbook2\n\nPDFjam https://alexcwatt.com/booklet/ https://github.com/pdfjam/pdfjam"}, {"id": 50560082, "au": "krthr", "dom": 31, "sr": 59, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 15.92, "grav": 180.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 165, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "thanks_add", "flbl": "Thanks & Add (Color)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "beautiful! thanks for sharing"}, {"id": 50567286, "au": "memo06", "dom": 58, "sr": 60, "sc": -11.45, "ep": 0.0, "bs": 9.41, "d": 0, "age": 7.42, "grav": 56.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 1, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "thanks_add", "flbl": "Thanks & Add (Color)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.133, "bl": 3.55, "ds": 0.0, "txt": "pretty cool"}, {"id": 50563728, "au": "spystath", "dom": 27, "sr": 61, "sc": -14.2, "ep": 0.0, "bs": 11.97, "d": 1, "age": 11.56, "grav": 109.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 6, "qw": 0, "k": 912, "kpp": 6.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "zine_kids", "flbl": "Zine & Kids (Fold)", "urls": ["https://1klb.com/posts/2020/04/27/making-zines-with-pdfjam/"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 4.517, "ds": 0.0, "txt": "pdfjam can do that pretty easily\n\nhttps://1klb.com/posts/2020/04/27/making-zines-with-pdfjam/"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "top_signal";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Signal Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("SIGNAL (INFO + FALSIFIABILITY) →", W - 295, H - 7);
+    pCtx.fillText("↑ BULLSHIT", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 40);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 40);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 40);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `${shown.length} of ${pool.length} comments` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const proofDrawer = document.getElementById("proofDrawer");
+  const expBtn = document.getElementById("exploreToggleBtn");
+  const eviBtn = document.getElementById("evidenceToggleBtn");
+
+  if (expBtn && labDrawer) {
+    expBtn.addEventListener("click", () => {
+      labDrawer.open = !labDrawer.open;
+    });
+    labDrawer.addEventListener("toggle", () => {
+      const isOpen = labDrawer.open;
+      expBtn.classList.toggle("active", isOpen);
+      expBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  if (eviBtn && proofDrawer) {
+    eviBtn.addEventListener("click", () => {
+      proofDrawer.open = !proofDrawer.open;
+    });
+    proofDrawer.addEventListener("toggle", () => {
+      const isOpen = proofDrawer.open;
+      eviBtn.classList.toggle("active", isOpen);
+      eviBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

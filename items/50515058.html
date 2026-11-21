@@ -1,0 +1,1385 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50515058 // Interpreting claims that a theorem is correct because it was checked in Lean — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+    }
+    .kpi-cell {
+      padding: 16px 16px 14px;
+      border-right: 1px solid rgb(205, 205, 200);
+    }
+    .kpi-cell:last-child { border-right: 0; }
+    .kpi-label {
+      font: 600 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 8px 0 4px;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      font-size: 12px;
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 6px;
+      corner-shape: bevel;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer > summary.hn-summary {
+      list-style: none;
+      cursor: pointer;
+      display: block;
+      padding: 2px 0;
+      margin: 0;
+      background: transparent;
+      border: 0;
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      user-select: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: rgb(255, 255, 253);
+      border: 1px solid rgb(13, 13, 13);
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+    }
+    table.ablation th {
+      background: rgb(236, 236, 231);
+      font: 700 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgb(60, 60, 58);
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 6px;
+      corner-shape: bevel;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    .mode-tabs {
+      gap: 6px;
+      padding: 0 8px;
+      margin-bottom: 8px;
+    }
+    button.mode-tab {
+      appearance: none;
+      border-width: 0px;
+      border-radius: 4px;
+      background: rgb(246, 246, 239);
+      color: rgb(130, 130, 130);
+      cursor: pointer;
+      padding: 6px 14px;
+      transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+    }
+    button.mode-tab:hover {
+      background: rgb(240, 240, 235);
+      color: rgb(13, 13, 13);
+    }
+    button.mode-tab.active {
+      background: rgb(246, 246, 239);
+      color: rgb(13, 13, 13);
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      border-top: 3px solid rgb(13, 13, 13);
+      padding-top: 14px;
+      margin-top: 36px;
+      font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpi-cell { border-bottom: 1px solid rgb(205, 205, 200); }
+      .mode-tabs button.mode-tab {
+        flex: 1;
+        text-align: center;
+        padding: 7px 8px;
+      }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; }
+      .topbar-right { font-size: 8pt; padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+      </div>
+      <div class="topbar-right">&nbsp;</div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://xenaproject.wordpress.com/2026/11/12/and-the-proof-is-checked-in-lean/">Interpreting claims that a theorem is correct because it was checked in Lean</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=xenaproject.wordpress.com"><span class="sitestr">xenaproject.wordpress.com</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">252 points</span> by <a href="https://news.ycombinator.com/user?id=matt_d">matt_d</a> <span class="age" title="2026-11-16T07:38:19.000Z"><a href="https://news.ycombinator.com/item?id=50515058">12 hours ago</a></span> | <a href="https://news.ycombinator.com/item?id=50515058">109&nbsp;comments</a> | 79.8% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">01 // EVIDENCE</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">109</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 81 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">20.2%</div>
+          <div class="kpi-sub">22 comments (3 Gold / 2.8%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">79.8%</div>
+          <div class="kpi-sub">60 chatter &bull; 27 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">1</div>
+        <div class="kpi-sub">3% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.958</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">38</div>
+          <div class="kpi-sub">HN POS 17..54 (34.9% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="margin-top:10px;font:600 11px/1.5 ui-monospace,Menlo,monospace;color:rgb(70,70,68)"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">02 // EXPLORE</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 109-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 109)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (3)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (19)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (60)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (27)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..109) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 33)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (Legend2440, 6.2h); largest subtree (@wodenokoto) occupies 38 slots (HN POS 17..54).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="mode-tabs" id="modeTabs" role="tablist" aria-label="Ranking view">
+        <button type="button" class="mode-tab active" data-mode="hn_top40" role="tab" aria-selected="true">HN Top 40</button>
+        <button type="button" class="mode-tab" data-mode="top_signal" role="tab" aria-selected="false">Epistemic Top 40</button>
+      </div>
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (109)</option>
+          <option value="statement_theorem">Statement &amp; Theorem (Code) (30)</option>
+          <option value="lean_kernel">Lean &amp; Kernel (Proving) (19)</option>
+          <option value="bugs_correct">Bugs &amp; Correct (Formally) (19)</option>
+          <option value="theory_software">Theory &amp; Software (Understand) (17)</option>
+          <option value="experience_feels">Experience &amp; Feels (Everything) (15)</option>
+          <option value="general_commentary">General Commentary (9)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, correct, theorem, kernel, statement, code...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50515058 + XENAPROJECT.WORDPRESS.COM + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50515058, "story_title": "Interpreting claims that a theorem is correct because it was checked in Lean", "story_url": "https://xenaproject.wordpress.com/2026/11/12/and-the-proof-is-checked-in-lean/", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50515058, "story_title": "Interpreting claims that a theorem is correct because it was checked in Lean", "story_url": "https://xenaproject.wordpress.com/2026/11/12/and-the-proof-is-checked-in-lean/", "points": 252, "story_author": "matt_d", "article_source": "fetched_url", "t1_ref_utc": "2026-11-16T19:51:05+00:00", "t2_ref_utc": "2026-11-16T19:51:05+00:00", "delta_minutes": 0.0, "story_anchors": ["correct", "theorem", "kernel", "statement", "code", "lines", "simple", "prove", "claims", "millions", "definitions", "file", "bug", "proof", "verification", "easy", "formal", "tests", "mathematics", "conjecture", "particular", "theory", "human", "fermat", "openai"], "facet_labels": {"statement_theorem": "Statement & Theorem (Code)", "theory_software": "Theory & Software (Understand)", "lean_kernel": "Lean & Kernel (Proving)", "experience_feels": "Experience & Feels (Everything)", "bugs_correct": "Bugs & Correct (Formally)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "statement_theorem", "label": "Statement & Theorem (Code)", "count": 30, "top_terms": ["statement", "theorem", "code", "lean"]}, {"slug": "theory_software", "label": "Theory & Software (Understand)", "count": 17, "top_terms": ["theory", "software", "understand", "reasoning"]}, {"slug": "lean_kernel", "label": "Lean & Kernel (Proving)", "count": 19, "top_terms": ["lean", "kernel", "proving", "buzzard"]}, {"slug": "experience_feels", "label": "Experience & Feels (Everything)", "count": 15, "top_terms": ["experience", "feels", "everything", "mathematicians"]}, {"slug": "bugs_correct", "label": "Bugs & Correct (Formally)", "count": 19, "top_terms": ["bugs", "correct", "formally", "program"]}], "counts": {"total_comments": 109, "live_t2_comments": 109, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 81, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "6ac6d54e358ed2358c18620caddd9148da2214110a0c813ec2dbd05c73a85bfd"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 3, "grounded_analysis": 19, "crowd_chatter": 60, "bullshit_or_flamewar": 27}, "facets": {"lean_kernel": 19, "statement_theorem": 30, "experience_feels": 15, "bugs_correct": 19, "theory_software": 17, "general_commentary": 9}, "facet_options": [{"slug": "statement_theorem", "label": "Statement & Theorem (Code)", "count": 30}, {"slug": "lean_kernel", "label": "Lean & Kernel (Proving)", "count": 19}, {"slug": "bugs_correct", "label": "Bugs & Correct (Formally)", "count": 19}, {"slug": "theory_software", "label": "Theory & Software (Understand)", "count": 17}, {"slug": "experience_feels", "label": "Experience & Feels (Everything)", "count": 15}, {"slug": "general_commentary", "label": "General Commentary", "count": 9}], "facet_diagnostics": [{"slug": "statement_theorem", "label": "Statement & Theorem (Code)", "count": 30, "useful": 7, "useful_pct": 23.3, "terms": "statement, theorem, code, lean"}, {"slug": "lean_kernel", "label": "Lean & Kernel (Proving)", "count": 19, "useful": 3, "useful_pct": 15.8, "terms": "lean, kernel, proving, buzzard"}, {"slug": "bugs_correct", "label": "Bugs & Correct (Formally)", "count": 19, "useful": 3, "useful_pct": 15.8, "terms": "bugs, correct, formally, program"}, {"slug": "theory_software", "label": "Theory & Software (Understand)", "count": 17, "useful": 2, "useful_pct": 11.8, "terms": "theory, software, understand, reasoning"}, {"slug": "experience_feels", "label": "Experience & Feels (Everything)", "count": 15, "useful": 7, "useful_pct": 46.7, "terms": "experience, feels, everything, mathematicians"}, {"slug": "general_commentary", "label": "General Commentary", "count": 9, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 9}, {"category": "code_repository", "count": 1}], "story_anchors": ["correct", "theorem", "kernel", "statement", "code", "lines", "simple", "prove", "claims", "millions", "definitions", "file", "bug", "proof", "verification", "easy", "formal", "tests"], "largest_root": {"root_id": 50516209, "author": "wodenokoto", "slots": 38, "start_dom": 17, "end_dom": 54, "share_pct": 34.9, "top_dom1_age": 6.2, "top_dom1_author": "Legend2440"}, "buried_cutoff": 33, "rescue_top_k": 22, "ablations": [], "tournament": [], "comments": [{"id": 50521065, "au": "troupo", "dom": 16, "sr": 1, "sc": 9.45, "ep": 9.45, "bs": 0.0, "d": 1, "age": 1.31, "grav": 8.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 73, "qw": 0, "k": 5897, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "lean_kernel", "flbl": "Lean & Kernel (Proving)", "urls": ["https://github.com/josevalim/lynx"], "ig": 1.497, "fa": 2.08, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "For Elixir its author, Jose Valim, created Lynx: https://github.com/josevalim/lynx\n\n--- start quote ---\n\nYou write laws in Erlang/Elixir, which are automatically translated to Lean alongside your Erlang/Elixir code, and you write proofs in Lean. The laws and proofs are assembled together and verified by Lean's kernel.\n\nThis technique is also known as shallow embedding, since it translates Erlang/Elixir to Lean and then use the features and properties of Lean for proofs.\n\n--- end quote ---"}, {"id": 50521342, "au": "troupo", "dom": 65, "sr": 2, "sc": 8.49, "ep": 9.33, "bs": 0.85, "d": 4, "age": 0.98, "grav": 7.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 160, "qw": 9, "k": 5897, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "epistemic_gold", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": [], "ig": 1.713, "fa": 1.37, "gp": 0.968, "bl": 0.32, "ds": 0.0, "txt": "> No, to be clear, in Lean, it really can't\n\nIt can. For two reasons. One reason is that the proofs themselves depend on on unchecked and unverified definitions and statements:\n\n--- start quote ---\n\nAn example of this right now is a PR to DeepMind’s Formal Conjectures repository containing a Lean formalisation of the statement of the Hodge conjecture. At the time of writing, the statement relies on over 10,000 lines of code sitting on top of Mathlib, because Mathlib does not yet have the definitions of things like the cycle class map needed to make the statement.\n\nAnother example is Axiom’s recent announcement of a formally-verified proof of the classification of finite simple groups. The statement which Axiom’s system proved is here in Tau Ceti, an AI-generated library of Lean code. The file containing the statement imports over 250K lines of Lean code in Tau Ceti (over 900 files). Of these, around 5600 lines of code are crucial because they contain all the relevant definitions\n\n--- end quote ---\n\nAnd the second reason is why `lake comparator` exists."}, {"id": 50522157, "au": "cubefox", "dom": 78, "sr": 3, "sc": 8.15, "ep": 8.15, "bs": 0.0, "d": 1, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 154, "qw": 7, "k": 8109, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "experience_feels", "flbl": "Experience & Feels (Everything)", "urls": ["https://terrytao.wordpress.com/wp-content/uploads/2026/09/cropped-thurston-1.png"], "ig": 1.814, "fa": 1.04, "gp": 0.637, "bl": 0.0, "ds": 0.0, "txt": "> https://terrytao.wordpress.com/wp-content/uploads/2026/09/cr...\n\nMany mathematicians are now saying that (human!) understanding is (and was) the true goal of pure math. Not proving theorems itself. But I don't think that's correct. Otherwise the mathematicians would be happy about the new math genius AIs (which are infinitely patient in explaining anything), rather than feeling the threat of AIs beating human mathematicians in proving various conjectures.\n\nI rather think pure resesarch math was merely partially about understanding. The other part was a sort of game, where you win prestige if you are the first to prove a famous conjecture, and where you feel like a \"researcher\", a math scientist of sorts, who \"discovers\" the secrets of the platonic math universe.\n\nPure mathematicians are a bit like gamers \"exploring\" the procedurally generated worlds of Minecraft (or rather, solving procedurally generated puzzles in a puzzle game), while feeling like they thereby make serious scientific discoveries.\n\nThe difference is that no actual gamer would delude himself into thinking he is a researcher."}, {"id": 50518223, "au": "sashank_1509", "dom": 87, "sr": 4, "sc": 6.95, "ep": 6.95, "bs": 0.0, "d": 3, "age": 4.95, "grav": 32.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 91, "qw": 0, "k": 2543, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "experience_feels", "flbl": "Experience & Feels (Everything)", "urls": [], "ig": 1.667, "fa": 0.56, "gp": 0.994, "bl": 0.0, "ds": 0.0, "txt": "I can believe that GPT provides shorter proof than automated theorem provers which are effectively brute force searching with far less guidance than an LLM.\n\nBut from what I’ve seen, it’a absolutely not true that GPT on average generates shorter proofs than humans. Humans have GPT beat handily on that. Sometimes GPT generates shorter proofs, like in cases where humans missed a connection that GPT found. But most of the time, GPT will generate >10X longer proofs, hundreds, even thousands of pages of inscrutable slop maths where it’s completely unclear what’s going on."}, {"id": 50520255, "au": "trehans", "dom": 9, "sr": 5, "sc": 6.32, "ep": 6.47, "bs": 0.0, "d": 0, "age": 2.3, "grav": 13.8, "surf": 5.3, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 168, "qw": 0, "k": 33, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": ["https://kellerai.io/resources/ai-proved-your-code-correct"], "ig": 1.522, "fa": 0.62, "gp": 0.778, "bl": 0.0, "ds": 0.0, "txt": "One thing I'm surprised to see little mention of here is that if you want to use Lean proofs for your code and really want good correspondence between what is proved in Lean and what your code actually does, you need a mathematical model of your programming language embedded in Lean and a deterministic parser converting your code itself into Lean. Otherwise, yes, an AI actually has no checks against hallucination and while writing Lean proofs probably helps AI identify its mistakes it really isn't an end-to-end proof of your code's functionality.\n\nI personally think the future probably involves a combination of unit tests and formal verification to support our confidence in AI-written software, as well as means to align high-level human intent with the low-level intent of individual code pieces, which as this article mentions is the other big piece that can slip with formal proofs: we might not be proving what we think we're proving. For those interested I've written an educational post about this topic here as well: https://kellerai.io/resources/ai-proved-your-code-correct"}, {"id": 50518037, "au": "seanwilson", "dom": 70, "sr": 6, "sc": 5.99, "ep": 5.99, "bs": 0.0, "d": 0, "age": 5.25, "grav": 35.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 248, "qw": 125, "k": 8496, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": [], "ig": 1.506, "fa": 0.42, "gp": 0.864, "bl": 0.0, "ds": 0.0, "txt": "> def FermatsLastTheorem : Prop := ∀ a b c n : ℕ, n ≥ 3 → a^n + b^n ≠ c^n\n\n> This code imports Lean’s mathematics library Mathlib and then defines a mathematical statement which looks at first glance like it might be Fermat’s Last Theorem, but which actually is a trivially false statement because in Lean ℕ contains 0, so a = b = c = 0 and n = 3 gives a counterexample.\n\n...\n\n> The first question which one has to ask when judging a pdf which comes with some Lean code is: “what is the statement of the theorem in the Lean code, and does this correspond to the actual theorem statement in the pdf?” For a human Lean expert, this is typically (but not always) an easy question to answer. For example any Lean-competent human mathematician would be able to read the two lines of code above and observe that this was a mis-statement of Fermat’s Last Theorem.\n\nTo add to this, if the statement is wrong, the proof steps and other theorem statements that appear in the full proof are going to follow a path that goes with the wrong statement so there's further opportunities to see there's a mistake.\n\nOften problems with the statement make it suspiciously easy to prove, the proof takes a path that doesn't make sense with the correct statement in mind, or it makes it impossible to complete the proof. In the above example, you would see from the easy counterexample found in the proof that the stateme"}, {"id": 50519315, "au": "Xcelerate", "dom": 99, "sr": 7, "sc": 5.86, "ep": 5.86, "bs": 0.0, "d": 0, "age": 3.5, "grav": 21.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 224, "qw": 0, "k": 11704, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "bugs_correct", "flbl": "Bugs & Correct (Formally)", "urls": [], "ig": 1.759, "fa": 0.0, "gp": 1.192, "bl": 0.0, "ds": 0.0, "txt": "I'm a little worried that the mountain of disclaimers against Lean proofs is going to slow something many industries desperately need: more formalization. (Buzzard's article is great by the way considering its target audience—my comment is more about the broader tech industry's perception of LLM-generated Lean proofs.)\n\nOne of the nice things about mathematical theories relevant to the real world (e.g. PA) is that confirming that a proof is correct is a purely mechanical procedure. Now Lean is built on the Calculus of Inductive Constructions (which can indirectly capture PA, but includes a lot more as well), but it's child's play to write a simple PA proof checker. It's probably a few hundred lines of Python, and even for something like a million line proof, confirming or refuting whether a proof is correct will take a few seconds tops (again, pure PA here, not Lean).\n\nThe caveats in the article are indeed important (e.g., \"Did your formal sentence in the language of first-order arithmetic actually capture what you intended?\", \"Is there a bug in your proof checker?\"), but I'd label these more as human factors than math factors. I'm afraid the general public is starting to get the impression that \"Lean-checked\" is just another quality improvement, like reviewing your code carefully or adding some unit tests. It's not—it's totally different, and I don't think we should make too m"}, {"id": 50517242, "au": "lionkor", "dom": 86, "sr": 8, "sc": 5.68, "ep": 5.82, "bs": 0.0, "d": 3, "age": 6.67, "grav": 48.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 84, "qw": 0, "k": 6988, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "theory_software", "flbl": "Theory & Software (Understand)", "urls": [], "ig": 1.515, "fa": 0.34, "gp": 0.894, "bl": 0.0, "ds": 0.0, "txt": "You're implying that GPT-6 Sol can do better. That is not how LLMs work! They will write code, and then, in a separate invocation, find 100 problems with that code. Unlike humans, the immediate context massively impacts the immediate next response, and \"knowing better\" is nearly entirely irrelevant, because even with thinking and reasoning, these machines do not adequately reflect.\n\nInstructing them to reflect also doesn't help; they pull whatever hallucinations make up the \"reflection\" into immediate context, and now they're even more confused."}, {"id": 50519285, "au": "adleyjulian", "dom": 58, "sr": 9, "sc": 5.63, "ep": 5.63, "bs": 0.0, "d": 0, "age": 3.54, "grav": 21.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 75, "qw": 10, "k": 39, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "lean_kernel", "flbl": "Lean & Kernel (Proving)", "urls": [], "ig": 1.51, "fa": 0.42, "gp": 0.613, "bl": 0.0, "ds": 0.0, "txt": "> Question 4: does the code exploit a bug in Lean’s official kernel?\n\nMy understanding is that this has generally been a non issue as one does not exploit a bug unintentionally (at least it hasn't happened yet), but the Huggingface hack shows agents are willing to go through great lengths to cheat to pass evals.\n\nGiven an impossible task I could see an agent finding and exploiting a Lean kernel bug and then obfuscating its method.\n\nI suspect the easiest solution to this is to have adversarial agents looking for such cheating."}, {"id": 50516507, "au": "DoctorOetker", "dom": 104, "sr": 10, "sc": 5.51, "ep": 5.51, "bs": 0.0, "d": 0, "age": 8.12, "grav": 64.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 94, "qw": 0, "k": 1969, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "lean_kernel", "flbl": "Lean & Kernel (Proving)", "urls": [], "ig": 1.608, "fa": 0.34, "gp": 0.524, "bl": 0.0, "ds": 0.0, "txt": "I have a concise proof of FLT.\n\n96 cores and 500 GB RAM to ... verify FLT?\n\nThe huge size of the proof is also remarkable, since brute forcing a long sequence of steps is much harder than brute forcing a shorter sequence of steps.\n\nI thought the whole \"tactics\" approach in Lean was supposed to permit shorter proofs? to skip the low level stuff?\n\nIf I formalize my short proof of FLT in MetaMath, it would just be a small file and any computer would be able to verify it.\n\nThis reflects so poorly on both OAI as well as the Lean project."}, {"id": 50517782, "au": "troupo", "dom": 63, "sr": 11, "sc": 5.45, "ep": 5.59, "bs": 0.0, "d": 2, "age": 5.65, "grav": 38.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 138, "qw": 0, "k": 5897, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": ["https://en.wikipedia.org/wiki/Mathematical_fallacy\u0023Division_by_zero"], "ig": 1.333, "fa": 0.62, "gp": 0.48, "bl": 0.0, "ds": 0.0, "txt": "They are not talking about changing the theorem. The solution can arbitrarily chose to override or ignore certain things to make sure the theorem passes.\n\nAs in the infamous 2=1 (https://en.wikipedia.org/wiki/Mathematical_fallacy\u0023Division_...). We ignore that division by zero is undefined, and boom, we get a \"proper\" solution to the stated theorem.\n\nThat's what the article means by \"how do we know for sure that somewhere in the millions of lines of code there is no hack which changes the meaning of the statement, changes the rules from just the axioms of mathematics\".\n\nAs for the meaning of the statement, I don't know how it is easy in maths. But in code, I've had Claude try and contort the definition of \"function accepts integers\" to \"anything that can look as an integer e.g. a string containing an integer is accepted\" and twist the solution to that."}, {"id": 50517288, "au": "program_whiz", "dom": 26, "sr": 12, "sc": 5.22, "ep": 5.44, "bs": 0.0, "d": 1, "age": 6.6, "grav": 48.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 67, "qw": 0, "k": 1683, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": [], "ig": 1.22, "fa": 0.68, "gp": 0.434, "bl": 0.0, "ds": 0.0, "txt": "Reading the friendly article:\n\nIt is worth noting that of the 290 OpenAI theorems which come with Lean code, around 38 of them have the property that the Lean code does not even state, let alone prove, the main theorem of the paper.\n\nSo even if LEAN is 100% bug-free, its still on the programmer to correctly express the logic and proofs, or they could be proving completely unrelated facts."}, {"id": 50519244, "au": "xg15", "dom": 89, "sr": 13, "sc": 5.05, "ep": 5.05, "bs": 0.0, "d": 0, "age": 3.61, "grav": 22.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 184, "qw": 0, "k": 23525, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "experience_feels", "flbl": "Experience & Feels (Everything)", "urls": [], "ig": 1.658, "fa": 0.0, "gp": 0.796, "bl": 0.0, "ds": 0.0, "txt": "I remember some frustrating math courses back when I was studying CS. The experience was somewhat like this:\n\nImagine you know nothing about vi except that it's a famous command line utility for linux. One day, your supervisor is tasked to give you an introduction to it.\n\nHowever, he doesn't tell you what vi is for or why it exists or how you use it - instead, he just sends you a tarball with the entire source code of it. Then he spends an hour with you going through the main function line by line, stopping whenever he finds a construct particularly clever or elegant. At the end, he runs \"make\" once to demonstrate that everything compiles.\n\nHe asks if you have any questions. You have none - you're still far away from being able to formulate meaningful questions. He is satisfied, declares you Knowledgeable in Vi and calls it a day.\n\nIt feels as if seasoned mathematicians now have a similar experience with AI generated proofs like the one students had in introductory math lectures like this one.\n\nI'm hoping a bit that this could motivate people to develop better didactics for math."}, {"id": 50516478, "au": "philipwhiuk", "dom": 80, "sr": 14, "sc": 4.73, "ep": 4.73, "bs": 0.0, "d": 0, "age": 8.19, "grav": 65.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 40, "k": 4290, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "experience_feels", "flbl": "Experience & Feels (Everything)", "urls": [], "ig": 1.046, "fa": 0.42, "gp": 0.742, "bl": 0.0, "ds": 0.0, "txt": "Thanks, this is really interesting and helpful context to us non-mathematicians.\n\n> It is probably worth stressing again: do not run random Lean code on your local machine unless you sandbox it first. Lean’s mathematics library is safe to run and build upon because this is human-curated and checked by human experts.\n\nI was surprised by this - does Lean need the ability to run arbitrary code? It feels like limiting Lean to not being Turing complete would be an advantage."}, {"id": 50520700, "au": "dwohnitmok", "dom": 55, "sr": 15, "sc": 4.65, "ep": 5.09, "bs": 0.0, "d": 0, "age": 1.76, "grav": 10.9, "surf": 6.1, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 145, "qw": 0, "k": 5271, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": [], "ig": 1.469, "fa": 0.28, "gp": 0.579, "bl": 0.0, "ds": 0.0, "txt": "Point 3 in this article basically is just a case of bad defaults in Lean (Lean at this point should probably just make `lake comparator` a mandatory part of compilation and that immediately fixes the issue as Buzzard mentions).\n\nReally there's only three things to check that the theorem is correct (leaving aside important questions of whether humans actually understand the proof and only caring about whether theorem is true):\n\n1. Check that the formal statement of the theorem matches the informal statement of the theorem\n\n2. Actually compile the proof (with `lake comparator`)\n\n3. Try to make the Lean kernel as bug-free as possible (the hardest one but also the one with the most amount of attention focused on it) or run with multiple different kernels\n\nAssuming those three, no need to read the potentially millions of lines of proof, if all you care about is correctness and not understanding."}, {"id": 50518527, "au": "paulddraper", "dom": 51, "sr": 16, "sc": 4.61, "ep": 4.75, "bs": 0.0, "d": 1, "age": 4.5, "grav": 29.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 74, "qw": 0, "k": 18142, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "bugs_correct", "flbl": "Bugs & Correct (Formally)", "urls": [], "ig": 1.466, "fa": 0.28, "gp": 0.353, "bl": 0.0, "ds": 0.0, "txt": "Yes it’s a good analogy.\n\nYou have to watch out for\n\n1. Translation. Do the author’s claims about the program/theorem match the actual code?\n\n2. Do you employ “shenanigans” to circumvent the checker? Bugs, unsafe operations. — Lean is a very strict checker as compilers go. Some compilers intentionally say “buyer beware.” It’s annoying to check for integer overflow in every operation. Lean doesn’t. But that still doesn’t mean it has zero bugs, in the framework or axioms."}, {"id": 50518519, "au": "hingler36", "dom": 90, "sr": 17, "sc": 4.02, "ep": 4.24, "bs": 0.0, "d": 0, "age": 4.52, "grav": 29.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 66, "qw": 19, "k": 239, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "experience_feels", "flbl": "Experience & Feels (Everything)", "urls": [], "ig": 1.043, "fa": 0.42, "gp": 0.41, "bl": 0.0, "ds": 0.0, "txt": "> OpenAI never claimed that it did! They just said “here is some Lean code which goes with this paper”.\n\nMaybe I'm misunderstanding this, but it feels like TFA is giving OpenAI entirely too much credibility here.\n\nIf I told you \"My grandma makes great chicken enchiladas\" and put a plate in front of you containing an enchilada filled with dog crap, you'd be rightfully confused and upset when you bit into it. Sure, I never specified what the enchilada in front of you was filled with, but come on!"}, {"id": 50517939, "au": "thechao", "dom": 67, "sr": 18, "sc": 4.02, "ep": 4.31, "bs": 0.0, "d": 2, "age": 5.4, "grav": 36.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 78, "qw": 0, "k": 5867, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "theory_software", "flbl": "Theory & Software (Understand)", "urls": [], "ig": 1.554, "fa": 0.0, "gp": 0.456, "bl": 0.0, "ds": 0.0, "txt": "As an ex- mathematician and ex- computer scientist who worked in programming language theory and computer algebra systems, I can assure you that we think about these problems deeply. In fact, outside of a few strongly normalizing toys, the first thing we do in PLT is drop completeness in favor of soundness. The article itself discusses this (the soundness issues that were addressed).\n\nAlthough, now I'm charmed about the idea of a programming language -- possibly a Brainfuck descendent? -- that drops soundness for completeness."}, {"id": 50517263, "au": "csande17", "dom": 19, "sr": 19, "sc": 4.01, "ep": 4.31, "bs": 0.0, "d": 2, "age": 6.65, "grav": 48.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 88, "qw": 0, "k": 4520, "kpp": 4.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "bugs_correct", "flbl": "Bugs & Correct (Formally)", "urls": [], "ig": 1.425, "fa": 0.0, "gp": 0.662, "bl": 0.0, "ds": 0.0, "txt": "On the bright side, the article claims Lean has built-in tools to do 2-4 as long as you have enough RAM. In particular, there's a formally verified alternative implementation of Lean's checker that would theoretically rule out 4.\n\nThat implementation seems to be vibe-coded/vibe-proven in Lean itself (assuming the \"con-leche\" that my quick Google search turned up is the one he's talking about), so it's kind of turtles all the way down, but it does decrease the chance that a program could be exploiting both a Lean bug and a con-leche bug."}, {"id": 50519601, "au": "guenthert", "dom": 103, "sr": 20, "sc": 3.7, "ep": 3.84, "bs": 0.0, "d": 2, "age": 3.17, "grav": 19.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 48, "qw": 23, "k": 1701, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "theory_software", "flbl": "Theory & Software (Understand)", "urls": [], "ig": 1.126, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> But for software, and many other real world applications, it's better thought of as a new orthogonal testing vector that everyone should be using.\n\nNot sure about should, but as long as even modestly complex systems like the Signal communication protocol map into millions of lines of Lean, its pretty clear that not everyone will be able to use it.  We still need better tools (tools better suited to our monkey brains)."}, {"id": 50517490, "au": "Legend2440", "dom": 1, "sr": 21, "sc": 3.63, "ep": 3.63, "bs": 0.0, "d": 0, "age": 6.2, "grav": 44.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 3385, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "lean_kernel", "flbl": "Lean & Kernel (Proving)", "urls": [], "ig": 0.98, "fa": 0.0, "gp": 0.915, "bl": 0.0, "ds": 0.0, "txt": "Worth pointing out that this article is by Kevin Buzzard, one of the biggest advocates for Lean and automated theorem proving.\n\nIt's refreshing to see intellectual honesty about a tool's limitations, from someone still advocating for its strengths."}, {"id": 50519044, "au": "bunderbunder", "dom": 30, "sr": 22, "sc": 3.59, "ep": 4.47, "bs": 0.0, "d": 5, "age": 3.85, "grav": 24.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 18581, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "experience_feels", "flbl": "Experience & Feels (Everything)", "urls": [], "ig": 0.747, "fa": 0.68, "gp": 0.539, "bl": 0.0, "ds": 0.0, "txt": "The cynical answer is that their primary goal was never to meaningfully contribute to mathematics. It was to pick some low-hanging fruit for the marketing department. So they did the 10% of the work that generates 90% of the buzz."}, {"id": 50517021, "au": "throwawayffffas", "dom": 18, "sr": 23, "sc": 3.4, "ep": 3.84, "bs": 0.0, "d": 1, "age": 7.11, "grav": 53.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 76, "qw": 0, "k": 3051, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bugs_correct", "flbl": "Bugs & Correct (Formally)", "urls": [], "ig": 1.168, "fa": 0.28, "gp": 0.208, "bl": 0.0, "ds": 0.0, "txt": "The gist of the article is that it's worse.\n\nThat it's the equivalent of saying \"It's full moon tonight because I wrote this program\".\n\nAnd he states that you have to check that:\n\n1. The statement the author is making corresponds to the statement in the lean program.\n\n2. The lean program actually compiles.\n\n3. There is no shenanigans hidden in the lean program to disguise a trivial proof as the one stated.\n\n4. The program does not exploit bugs in lean."}, {"id": 50519129, "au": "fweimer", "dom": 47, "sr": 24, "sc": 3.37, "ep": 3.81, "bs": 0.0, "d": 2, "age": 3.75, "grav": 23.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 64, "qw": 0, "k": 1914, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "theory_software", "flbl": "Theory & Software (Understand)", "urls": [], "ig": 1.271, "fa": 0.28, "gp": 0.019, "bl": 0.0, "ds": 0.0, "txt": "That's like saying that all memory-safety programs are written in Rust.\n\nThere is no fundamental reason why mathematics should be formalized using concepts that are alien to most mathematicians, in the way that type theory is.\n\n(I guess Isabelle/HOL is the Java of formalized mathematics, in the sense that for reasons that are difficult to understand, memory safety of Java-implemented technology does not count.)"}, {"id": 50519490, "au": "thomasahle", "dom": 102, "sr": 25, "sc": 3.25, "ep": 4.21, "bs": 0.0, "d": 1, "age": 3.31, "grav": 20.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 91, "qw": 21, "k": 7001, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": [], "ig": 1.2, "fa": 0.42, "gp": 0.129, "bl": 0.0, "ds": 0.0, "txt": "> \"Lean-checked\" is just another quality improvement, like reviewing your code carefully or adding some unit tests. It's not—it's totally different\n\nI think for most things, this is actually a good way to see it: As a third leg on top of reviewing your code carefully and unit tests.\n\nAs you say, people will still make many mistakes in how they write their formal requirements, or miss things they care about.\n\nFor math this is not an issue, it's usually easy to check that the lean statement is exactly what you want. But for software, and many other real world applications, it's better thought of as a new orthogonal testing vector that everyone should be using."}, {"id": 50519196, "au": "lumost", "dom": 20, "sr": 26, "sc": 3.17, "ep": 3.83, "bs": 0.0, "d": 3, "age": 3.67, "grav": 22.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 90, "qw": 0, "k": 11846, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bugs_correct", "flbl": "Bugs & Correct (Formally)", "urls": [], "ig": 1.534, "fa": 0.0, "gp": 0.152, "bl": 0.0, "ds": 0.0, "txt": "Saying that a \"formally verified\" program rules out any bugs is a bit of a reach. Formal verification only checks that the properties you claim are true are actually true in the absence of bugs in the proof logic.\n\nExample bug\n\nA verified network program ensures that \"data from two addresses are never commingled\", but it does not verify that the NIC can't overwrite control flow memory opening up RCE attacks/other memory reads.\n\nIt certainly is harder to make bugs in formally verified software than the alternative, but it is not bug free."}, {"id": 50516425, "au": "red_trumpet", "dom": 61, "sr": 27, "sc": 3.15, "ep": 4.25, "bs": 0.0, "d": 0, "age": 8.28, "grav": 66.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 72, "k": 1586, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "experience_feels", "flbl": "Experience & Feels (Everything)", "urls": [], "ig": 0.63, "fa": 0.42, "gp": 1.085, "bl": 0.0, "ds": 0.0, "txt": "> Put another way — given a Challenge.lean file with only trusted code imported and the statement of a theorem, and a Solution.lean file with millions of lines of untrusted code imported and the proof of a theorem which looks identical, how do we know for sure that somewhere in the millions of lines of code there is no hack which changes the meaning of the statement, changes the rules from just the axioms of mathematics.\n\nAs someone with a PhD in mathematics, but no experience with Lean, I found this pretty surprising. Shouldn't there be some kind of encapsulation, which insulates the statement from the proof?"}, {"id": 50519940, "au": "thejokeisonme", "dom": 100, "sr": 28, "sc": 2.84, "ep": 3.5, "bs": 0.0, "d": 1, "age": 2.7, "grav": 16.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 62, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "lean_kernel", "flbl": "Lean & Kernel (Proving)", "urls": [], "ig": 1.076, "fa": 0.28, "gp": 0.119, "bl": 0.0, "ds": 0.0, "txt": "The problem with your PA proposal is that, while the kernel will be much small, the specifications/theorems will be much harder to read. So you are saving on a one time effort (writing a correct kernel) by sacrificing in many time efforts (writing a correct specification)."}, {"id": 50519973, "au": "guenthert", "dom": 76, "sr": 29, "sc": 2.74, "ep": 3.11, "bs": 0.0, "d": 2, "age": 2.66, "grav": 16.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 54, "qw": 0, "k": 1701, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "theory_software", "flbl": "Theory & Software (Understand)", "urls": [], "ig": 1.322, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The software that enables you and me to write comments here is held together with spit and duck tape (*). For mathematical proofs we should strive for higher standards.\n\n*) no offense intended, don't mean to belittle the software of this particular website in particular, but software in general is written with different aim than perfection."}, {"id": 50520564, "au": "nirinor", "dom": 79, "sr": 30, "sc": 2.68, "ep": 3.56, "bs": 0.0, "d": 0, "age": 1.93, "grav": 11.7, "surf": 6.6, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 71, "qw": 0, "k": 120, "kpp": 5.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": [], "ig": 1.411, "fa": 0.0, "gp": 0.166, "bl": 0.0, "ds": 0.0, "txt": "The problem here is that people want a simple fact to deal with many situations.\n\nA) \"Someone said Lean4 proof so it must be bullet-proof and fulfill all my hopes!\"\nB) \"Eh, lean4 is imperfect, so it means nothing\"\n\nInconveniently, both of those caricatures are wrong.\n\nLean4 gives us a high level of confidence in the _theorem validated, under the assumptions allowed_.\n\nThis makes it high value to learn to read lean4 theorems (not proofs)."}, {"id": 50518294, "au": "fooker", "dom": 97, "sr": 31, "sc": 2.61, "ep": 3.05, "bs": 0.0, "d": 0, "age": 4.87, "grav": 32.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 5919, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bugs_correct", "flbl": "Bugs & Correct (Formally)", "urls": [], "ig": 1.172, "fa": 0.0, "gp": 0.204, "bl": 0.0, "ds": 0.0, "txt": "I am not looking forward to bugs in code becoming bugs in specifications instead.\n\nIt is far more pleasant to deal with bugs in code.\n\nFor complex things like compilers, we like to deliberately leave some parts of the spec weak to make the code pragmatic. Welp."}, {"id": 50519446, "au": "guenthert", "dom": 6, "sr": 32, "sc": 2.51, "ep": 3.1, "bs": 0.0, "d": 1, "age": 3.37, "grav": 20.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 97, "qw": 0, "k": 1701, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "lean_kernel", "flbl": "Lean & Kernel (Proving)", "urls": [], "ig": 1.318, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "\"Worth pointing out that this article is by Kevin Buzzard\"\n\nIs it?  The site claims that the article is written by the Xena Project.  In the comment section it answers on (paraphrasing) \"whether proving that a Lean kernel written in Lean and verified by Lean would be a circular proof\" with \"I’m really sorry, you need to ask these questions elsewhere (e.g. on the Lean Zulip). I am by no means an expert in these matters, all I know is that people who are experts have thought hard about them. \"\n\nIf that is indeed Kevin Buzzward's writing, it is by no means obvious."}, {"id": 50516712, "au": "yorwba", "dom": 81, "sr": 33, "sc": 2.44, "ep": 3.03, "bs": 0.0, "d": 1, "age": 7.69, "grav": 59.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 54, "qw": 0, "k": 16093, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "theory_software", "flbl": "Theory & Software (Understand)", "urls": [], "ig": 1.18, "fa": 0.0, "gp": 0.179, "bl": 0.0, "ds": 0.0, "txt": "Lean needs the ability to call out to external solvers and import proof certificates generated by them. In theory you could have Turing-complete Lean without the ability to interact with other programs or the file system, but you would have to fully reimplement those external solvers in Lean and it would be terribly slow."}, {"id": 50516209, "au": "wodenokoto", "dom": 17, "sr": 34, "sc": 2.26, "ep": 3.8, "bs": 0.0, "d": 0, "age": 8.91, "grav": 73.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 45, "qw": 0, "k": 18109, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": [], "ig": 0.804, "fa": 0.0, "gp": 1.315, "bl": 0.0, "ds": 0.0, "txt": "Isn’t “proof is checked in Lean” kinda similar to assuming your code works just because it compiles.\n\nSure, the code works, but does it work at doing what you want?\n\nSure, the proof is valid, but does it prove what you set out to prove?"}, {"id": 50516095, "au": "troupo", "dom": 83, "sr": 35, "sc": 2.24, "ep": 3.41, "bs": 0.0, "d": 0, "age": 9.25, "grav": 78.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 5897, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "experience_feels", "flbl": "Experience & Feels (Everything)", "urls": [], "ig": 0.95, "fa": 0.0, "gp": 0.815, "bl": 0.0, "ds": 0.0, "txt": "(Judging from my very limited experience with Lean, and with Lean written by LLMs)\n\nIt also doesn't help that LLMs tend to generate a lot of unnecessary Lean code to prove even the simplest statements."}, {"id": 50521889, "au": "lumost", "dom": 22, "sr": 36, "sc": 2.03, "ep": 3.57, "bs": 0.0, "d": 5, "age": 0.34, "grav": 4.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 78, "qw": 0, "k": 11846, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": [], "ig": 1.432, "fa": 0.0, "gp": 0.141, "bl": 0.0, "ds": 0.0, "txt": "It verifies what it verifies, NICs write to main memory as the standard method of reading/writing packets - if there is no proof that the main memory/NIC memory is segmented for all packets/sequences of packets. Then there is no strict reason to believe that the program can't be RCE'd.\n\nThe same would apply to any interaction between pointer based memory operations and LEAN. Pointer based memory ops are everywhere below a certain level of code/hardware integration."}, {"id": 50520528, "au": "erichocean", "dom": 69, "sr": 37, "sc": 1.94, "ep": 3.04, "bs": 0.0, "d": 2, "age": 1.96, "grav": 11.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 2, "k": 5480, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "theory_software", "flbl": "Theory & Software (Understand)", "urls": [], "ig": 1.292, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> self contained\n\nThis is a totally unnecessary requirement, noticed by Alfred Tarski roughly two seconds after Göedel's work was announced.\n\nIf you don't personally find formal reasoning useful in proving correctness, that's a you problem. The rest of us are progressing forward just fine."}, {"id": 50516253, "au": "oulipo", "dom": 52, "sr": 38, "sc": 1.92, "ep": 3.02, "bs": 0.0, "d": 1, "age": 8.76, "grav": 72.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 1449, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bugs_correct", "flbl": "Bugs & Correct (Formally)", "urls": [], "ig": 0.848, "fa": 0.28, "gp": 0.159, "bl": 0.0, "ds": 0.0, "txt": "If the proof is valid, it DOES prove what your theorem is saying (except for rare verification kernel bugs). The issue is mostly: did you correctly formalize and check the specification of your theorem itself..."}, {"id": 50521003, "au": "fritzo", "dom": 13, "sr": 39, "sc": 1.91, "ep": 3.3, "bs": 0.0, "d": 3, "age": 1.38, "grav": 9.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 70, "qw": 0, "k": 1084, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": [], "ig": 1.361, "fa": 0.0, "gp": 0.073, "bl": 0.0, "ds": 0.0, "txt": "You need to pick an abstraction level. I don't prove in lean the impact of my programs on the price of eggs at the local market. I don't prove in lean how much energy my programs consume, or even how much RAM they consume. I do prove that say a particular pair of functions commute, or that another function is idempotent, or that under a denotational semantics a collection of functions can be composed without error."}, {"id": 50522190, "au": "skybrian", "dom": 34, "sr": 40, "sc": 1.77, "ep": 3.31, "bs": 0.0, "d": 8, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 100, "qw": 0, "k": 27937, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": [], "ig": 1.391, "fa": 0.0, "gp": 0.028, "bl": 0.0, "ds": 0.0, "txt": "There was a blog post. It's the bare minimum when announcing something to the public, not a sign that they're going to use it to promote themselves in a significant way.\n\nThere's no \"low profile\" for a company like OpenAI. Either you let the public (including the press) know or you don't, and keeping the results secret would be bad.\n\nIf they just told a few people, it would leak eventually and then you'd have articles based on rumors, along with accusations of a coverup. For an example of the difficulty, look at what happens when people try to do coordinated disclosure of a security bug."}, {"id": 50520759, "au": "dwohnitmok", "dom": 57, "sr": 41, "sc": 1.76, "ep": 3.0, "bs": 0.0, "d": 2, "age": 1.69, "grav": 10.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 5271, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": [], "ig": 0.454, "fa": 0.68, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "No. Verify the statement not the proof (usually the statement is <<1% the lines of the proof, e.g. in the case of Fermat's Last Theorem it's approximately 0.00001%)."}, {"id": 50518233, "au": "bunderbunder", "dom": 27, "sr": 42, "sc": 1.52, "ep": 3.06, "bs": 0.0, "d": 2, "age": 4.93, "grav": 32.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 73, "qw": 0, "k": 18581, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": [], "ig": 1.301, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It also speaks to why I remain skeptical of relying too much on coding agents for code review. They are still pretty iffy on implementing the right thing, and even worse at detecting when a PR didn’t implement the right thing. Ignoring that reality is how you do like Anthropic did and increase your rate of merging changes from 2500/day to 30,000/day without a corresponding increase in the rate at which you deliver useful work product."}, {"id": 50517720, "au": "tomtomtom777", "dom": 73, "sr": 43, "sc": 1.51, "ep": 2.69, "bs": 0.0, "d": 0, "age": 5.76, "grav": 40.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 733, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "theory_software", "flbl": "Theory & Software (Understand)", "urls": [], "ig": 0.606, "fa": 0.0, "gp": 0.87, "bl": 0.0, "ds": 0.0, "txt": "The sizes of these proofs are mind boggling.\n\nThis raises the question, is there any value in a proof so complicated that no human could ever understand it?\n\nIs there any purpose to mathematical proofs other than to increase our understanding?"}, {"id": 50519257, "au": "skybrian", "dom": 32, "sr": 44, "sc": 1.45, "ep": 2.99, "bs": 0.0, "d": 6, "age": 3.59, "grav": 22.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 116, "qw": 0, "k": 27937, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "experience_feels", "flbl": "Experience & Feels (Everything)", "urls": [], "ig": 1.273, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It’s more likely that their goal was internal research, to test a new LLM before releasing it. But, then they had something that mathematicians would be interested in, so they threw a data dump over the wall. It’s a rather rude way to do it, but this isn’t a company that particularly cares about the things that mathematicians care about.\n\nOpenAI no longer needs to do anything to get publicity. There are some organizations that are so famous that everything they do is newsworthy and anything they do will be covered whether they like it or not. Remaining low-profile is no longer an option.\n\nThe people claiming that everything is marketing haven’t come to grips with the inequality of fame."}, {"id": 50517320, "au": "moi2388", "dom": 72, "sr": 45, "sc": 1.38, "ep": 2.26, "bs": 0.0, "d": 0, "age": 6.55, "grav": 47.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 1501, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bugs_correct", "flbl": "Bugs & Correct (Formally)", "urls": [], "ig": 0.583, "fa": 0.0, "gp": 0.617, "bl": 0.0, "ds": 0.0, "txt": "“Beware of bugs in the above code; I have only proved it correct, not tried it.\" - Donald Knuth"}, {"id": 50517814, "au": "Gabriel54", "dom": 49, "sr": 46, "sc": 1.36, "ep": 2.9, "bs": 0.0, "d": 1, "age": 5.59, "grav": 38.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 51, "qw": 0, "k": 874, "kpp": 5.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": [], "ig": 1.158, "fa": 0.0, "gp": 0.125, "bl": 0.0, "ds": 0.0, "txt": "For relatively \"simple\" statements in mathematics it is pretty easy to learn enough Lean to verify that the Lean statement correctly encodes the intention of the mathematics.  It gets more difficult in certain areas of mathematics where there are many layers of definitions and they haven't been standardized in Lean yet."}, {"id": 50516163, "au": "QuesnayJr", "dom": 85, "sr": 47, "sc": 1.34, "ep": 2.88, "bs": 0.0, "d": 2, "age": 9.04, "grav": 75.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 1409, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": [], "ig": 1.005, "fa": 0.0, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "This is a trivial example, but I asked Prover9 (which is a brute-force automated theorem prover) to prove a theorem, and then I asked GPT-6 Sol to explain the proof.  Instead of doing that, it said \"You don't need most of this\" and gave a shorter proof."}, {"id": 50516888, "au": "CJefferson", "dom": 62, "sr": 48, "sc": 1.23, "ep": 2.33, "bs": 0.0, "d": 1, "age": 7.38, "grav": 56.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 53, "qw": 0, "k": 15711, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "lean_kernel", "flbl": "Lean & Kernel (Proving)", "urls": [], "ig": 0.992, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I don't understand this at all, as someone with a PhD in this area, and who uses lean quite a bit.\n\nIf 'Challenge.lean' states the theorem, the solution can't change the theorem. The only thing it can do is do a 'sorry', just skip proving some part, but that's printed out very clearly when it happens."}, {"id": 50516441, "au": "bananaflag", "dom": 42, "sr": 49, "sc": 1.21, "ep": 2.75, "bs": 0.0, "d": 1, "age": 8.25, "grav": 66.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 1561, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": [], "ig": 0.798, "fa": 0.0, "gp": 0.606, "bl": 0.0, "ds": 0.0, "txt": "No, because proofs are programs and theorems are types. It is enough to construct a function of the needed type to have a proof of the needed theorem. You don't need to look through all the code to see that the function has the desired type."}, {"id": 50517813, "au": "dcss_gardener", "dom": 2, "sr": 50, "sc": 1.2, "ep": 2.6, "bs": 0.0, "d": 1, "age": 5.59, "grav": 38.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 84, "qw": 0, "k": 331, "kpp": 6.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "experience_feels", "flbl": "Experience & Feels (Everything)", "urls": [], "ig": 0.934, "fa": 0.0, "gp": 0.277, "bl": 0.0, "ds": 0.0, "txt": "In my experience the actual formal verification practitioners are generally very straightforward about its strengths weaknesses and limitations. Understanding those limitations is fundamental to using them well, gaining any real value from them, beyond what is typical of complex tools.\n\nWhat you need to watch out for are the people or companies who latch on to proof checkers and formal verification as some sort of shortcut to correctness, intending to use it as a signal of seriousness rather than a serious tool in its own right."}, {"id": 50520609, "au": "fritzo", "dom": 11, "sr": 51, "sc": 1.2, "ep": 2.74, "bs": 0.0, "d": 1, "age": 1.87, "grav": 11.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 51, "qw": 0, "k": 1084, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": [], "ig": 1.081, "fa": 0.0, "gp": 0.139, "bl": 0.0, "ds": 0.0, "txt": "You don't need a model of your programming language in Lean, that's overkill.\n\nIt's already useful to isolate a DSL in your software and model that in Lean. Sure that only proves that the domain specific code is correct, but now you've factored your proof into proving high-level correctness and low-level correctness."}, {"id": 50517382, "au": "yk", "dom": 50, "sr": 52, "sc": 1.2, "ep": 2.74, "bs": 0.0, "d": 1, "age": 6.41, "grav": 46.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 45, "qw": 0, "k": 5635, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": [], "ig": 1.067, "fa": 0.0, "gp": 0.159, "bl": 0.0, "ds": 0.0, "txt": "On a technical level, yes. Though lean is build such that \"it compiles\" is a very strong statement about mathematics while most programming languages are not build to provide a very strong statement about correctness of the program. It is perhaps more similar to checking an equation numerically."}, {"id": 50516851, "au": "lickonographic", "dom": 66, "sr": 53, "sc": 1.16, "ep": 5.22, "bs": 2.52, "d": 1, "age": 7.45, "grav": 57.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 250, "qw": 0, "k": 3, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "theory_software", "flbl": "Theory & Software (Understand)", "urls": [], "ig": 1.778, "fa": 0.0, "gp": 0.721, "bl": 0.95, "ds": 0.0, "txt": "I think the deeper problem - an I am reading Computational Reflections by Cantwell Smith and that might be colouring my view - is that fundamentally it comes down to the interpretation of what the code or the math says.\n\nThe very meaning of interpretation in computer science is at odds with the use in philosophy of language and that is symptomatic.\n\nWe're still fundamentally trying to advance Hilbert's program. It's like Göedel's work hasn't sunk in to our collective reasoning about reasoning. It just doesn't seem possible to build a self contained correct and truthful system of symbolic logic. Truth is in the relationship of the system with other systems.\n\nAutomating mathematics, like automating software engineering, or automating automation, are all self contradictory propositions. Anything of what we build only ever means anything in how it interacts with us. I mean, people will go round and round in this forum discussing semantics and the meta implication of these unceasing discussions never seems to hit home. Namely, that there is no universal, truthful, correct, system of symbolic logic. It seems in fact impossible to have one. But the results that indicate this impossibility are built with a system of symbolic logic and the validity therein is contingent on people's understanding and, like all symbolic logic systems (including the ones that states the limits to universal"}, {"id": 50520946, "au": "CJefferson", "dom": 64, "sr": 54, "sc": 1.01, "ep": 2.33, "bs": 0.0, "d": 3, "age": 1.45, "grav": 9.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 45, "qw": 0, "k": 15711, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "lean_kernel", "flbl": "Lean & Kernel (Proving)", "urls": [], "ig": 0.99, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "'The solution can arbitrarily chose to override or ignore certain things to make sure the theorem passes.' - No, to be clear, in Lean, it really can't (with the one exception of using 'sorry' to mark some bits as unproved, which is then always flagged clearly)."}, {"id": 50517867, "au": "contubernio", "dom": 5, "sr": 55, "sc": 0.78, "ep": 2.32, "bs": 0.0, "d": 1, "age": 5.5, "grav": 37.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 545, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "experience_feels", "flbl": "Experience & Feels (Everything)", "urls": [], "ig": 0.874, "fa": 0.0, "gp": 0.186, "bl": 0.0, "ds": 0.0, "txt": "This kind of skepticism and self criticism is typical of good mathematicians and scientists because it's essential to doing good math and science."}, {"id": 50517906, "au": "kccqzy", "dom": 74, "sr": 56, "sc": 0.78, "ep": 2.3, "bs": 0.0, "d": 1, "age": 5.45, "grav": 37.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 19940, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "theory_software", "flbl": "Theory & Software (Understand)", "urls": [], "ig": 0.542, "fa": 0.0, "gp": 0.707, "bl": 0.0, "ds": 0.0, "txt": "The sizes of the total sum of software that enables you and me to write comments here is mind boggling. Probably no human could understand it all. But then why are we comfortable with it? Abstractions."}, {"id": 50520521, "au": "trehans", "dom": 15, "sr": 57, "sc": 0.78, "ep": 2.27, "bs": 0.0, "d": 2, "age": 1.97, "grav": 12.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 98, "qw": 0, "k": 33, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "bugs_correct", "flbl": "Bugs & Correct (Formally)", "urls": [], "ig": 0.964, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Yes, Verus (for Rust) is a good example of programming language level verification. The recent GitHub Next announcement indicates they are using it in their backend.\n\nYou're right that if you verify at the assembly language it can give you additional certainty that there are no additional errors in the compilation step. However, it can be easier for AI to reason about proofs written at the programming language level because (from what I can deduce) it matches the level that humans are operating at and it doesn't have additional details such as registers and memory operations to worry about."}, {"id": 50517089, "au": "Sharlin", "dom": 43, "sr": 58, "sc": 0.78, "ep": 2.12, "bs": 0.0, "d": 2, "age": 6.96, "grav": 51.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 22376, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": [], "ig": 0.766, "fa": 0.0, "gp": 0.221, "bl": 0.0, "ds": 0.0, "txt": "You have to be sure that the formalized theorem matches the informally stated theorem. Which is what GP meant and what the article is about. A program does what is written, not what is meant; a Lean program proves what is written, not what is meant."}, {"id": 50518828, "au": "skybrian", "dom": 28, "sr": 59, "sc": 0.78, "ep": 2.08, "bs": 0.0, "d": 3, "age": 4.1, "grav": 26.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 27937, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "experience_feels", "flbl": "Experience & Feels (Everything)", "urls": [], "ig": 0.883, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "OpenAI did a data dump of work in progress, leaving it to the mathematics community to make sense of it. I don’t think they claimed that there were Lean proofs for everything? Did they warn that some Lean proofs were incomplete?"}, {"id": 50518843, "au": "tomtomtom777", "dom": 75, "sr": 60, "sc": 0.78, "ep": 2.05, "bs": 0.0, "d": 2, "age": 4.09, "grav": 25.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 733, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "theory_software", "flbl": "Theory & Software (Understand)", "urls": [], "ig": 0.772, "fa": 0.0, "gp": 0.161, "bl": 0.0, "ds": 0.0, "txt": "The purpose of software isn't primarily to understand computers. I wouldn't know the purpose of say a number theory proof other then gaining a deeper understanding."}, {"id": 50519981, "au": "thejokeisonme", "dom": 71, "sr": 61, "sc": 0.78, "ep": 1.97, "bs": 0.0, "d": 1, "age": 2.65, "grav": 15.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 62, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "experience_feels", "flbl": "Experience & Feels (Everything)", "urls": [], "ig": 0.838, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "This is exactly one reason why human written mechanized proofs are so much more trust worthy. AI isn't really good at judgment calls, and that includes whether it is mechanizing the right things."}, {"id": 50520514, "au": "dozerly", "dom": 24, "sr": 62, "sc": 0.78, "ep": 1.96, "bs": 0.0, "d": 2, "age": 1.98, "grav": 12.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 8, "k": 653, "kpp": 4.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "lean_kernel", "flbl": "Lean & Kernel (Proving)", "urls": [], "ig": 0.835, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> the program does not exploit bugs in lean\n\nBeing fairly naive to Lean in general, this always seemed to me like a clear flaw of using Lean solutions as proof of hypotheses"}, {"id": 50520378, "au": "hoten", "dom": 14, "sr": 63, "sc": 0.78, "ep": 1.87, "bs": 0.0, "d": 1, "age": 2.14, "grav": 12.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 2066, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": [], "ig": 0.699, "fa": 0.0, "gp": 0.157, "bl": 0.0, "ds": 0.0, "txt": "Do people really approach Lean proofs from the programming language level rather than assembly code level (x64, arm, etc)?"}, {"id": 50516778, "au": "dgellow", "dom": 53, "sr": 64, "sc": 0.78, "ep": 1.86, "bs": 0.0, "d": 1, "age": 7.57, "grav": 58.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 23163, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bugs_correct", "flbl": "Bugs & Correct (Formally)", "urls": [], "ig": 0.792, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I mean, in some strange way, yes. Because your type system is basically a set of claims that are proven by your compiler. But the analogy doesn’t go further than that. The running program itself is the proof"}, {"id": 50520308, "au": "NewEntryHN", "dom": 59, "sr": 65, "sc": 0.78, "ep": 1.73, "bs": 0.0, "d": 1, "age": 2.22, "grav": 13.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 18, "qw": 0, "k": 581, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "lean_kernel", "flbl": "Lean & Kernel (Proving)", "urls": ["https://leodemoura.github.io/blog/2026-8-1-postmortem-for-kernel-soundness-bug-14576/"], "ig": 0.736, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Already happened. An agent produced a Lean proof of the Collatz conjecture being incorrect by exploiting a bug in Lean: https://leodemoura.github.io/blog/2026-8-1-postmortem-for-ke..."}, {"id": 50521495, "au": "jeremyjh", "dom": 10, "sr": 66, "sc": 0.78, "ep": 1.62, "bs": 0.0, "d": 1, "age": 0.79, "grav": 6.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 11665, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": [], "ig": 0.645, "fa": 0.0, "gp": 0.072, "bl": 0.0, "ds": 0.0, "txt": "I guess it isn't mentioned here because it is completely off-topic. Lean can make formal proofs of code but TFA is about proofs in pure mathematics."}, {"id": 50521530, "au": "jeremyjh", "dom": 31, "sr": 67, "sc": 0.78, "ep": 1.62, "bs": 0.0, "d": 6, "age": 0.75, "grav": 6.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 11665, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "lean_kernel", "flbl": "Lean & Kernel (Proving)", "urls": [], "ig": 0.689, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The more likely answer is because that is what the agent decided to do given inconsistent instructions. No one read what it said about what it was doing before releasing the presser."}, {"id": 50518159, "au": "throwawayffffas", "dom": 35, "sr": 68, "sc": 0.78, "ep": 1.57, "bs": 0.0, "d": 2, "age": 5.05, "grav": 33.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 3051, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "lean_kernel", "flbl": "Lean & Kernel (Proving)", "urls": [], "ig": 0.668, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "They could be proving completely unrelated stuff. Or even entirely trivial things like 1 + 1 = 2 over multiple millions of lines of lean code."}, {"id": 50517964, "au": "kccqzy", "dom": 82, "sr": 69, "sc": 0.78, "ep": 1.53, "bs": 0.0, "d": 1, "age": 5.36, "grav": 36.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 19940, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": [], "ig": 0.651, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It does. What if you want to use Lean to write say an HTTP server that contains several theorems about how it behaves?"}, {"id": 50516606, "au": "fancyfredbot", "dom": 38, "sr": 70, "sc": 0.78, "ep": 1.48, "bs": 0.0, "d": 1, "age": 7.9, "grav": 61.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 3734, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bugs_correct", "flbl": "Bugs & Correct (Formally)", "urls": [], "ig": 0.494, "fa": 0.0, "gp": 0.217, "bl": 0.0, "ds": 0.0, "txt": "I think it's a reasonable point but a bad analogy.\n\nIt's more like assuming that because your code is formally proven correct the client will be happy with it.\n\nThe code can be right but it may still do the wrong thing."}, {"id": 50519663, "au": "fancyfredbot", "dom": 40, "sr": 71, "sc": 0.78, "ep": 1.46, "bs": 0.0, "d": 3, "age": 3.06, "grav": 18.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 3734, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "bugs_correct", "flbl": "Bugs & Correct (Formally)", "urls": [], "ig": 0.621, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "OP said it's like saying the code compiles, but I said formally proven correct.\n\nFormally proven correct is a much stronger guarantee that the code meets its spec than a successful compilation."}, {"id": 50518569, "au": "paulddraper", "dom": 25, "sr": 72, "sc": 0.78, "ep": 1.28, "bs": 0.0, "d": 2, "age": 4.45, "grav": 28.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 18142, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bugs_correct", "flbl": "Bugs & Correct (Formally)", "urls": [], "ig": 0.204, "fa": 0.28, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "That’s pretty much the same as compiling a program.\n\n1. Yes.\n\n2. Yes.\n\n3. This is “you took 10 KLOC to do what 1 could have.”\n\n4. Yes."}, {"id": 50516125, "au": "mitxela", "dom": 84, "sr": 73, "sc": 0.78, "ep": 1.12, "bs": 0.0, "d": 1, "age": 9.16, "grav": 76.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 1578, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": [], "ig": 0.477, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Proofs are really hard, good proofs are really really hard. Having any proof at all is a huge step forward from not having one.\n\n2/5"}, {"id": 50517418, "au": "mihaic", "dom": 107, "sr": 74, "sc": 0.78, "ep": 1.1, "bs": 0.0, "d": 0, "age": 6.33, "grav": 45.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 3249, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bugs_correct", "flbl": "Bugs & Correct (Formally)", "urls": [], "ig": 0.467, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "At this point I've seen so many Lean articles that I have to ask: who check that Lean is actually correct itself?"}, {"id": 50517401, "au": "129298467", "dom": 94, "sr": 75, "sc": 0.78, "ep": 3.46, "bs": 2.52, "d": 0, "age": 6.36, "grav": 45.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 55, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "lean_kernel", "flbl": "Lean & Kernel (Proving)", "urls": [], "ig": 1.296, "fa": 0.0, "gp": 0.283, "bl": 0.95, "ds": 0.0, "txt": "Both the Lean kernel and the so called independent Con Leche kernel have massive Claude contributions.\n\nAsking the same entity to write the proof checkers as well as the proofs is not good practice. I'm very curious why Buzzard omits this fundamental fact.\n\nThis is just like an auditing company also writing the original financial statements."}, {"id": 50519528, "au": "lickonographic", "dom": 68, "sr": 76, "sc": 0.78, "ep": 3.45, "bs": 2.52, "d": 3, "age": 3.26, "grav": 19.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 103, "qw": 0, "k": 3, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "theory_software", "flbl": "Theory & Software (Understand)", "urls": [], "ig": 1.468, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "Oh I know how deeply we think about these things in the academy. I also know how practice, not least of all in industry, falls short of the depth of the theoretical thought.\n\nI hear and participate daily in discussions about automation, computation, programming - languages, environments. I have no illusions about the pinnacle of theory filtering down to how people spend their time, how organizations their resources, or how people talk about these problems every day in the context of real world project which tie up very limited resources pursuing things the theory should have made very clear to be out of reach for several decades now."}, {"id": 50520843, "au": "amw-zero", "dom": 12, "sr": 77, "sc": 0.6, "ep": 0.6, "bs": 0.0, "d": 2, "age": 1.59, "grav": 10.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 1250, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "lean_kernel", "flbl": "Lean & Kernel (Proving)", "urls": [], "ig": 0.257, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "What are you proving in Lean if you don't have the semantics of the thing that you're writing a proof about?"}, {"id": 50519886, "au": "peterbell_nyc", "dom": 101, "sr": 78, "sc": 0.56, "ep": 1.75, "bs": 1.19, "d": 1, "age": 2.76, "grav": 16.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 246, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bugs_correct", "flbl": "Bugs & Correct (Formally)", "urls": [], "ig": 0.746, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Pro's and cons. Personally I'm glad to have a short list of additional \"check this too\" items to improve the confidence in the accuracy of the rigor."}, {"id": 50518464, "au": "beepbooptheory", "dom": 88, "sr": 79, "sc": 0.12, "ep": 1.31, "bs": 1.19, "d": 3, "age": 4.6, "grav": 29.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 2687, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "lean_kernel", "flbl": "Lean & Kernel (Proving)", "urls": [], "ig": 0.558, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Funny how they always seem to do great on a trivial example. But not too trivial that it isn't worth sharing... Just trivial enough."}, {"id": 50520737, "au": "pasquinelli", "dom": 41, "sr": 80, "sc": 0.05, "ep": 0.9, "bs": 0.85, "d": 4, "age": 1.72, "grav": 10.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 2731, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "lean_kernel", "flbl": "Lean & Kernel (Proving)", "urls": [], "ig": 0.383, "fa": 0.0, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "and op's question was \"but how do you know the spec is what you want.\" making the guarantee stronger doesn't fix the problem. you can't fly by pulling your feet up no matter how strong you are."}, {"id": 50520651, "au": "dwohnitmok", "dom": 23, "sr": 81, "sc": -0.12, "ep": 1.07, "bs": 1.19, "d": 2, "age": 1.83, "grav": 11.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 22, "k": 5271, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "lean_kernel", "flbl": "Lean & Kernel (Proving)", "urls": [], "ig": 0.389, "fa": 0.0, "gp": 0.108, "bl": 0.45, "ds": 0.0, "txt": "> 3. There is no shenanigans hidden in the lean program to disguise a trivial proof as the one stated.\n\nTo be clear, this is basically a case of bad defaults in Lean. As Buzzard says, the fix is literally one command.\n\n> The one-line answer: `lake comparator`."}, {"id": 50516354, "au": "j16sdiz", "dom": 54, "sr": 82, "sc": -0.23, "ep": 0.96, "bs": 1.19, "d": 1, "age": 8.46, "grav": 68.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 3676, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bugs_correct", "flbl": "Bugs & Correct (Formally)", "urls": [], "ig": 0.41, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "it is more like \"unit test pass\"\n\nFresh today, I asked llm to fix a unit test for me, it replaced the test with no-op."}, {"id": 50519805, "au": "YeGoblynQueenne", "dom": 36, "sr": 83, "sc": -0.28, "ep": 0.91, "bs": 1.19, "d": 3, "age": 2.87, "grav": 17.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 24937, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "lean_kernel", "flbl": "Lean & Kernel (Proving)", "urls": [], "ig": 0.389, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Look, don't want to derail the conversation but proving that 1 + 1 = 2 is not trivial. Try it out. Why does 1 + 1 = 2?"}, {"id": 50518378, "au": "ptk", "dom": 3, "sr": 84, "sc": -0.28, "ep": 0.91, "bs": 1.19, "d": 2, "age": 4.75, "grav": 31.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 273, "kpp": 5.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "lean_kernel", "flbl": "Lean & Kernel (Proving)", "urls": [], "ig": 0.387, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "I haven’t seen the it yet, but keeping an eye out for “military-grade Lean” or some other nonsense."}, {"id": 50519384, "au": "Gander5739", "dom": 60, "sr": 85, "sc": -1.15, "ep": 0.84, "bs": 1.99, "d": 1, "age": 3.43, "grav": 21.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 16, "qw": 0, "k": 320, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": ["https://xkcd.com/1821/"], "ig": 0.356, "fa": 0.0, "gp": 0.0, "bl": 0.75, "ds": 0.0, "txt": "If only there was a way to prove the compiler worked exactly as intended in all cases...\n\nhttps://xkcd.com/1821/"}, {"id": 50521542, "au": "jeremyjh", "dom": 33, "sr": 86, "sc": -1.17, "ep": 1.88, "bs": 3.05, "d": 7, "age": 0.74, "grav": 6.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 11665, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "bugs_correct", "flbl": "Bugs & Correct (Formally)", "urls": [], "ig": 0.194, "fa": 0.5, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "This would be plausible except for the fact that there was a press release."}, {"id": 50520487, "au": "erichocean", "dom": 21, "sr": 87, "sc": -1.63, "ep": 1.41, "bs": 3.05, "d": 4, "age": 2.02, "grav": 12.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 13, "k": 5480, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "theory_software", "flbl": "Theory & Software (Understand)", "urls": [], "ig": 0.601, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "> but it does not verify that the NIC can't overwrite control flow memory\n\nYes, Lean verifies the algorithm being verified, not hardware or someone else's software."}, {"id": 50517629, "au": "adrianN", "dom": 108, "sr": 88, "sc": -2.07, "ep": 0.97, "bs": 3.05, "d": 1, "age": 5.94, "grav": 41.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 32995, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "theory_software", "flbl": "Theory & Software (Understand)", "urls": [], "ig": 0.414, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "The article mentions that there are a number of independent lean kernels."}, {"id": 50518751, "au": "samlinnfer", "dom": 8, "sr": 89, "sc": -2.11, "ep": 0.94, "bs": 3.05, "d": 1, "age": 4.2, "grav": 26.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 768, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": [], "ig": 0.398, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "He’s currently working on formalising Fermat’s Last Theorem in Lean btw."}, {"id": 50517148, "au": "Oarch", "dom": 95, "sr": 90, "sc": -3.35, "ep": 0.89, "bs": 4.24, "d": 0, "age": 6.84, "grav": 50.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 1139, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": [], "ig": 0.199, "fa": 0.0, "gp": 0.289, "bl": 1.6, "ds": 0.0, "txt": "He doesn't tell it to make no mistakes. How can I trust this article!"}, {"id": 50516935, "au": "lordnacho", "dom": 45, "sr": 91, "sc": -3.39, "ep": 0.85, "bs": 4.24, "d": 2, "age": 7.28, "grav": 55.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 31601, "kpp": 4.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "theory_software", "flbl": "Theory & Software (Understand)", "urls": [], "ig": 0.226, "fa": 0.0, "gp": 0.223, "bl": 1.6, "ds": 0.0, "txt": "This sounds interesting enough that I think a link would be useful"}, {"id": 50517918, "au": "ncruces", "dom": 106, "sr": 92, "sc": -3.68, "ep": 0.56, "bs": 4.24, "d": 2, "age": 5.43, "grav": 37.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 2574, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.237, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "The margin is too narrow to contain it."}, {"id": 50517455, "au": "s-zeng", "dom": 105, "sr": 93, "sc": -3.69, "ep": 0.55, "bs": 4.24, "d": 1, "age": 6.26, "grav": 44.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 89, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": [], "ig": 0.235, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Would you be willing to share your concise proof?"}, {"id": 50517313, "au": "bananaflag", "dom": 44, "sr": 94, "sc": -3.72, "ep": 0.52, "bs": 4.24, "d": 3, "age": 6.57, "grav": 47.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 1561, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": [], "ig": 0.22, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "I agree with that. I never said you don't have to check the statement."}, {"id": 50518951, "au": "suddenlybananas", "dom": 29, "sr": 95, "sc": -3.77, "ep": 0.47, "bs": 4.24, "d": 4, "age": 3.96, "grav": 24.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 1440, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.2, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Why did they stop in the middle anyway? Was there a justification given for that?"}, {"id": 50521193, "au": "breakwaterlabs", "dom": 93, "sr": 96, "sc": -3.8, "ep": 1.63, "bs": 5.43, "d": 0, "age": 1.16, "grav": 7.9, "surf": 9.7, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 299, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "bugs_correct", "flbl": "Bugs & Correct (Formally)", "urls": [], "ig": 0.673, "fa": 0.0, "gp": 0.037, "bl": 2.05, "ds": 0.0, "txt": "The issues in the article sound eerily familiar to anyone who has seen the passing unit tests that LLMs love to generate."}, {"id": 50517676, "au": "mihaic", "dom": 109, "sr": 97, "sc": -3.81, "ep": 0.43, "bs": 4.24, "d": 2, "age": 5.84, "grav": 40.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 3249, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.182, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Thank you, I should have actually gone through the whole article before commenting."}, {"id": 50520166, "au": "Isamu", "dom": 4, "sr": 98, "sc": -3.89, "ep": 0.35, "bs": 4.24, "d": 1, "age": 2.4, "grav": 14.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 89, "k": 6402, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "experience_feels", "flbl": "Experience & Feels (Everything)", "urls": [], "ig": 0.107, "fa": 0.0, "gp": 0.066, "bl": 1.6, "ds": 0.0, "txt": "Seems more about the limitations of the way it was used\n\n>It is worth noting that of the 290 OpenAI theorems which come with Lean code, around 38 of them have the property that the Lean code does not even state, let alone prove, the main theorem of the paper. And OpenAI never claimed that it did! They just said “here is some Lean code which goes with this paper”. Sometimes the code just states and proves some intermediate results — my impression is that OpenAI decided to go live when some of the formalizations were incomplete, so just dumped what they had."}, {"id": 50520492, "au": "AnimalMuppet", "dom": 37, "sr": 99, "sc": -3.99, "ep": 0.25, "bs": 4.24, "d": 4, "age": 2.02, "grav": 12.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 29332, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "theory_software", "flbl": "Theory & Software (Understand)", "urls": [], "ig": 0.106, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Isn't that pretty much by definition?  2 is defined as the number that is 1 more than 1."}, {"id": 50516544, "au": "barrenko", "dom": 98, "sr": 100, "sc": -8.58, "ep": 0.0, "bs": 6.89, "d": 0, "age": 8.04, "grav": 63.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 1376, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.373, "bl": 2.6, "ds": 0.0, "txt": "...\"left as an exercise to the reader\"."}, {"id": 50520784, "au": "vikramkr", "dom": 77, "sr": 101, "sc": -8.71, "ep": 0.0, "bs": 6.89, "d": 1, "age": 1.66, "grav": 10.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 6373, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "theory_software", "flbl": "Theory & Software (Understand)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.282, "bl": 2.6, "ds": 0.0, "txt": "Formal verification of software"}, {"id": 50516855, "au": "pasquinelli", "dom": 39, "sr": 102, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 7.45, "grav": 56.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 2731, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "you just said the same thing"}, {"id": 50520746, "au": "santaboom", "dom": 56, "sr": 103, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 1.71, "grav": 10.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 0, "qw": 9, "k": 28, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": ">Only 3 steps to verify a proof\n\n>step 1, verify the proof"}, {"id": 50518982, "au": "skybrian", "dom": 91, "sr": 104, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 3.92, "grav": 24.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 27937, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "experience_feels", "flbl": "Experience & Feels (Everything)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "What did OpenAI actually claim?"}, {"id": 50519212, "au": "choxi", "dom": 92, "sr": 105, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 3.65, "grav": 22.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 0, "qw": 144, "k": 2471, "kpp": 5.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "> It is worth noting that of the 290 OpenAI theorems which come with Lean code, around 38 of them have the property that the Lean code does not even state, let alone prove, the main theorem of the paper. And OpenAI never claimed that it did! They just said “here is some Lean code which goes with this paper”. Sometimes the code just states and proves some intermediate results — my impression is that OpenAI decided to go live when some of the formalizations were incomplete, so just dumped what they had. To give a concrete example: paper 194 claims to prove Lech’s multiplicity conjecture in commutative algebra, with no restriction on dimension, residue field or characteristic; this question has been open since 1960. The headline theorem in the corresponding Lean code can be checked to be Corollary 5.4 of the paper — already an impressive achievement, but not the headline result."}, {"id": 50516136, "au": "cobychapple", "dom": 96, "sr": 106, "sc": -10.58, "ep": 0.0, "bs": 8.88, "d": 0, "age": 9.12, "grav": 76.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 3, "qw": 0, "k": 1109, "kpp": 6.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "statement_theorem", "flbl": "Statement & Theorem (Code)", "urls": ["https://xkcd.com/3201/"], "ig": -0.95, "fa": 0.0, "gp": 0.368, "bl": 3.35, "ds": 0.0, "txt": "https://xkcd.com/3201/ \"Proof Without Content\""}, {"id": 50519577, "au": "bigdict", "dom": 7, "sr": 107, "sc": -11.11, "ep": 0.0, "bs": 8.88, "d": 2, "age": 3.2, "grav": 19.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 0, "qw": 0, "k": 1234, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://xenaproject.wordpress.com/what-is-the-xena-project/"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.35, "ds": 0.0, "txt": "https://xenaproject.wordpress.com/what-is-the-xena-project/"}, {"id": 50517002, "au": "RossBencina", "dom": 46, "sr": 108, "sc": -11.11, "ep": 0.0, "bs": 8.88, "d": 3, "age": 7.14, "grav": 53.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 3, "qw": 0, "k": 2067, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "bugs_correct", "flbl": "Bugs & Correct (Formally)", "urls": ["https://en.wikipedia.org/wiki/Curry%E2%80%93Howard_correspondence"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.35, "ds": 0.0, "txt": "Here you go: https://en.wikipedia.org/wiki/Curry%E2%80%93Howard_correspon..."}, {"id": 50520573, "au": "bananaflag", "dom": 48, "sr": 109, "sc": -11.11, "ep": 0.0, "bs": 8.88, "d": 3, "age": 1.92, "grav": 11.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 0, "qw": 0, "k": 1561, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://mathoverflow.net/questions/376839/what-makes-dependent-type-theory-more-suitable-than-set-theory-for-proof-assista"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.35, "ds": 0.0, "txt": "https://mathoverflow.net/questions/376839/what-makes-depende..."}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 40);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 40);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 40);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `${shown.length} of ${pool.length} comments` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

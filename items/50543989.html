@@ -1,0 +1,1387 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50543989 // Energy-Based Reasoners: 385x more efficient inference — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+      text-transform: lowercase;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      text-transform: lowercase;
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .kpi-cell {
+      padding: 8px 0;
+    }
+    .kpi-label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 4px 0;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer:not([open]) {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary,
+    details.proof-drawer > summary {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+    }
+    table.ablation th {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: normal;
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    button.nav-btn,
+    button.mode-tab,
+    button.topbar-toggle {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: rgb(0, 0, 0);
+      cursor: pointer;
+      text-decoration: none;
+      line-height: inherit;
+      vertical-align: baseline;
+      transition: color 0.12s ease;
+      text-transform: lowercase;
+    }
+    button.nav-btn:hover,
+    button.nav-btn.active,
+    button.mode-tab:hover,
+    button.mode-tab.active,
+    button.topbar-toggle:hover,
+    button.topbar-toggle.active {
+      color: rgb(255, 255, 255);
+      text-decoration: none;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      padding: 14px;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; row-gap: 4px; }
+      .topbar-right { font-size: 8pt; padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+        <span class="pagetop" id="modeTabs">
+          <button type="button" class="nav-btn mode-tab active" data-mode="top_signal" role="tab" aria-selected="true">Top 40</button> | <button type="button" class="nav-btn mode-tab" data-mode="hn_top40" role="tab" aria-selected="false">HN Top 40</button>
+        </span>
+      </div>
+      <div class="topbar-right">
+        <button type="button" class="nav-btn topbar-toggle" id="exploreToggleBtn" aria-expanded="false">explore</button> | <button type="button" class="nav-btn topbar-toggle" id="evidenceToggleBtn" aria-expanded="false">evidence</button>
+      </div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://energy-based-reasoners.github.io/">Energy-Based Reasoners: 385x more efficient inference</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=energy-based-reasoners.github.io"><span class="sitestr">energy-based-reasoners.github.io</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">305 points</span> by <a href="https://news.ycombinator.com/user?id=frenchmajesty">frenchmajesty</a> <span class="age" title="2026-11-18T09:29:32.000Z"><a href="https://news.ycombinator.com/item?id=50543989">14 hours ago</a></span> | <a href="https://news.ycombinator.com/item?id=50543989">52&nbsp;comments</a> | 82.7% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Evidence</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">52</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 36 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">17.3%</div>
+          <div class="kpi-sub">9 comments (4 Gold / 7.7%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">82.7%</div>
+          <div class="kpi-sub">28 chatter &bull; 15 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">2</div>
+        <div class="kpi-sub">7% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.912</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">16</div>
+          <div class="kpi-sub">HN POS 1..16 (30.8% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="color: rgb(90, 90, 88); margin-top: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Explore</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 52-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 52)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (4)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (5)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (28)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (15)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..52) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 25)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (Topfi, 11.9h); largest subtree (@Topfi) occupies 16 slots (HN POS 1..16).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (52)</option>
+          <option value="reasoning_llm">Reasoning &amp; LLM (Efficient) (14)</option>
+          <option value="understand_researchers">Understand &amp; Researchers (Machine) (11)</option>
+          <option value="fep_models">Fep &amp; Models (Energy-based) (9)</option>
+          <option value="ebms_llms">Ebms &amp; LLMS (Lean) (7)</option>
+          <option value="energy_based">Energy &amp; Based (Row) (3)</option>
+          <option value="general_commentary">General Commentary (8)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, energy-based, solutions, inference, reasoning, model...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50543989 + ENERGY-BASED-REASONERS.GITHUB.IO + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50543989, "story_title": "Energy-Based Reasoners: 385x more efficient inference", "story_url": "https://energy-based-reasoners.github.io/", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50543989, "story_title": "Energy-Based Reasoners: 385x more efficient inference", "story_url": "https://energy-based-reasoners.github.io/", "points": 305, "story_author": "frenchmajesty", "article_source": "fetched_url", "t1_ref_utc": "2026-11-18T23:55:41+00:00", "t2_ref_utc": "2026-11-18T23:55:41+00:00", "delta_minutes": 0.0, "story_anchors": ["energy-based", "solutions", "inference", "reasoning", "model", "models", "reasoners", "energy", "efficient", "latent", "385x", "number", "learned", "valid", "pick", "function", "sudoku", "training", "conflicts", "correct", "train", "far", "learn", "works", "checking"], "facet_labels": {"reasoning_llm": "Reasoning & LLM (Efficient)", "fep_models": "Fep & Models (Energy-based)", "ebms_llms": "Ebms & LLMS (Lean)", "energy_based": "Energy & Based (Row)", "understand_researchers": "Understand & Researchers (Machine)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "reasoning_llm", "label": "Reasoning & LLM (Efficient)", "count": 14, "top_terms": ["reasoning", "llm", "efficient", "program"]}, {"slug": "fep_models", "label": "Fep & Models (Energy-based)", "count": 9, "top_terms": ["fep", "models", "energy-based", "function"]}, {"slug": "ebms_llms", "label": "Ebms & LLMS (Lean)", "count": 7, "top_terms": ["ebms", "llms", "lean", "scale"]}, {"slug": "energy_based", "label": "Energy & Based (Row)", "count": 3, "top_terms": ["energy", "based", "row", "cell"]}, {"slug": "understand_researchers", "label": "Understand & Researchers (Machine)", "count": 11, "top_terms": ["understand", "researchers", "machine", "learning"]}], "counts": {"total_comments": 52, "live_t2_comments": 52, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 36, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "8fe15955bbf35f4d2a08949e1e4904b40193c1dcbf7ffc0daee1a1f7b6c436e9"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 4, "grounded_analysis": 5, "crowd_chatter": 28, "bullshit_or_flamewar": 15}, "facets": {"reasoning_llm": 14, "fep_models": 9, "energy_based": 3, "ebms_llms": 7, "understand_researchers": 11, "general_commentary": 8}, "facet_options": [{"slug": "reasoning_llm", "label": "Reasoning & LLM (Efficient)", "count": 14}, {"slug": "understand_researchers", "label": "Understand & Researchers (Machine)", "count": 11}, {"slug": "fep_models", "label": "Fep & Models (Energy-based)", "count": 9}, {"slug": "ebms_llms", "label": "Ebms & LLMS (Lean)", "count": 7}, {"slug": "energy_based", "label": "Energy & Based (Row)", "count": 3}, {"slug": "general_commentary", "label": "General Commentary", "count": 8}], "facet_diagnostics": [{"slug": "reasoning_llm", "label": "Reasoning & LLM (Efficient)", "count": 14, "useful": 2, "useful_pct": 14.3, "terms": "reasoning, llm, efficient, program"}, {"slug": "understand_researchers", "label": "Understand & Researchers (Machine)", "count": 11, "useful": 3, "useful_pct": 27.3, "terms": "understand, researchers, machine, learning"}, {"slug": "fep_models", "label": "Fep & Models (Energy-based)", "count": 9, "useful": 1, "useful_pct": 11.1, "terms": "fep, models, energy-based, function"}, {"slug": "ebms_llms", "label": "Ebms & LLMS (Lean)", "count": 7, "useful": 1, "useful_pct": 14.3, "terms": "ebms, llms, lean, scale"}, {"slug": "energy_based", "label": "Energy & Based (Row)", "count": 3, "useful": 2, "useful_pct": 66.7, "terms": "energy, based, row, cell"}, {"slug": "general_commentary", "label": "General Commentary", "count": 8, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 4}, {"category": "arxiv_preprint", "count": 2}], "story_anchors": ["energy-based", "solutions", "inference", "reasoning", "model", "models", "reasoners", "energy", "efficient", "latent", "385x", "number", "learned", "valid", "pick", "function", "sudoku", "training"], "largest_root": {"root_id": 50545266, "author": "Topfi", "slots": 16, "start_dom": 1, "end_dom": 16, "share_pct": 30.8, "top_dom1_age": 11.9, "top_dom1_author": "Topfi"}, "buried_cutoff": 25, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50544356, "au": "saithound", "dom": 47, "sr": 1, "sc": 12.29, "ep": 12.29, "bs": 0.0, "d": 0, "age": 13.66, "grav": 141.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 39, "qw": 0, "k": 2033, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "reasoning_llm", "flbl": "Reasoning & LLM (Efficient)", "urls": ["https://arxiv.org/abs/2611.17309", "https://developers.openai.com/api/docs/guides/reasoning?api-mode=responses"], "ig": 0.976, "fa": 3.03, "gp": 0.937, "bl": 0.0, "ds": 0.0, "txt": "385x? Them's rookie numbers. Classical energies learn to reason 1000x faster than looped models. [1] Of course, all for a very generous definition of reasoning, that has almost nothing in common with the thing most people associate with the term nowadays. [2]\n\n[1] https://arxiv.org/abs/2611.17309\n\n[2] https://developers.openai.com/api/docs/guides/reasoning?api-..."}, {"id": 50546005, "au": "xgk", "dom": 33, "sr": 2, "sc": 12.03, "ep": 12.03, "bs": 0.0, "d": 2, "age": 10.56, "grav": 95.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 86, "qw": 0, "k": 79, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "epistemic_gold", "facet": "fep_models", "flbl": "Fep & Models (Energy-based)", "urls": ["https://arxiv.org/abs/2101.03288"], "ig": 1.215, "fa": 2.97, "gp": 0.487, "bl": 0.0, "ds": 0.0, "txt": "That's also my default assumption: P(x) ∝ e^(−E(x)) Or, in more detail,\n\n    E(x) = −log P(x) + constant\n\nIf that's the correct interpretation, then the main advantage of energy-based methods over strictly probabilistic methods seems to be that, since the energy function does not need to integrate to one, it can be parameterised with any nonlinear regression function. That means density estimation is basically a nonlinear regression problem.\n\nThis is the interpretation in [1]. I am not sure, however, if the paper here is an unnormalised probabilistic model.\n\n[1] Y. Song, D. P. Kingma, How to Train Your Energy-Based Models. (2021) https://arxiv.org/abs/2101.03288"}, {"id": 50545736, "au": "program_whiz", "dom": 17, "sr": 3, "sc": 8.31, "ep": 8.31, "bs": 0.0, "d": 0, "age": 11.03, "grav": 101.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 181, "qw": 0, "k": 1683, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "energy_based", "flbl": "Energy & Based (Row)", "urls": [], "ig": 1.597, "fa": 1.23, "gp": 0.726, "bl": 0.0, "ds": 0.0, "txt": "A clarifying way to think about this for sudoku:\n\nFor every clue, mark the probability of sampling its number in the row/col to zero.  Also mark the probability of selecting a \"clue cell\" for modification to 0.\n\nPick a random cell for modification, based on its \"energy\" (higher energy get modified first):\n\n    1. Every conflicting cell gets energy +1.0 (try to resolve conflicts before new empty cells).  E.g. two 7s on the same row both get +1 energy.\n\n    2. Empty cells have small energy 0.1\n\n    3. Filled cells with no conflicts have energy 0\n\nFor the selected cell, choose a digit.  Look at numbers in its row/column, every occurrence of a number in the row/col drop prob of sampling by 90%.  Example:\n\n    | No. of 7s | chance of 7 |\n    | --- | --- |\n    | 0 | 10% (equal to other digits) |\n    | 1 | 1% |\n    | 2 | 0.1% |\n\nObviously this would get more complex with more numbers on the line (this is just checking 7 on otherwise empty line).\n\nThis is essentially what these models are doing.  It provides a kind of \"wave function collapse\" search with random exploration based on \"energy\", but energy is just defined as conflict / unsolved.  For something like a maze, energy is disconnected path segments or walls, etc."}, {"id": 50545451, "au": "program_whiz", "dom": 36, "sr": 4, "sc": 8.25, "ep": 8.25, "bs": 0.0, "d": 0, "age": 11.56, "grav": 109.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 557, "qw": 0, "k": 1683, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "reasoning_llm", "flbl": "Reasoning & LLM (Efficient)", "urls": [], "ig": 1.766, "fa": 1.06, "gp": 0.748, "bl": 0.0, "ds": 0.0, "txt": "Big caveat if anyone thinks this could replace or strongly augment \"reasoning\" models (LLMs, RNNs) -- its more like an energy-based search for a discrete problem (graph coloring, solving mazes, sudoku).\n\nIt works by training a weight matrix (N-to-N) on different solutions. For example, in sudoku you're training a weight matrix for every space to every other space (81 c 2), with 9x9 numbers (~240K weights).  So then the \"energy\" for every number in a space is W_ij(a, b) where ij is a pair of spaces, and (a, b) is a pair numbers you want to swap (e.g. 4->2 in the space).  Pick the lowest energy move each time (argmin of this whole space), and iterate.\n\nThis has a few limitations.  First, its discrete and has a limited space definition, getting this to work for arbitrary reasoning seems hard (what size/shape graph would you use for arbitrary reasoning).  Second, the ruleset is defined apriori (e.g. you need to know you have a 9x9 grid and 9 numbers, the rules of the game are implicit in the checker).  Third, the actual search algorithm is somewhat bespoke to task (less of a factor, maybe use generic graph coloring as the basis of any problem), but for something like agentic reasoning its not clear how this would be adapted. For example with mazes, we need to know what constitutes a valid path and a solved maze, but for language/code rules like that are hard to formulate.\n\nFourth, "}, {"id": 50545266, "au": "Topfi", "dom": 1, "sr": 5, "sc": 7.15, "ep": 7.15, "bs": 0.0, "d": 0, "age": 11.87, "grav": 113.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 93, "qw": 0, "k": 4349, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "ebms_llms", "flbl": "Ebms & LLMS (Lean)", "urls": ["https://logicalintelligence.com/blog/energy-based-model-sudoku-demo"], "ig": 1.508, "fa": 0.62, "gp": 1.268, "bl": 0.0, "ds": 0.0, "txt": "Recommend checking out Logical Intelligence, chaired by among others Yann LeCun, for more context on EBMs [0]. Has great potential in areas that LLMs traditionally do not perform that well in and, because they want to show the advantages of EBMs, also tends to be a great source of examples LLMs struggle with, like primary school level maths and counting (while ironically providing Millennium level Lean proofs). Does of course open the not unreasonable discussion of whether it matters if LLMs can accurately count when writing code to do the calculation is reliable and fast...\n\n[0] https://logicalintelligence.com/blog/energy-based-model-sudo..."}, {"id": 50551448, "au": "reasonableklout", "dom": 40, "sr": 6, "sc": 5.24, "ep": 5.24, "bs": 0.0, "d": 1, "age": 3.79, "grav": 23.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 94, "qw": 22, "k": 2513, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "understand_researchers", "flbl": "Understand & Researchers (Machine)", "urls": [], "ig": 1.177, "fa": 0.7, "gp": 0.332, "bl": 0.0, "ds": 0.0, "txt": ">It’s a pet peeve of mine when people say we don’t understand AI, we designed it using mathematics we understand perfectly the mechanisms\n\nThat's not what researchers mean when they say we don't understand AI. What they mean is that while we understand the learning algorithm that produced a given model, we don't know what beliefs about the world nor what internal representations it has learned.\n\nIn turn this means we cannot predict ahead-of-time (without running the model) its behavior in many scenarios. For example, in the Hugging Face incident, researchers had no way of ruling out the possibility that the models would try to break out of their sandbox and trick the grader (which they did)."}, {"id": 50549605, "au": "tristenharr", "dom": 39, "sr": 7, "sc": 4.84, "ep": 4.99, "bs": 0.0, "d": 0, "age": 6.04, "grav": 42.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 174, "qw": 0, "k": 179, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "understand_researchers", "flbl": "Understand & Researchers (Machine)", "urls": [], "ig": 1.44, "fa": 0.28, "gp": 0.557, "bl": 0.0, "ds": 0.0, "txt": "Ahh finally! It’s what I would have expected. Thank you so much for scratching this intellectual itch I’ve had for a bit now.\n\nThis also might be a good way to finally explain to people how AI is working in some sense. If you look at it from an information theoretic view and treat things like kolgomorov complexity and the data inputs to machine learning as an energy landscape, you can look at AI and ML as a whole as something that is learning the energy landscape.\n\nIt’s not that AI ever was a black box, we have always known how it works. (It’s a pet peeve of mine when people say we don’t understand AI, we designed it using mathematics we understand perfectly the mechanisms)\n\nThe information we observe is a consequence of the underlying structure and constraints of reality. The universe has an underlying physical structure, with energy, interactions, constraints, and relationships. What we call data is an observable artifact of those underlying structures.\n\nYou can view reasoning as navigating an energy landscape.\n\nVery neat and interesting nice work!"}, {"id": 50545647, "au": "program_whiz", "dom": 22, "sr": 8, "sc": 4.29, "ep": 4.44, "bs": 0.0, "d": 1, "age": 11.17, "grav": 103.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 305, "qw": 0, "k": 1683, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "energy_based", "flbl": "Energy & Based (Row)", "urls": [], "ig": 0.937, "fa": 0.62, "gp": 0.323, "bl": 0.0, "ds": 0.0, "txt": "See my comment below, I explain what it means.  Energy is just a number that comes out of matrix which learns the relationship between different states of the system being searched.  For example, suppose we're talking about sudoku.  You would have a matrix that has W_ij (weights between spaces).  For each of those, there are 9x9 numbers (energy between two of the digits).  A combination like W[0, 1](4, 4) is high because you would have a 4 in the first space, and a 4 in the 2nd space (which breaks the rules).  Most of the values are low energy (e.g. 4 and 2 is energy 0, no conflict).  However, as different numbers are placed, they are checking for the lowest energy number across the whole board, and the \"clues\" are locked in.\n\nSo if you had a \"clue\" like 2 in a space, then the energy for 2 on that row / column would be high, but other numbers low.  You just sum this up and pick the lowest energy number.  As you add numbers, you can hit conflicts (e.g. two 7s in the row), changing one of them will be the next lowest energy move.  The probability of changing a number is inversely proportional to its energy.  So changing the conflicting numbers is the usual most likely move.\n\nSo in the best case it works like this: For each empty cell, pick a number at random, but its weighted by the other numbers that affect it (e.g. if 7 is in the row, the chance of 7 is 0.1%).  Continue doing t"}, {"id": 50552277, "au": "usernametaken29", "dom": 26, "sr": 9, "sc": 3.9, "ep": 4.2, "bs": 0.0, "d": 3, "age": 2.56, "grav": 15.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 94, "qw": 0, "k": 639, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "understand_researchers", "flbl": "Understand & Researchers (Machine)", "urls": [], "ig": 1.362, "fa": 0.28, "gp": 0.137, "bl": 0.0, "ds": 0.0, "txt": "The term energy literally comes from physiological observations of cellular processes to reduce the amount of entropy, or find a resting state. If the model isn’t a FEP model I just don’t see how the term energy bear’s any significant meaning. What you’re describing with -log(η) is called the (empirical) risk as described in statistical learning theory. One has a clear background grounded in physiological reasoning and the other uses entropy as the ground measure and derived from information theory. So unless there’s any motivation or definition of the term by the authors, it’s really just confusing."}, {"id": 50546322, "au": "program_whiz", "dom": 38, "sr": 10, "sc": 3.52, "ep": 3.67, "bs": 0.0, "d": 2, "age": 10.05, "grav": 88.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 113, "qw": 0, "k": 1683, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "reasoning_llm", "flbl": "Reasoning & LLM (Efficient)", "urls": [], "ig": 1.436, "fa": 0.0, "gp": 0.203, "bl": 0.0, "ds": 0.0, "txt": "Yeah any method I'm thinking is better solved another way.  If you need continuous graphs, then this devolves into GNN or transformers.  If you truly have discrete graphs, just use standard programming?  I dunno, maybe this energy approach is better on some problems (more efficient), but getting training examples where you automatically extract the graph representation, and the energy rules seems like a big leap.  If you already have the energy rules in code, then the \"just program it\" approach is stronger.  I left a comment above with an example how to sample this just using ordinary code that would be a lot more efficient imo (but keeps the random weighted search), and is probably better than brute force."}, {"id": 50545445, "au": "xgk", "dom": 21, "sr": 11, "sc": 3.38, "ep": 3.82, "bs": 0.0, "d": 0, "age": 11.57, "grav": 109.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 79, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fep_models", "flbl": "Fep & Models (Energy-based)", "urls": [], "ig": 1.131, "fa": 0.0, "gp": 0.802, "bl": 0.0, "ds": 0.0, "txt": "The paper does not seem to define what Energy-Based means. The paper says: \"EBMs learn a scalar function that assigns an energy to a candidate prediction given an input.\" What codomain do those learned scalar function have? I guess real numbers? But is \"Energy\" just a synonym for the reals?"}, {"id": 50546168, "au": "mocmoc", "dom": 18, "sr": 12, "sc": 3.31, "ep": 3.31, "bs": 0.0, "d": 0, "age": 10.3, "grav": 91.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 96, "qw": 0, "k": 36, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ebms_llms", "flbl": "Ebms & LLMS (Lean)", "urls": [], "ig": 1.169, "fa": 0.0, "gp": 0.386, "bl": 0.0, "ds": 0.0, "txt": "I've spent a year on this. EBMs while ... how to say it, they are impressive validators , it's insanely hard to train them. They are very niche specific. While LLMs , being not right all the time and clumsy and so on, they help the people to get the job done at the end.\n\nEBM sudoku is not that hard in a small scale, and Logical Intelligence sudoku solver doesn't scale , if I'm wrong , I want to see them offering as big of a sudoku as you want.\n\nalso, after months and months training EBMs , you come to realize... it's really worth it?"}, {"id": 50548826, "au": "thelaxiankey", "dom": 6, "sr": 13, "sc": 3.26, "ep": 3.4, "bs": 0.0, "d": 4, "age": 6.84, "grav": 50.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 131, "qw": 0, "k": 51, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "understand_researchers", "flbl": "Understand & Researchers (Machine)", "urls": [], "ig": 1.355, "fa": 0.0, "gp": 0.152, "bl": 0.0, "ds": 0.0, "txt": "There's a distinction between reasoning with access to a turing machine and reasoning without access to a turing machine. In one case, you must sometimes become a turing machine yourself and execute \"algorithms\", which is something LLMs can struggle with.\n\nWhen I was learning combinatorics, I was aggressively discouraged from using induction to prove things. Not because it was bad, or because it didn't work, but because if I used induction, I wouldn't be practicing 'combinatorics', I'd be practicing induction. You can make similar observations about solving ODEs numerically, or using mathematica for all your integrals.\n\nOne way to think of this is that banning coding prevents the agent from outsourcing some of the skills it's bad at (discrete sequential reasoning) to a computer. We are grading precisely the thing it's outsourcing because we suspect improving that might make it better."}, {"id": 50548357, "au": "eli_gottlieb", "dom": 25, "sr": 14, "sc": 3.13, "ep": 3.57, "bs": 0.0, "d": 2, "age": 7.39, "grav": 56.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 62, "qw": 0, "k": 9897, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fep_models", "flbl": "Fep & Models (Energy-based)", "urls": [], "ig": 1.299, "fa": 0.0, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "Energy-based models parameterize energy functions $$E_{\\eta}(x) = -log p_{\\eta}(x)$$ with neural networks $$\\eta$$.  The FEP and active inference are specializations of this paradigm to latent-variable models where the energy function is defined by the unnormalized Bayesian posterior over the latent instead of just a marginal distribution over the observed data.\n\nSource: I've worked with a lot of core FEP folks and published at their conference."}, {"id": 50547886, "au": "abeppu", "dom": 3, "sr": 15, "sc": 3.05, "ep": 3.34, "bs": 0.0, "d": 1, "age": 7.96, "grav": 62.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 39, "k": 10132, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "reasoning_llm", "flbl": "Reasoning & LLM (Efficient)", "urls": [], "ig": 0.875, "fa": 0.42, "gp": 0.06, "bl": 0.0, "ds": 0.0, "txt": "> We disabled code execution for all models in the demo, to prevent the LLMs from writing a brute-force backtracking solver in Python and running it, which would tell us something about their coding ability but nothing about their reasoning ability.\n\nThis seems sketchy. Reasoning how to solve the problem with a program is still reasoning, and if it yields programs which are more efficient (bc even a slow interpreter is faster/cheaper than an LLM) and potentially reusable, then so much the better!"}, {"id": 50546813, "au": "xgk", "dom": 19, "sr": 16, "sc": 2.78, "ep": 2.93, "bs": 0.0, "d": 1, "age": 9.33, "grav": 79.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 79, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ebms_llms", "flbl": "Ebms & LLMS (Lean)", "urls": [], "ig": 1.246, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "What makes EBM hard to train?\n\nIt took a long time (including the development of GPUs, then TPUs, not to mention domain-specific languages like JAX and PyTorch with associated compilers) and scale to train LLMs. EBMs have not yet seen this level of decades of 'full-stack' optimisation."}, {"id": 50545464, "au": "netbioserror", "dom": 45, "sr": 17, "sc": 2.66, "ep": 2.88, "bs": 0.0, "d": 0, "age": 11.53, "grav": 108.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 0, "k": 1506, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "reasoning_llm", "flbl": "Reasoning & LLM (Efficient)", "urls": [], "ig": 1.117, "fa": 0.0, "gp": 0.179, "bl": 0.0, "ds": 0.0, "txt": "The more abstractly reasoning can be modeled, the better. It means knowledge can be externalized to discrete knowledge bases and queried when needed, and models can be run locally with lower and lower energy hardware.\n\nThe question is, how integral to reasoning is compressing vast quantities of knowledge to the latent space?"}, {"id": 50552319, "au": "usernametaken29", "dom": 28, "sr": 18, "sc": 2.44, "ep": 2.88, "bs": 0.0, "d": 4, "age": 2.5, "grav": 15.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 77, "qw": 0, "k": 639, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fep_models", "flbl": "Fep & Models (Energy-based)", "urls": [], "ig": 1.227, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "There aren’t any large FEP models that I’m aware of. Part of this is that many neuroscientists learn to model Bayesian. Classic FEP is modelled using latent fields in a Bayesian model and as far  I know there haven’t been any significant advances of scaling Bayesian prior estimation to high dimensional data… is it a limitation of FEP? Maybe. Then again you can make the case that JEPA and FEP have a large overlap conceptually… and those models can definitely be trained"}, {"id": 50544691, "au": "igleria", "dom": 35, "sr": 19, "sc": 2.21, "ep": 2.43, "bs": 0.0, "d": 0, "age": 12.98, "grav": 130.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 814, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "understand_researchers", "flbl": "Understand & Researchers (Machine)", "urls": [], "ig": 0.733, "fa": 0.0, "gp": 0.491, "bl": 0.0, "ds": 0.0, "txt": "As far as I could understand, this works very well for a very specific logic puzzle problem set. Interested on future papers tho :)"}, {"id": 50545415, "au": "scurnus", "dom": 52, "sr": 20, "sc": 1.95, "ep": 2.39, "bs": 0.0, "d": 0, "age": 11.61, "grav": 109.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 0, "k": 9, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "reasoning_llm", "flbl": "Reasoning & LLM (Efficient)", "urls": [], "ig": 1.016, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "This is basic and similar to recurrent reasoning papers, it works only on sudoku and basic games, with constrained rules, unique or low number of solutions. It would be interesting to see how these reasoners do in games like Chess or Go. Efficient inference is useful when it comes with something useful."}, {"id": 50549652, "au": "andai", "dom": 41, "sr": 21, "sc": 1.9, "ep": 2.64, "bs": 0.0, "d": 1, "age": 5.99, "grav": 42.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 22, "k": 18117, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "understand_researchers", "flbl": "Understand & Researchers (Machine)", "urls": [], "ig": 0.613, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": ">It’s a pet peeve of mine when people say we don’t understand AI, we designed it using mathematics we understand perfectly the mechanisms\n\nWell, unfortunately I am here to peeve your pet. OpenAI and Anthropic have both spent years training specialized AIs to help them figure out what the heck their AIs are doing!"}, {"id": 50545475, "au": "usernametaken29", "dom": 24, "sr": 22, "sc": 1.61, "ep": 2.27, "bs": 0.0, "d": 1, "age": 11.51, "grav": 108.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 61, "qw": 0, "k": 639, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fep_models", "flbl": "Fep & Models (Energy-based)", "urls": [], "ig": 0.966, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I find this particularly concerning because in their related works they did not refer to the free energy principle, which is the underlying principle of energy based cognition... so eh... what are they referring to? If its not the energy as defined by FEP and active inference, which energy is it? Did they mean entropy? I didn't get it from the paper, really"}, {"id": 50545865, "au": "otabdeveloper4", "dom": 10, "sr": 23, "sc": 1.56, "ep": 3.59, "bs": 1.59, "d": 1, "age": 10.8, "grav": 98.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 7, "k": 3236, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ebms_llms", "flbl": "Ebms & LLMS (Lean)", "urls": [], "ig": 0.796, "fa": 0.42, "gp": 0.36, "bl": 0.6, "ds": 0.0, "txt": "> while ironically providing Millennium level Lean proofs\n\nThey're doing that by generating a metric shitload of schizo syllogism junk that is then sifted through Lean to find a valid nugget. (Or not.)\n\nThe implication is that \"Millennium level\" is mostly stuff that's too tedius for meatsack humans to sift through."}, {"id": 50544794, "au": "yorwba", "dom": 48, "sr": 24, "sc": 1.55, "ep": 2.36, "bs": 0.0, "d": 1, "age": 12.79, "grav": 127.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 16093, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "reasoning_llm", "flbl": "Reasoning & LLM (Efficient)", "urls": [], "ig": 1.004, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The common definition of \"reasoning\" for all three is \"performing a sequence of intermediate steps with multiple passes through the model before outputting an answer.\" The main difference is that the reasoning models in TFA and [1] are puzzle-solving models, not language models."}, {"id": 50548616, "au": "zbentley", "dom": 12, "sr": 25, "sc": 1.28, "ep": 2.6, "bs": 0.0, "d": 2, "age": 7.08, "grav": 53.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 6248, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "reasoning_llm", "flbl": "Reasoning & LLM (Efficient)", "urls": [], "ig": 1.106, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I think that’s valuable, potentially. The bitter lesson writ large, basically: lots of problem spaces that previously required reasoning to narrow down possible paths to solutions can now be permitted over much more broadly instead.\n\nSucks for the project of human learning though."}, {"id": 50546599, "au": "datsci_est_2015", "dom": 23, "sr": 26, "sc": 1.25, "ep": 2.35, "bs": 0.0, "d": 2, "age": 9.65, "grav": 83.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 2196, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "understand_researchers", "flbl": "Understand & Researchers (Machine)", "urls": [], "ig": 0.998, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Nice explanation. Very intuitive use of the word “energy” by the researchers, imo, because of its relationship to entropy and “low energy states” (good / desirable / stable) and “high energy states” (bad / undesirable / unstable)."}, {"id": 50545801, "au": "CuriouslyC", "dom": 32, "sr": 27, "sc": 1.04, "ep": 1.49, "bs": 0.0, "d": 1, "age": 10.91, "grav": 100.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 8288, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "energy_based", "flbl": "Energy & Based (Row)", "urls": [], "ig": 0.632, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "To simplify the explanation further, the main difference in practice between energy based and more traditional models is that they throw out normalization."}, {"id": 50548449, "au": "abeppu", "dom": 5, "sr": 28, "sc": 0.88, "ep": 2.42, "bs": 0.0, "d": 3, "age": 7.28, "grav": 55.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 10132, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "reasoning_llm", "flbl": "Reasoning & LLM (Efficient)", "urls": [], "ig": 0.691, "fa": 0.28, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "What is reasoning if examining a problem and constructing a program to solve it doesn't count? Changing the original represention into one that is more familiar (particular sequences of tokens) seems like it is all about \"intrinsic ability\".\n\nI'm not saying they don't have a point, but I think this is actually not great evidence."}, {"id": 50550790, "au": "xgk", "dom": 27, "sr": 29, "sc": 0.84, "ep": 1.72, "bs": 0.0, "d": 3, "age": 4.56, "grav": 29.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 79, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fep_models", "flbl": "Fep & Models (Energy-based)", "urls": [], "ig": 0.731, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "How do those core FEP folks train their models, and can the results  compete with LMs?\n\nWhat I have seen in the past made me think that majority of them would not even know how to write a line of CUDA ..."}, {"id": 50546102, "au": "vessenes", "dom": 43, "sr": 30, "sc": 0.76, "ep": 1.64, "bs": 0.0, "d": 1, "age": 10.41, "grav": 93.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 14148, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "understand_researchers", "flbl": "Understand & Researchers (Machine)", "urls": [], "ig": 0.699, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Well their Sudoku model is 1.8 million parameters, so yes. You could run it on your toothbrush. I like the idea of a Sudoku-cheating toothbrush, or maybe vape, actually, you could be that guy at the cafe."}, {"id": 50546076, "au": "thesnarkitecht", "dom": 42, "sr": 31, "sc": 0.04, "ep": 1.29, "bs": 0.0, "d": 0, "age": 10.44, "grav": 93.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 15, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "reasoning_llm", "flbl": "Reasoning & LLM (Efficient)", "urls": [], "ig": 0.308, "fa": 0.0, "gp": 0.391, "bl": 0.0, "ds": 0.0, "txt": "Anyone want to explain how these models work? And can you actually run them on any hardware?"}, {"id": 50546329, "au": "cobychapple", "dom": 51, "sr": 32, "sc": -0.02, "ep": 3.03, "bs": 3.05, "d": 0, "age": 10.04, "grav": 88.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 1109, "kpp": 6.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.463, "fa": 0.68, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "title says 385x and the page says 345x, I guess the compression is lossy?"}, {"id": 50547985, "au": "throwaway0q5347", "dom": 4, "sr": 33, "sc": -0.65, "ep": 0.89, "bs": 0.0, "d": 2, "age": 7.85, "grav": 61.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 54, "kpp": 4.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "reasoning_llm", "flbl": "Reasoning & LLM (Efficient)", "urls": [], "ig": 0.38, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I think the goal in this case is to isolate the LLM from that avenue in order to determine whether or not the approach is improving the LLM intrinsic ability, not because it is a better solution than having the LLM create programs."}, {"id": 50545318, "au": "saithound", "dom": 49, "sr": 34, "sc": -0.68, "ep": 1.03, "bs": 1.19, "d": 2, "age": 11.77, "grav": 112.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 2033, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "ebms_llms", "flbl": "Ebms & LLMS (Lean)", "urls": [], "ig": 0.436, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Well, yes, that's the very generous definition of reasoning I was referring to, under which almost any iterative computation could count as reasoning."}, {"id": 50554056, "au": "xgk", "dom": 31, "sr": 35, "sc": -0.69, "ep": 0.85, "bs": 0.0, "d": 7, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 79, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "reasoning_llm", "flbl": "Reasoning & LLM (Efficient)", "urls": [], "ig": 0.363, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "They looked so sketchy. I warned a friend of mine to work there, but he ignored me.\n\nI wonder what Gabriel and Dan are doing now?\n\nAnd I never understood why they received so much funding."}, {"id": 50546066, "au": "plaguuuuuu", "dom": 37, "sr": 36, "sc": -0.73, "ep": 0.66, "bs": 0.0, "d": 1, "age": 10.45, "grav": 93.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 1104, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "understand_researchers", "flbl": "Understand & Researchers (Machine)", "urls": [], "ig": 0.28, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I'd love to wire it into a model and do some training. Can't see any way to obtain it though."}, {"id": 50553921, "au": "eli_gottlieb", "dom": 30, "sr": 37, "sc": -0.76, "ep": 0.87, "bs": 1.19, "d": 6, "age": 0.27, "grav": 4.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 9897, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.371, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Yes, well, maybe the executives should try not stealing the budgets and then laying everyone off without even the cash for a nondisparagement agreement from former employees."}, {"id": 50550037, "au": "freecodeio", "dom": 7, "sr": 38, "sc": -1.1, "ep": 0.54, "bs": 1.19, "d": 4, "age": 5.51, "grav": 37.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 346, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.228, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "someone is teaching a kid to do multiplication and removed the calculator, why are you so surprised with this concept?"}, {"id": 50546186, "au": "testtestmetest", "dom": 14, "sr": 39, "sc": -1.16, "ep": 2.24, "bs": 2.52, "d": 1, "age": 10.28, "grav": 91.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 65, "qw": 0, "k": -3, "kpp": -0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "ebms_llms", "flbl": "Ebms & LLMS (Lean)", "urls": [], "ig": 0.953, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "Logical Intelligence is most definately a scam, that should hardly be taken seriously. Its one of the handful of companies that is able to automatically fundraise a fk ton of momey just by putting LeCun's name on it (a great way to make a bunch of money off VCs last year).\n\nIts funny everytime ebms get brought up people have to name drop this company. They literally do nothing."}, {"id": 50550119, "au": "topicalSoup", "dom": 11, "sr": 40, "sc": -1.69, "ep": 1.93, "bs": 2.52, "d": 2, "age": 5.42, "grav": 36.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 64, "qw": 0, "k": 5, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "ebms_llms", "flbl": "Ebms & LLMS (Lean)", "urls": [], "ig": 0.483, "fa": 0.28, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "You are factually incorrect about this. If you look at how these proofs are actually being generated, the proof comes first and is only later Lean-verified. For example, take Yang-Mills: it was proved by OpenAI on Sept 9 and then Lean-formalized on Oct 16. If all the AI was doing was sifting Lean, we would expect the proof completion and the Lean verification to happen simultaneously."}, {"id": 50545592, "au": "Topfi", "dom": 9, "sr": 41, "sc": -1.72, "ep": 0.7, "bs": 1.99, "d": 2, "age": 11.26, "grav": 104.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 22, "qw": 0, "k": 4349, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://www.linkedin.com/posts/brianbuntz_sudoku-is-apparently-not-a-strong-suite-for-activity-7442670455754403840-ZH70"], "ig": 0.3, "fa": 0.0, "gp": 0.0, "bl": 0.75, "ds": 0.0, "txt": "Yeah, that's embarrassing. It was a neat showcase when it was online. Was only able to find this video that shows the demo [0].\n\n[0] https://www.linkedin.com/posts/brianbuntz_sudoku-is-apparent..."}, {"id": 50552676, "au": "xgk", "dom": 29, "sr": 42, "sc": -2.16, "ep": 0.93, "bs": 1.99, "d": 5, "age": 2.09, "grav": 12.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 18, "qw": 0, "k": 79, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "fep_models", "flbl": "Fep & Models (Energy-based)", "urls": ["https://www.verses.ai/"], "ig": 0.397, "fa": 0.0, "gp": 0.0, "bl": 0.75, "ds": 0.0, "txt": "There have always been a lot of startups in the FEP space that make (made) huge claims (e.g. https://www.verses.ai/), then disappear ..."}, {"id": 50547001, "au": "m3kw9", "dom": 20, "sr": 43, "sc": -4.72, "ep": 0.91, "bs": 4.24, "d": 1, "age": 9.07, "grav": 75.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 3505, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "reasoning_llm", "flbl": "Reasoning & LLM (Efficient)", "urls": [], "ig": 0.389, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "is it good for local llm's where you do a very specific task like voice removal?"}, {"id": 50544575, "au": "ricardobeat", "dom": 50, "sr": 44, "sc": -4.92, "ep": 0.86, "bs": 4.24, "d": 1, "age": 13.21, "grav": 134.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 23099, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "understand_researchers", "flbl": "Understand & Researchers (Machine)", "urls": [], "ig": 0.368, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Did those two papers get published six days apart?"}, {"id": 50546613, "au": "datsci_est_2015", "dom": 34, "sr": 45, "sc": -5.01, "ep": 0.55, "bs": 4.24, "d": 2, "age": 9.62, "grav": 82.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 2196, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "fep_models", "flbl": "Fep & Models (Energy-based)", "urls": [], "ig": 0.236, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Which can be a huge advantage, as normalization is an often-overlooked source of bias in modeling."}, {"id": 50552235, "au": "Isamu", "dom": 2, "sr": 46, "sc": -8.47, "ep": 0.53, "bs": 8.34, "d": 1, "age": 2.65, "grav": 15.9, "surf": 6.9, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 78, "k": 6402, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.212, "fa": 0.0, "gp": 0.026, "bl": 3.148, "ds": 0.0, "txt": "Thank you for this reference, the first article summarizes what I am seeing myself:\n\n>LLM reasoning is strong in problems where useful planning happens through language; conversation, summarization, translation, and code generation. They’re good at producing syntactically valid solutions that do roughly what you requested. LLM-generated code mostly performs, translations are mostly correct, and if they happen in a language one doesn’t likely know well (Haskell, Tagalog), the improvement over typical human performance is tremendous. But many of the problems that matter the most in the economy do not look like language."}, {"id": 50553699, "au": "mentalgear", "dom": 15, "sr": 47, "sc": -9.35, "ep": 0.67, "bs": 8.48, "d": 2, "age": 0.7, "grav": 6.0, "surf": 10.1, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 4700, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "understand_researchers", "flbl": "Understand & Researchers (Machine)", "urls": [], "ig": 0.286, "fa": 0.0, "gp": 0.0, "bl": 3.2, "ds": 0.0, "txt": "please elaborate - their work so far seems legit."}, {"id": 50551263, "au": "anamax", "dom": 44, "sr": 48, "sc": -9.51, "ep": 0.0, "bs": 6.89, "d": 0, "age": 4.0, "grav": 25.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 7213, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.04, "bl": 2.6, "ds": 0.0, "txt": "Seems sort of like Ising machines."}, {"id": 50545423, "au": "nilsherzig", "dom": 8, "sr": 49, "sc": -10.05, "ep": 0.0, "bs": 6.89, "d": 1, "age": 11.6, "grav": 109.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 4, "k": 749, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.122, "bl": 2.6, "ds": 0.0, "txt": "> See the live benchmark\n\nbroken login wall. truly agi."}, {"id": 50547701, "au": "crab2", "dom": 46, "sr": 50, "sc": -10.07, "ep": 0.0, "bs": 6.89, "d": 0, "age": 8.2, "grav": 65.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": -5, "kpp": -0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "fep_models", "flbl": "Fep & Models (Energy-based)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.103, "bl": 2.6, "ds": 0.0, "txt": "\"Autoregressive Language Models are Secretly Energy-Based Models\""}, {"id": 50548042, "au": "throwaway0q5347", "dom": 16, "sr": 51, "sc": -10.44, "ep": 0.0, "bs": 6.89, "d": 2, "age": 7.75, "grav": 60.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 12, "k": 54, "kpp": 4.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "> Logical Intelligence is most definately a scam, that should hardly be taken seriously\n\ncitation needed?"}, {"id": 50552831, "au": "zbentley", "dom": 13, "sr": 52, "sc": -10.66, "ep": 0.0, "bs": 6.89, "d": 3, "age": 1.89, "grav": 11.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 6248, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "reasoning_llm", "flbl": "Reasoning & LLM (Efficient)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Er, “permuted” over, not “permitted”."}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "top_signal";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 40);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 40);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 40);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `${shown.length} of ${pool.length} comments` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const proofDrawer = document.getElementById("proofDrawer");
+  const expBtn = document.getElementById("exploreToggleBtn");
+  const eviBtn = document.getElementById("evidenceToggleBtn");
+
+  if (expBtn && labDrawer) {
+    expBtn.addEventListener("click", () => {
+      labDrawer.open = !labDrawer.open;
+    });
+    labDrawer.addEventListener("toggle", () => {
+      const isOpen = labDrawer.open;
+      expBtn.classList.toggle("active", isOpen);
+      expBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  if (eviBtn && proofDrawer) {
+    eviBtn.addEventListener("click", () => {
+      proofDrawer.open = !proofDrawer.open;
+    });
+    proofDrawer.addEventListener("toggle", () => {
+      const isOpen = proofDrawer.open;
+      eviBtn.classList.toggle("active", isOpen);
+      eviBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

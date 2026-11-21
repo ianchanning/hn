@@ -1,0 +1,1259 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50491400 // How Not to Build a Music Player — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      background: rgb(247, 247, 245);
+      color: rgb(13, 13, 13);
+      font: 15px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+    }
+    .sheet-top {
+      border-top: 3px solid rgb(13, 13, 13);
+      border-bottom: 1px solid rgb(13, 13, 13);
+      padding: 16px 0 26px;
+    }
+    .eyebrow {
+      font: 600 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .eyebrow strong { color: rgb(255, 51, 0); }
+    h1 {
+      font-size: clamp(36px, 5.2vw, 72px);
+      line-height: 0.96;
+      letter-spacing: -0.045em;
+      margin: 18px 0 14px;
+      font-weight: 800;
+    }
+    h1 .accent { color: rgb(255, 51, 0); }
+    .sublead {
+      max-width: 920px;
+      font-size: 16px;
+      color: rgb(52, 52, 50);
+      margin: 0;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      font: 700 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 24px;
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+    }
+    .kpi-cell {
+      padding: 16px 16px 14px;
+      border-right: 1px solid rgb(205, 205, 200);
+    }
+    .kpi-cell:last-child { border-right: 0; }
+    .kpi-label {
+      font: 600 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 8px 0 4px;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      font-size: 12px;
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      background: rgb(13, 15, 17);
+      color: rgb(228, 232, 236);
+      border: 2px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 6px;
+      corner-shape: bevel;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(156, 166, 176);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      background: rgb(9, 11, 13);
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(180, 188, 196);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 58px;
+      background: rgb(20, 24, 28);
+      border-left: 3px solid rgb(0, 230, 118);
+      font: 12px/19px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(220, 226, 232);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 38px;
+    }
+
+    /* Collapsible 03A / 03B Justification Drawer */
+    details.proof-drawer {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 12px 0;
+    }
+    details.proof-drawer > summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      font: 700 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      user-select: none;
+    }
+    details.proof-drawer > summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary:hover { border-color: rgb(255, 51, 0); }
+    details.proof-drawer > summary .toggle-pill {
+      flex-shrink: 0;
+      padding: 3px 8px;
+      background: rgb(13, 13, 13);
+      color: rgb(247, 247, 245);
+      font-size: 10px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 16px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: rgb(255, 255, 253);
+      border: 1px solid rgb(13, 13, 13);
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+    }
+    table.ablation th {
+      background: rgb(236, 236, 231);
+      font: 700 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgb(60, 60, 58);
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      font: 600 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+      color: rgb(13, 13, 13);
+      padding: 7px 11px;
+      font: 600 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      box-shadow: 0 2px 0 rgb(13, 13, 13);
+    }
+    button.tab-btn.active {
+      background: rgb(13, 13, 13);
+      color: rgb(247, 247, 245);
+    }
+    button.tab-btn:hover {
+      border-color: rgb(255, 51, 0);
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      padding: 8px 11px;
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+      font: 600 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { flex: 1; min-width: 220px; font-weight: 400; }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border: 1px solid rgb(216, 216, 206);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      border-top: 3px solid rgb(13, 13, 13);
+      padding-top: 14px;
+      margin-top: 36px;
+      font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        background: rgb(239, 239, 234);
+        border: 1px solid rgb(13, 13, 13);
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        font-size: 17px;
+        margin: 0;
+        white-space: normal;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        background: rgb(13, 13, 13);
+        color: rgb(247, 247, 245);
+        font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-] HIDE"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+] SHOW"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpi-cell { border-bottom: 1px solid rgb(205, 205, 200); }
+      .filter-bar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .filter-bar select.sel-in {
+        width: 100%;
+        font-size: 16px;
+        padding: 8px 9px;
+      }
+      .filter-bar input.search-in {
+        grid-column: span 2;
+        width: 100%;
+        min-width: 0;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="sheet-top">
+    <div class="eyebrow">
+      <span>NYX OBSERVATORY // <a class="ext-link" href="https://news.ycombinator.com/item?id=50491400">HN ITEM 50491400</a> // ALICHRAGHI.GITHUB.IO</span>
+      <span><strong>BULLSHIT: 82.3%</strong>
+    </div>
+    <h1>Bullshit vs. <span class="accent">Epistemic.</span></h1>
+    <p class="sublead">
+      <strong>62</strong> Hacker News comments on <a class="ext-link" href="https://alichraghi.github.io/blog/how-not-to-build-a-music-player/">How Not to Build a Music Player (alichraghi.github.io)</a>.
+    </p>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary>
+      <span>01 // EVIDENCE</span>
+      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    </summary>
+    <p>
+      Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+      Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+    </p>
+    <div class="proof-body">
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">62</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 50 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">17.7%</div>
+          <div class="kpi-sub">11 comments (3 Gold / 4.8%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">82.3%</div>
+          <div class="kpi-sub">36 chatter &bull; 15 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">3</div>
+        <div class="kpi-sub">7% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.906</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">29</div>
+          <div class="kpi-sub">HN POS 19..47 (46.8% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="margin-top:10px;font:600 11px/1.5 ui-monospace,Menlo,monospace;color:rgb(70,70,68)"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary>
+      <span>02 // EXPLORE</span>
+      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / INTERACTIVE EQUATION</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p style="font-size:11.5px;line-height:1.42;color:rgb(85,85,82);margin:12px 0 0">
+              Drag any weight to watch the 62-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 62)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (3)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (8)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (36)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (15)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..62) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 25)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (@Telaneo, 0.7h); largest subtree (@winternett) occupies 29 slots (HN POS 19..47).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="modeSelect" class="sel-in" aria-label="Ranking view">
+          <option value="hn_top40">HN Top 40</option>
+          <option value="top_signal">Epistemic Top 50</option>
+          <option value="buried_gems">Buried Gems (HN POS &gt; 25)</option>
+          <option value="bullshit_traps">High-Karma / URL Traps Caught</option>
+          <option value="mod_morgue">Mod Rebukes &amp; Downvoted Morgue</option>
+          <option value="c5a_rescues">c5A Heterodox Rescues</option>
+        </select>
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (62)</option>
+          <option value="random_android">Random &amp; Android (Order) (12)</option>
+          <option value="songs_play">Songs &amp; Play (Shuffle) (12)</option>
+          <option value="code_models">Code &amp; Models (Words) (11)</option>
+          <option value="wrote_player">Wrote &amp; Player (App) (11)</option>
+          <option value="played_smart">Played &amp; Smart (Ipod) (10)</option>
+          <option value="general_commentary">General Commentary (6)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, player, internet, players, option, music...">
+      </div>
+      <div id="resultMeta" style="font:600 11px/1.4 ui-monospace,Menlo,monospace;color:rgb(90,90,88);margin-bottom:10px"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50491400 + ALICHRAGHI.GITHUB.IO + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50491400, "story_title": "How Not to Build a Music Player", "story_url": "https://alichraghi.github.io/blog/how-not-to-build-a-music-player/", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50491400, "story_title": "How Not to Build a Music Player", "story_url": "https://alichraghi.github.io/blog/how-not-to-build-a-music-player/", "points": 142, "story_author": "vinhnx", "article_source": "fetched_url", "t1_ref_utc": "2026-11-14T14:00:12+00:00", "t2_ref_utc": "2026-11-14T14:00:12+00:00", "delta_minutes": 0.0, "story_anchors": ["player", "internet", "players", "option", "music", "amp", "hard", "feature", "foobar2000", "support", "code", "audio", "control", "free", "fully", "interesting", "phone", "solution", "story", "words", "works"], "facet_labels": {"songs_play": "Songs & Play (Shuffle)", "code_models": "Code & Models (Words)", "played_smart": "Played & Smart (Ipod)", "wrote_player": "Wrote & Player (App)", "random_android": "Random & Android (Order)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "songs_play", "label": "Songs & Play (Shuffle)", "count": 12, "top_terms": ["songs", "play", "shuffle", "fix"]}, {"slug": "code_models", "label": "Code & Models (Words)", "count": 11, "top_terms": ["code", "models", "words", "fix"]}, {"slug": "played_smart", "label": "Played & Smart (Ipod)", "count": 10, "top_terms": ["played", "smart", "ipod", "tracks"]}, {"slug": "wrote_player", "label": "Wrote & Player (App)", "count": 11, "top_terms": ["wrote", "player", "app", "music"]}, {"slug": "random_android", "label": "Random & Android (Order)", "count": 12, "top_terms": ["random", "android", "order", "plays"]}], "counts": {"total_comments": 62, "live_t2_comments": 62, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 50, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "78077518a6fa9bff1b36140264e77c95a7f45040d668ffd729fd9d39e6641737"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 3, "grounded_analysis": 8, "crowd_chatter": 36, "bullshit_or_flamewar": 15}, "facets": {"played_smart": 10, "random_android": 12, "code_models": 11, "wrote_player": 11, "songs_play": 12, "general_commentary": 6}, "facet_options": [{"slug": "random_android", "label": "Random & Android (Order)", "count": 12}, {"slug": "songs_play", "label": "Songs & Play (Shuffle)", "count": 12}, {"slug": "code_models", "label": "Code & Models (Words)", "count": 11}, {"slug": "wrote_player", "label": "Wrote & Player (App)", "count": 11}, {"slug": "played_smart", "label": "Played & Smart (Ipod)", "count": 10}, {"slug": "general_commentary", "label": "General Commentary", "count": 6}], "facet_diagnostics": [{"slug": "random_android", "label": "Random & Android (Order)", "count": 12, "useful": 2, "useful_pct": 16.7, "terms": "random, android, order, plays"}, {"slug": "songs_play", "label": "Songs & Play (Shuffle)", "count": 12, "useful": 0, "useful_pct": 0.0, "terms": "songs, play, shuffle, fix"}, {"slug": "code_models", "label": "Code & Models (Words)", "count": 11, "useful": 4, "useful_pct": 36.4, "terms": "code, models, words, fix"}, {"slug": "wrote_player", "label": "Wrote & Player (App)", "count": 11, "useful": 1, "useful_pct": 9.1, "terms": "wrote, player, app, music"}, {"slug": "played_smart", "label": "Played & Smart (Ipod)", "count": 10, "useful": 4, "useful_pct": 40.0, "terms": "played, smart, ipod, tracks"}, {"slug": "general_commentary", "label": "General Commentary", "count": 6, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 7}, {"category": "code_repository", "count": 3}], "story_anchors": ["player", "internet", "players", "option", "music", "amp", "hard", "feature", "foobar2000", "support", "code", "audio", "control", "free", "fully", "interesting", "phone", "solution"], "largest_root": {"root_id": 50492444, "author": "winternett", "slots": 29, "start_dom": 19, "end_dom": 47, "share_pct": 46.8, "top_dom1_age": 0.7, "top_dom1_author": "Telaneo"}, "buried_cutoff": 25, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50493501, "au": "sandreas", "dom": 58, "sr": 1, "sc": 11.98, "ep": 11.98, "bs": 0.0, "d": 0, "age": 10.54, "grav": 94.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 280, "qw": 0, "k": 2873, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "played_smart", "flbl": "Played & Smart (Ipod)", "urls": ["https://github.com/nanowave-player/nanowave-ui", "https://www.navidrome.org/docs/usage/features/smart-playlists/", "https://substreamer.org/"], "ig": 1.775, "fa": 2.42, "gp": 0.631, "bl": 0.0, "ds": 0.0, "txt": "Interesting Story. Starting my own hardware music player as a learning project[1] (that will probably take years until the first release) I noticed how MANY music player projects are out there (software and hardware ones).\n\nThis seems to be a field with so many different approaches and requirements, that no solution can fit them all and everyone settles with the least annoying one or starts their own.\n\nPersonally, I've found that since breaking up with macOS/iOS in 2020 my most missing feature is using my headphone remote to control volume or skip songs without taking my phone out of my pocket / touching my keyboard. It's still in my muscle memory, because I'm using my iPod Nano 7 to listen to audio books a lot and while every iPod and MacBook does support this, Linux capable notebooks don't.\n\nBesides this single feature, for music I found navidrome with smart playlists[2] and Substreamer[3] / DSub[4] to be a great way to listen to local music, since Substreamer supports OFFLINE sync for playlists. So every time I get home I sync my smart playlists, which includes a \"last played\" filter / ordering - so I get to listen to \"new\" music every time.\n\nUnfortunately the headphone remote stuff probably will never be fully fixed on Android, because google chose to block \"longpress\" on OS level for their own Voiceover, but like I said: The least annoying option.\n\nFor audio books I can re"}, {"id": 50494367, "au": "Springtime", "dom": 32, "sr": 2, "sc": 9.2, "ep": 9.2, "bs": 0.0, "d": 1, "age": 8.25, "grav": 66.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 40, "qw": 0, "k": 2567, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "random_android", "flbl": "Random & Android (Order)", "urls": ["https://github.com/OxygenCobalt/Auxio"], "ig": 1.03, "fa": 2.08, "gp": 0.588, "bl": 0.0, "ds": 0.0, "txt": "Auxio music player[1] for Android shuffles a new order each time the shuffle button is clicked (and ime is excellent for handling well-tagged libraries).\n\nfoobar2000 for Windows also changes the shuffle order but (at least in earlier versions) only after a relaunch.\n\n[1] https://github.com/OxygenCobalt/Auxio"}, {"id": 50493962, "au": "mojuba", "dom": 9, "sr": 3, "sc": 7.66, "ep": 7.66, "bs": 0.0, "d": 0, "age": 9.46, "grav": 80.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 112, "qw": 14, "k": 5176, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "code_models", "flbl": "Code & Models (Words)", "urls": [], "ig": 1.367, "fa": 0.98, "gp": 1.141, "bl": 0.0, "ds": 0.0, "txt": "> I was surprised by my own ignorance and how much LLMs like to complicate stuff.\n\nExactly and it's like a plague. I think the main reason is that LLMs are generators, they like to generate code where code removal or reduction would solve the problem just as well. You ask them to fix something, they generate a fix. You tell them the fix didn't work, now they generate a fix for a fix, whereas a fix that would also reduce complexity existed from the start.\n\nWith a fair amount of babysitting and constantly reminding the agent that code removal is an option, you can eventually get a decent codebase but I wonder why this isn't a default. Because they are trained on mediocre code that is the vast majority of what's available on the internet? Most likely."}, {"id": 50496435, "au": "customguy", "dom": 24, "sr": 4, "sc": 6.08, "ep": 6.22, "bs": 0.0, "d": 3, "age": 1.73, "grav": 10.7, "surf": 5.3, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 102, "qw": 0, "k": 781, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "played_smart", "flbl": "Played & Smart (Ipod)", "urls": ["https://www.roguebasin.com/index.php?title=Weighted_random_generator"], "ig": 1.28, "fa": 0.9, "gp": 0.448, "bl": 0.0, "ds": 0.0, "txt": "I understand none of that, but there's a little snippet from roguebasin I find myself re-using all the time because it's so versatile:\n\nhttps://www.roguebasin.com/index.php?title=Weighted_random_g...\n\nYou start with a weight of 1 and you just have things affect the weights, e.g.\n\n- for every time it's been played before, multiply the weight with 0.1\n\n- if the total number of tracks is N, and it was among the last N/2 songs played, set weight to 0\n\n- for every word in title, filename, artist, album etc. that the last played song had, penalize tracks for any of those words they have\n\n- if the song has a very similar length than the last song was played, it gets a penalty"}, {"id": 50492444, "au": "winternett", "dom": 19, "sr": 5, "sc": 5.7, "ep": 5.99, "bs": 0.0, "d": 0, "age": 12.85, "grav": 128.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 103, "qw": 0, "k": 3584, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "random_android", "flbl": "Random & Android (Order)", "urls": [], "ig": 1.363, "fa": 0.34, "gp": 1.255, "bl": 0.0, "ds": 0.0, "txt": "It's been under my skin for a long time now, but every single free music player app I've used in the past 8 years plays my locally stored mp3s in the exact same order each time the shuffle button is on. Many others complain about that too.\n\nI don't know if it's happening on Android OS level, but even VLC, plays songs in the exact same predictable order. I've left support notes on VLC's forums, and submitted the issue to issue cues and there are no responses each time.\n\nNone of that encourages me to pay for a premium app, shuffle has been around since CD changers."}, {"id": 50495192, "au": "gobdovan", "dom": 28, "sr": 6, "sc": 5.53, "ep": 5.97, "bs": 0.0, "d": 1, "age": 5.5, "grav": 37.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 69, "qw": 0, "k": 1189, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "played_smart", "flbl": "Played & Smart (Ipod)", "urls": ["https://sjdm.org/pipermail/jdm-society/2006-October/002793.html"], "ig": 1.338, "fa": 0.84, "gp": 0.296, "bl": 0.0, "ds": 0.0, "txt": "Mandatory iPod Shuffle plug: https://sjdm.org/pipermail/jdm-society/2006-October/002793.h...\n\nThe engineering of perceived randomness is an art.\n\nThe iPod comments don't fully apply to 'songs play in same order on shuffle', but still relevant if the players you tried actually have a smart shuffle that does things like matching metadata between consecutively played songs or some quickly computed properties like energy, and end up producing just a small set of plausible orderings that make a playlist listenable."}, {"id": 50494428, "au": "mojuba", "dom": 11, "sr": 7, "sc": 5.0, "ep": 5.15, "bs": 0.0, "d": 2, "age": 8.04, "grav": 63.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 62, "qw": 0, "k": 5176, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "code_models", "flbl": "Code & Models (Words)", "urls": [], "ig": 1.373, "fa": 0.28, "gp": 0.773, "bl": 0.0, "ds": 0.0, "txt": "They have improved I agree but still, if left unattended they can produce a lot of unnecessary complexity. Even Fable and whatever the other top models.\n\nProgramming is engineering and it's hard. In fact outside of engineering the LLMs have become so impressively good at reasoning, pulling the necessary information, connecting the dots. And yet it's still not enough to produce high quality code."}, {"id": 50496785, "au": "Telaneo", "dom": 1, "sr": 8, "sc": 4.62, "ep": 4.62, "bs": 0.0, "d": 0, "age": 0.73, "grav": 6.1, "surf": 21.1, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 221, "qw": 0, "k": 2324, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "played_smart", "flbl": "Played & Smart (Ipod)", "urls": [], "ig": 1.419, "fa": 0.34, "gp": 0.217, "bl": 0.0, "ds": 0.0, "txt": "It's interesting how there are countless options for music players, some simple, some fully featured, and yet there are still holes unfilled in the market. There's probably some soul out there who's even unhappy with Foobar2000.\n\nIt's like a microcosm Linux: there are dozens of options, hundreds if you really go looking, but there are still holes in the market. Some are for somewhat understandable reasons beyond the individual distro/music program's control, while others are simply because no two features are in package at the same time, while others again are simply because no actual dev has had that idea and actually implemented it yet (maybe it's in some ancient thing, but nothing made in the past 20 years will have it).\n\nOn the one hand, I'm the guy that's largely happy with Linux Mint and VLC for playing my music files, so I apparently don't need much. On the other hand, syncing music from my Linux PC to my phone while keeping track of play counts seems to be an unsolved problem. Maybe there's that one program out there which can do it, but I've had to put that idea on pause while using Musicbee via Wine on Linux for syncing, which also stores my old play counts from my iPod and iPhone days. Hardly an ideal solution, just the least bad one."}, {"id": 50496744, "au": "mathteacher1729", "dom": 7, "sr": 9, "sc": 4.56, "ep": 4.56, "bs": 0.0, "d": 1, "age": 0.84, "grav": 6.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 77, "qw": 0, "k": 39, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "code_models", "flbl": "Code & Models (Words)", "urls": [], "ig": 1.53, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "\"Perhaps there is a “universal” music. In addition, I was cheered by an earlier remark of the biologist Lewis Thomas, president of the Sloan-Kettering Institute in New York City. When asked what message he would send to other civilizations in space, Thomas replied with words to this effect: “I would send the complete works of Johann Sebastian Bach.” “But that,” he added as an aside, “would be boasting.” - Carl Sagan (1978) from  his book Murmurs of Earth: The Voyager Interstellar Record"}, {"id": 50492354, "au": "ta2112", "dom": 52, "sr": 10, "sc": 4.51, "ep": 4.51, "bs": 0.0, "d": 0, "age": 13.04, "grav": 131.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 10, "k": 74, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "wrote_player", "flbl": "Wrote & Player (App)", "urls": [], "ig": 0.996, "fa": 0.42, "gp": 0.67, "bl": 0.0, "ds": 0.0, "txt": "> I’ve got no pre-rewrite history of the repo to check).\n\nI love this type of story, because it describes a different Internet that I'm familiar with. And honestly it sounds pretty rough out there! But regardless, we all should be using some kind of version control (git), and as an added bonus you'd get your pre-rewrite history from it."}, {"id": 50494159, "au": "sho", "dom": 10, "sr": 11, "sc": 4.17, "ep": 4.46, "bs": 0.0, "d": 1, "age": 8.89, "grav": 73.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 242, "qw": 40, "k": 8675, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "code_models", "flbl": "Code & Models (Words)", "urls": [], "ig": 0.86, "fa": 0.42, "gp": 0.858, "bl": 0.0, "ds": 0.0, "txt": ">  the main reason is that LLMs are generators, they like to generate code where code removal or reduction would solve the problem\n\nDon't over-index on this choice of words. LLMs can just as easily generate a diff that removes or refactors code, they don't have any intrinsic \"preference\" to always add more code, unless it's been trained into them.\n\nA lot of the early training had concentrated on \"wow factor\" one-shot style demoable use cases, where the models indeed ended up with a tendency to assume they were in a \"produce something new for me right now\" situation and often or always started churning out additional code, even without all relevant information. As training regimes improve, and as customer demand evolves, this is changing, and the latest big models place a lot more emphasis on maintenance tasks - still not enough, but it's at least in the mix. As they mature, I'd expect the models' \"instinct\" to gradually align with what everyone's idea of a senior software engineer is, taking time to figure out if they can simplify and refactor rather than always adding more.\n\nIt's a new field, it will take time to get it right, but I don't doubt it will eventually be right.\n\n> Because they are trained on mediocre code that is the vast majority of what's available on the internet\n\nAgain, this is outdated. It's true that the earliest training took this \"spray and pray\" approach, "}, {"id": 50492445, "au": "dead_hn_theory", "dom": 60, "sr": 12, "sc": 3.83, "ep": 3.83, "bs": 0.0, "d": 0, "age": 12.85, "grav": 128.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 118, "qw": 0, "k": 78, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "wrote_player", "flbl": "Wrote & Player (App)", "urls": [], "ig": 1.63, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "This post makes no sense. The author goes from having no internet due to a bombardment to LLM'ing. I find it hard to share the plight of a warzone when they go unhinged to build their own audio player afterwards (?!). If I want a music player every OS comes with one, and phones hold enough storage. USB thumb drives are also good. Failing that, burning CDs and using rechargeable batteries is another off-the-grid solution that will work fine, and CDs are easily transportable and will last for decades. Slightly physically damaged CDs are somewhat resilient and can be brought back to life with toothpaste, so they're somewhat \"better\" than files which shit the bed if there is any data corruption."}, {"id": 50495581, "au": "masklinn", "dom": 45, "sr": 13, "sc": 3.32, "ep": 3.98, "bs": 0.0, "d": 6, "age": 4.24, "grav": 27.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 137, "qw": 0, "k": 69187, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "played_smart", "flbl": "Played & Smart (Ipod)", "urls": [], "ig": 1.191, "fa": 0.34, "gp": 0.143, "bl": 0.0, "ds": 0.0, "txt": "Except \"small\" is very large because this runs face first into the birthday problem so the average distance between duplicates grows to the square root of the number of files.\n\nHell even actual shuffling is not necessarily enough to \"feel\" right for human psyche, famously despite the ipod doing actual shuffling[0] users complained because tracks of the same artist / album could still cluster over shuffling an entire library, so they implemented \"smart shuffle\" to skew the shuffle and break up clusters. An other option is to weight the random pick by how far back a track was last played, or how little it's been played overall. This has the advantage of favouring less played tracks across listening sessions.\n\n[0] and frankly if the ipod was able to do actual shuffling back in 2005 the memory footprint is just a lazy excuse"}, {"id": 50493491, "au": "cooljoseph", "dom": 21, "sr": 14, "sc": 3.09, "ep": 3.53, "bs": 0.0, "d": 2, "age": 10.57, "grav": 95.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 87, "qw": 0, "k": 97, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "songs_play", "flbl": "Songs & Play (Shuffle)", "urls": [], "ig": 1.072, "fa": 0.0, "gp": 0.697, "bl": 0.0, "ds": 0.0, "txt": "It sounds like maybe what you want is to have the \"shuffle\" mode play songs close to truly randomly while still penalizing songs that have been played too much recently. This gives us an optimization problem:\n\n    minimize KL(π || uniform) - β E_π[times played already],\n\nwhere β is an inverse temperature determining how much you dislike repetition and π is your policy. Here I've arbitrarily chosen a reverse KL divergence because it leads to a nicer closed form:\n\n    π(song) ∝ exp(-β⋅\"times song played already\").\n\nI wonder if anyone has implemented this before in a music playlist."}, {"id": 50494337, "au": "sourweasel", "dom": 30, "sr": 15, "sc": 2.96, "ep": 3.4, "bs": 0.0, "d": 2, "age": 8.36, "grav": 67.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 10, "k": 58, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "random_android", "flbl": "Random & Android (Order)", "urls": [], "ig": 0.526, "fa": 0.76, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": ">I have this issue with youtube music only for some reason…\n\nTry navigating to the playlist and look below the currently playing track. There should be a \"shuffle type\" button bar showing 'Familiar', 'Discover', 'Chill', etc. It seems to produce better results for me if I explicitly choose familiar tracks or discover mode (or the other options, but i use the first two 99% of the time)."}, {"id": 50495577, "au": "rjh29", "dom": 3, "sr": 16, "sc": 2.83, "ep": 2.83, "bs": 0.0, "d": 0, "age": 4.24, "grav": 27.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 3980, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "wrote_player", "flbl": "Wrote & Player (App)", "urls": [], "ig": 1.033, "fa": 0.0, "gp": 0.279, "bl": 0.0, "ds": 0.0, "txt": "I also \"wrote\" my own music player. It took less time to vibe code a player than it did to test 5-6 music apps and find out they were missing feature X that I wanted.\n\nShoutout to LIBLRC, a free API for lyrics search."}, {"id": 50492831, "au": "WalterBright", "dom": 38, "sr": 17, "sc": 2.67, "ep": 3.11, "bs": 0.0, "d": 1, "age": 12.0, "grav": 115.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 81579, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "songs_play", "flbl": "Songs & Play (Shuffle)", "urls": [], "ig": 0.775, "fa": 0.28, "gp": 0.337, "bl": 0.0, "ds": 0.0, "txt": "Pretty much every USB music player has the same faults:\n\n1. shuffle play does not work\n\n2. crashes if there are more than N songs\n\n3. does not find songs in subdirectories\n\nAll of these are trivial to fix. I do not understand the programmers who make the firmware."}, {"id": 50492823, "au": "jancsika", "dom": 46, "sr": 18, "sc": 2.54, "ep": 3.2, "bs": 0.0, "d": 1, "age": 12.03, "grav": 116.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 67, "qw": 0, "k": 10731, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_models", "flbl": "Code & Models (Words)", "urls": [], "ig": 1.154, "fa": 0.0, "gp": 0.334, "bl": 0.0, "ds": 0.0, "txt": "Amperfy for the Iphone randomizes the shuffle.\n\nI just looked at the code and it's apparently using the Fisher-Yates shuffle with a call to arc4random each pass. It's literally eight lines of Swift!\n\nI've never suggested this before, but if the Android app store has truly been as bad as you claim for as long as you claim, you should seriously consider buying an Iphone to solve your problem."}, {"id": 50495832, "au": "tkgally", "dom": 4, "sr": 19, "sc": 2.52, "ep": 2.66, "bs": 0.0, "d": 1, "age": 3.5, "grav": 21.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 69, "qw": 0, "k": 6365, "kpp": 5.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "wrote_player", "flbl": "Wrote & Player (App)", "urls": [], "ig": 0.966, "fa": 0.0, "gp": 0.273, "bl": 0.0, "ds": 0.0, "txt": "Same here. When I read this article a few hours ago, I realized that I should vibecode a player for myself. I often listen to multihour recordings of radio programs, and I have been wanting an app that would remember the files I've played and the playback position in each recording--that's all. I set Claude to it, and in half an hour it produced a native Mac app in Swift that worked perfectly on the first try."}, {"id": 50496442, "au": "OroPla", "dom": 8, "sr": 20, "sc": 2.35, "ep": 2.35, "bs": 0.0, "d": 0, "age": 1.7, "grav": 10.5, "surf": 12.5, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 457, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "random_android", "flbl": "Random & Android (Order)", "urls": [], "ig": 0.954, "fa": 0.0, "gp": 0.072, "bl": 0.0, "ds": 0.0, "txt": "I've been meaning to switch to some CLI music player that uses mpd, but I've stayed with Clementine since I don't want to live without the moodbar. Also, the only thing I don't like about Clementine is the annoying \"various artist\" grouping feature."}, {"id": 50493826, "au": "WalterBright", "dom": 40, "sr": 21, "sc": 2.29, "ep": 2.73, "bs": 0.0, "d": 3, "age": 9.81, "grav": 85.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 72, "qw": 0, "k": 81579, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "songs_play", "flbl": "Songs & Play (Shuffle)", "urls": [], "ig": 0.829, "fa": 0.0, "gp": 0.54, "bl": 0.0, "ds": 0.0, "txt": "To implement shuffle play, it is not necessary to actually shuffle filenames in memory. Just generate a random number modulo the number of files, and then play that file. That way your program can shuffle play any number of files, no worries about running out of memory.\n\nBy the way, the Roku box has a \"media player\" app in it by default, and it cannot shuffle play more than a handful of files. Completely useless."}, {"id": 50492743, "au": "eddythompson80", "dom": 29, "sr": 22, "sc": 2.24, "ep": 2.68, "bs": 0.0, "d": 1, "age": 12.18, "grav": 118.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 0, "k": 3449, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "songs_play", "flbl": "Songs & Play (Shuffle)", "urls": [], "ig": 0.673, "fa": 0.0, "gp": 0.761, "bl": 0.0, "ds": 0.0, "txt": "I have this issue with youtube music only for some reason. For me \"Shuffle\" seems to be starting random, then after a handful of songs entering a loop of 6 or 7 songs. I never figured out why or looked it up, I just refresh the page. I know it must be only me somehow, but don't know what's happening."}, {"id": 50495539, "au": "NSPG911", "dom": 55, "sr": 23, "sc": 2.09, "ep": 2.09, "bs": 0.0, "d": 1, "age": 4.37, "grav": 28.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 49, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.476, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I agree, I've been using it for 5 years now, no qualms, it just does its job, and its job well. Someday I'll grab premium to support the dev..."}, {"id": 50496086, "au": "IndySun", "dom": 57, "sr": 24, "sc": 2.02, "ep": 2.46, "bs": 0.0, "d": 0, "age": 2.68, "grav": 16.1, "surf": 8.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 53, "qw": 0, "k": 772, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "played_smart", "flbl": "Played & Smart (Ipod)", "urls": [], "ig": 1.026, "fa": 0.0, "gp": 0.032, "bl": 0.0, "ds": 0.0, "txt": "\"...I wasn’t aware of other music players such as foobar2000 which my friend just pointed me to while writing this post...\"\n\nAfter reading this early sentence I stopped reading and wondered why that was. Not knowing the serious competition might be advantageous, it might be smart. When I've finished pondering why, I'll jump back in."}, {"id": 50494129, "au": "egypturnash", "dom": 22, "sr": 25, "sc": 1.69, "ep": 2.79, "bs": 0.0, "d": 3, "age": 8.96, "grav": 74.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 65, "qw": 0, "k": 16836, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "played_smart", "flbl": "Played & Smart (Ipod)", "urls": [], "ig": 0.837, "fa": 0.0, "gp": 0.568, "bl": 0.0, "ds": 0.0, "txt": "Easy version: Make a smart playlist whose criteria are 'last played is not in the last 3 weeks, last skipped is not in the last 3 weeks'. Randomize within that. Possibly add some other conditions like 'genre is not podcast'. I've been having iTunes/Music.app do this for... probably at least a decade, at this point, it doesn't track when you made playlists so this is just guessing."}, {"id": 50492549, "au": "Hobadee", "dom": 20, "sr": 26, "sc": 1.59, "ep": 2.25, "bs": 0.0, "d": 1, "age": 12.6, "grav": 124.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 47, "qw": 0, "k": 521, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "random_android", "flbl": "Random & Android (Order)", "urls": [], "ig": 0.368, "fa": 0.0, "gp": 0.959, "bl": 0.0, "ds": 0.0, "txt": "I would rather have the same \"random\" order than what Spotify does; random never plays some songs, and overplays other.  I get true random has the possibility of that, but when I've heard the same song for the 4th time in an hour, on a 20-hour playlist, something is wrong."}, {"id": 50496033, "au": "dvh", "dom": 6, "sr": 27, "sc": 1.51, "ep": 1.87, "bs": 0.0, "d": 0, "age": 2.85, "grav": 17.2, "surf": 7.7, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 24, "qw": 0, "k": 7165, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "wrote_player", "flbl": "Wrote & Player (App)", "urls": ["https://imgur.com/zyaFRYF"], "ig": 0.693, "fa": 0.0, "gp": 0.169, "bl": 0.0, "ds": 0.0, "txt": "I also wrote my own music player. In Lazarus, mplayer in slave mode. Wrote it 10+ years ago and never changed it since, using it daily: https://imgur.com/zyaFRYF"}, {"id": 50494402, "au": "sourweasel", "dom": 35, "sr": 28, "sc": 1.3, "ep": 2.62, "bs": 0.0, "d": 2, "age": 8.13, "grav": 64.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 58, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "played_smart", "flbl": "Played & Smart (Ipod)", "urls": [], "ig": 1.114, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "If you're on Android, I highly recommend trying the app Symphonium. It can connect to your Plex music library and the \"Smart Flow\" playlist bring all the auto DJ modes from Plex amp and add a few more options. It also looks far better imho."}, {"id": 50493874, "au": "WalterBright", "dom": 42, "sr": 29, "sc": 1.07, "ep": 1.73, "bs": 0.0, "d": 4, "age": 9.7, "grav": 83.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 81579, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "songs_play", "flbl": "Songs & Play (Shuffle)", "urls": [], "ig": 0.735, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "BTW, Windows Media Player is the winner, as it \"just works\". Just point it at the root directory of the music files, turn on shuffle play, and it works, and doesn't crash."}, {"id": 50492777, "au": "eddythompson80", "dom": 53, "sr": 30, "sc": 0.89, "ep": 1.48, "bs": 0.0, "d": 1, "age": 12.11, "grav": 117.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 3449, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_models", "flbl": "Code & Models (Words)", "urls": [], "ig": 0.63, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I mean they mentioned they had the code on codeberg initially, so it must have been in a git repo before. Maybe they just did the ol' `rm -rf .git && git init .`"}, {"id": 50497085, "au": "dpcx", "dom": 23, "sr": 31, "sc": 0.87, "ep": 1.31, "bs": 0.0, "d": 4, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 12, "qw": 0, "k": 2228, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://github.com/gms8994/wsp"], "ig": 0.145, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I worked with another developer 10 years ago to do something just like this https://github.com/gms8994/wsp"}, {"id": 50492900, "au": "CWuestefeld", "dom": 34, "sr": 32, "sc": 0.75, "ep": 2.29, "bs": 0.0, "d": 1, "age": 11.86, "grav": 113.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 179, "qw": 0, "k": 12356, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "played_smart", "flbl": "Played & Smart (Ipod)", "urls": [], "ig": 0.778, "fa": 0.0, "gp": 0.32, "bl": 0.0, "ds": 0.0, "txt": "My car's player (reading from a flash drive full of MP3s) doesn't have \"shuffle\", it has \"random\". The difference is subtle, but it means that each time it advances to a new track, it selects that at random. The result is that I never hear all the tracks in an album/playlist without hearing a bunch of repeats. Infuriating!\n\nBut when I play from my phone or PC, I use PlexAmp (backed by my Plex media server), which is the opposite extreme. Not only does it know what randomly shuffling is, but the server has analyzed the sonic profile of every track, and knows about similar artists and similar albums. So you can play an \"artist radio\" featuring that artist and other related stuff. And you can choose an auto DJ, which inserts between tracks the closest sonic match to the song it just played, or a brief detour of about 3 tracks that are spaced along the path from the track that just played to the one that's about to play. It's fantastic for discovering stuff you haven't heard in a long time within a very large library."}, {"id": 50493138, "au": "0gs", "dom": 39, "sr": 33, "sc": 0.75, "ep": 1.63, "bs": 0.0, "d": 2, "age": 11.39, "grav": 106.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 119, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "songs_play", "flbl": "Songs & Play (Shuffle)", "urls": [], "ig": 0.693, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "wow hacker news wins again. i am going to fix these in my music player. i think 2 & 3 are chill already... and i can totally fix 1. thanks!"}, {"id": 50494735, "au": "WalterBright", "dom": 44, "sr": 34, "sc": 0.67, "ep": 2.21, "bs": 0.0, "d": 5, "age": 6.93, "grav": 51.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 43, "qw": 0, "k": 81579, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "played_smart", "flbl": "Played & Smart (Ipod)", "urls": [], "ig": 0.94, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "You are correct, and that matters if it is a small number of music files. If it is a large number of files, the difference in user experience is irrelevant. But not needing to remember what was already played keeps the player memory footprint small."}, {"id": 50495215, "au": "rjh29", "dom": 16, "sr": 35, "sc": 0.61, "ep": 1.49, "bs": 0.0, "d": 1, "age": 5.42, "grav": 36.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 3980, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "random_android", "flbl": "Random & Android (Order)", "urls": [], "ig": 0.552, "fa": 0.0, "gp": 0.136, "bl": 0.0, "ds": 0.0, "txt": "Recent one was there was a text selection bug in Flutter that is fixed in the next minor version, but AI decided to create a hacky wrapper class that monitors all input gestures and manipulates them to avoid the bug with various timeouts and debounces. When it could have just updated Flutter."}, {"id": 50492653, "au": "summermusic", "dom": 61, "sr": 36, "sc": 0.29, "ep": 0.88, "bs": 0.0, "d": 1, "age": 12.38, "grav": 121.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 450, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "wrote_player", "flbl": "Wrote & Player (App)", "urls": [], "ig": 0.373, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The point is that the author wrote the music player app because they wanted specific features and for their own pleasure/coping."}, {"id": 50495480, "au": "hobo123", "dom": 17, "sr": 37, "sc": 0.27, "ep": 1.37, "bs": 0.0, "d": 1, "age": 4.51, "grav": 29.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 268, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "songs_play", "flbl": "Songs & Play (Shuffle)", "urls": [], "ig": 0.585, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Like human devs did not accumulate if blocks over if blocks, because they didn't understand the code, and fixed bugs at the completely wrong level.\n\nAt least that's my experience."}, {"id": 50495306, "au": "fuzzfactor", "dom": 47, "sr": 38, "sc": 0.19, "ep": 1.29, "bs": 0.0, "d": 1, "age": 5.1, "grav": 34.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 68, "qw": 0, "k": 3344, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "random_android", "flbl": "Random & Android (Order)", "urls": [], "ig": 0.55, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "In VLC I create a playlist myself, then save it as a file.\n\nThen when playing that list the random function behaves as expected, by playing any random song after any other, including repeats and seeming omissions in no pattern whatsoever.\n\nDisengage the random switch and it plays top-down.\n\nEdit: This is in Windows, I haven't tried it in Android but have found the Android version to be less-capable in other ways."}, {"id": 50496332, "au": "MarceliusK", "dom": 12, "sr": 39, "sc": 0.1, "ep": 1.2, "bs": 0.0, "d": 2, "age": 2.0, "grav": 12.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 215, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_models", "flbl": "Code & Models (Words)", "urls": [], "ig": 0.511, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The ability to delete code was never really the issue. It's knowing what can be deleted without breaking anything, and having enough confidence in that judgment to actually do it"}, {"id": 50494843, "au": "sgtlaggy", "dom": 27, "sr": 40, "sc": -0.15, "ep": 1.17, "bs": 0.0, "d": 2, "age": 6.57, "grav": 47.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 65, "qw": 0, "k": 30, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "songs_play", "flbl": "Songs & Play (Shuffle)", "urls": [], "ig": 0.499, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "My experience for years before finally dropping Spotify, and reinforced in some random comment online, was that it only grabs the first X songs in a playlist and shuffles among them, never proceeding to the rest. \"First\" may not be entirely correct but it was relatively consistent that a given playlist would always shuffle the same songs so it may have something to do with internal ordering/IDs."}, {"id": 50492539, "au": "Gualdrapo", "dom": 36, "sr": 41, "sc": -0.38, "ep": 1.16, "bs": 0.0, "d": 1, "age": 12.63, "grav": 125.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 1916, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "songs_play", "flbl": "Songs & Play (Shuffle)", "urls": [], "ig": 0.267, "fa": 0.0, "gp": 0.365, "bl": 0.0, "ds": 0.0, "txt": "Is what you call the \"shuffle button\" a \"shuffle playlist\" button or a \"shuffle mode\" button? There is a subtle difference between those two and for what I understand you want the second"}, {"id": 50492626, "au": "bombcar", "dom": 37, "sr": 42, "sc": -0.48, "ep": 0.84, "bs": 0.0, "d": 2, "age": 12.44, "grav": 122.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 45, "qw": 0, "k": 53876, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "random_android", "flbl": "Random & Android (Order)", "urls": [], "ig": 0.358, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Most people want the second - if they hit it, it picks a random song, and then plays all of the remaining songs randomly before repeating.\n\nFew people want to shuffle the playlist (which is closer to above) or worse, to actually randomly select a song each time."}, {"id": 50495519, "au": "hobo123", "dom": 26, "sr": 43, "sc": -0.51, "ep": 1.03, "bs": 0.0, "d": 2, "age": 4.41, "grav": 28.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 268, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "songs_play", "flbl": "Songs & Play (Shuffle)", "urls": [], "ig": 0.438, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Spotify is an organization. Of course they have an active interest in what things you stream and which ones you don't.\n\nIIRC in Germany they don't want you to stream whole albums, as under GEMA rules an album \"performance\" costs more than individual songs."}, {"id": 50492767, "au": "entropie", "dom": 31, "sr": 44, "sc": -0.83, "ep": 0.71, "bs": 0.0, "d": 2, "age": 12.13, "grav": 117.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 1035, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "songs_play", "flbl": "Songs & Play (Shuffle)", "urls": [], "ig": 0.301, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I think you can have a rss feed of your playlist, you could grep the urls, | rand them like you want and play with mpv or just download everything with yt-dlp."}, {"id": 50494807, "au": "heisenbit", "dom": 15, "sr": 45, "sc": -0.91, "ep": 1.61, "bs": 1.19, "d": 1, "age": 6.7, "grav": 49.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 3650, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_models", "flbl": "Code & Models (Words)", "urls": [], "ig": 0.573, "fa": 0.0, "gp": 0.179, "bl": 0.45, "ds": 0.0, "txt": "Rewriting code often makes it more readable and robust. That is sometimes also true for the human -> llm direction."}, {"id": 50495251, "au": "a3w", "dom": 51, "sr": 46, "sc": -0.95, "ep": 0.9, "bs": 1.19, "d": 2, "age": 5.31, "grav": 35.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 632, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "wrote_player", "flbl": "Wrote & Player (App)", "urls": [], "ig": 0.385, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "And zinf, formerly freeamp, but don't call it free*mp, or winamp will sue, was always the motto."}, {"id": 50496118, "au": "IndySun", "dom": 62, "sr": 47, "sc": -1.48, "ep": 2.56, "bs": 2.79, "d": 2, "age": 2.62, "grav": 15.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 61, "qw": 0, "k": 772, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "wrote_player", "flbl": "Wrote & Player (App)", "urls": [], "ig": 0.675, "fa": 0.34, "gp": 0.0, "bl": 1.055, "ds": 0.0, "txt": "\"The point is that the author wrote the music player app because they wanted specific features and for their own pleasure/coping.\"\n\nBut didn't look at popular alternatives, it seems, which is totally legit, go your own way 100% - but I felt the story, interesting as it is, was not being framed honestly from the start if I'm being honest, and that's a turn off."}, {"id": 50495534, "au": "NSPG911", "dom": 33, "sr": 48, "sc": -1.92, "ep": 0.81, "bs": 1.19, "d": 1, "age": 4.38, "grav": 28.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 49, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "random_android", "flbl": "Random & Android (Order)", "urls": [], "ig": 0.289, "fa": 0.0, "gp": 0.091, "bl": 0.45, "ds": 0.0, "txt": "Huh, I'm using Musicolet, never really experienced it. What's the number of mp3s you have locally? Maybe that is playing a part in the predictability?"}, {"id": 50492423, "au": "Hobadee", "dom": 48, "sr": 49, "sc": -2.48, "ep": 1.81, "bs": 3.05, "d": 0, "age": 12.89, "grav": 129.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 9, "qw": 0, "k": 521, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "wrote_player", "flbl": "Wrote & Player (App)", "urls": ["https://aimp.ru/"], "ig": 0.385, "fa": 0.0, "gp": 0.627, "bl": 1.15, "ds": 0.0, "txt": "\"AMP\" is unfortunately close to \"AIMP\", another music player.  (https://aimp.ru/)"}, {"id": 50493405, "au": "hoooooooooome", "dom": 54, "sr": 50, "sc": -3.24, "ep": 1.72, "bs": 3.71, "d": 0, "age": 10.75, "grav": 97.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 5, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "random_android", "flbl": "Random & Android (Order)", "urls": [], "ig": 0.388, "fa": 0.0, "gp": 0.558, "bl": 1.4, "ds": 0.0, "txt": "Musicolet for android has a shuffle, and also folder view, that works very well. Truly shuffled up."}, {"id": 50494672, "au": "iloveyoutwo", "dom": 49, "sr": 51, "sc": -3.58, "ep": 0.86, "bs": 3.05, "d": 1, "age": 7.15, "grav": 53.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 11, "qw": 0, "k": 34, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "random_android", "flbl": "Random & Android (Order)", "urls": ["https://fmhy.net/mobile\u0023android-audio-players"], "ig": 0.365, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "There's a lot of music players for Android: https://fmhy.net/mobile\u0023android-audio-players.\n\nAnd that's a curated list!"}, {"id": 50496445, "au": "xigoi", "dom": 18, "sr": 52, "sc": -5.11, "ep": 0.67, "bs": 4.24, "d": 2, "age": 1.69, "grav": 10.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 4278, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "code_models", "flbl": "Code & Models (Words)", "urls": [], "ig": 0.284, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Bad human developers did. But AI models are supposed to replace good human developers."}, {"id": 50493947, "au": "moron4hire", "dom": 43, "sr": 53, "sc": -5.8, "ep": 0.91, "bs": 5.17, "d": 4, "age": 9.49, "grav": 81.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 12237, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "songs_play", "flbl": "Songs & Play (Shuffle)", "urls": [], "ig": 0.388, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "That's random play, not shuffle play. Random play can repeat songs before all songs are played. Shuffle play will play all songs exactly once before any repeats occur. Random play \"puts the card back into the deck\" before dealing the next one."}, {"id": 50496324, "au": "MarceliusK", "dom": 13, "sr": 54, "sc": -7.03, "ep": 0.7, "bs": 6.18, "d": 1, "age": 2.02, "grav": 12.2, "surf": 4.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 215, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "code_models", "flbl": "Code & Models (Words)", "urls": [], "ig": 0.272, "fa": 0.0, "gp": 0.04, "bl": 2.333, "ds": 0.0, "txt": "This is why I think diff size is an underrated metric when evaluating coding agents"}, {"id": 50494616, "au": "shakow", "dom": 41, "sr": 55, "sc": -7.13, "ep": 0.77, "bs": 6.36, "d": 4, "age": 7.35, "grav": 55.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 14, "k": 3236, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "random_android", "flbl": "Random & Android (Order)", "urls": [], "ig": 0.286, "fa": 0.0, "gp": 0.069, "bl": 2.4, "ds": 0.0, "txt": "> Just generate a random number modulo the number of files, and then play that file\n\nThat won't be uniform. If you want really random shuffle, mod to the closest next power of 2 then re-sample until you get a number within the bounds."}, {"id": 50494869, "au": "31rf89e1f5e6", "dom": 59, "sr": 56, "sc": -7.13, "ep": 0.67, "bs": 6.76, "d": 0, "age": 6.5, "grav": 47.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 5, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "wrote_player", "flbl": "Wrote & Player (App)", "urls": [], "ig": 0.285, "fa": 0.0, "gp": 0.0, "bl": 2.55, "ds": 0.0, "txt": "Looks fine an dandy, but the name is too similar to AIMP... another player."}, {"id": 50496306, "au": "Ylpertnodi", "dom": 56, "sr": 57, "sc": -8.15, "ep": 0.0, "bs": 6.89, "d": 2, "age": 2.05, "grav": 12.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 566, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.34, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Another +1 for musicale, also 5 years no problems."}, {"id": 50496679, "au": "andai", "dom": 5, "sr": 58, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 1.02, "grav": 7.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 18117, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "wrote_player", "flbl": "Wrote & Player (App)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "<audio src=\"american_idiot.mp3\">"}, {"id": 50496911, "au": "christophilus", "dom": 14, "sr": 59, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 0.42, "grav": 4.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 14196, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "code_models", "flbl": "Code & Models (Words)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "You’re asking for a code-golf-optimized LLM."}, {"id": 50494603, "au": "anvuong", "dom": 25, "sr": 60, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 3, "age": 7.4, "grav": 56.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 861, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "uhm this is exponential backoff"}, {"id": 50493620, "au": "sowbug", "dom": 50, "sr": 61, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 10.27, "grav": 91.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 7497, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "And Winamp."}, {"id": 50497070, "au": "dpcx", "dom": 2, "sr": 62, "sc": -14.65, "ep": 0.0, "bs": 12.46, "d": 0, "age": 0.05, "grav": 3.6, "surf": 36.1, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 6, "qw": 0, "k": 2228, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://amarok.kde.org/"], "ig": -0.95, "fa": 0.0, "gp": 0.029, "bl": 4.7, "ds": 0.0, "txt": "Amarok is also still a thing, surprisingly. https://amarok.kde.org/"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      const jumpBtns = isPinned
+        ? `<button type="button" class="probe-inline-btn" data-probe-jump="1">Comment &darr;</button>` +
+          `<button type="button" class="probe-inline-btn" data-probe-clear="1">Clear &times;</button>`
+        : "";
+      probeEl.innerHTML =
+        `<strong>@${escHtml(hit.au)}</strong> | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})` +
+        jumpBtns +
+        `<br>"${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 60);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 50);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 50);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 50);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `Showing ${shown.length} of ${pool.length} matching comments (mode: ${activeMode})` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear selection</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeSelect = document.getElementById("modeSelect");
+  modeSelect.addEventListener("change", () => {
+    activeMode = modeSelect.value;
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

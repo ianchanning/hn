@@ -1,0 +1,1387 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50551046 // DaisyRose-27B — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+      text-transform: lowercase;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      text-transform: lowercase;
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .kpi-cell {
+      padding: 8px 0;
+    }
+    .kpi-label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 4px 0;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer:not([open]) {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary,
+    details.proof-drawer > summary {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+    }
+    table.ablation th {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: normal;
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    button.nav-btn,
+    button.mode-tab,
+    button.topbar-toggle {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: rgb(0, 0, 0);
+      cursor: pointer;
+      text-decoration: none;
+      line-height: inherit;
+      vertical-align: baseline;
+      transition: color 0.12s ease;
+      text-transform: lowercase;
+    }
+    button.nav-btn:hover,
+    button.nav-btn.active,
+    button.mode-tab:hover,
+    button.mode-tab.active,
+    button.topbar-toggle:hover,
+    button.topbar-toggle.active {
+      color: rgb(255, 255, 255);
+      text-decoration: none;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      padding: 14px;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; row-gap: 4px; }
+      .topbar-right { padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+        <span class="pagetop" id="modeTabs">
+          <button type="button" class="nav-btn mode-tab active" data-mode="top_signal" role="tab" aria-selected="true">Top 40</button> | <button type="button" class="nav-btn mode-tab" data-mode="hn_top40" role="tab" aria-selected="false">HN Top 40</button>
+        </span>
+      </div>
+      <div class="topbar-right">
+        <button type="button" class="nav-btn topbar-toggle" id="exploreToggleBtn" aria-expanded="false">explore</button> | <button type="button" class="nav-btn topbar-toggle" id="evidenceToggleBtn" aria-expanded="false">evidence</button>
+      </div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://www.radixark.com/blog/daisyrose-27b">DaisyRose-27B</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=radixark.com"><span class="sitestr">radixark.com</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">235 points</span> by <a href="https://news.ycombinator.com/user?id=de_sty">de_sty</a> <span class="age" title="2026-11-18T19:39:16.000Z"><a href="https://news.ycombinator.com/item?id=50551046">18 hours ago</a></span> | <a href="https://news.ycombinator.com/item?id=50551046">86&nbsp;comments</a> | 79.1% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Evidence</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">86</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 65 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">20.9%</div>
+          <div class="kpi-sub">18 comments (5 Gold / 5.8%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">79.1%</div>
+          <div class="kpi-sub">42 chatter &bull; 26 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">3</div>
+        <div class="kpi-sub">7% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.905</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">47</div>
+          <div class="kpi-sub">HN POS 2..48 (54.7% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="color: rgb(90, 90, 88); margin-top: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Explore</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 86-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 86)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (5)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (13)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (42)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (26)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..86) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 26)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (chriddyp, 7.8h); largest subtree (@woah) occupies 47 slots (HN POS 2..48).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (86)</option>
+          <option value="training_hard">Training &amp; Hard (Nodes) (16)</option>
+          <option value="models_tasks">Models &amp; Tasks (Benchmarks) (14)</option>
+          <option value="qwen_flash">Qwen &amp; Flash (27b) (14)</option>
+          <option value="llm_train">LLM &amp; Train (Data) (13)</option>
+          <option value="dna_learn">Dna &amp; Learn (Believe) (10)</option>
+          <option value="general_commentary">General Commentary (19)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, model, post-training, tasks, reasoning, task...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50551046 + RADIXARK.COM + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50551046, "story_title": "DaisyRose-27B", "story_url": "https://www.radixark.com/blog/daisyrose-27b", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50551046, "story_title": "DaisyRose-27B", "story_url": "https://www.radixark.com/blog/daisyrose-27b", "points": 235, "story_author": "de_sty", "article_source": "fetched_url", "t1_ref_utc": "2026-11-19T13:19:34+00:00", "t2_ref_utc": "2026-11-19T13:19:34+00:00", "delta_minutes": 0.0, "story_anchors": ["model", "post-training", "tasks", "reasoning", "task", "end", "makes", "miles", "trained", "daisyrose-27b", "training", "release", "bench", "cost", "machine", "qwen", "tokens", "trainer", "27b", "h200", "frontier", "compute", "couple", "train", "models"], "facet_labels": {"training_hard": "Training & Hard (Nodes)", "qwen_flash": "Qwen & Flash (27b)", "llm_train": "LLM & Train (Data)", "dna_learn": "Dna & Learn (Believe)", "models_tasks": "Models & Tasks (Benchmarks)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "training_hard", "label": "Training & Hard (Nodes)", "count": 16, "top_terms": ["training", "hard", "nodes", "believe"]}, {"slug": "qwen_flash", "label": "Qwen & Flash (27b)", "count": 14, "top_terms": ["qwen", "flash", "27b", "thought"]}, {"slug": "llm_train", "label": "LLM & Train (Data)", "count": 13, "top_terms": ["llm", "train", "data", "mind"]}, {"slug": "dna_learn", "label": "Dna & Learn (Believe)", "count": 10, "top_terms": ["dna", "learn", "believe", "body"]}, {"slug": "models_tasks", "label": "Models & Tasks (Benchmarks)", "count": 14, "top_terms": ["models", "tasks", "benchmarks", "capable"]}], "counts": {"total_comments": 86, "live_t2_comments": 86, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 65, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "5b436bb44a58ed8d2753f6c084b5ef9330a263b4be0299289f68552da3d643bc"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 5, "grounded_analysis": 13, "crowd_chatter": 42, "bullshit_or_flamewar": 26}, "facets": {"llm_train": 13, "models_tasks": 14, "qwen_flash": 14, "dna_learn": 10, "training_hard": 16, "general_commentary": 19}, "facet_options": [{"slug": "training_hard", "label": "Training & Hard (Nodes)", "count": 16}, {"slug": "models_tasks", "label": "Models & Tasks (Benchmarks)", "count": 14}, {"slug": "qwen_flash", "label": "Qwen & Flash (27b)", "count": 14}, {"slug": "llm_train", "label": "LLM & Train (Data)", "count": 13}, {"slug": "dna_learn", "label": "Dna & Learn (Believe)", "count": 10}, {"slug": "general_commentary", "label": "General Commentary", "count": 19}], "facet_diagnostics": [{"slug": "training_hard", "label": "Training & Hard (Nodes)", "count": 16, "useful": 4, "useful_pct": 25.0, "terms": "training, hard, nodes, believe"}, {"slug": "models_tasks", "label": "Models & Tasks (Benchmarks)", "count": 14, "useful": 4, "useful_pct": 28.6, "terms": "models, tasks, benchmarks, capable"}, {"slug": "qwen_flash", "label": "Qwen & Flash (27b)", "count": 14, "useful": 4, "useful_pct": 28.6, "terms": "qwen, flash, 27b, thought"}, {"slug": "llm_train", "label": "LLM & Train (Data)", "count": 13, "useful": 4, "useful_pct": 30.8, "terms": "llm, train, data, mind"}, {"slug": "dna_learn", "label": "Dna & Learn (Believe)", "count": 10, "useful": 2, "useful_pct": 20.0, "terms": "dna, learn, believe, body"}, {"slug": "general_commentary", "label": "General Commentary", "count": 19, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 9}, {"category": "code_repository", "count": 2}, {"category": "low_cred_or_joke", "count": 2}, {"category": "github_artifact", "count": 1}], "story_anchors": ["model", "post-training", "tasks", "reasoning", "task", "end", "makes", "miles", "trained", "daisyrose-27b", "training", "release", "bench", "cost", "machine", "qwen", "tokens", "trainer"], "largest_root": {"root_id": 50552188, "author": "woah", "slots": 47, "start_dom": 2, "end_dom": 48, "share_pct": 54.7, "top_dom1_age": 7.8, "top_dom1_author": "chriddyp"}, "buried_cutoff": 26, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50554743, "au": "cookiengineer", "dom": 64, "sr": 1, "sc": 13.22, "ep": 13.22, "bs": 0.0, "d": 1, "age": 12.14, "grav": 117.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 59, "qw": 0, "k": 7948, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "llm_train", "flbl": "LLM & Train (Data)", "urls": ["https://github.com/cookiengineer/qwen-reasoning-trainer"], "ig": 1.509, "fa": 2.76, "gp": 1.248, "bl": 0.0, "ds": 0.0, "txt": "It isn't if you train the quantized model with a quantized K/V and cache. That's my approach and usually takes around a day for 100k reasoning traces (including abliteration).\n\nAlso this is on consumer hardware, meaning 96GB CPU RAM and 48GB GPU VRAM, using an optimized Vulkan concurrent shader pipeline. So costs for the machine are around 3-5k depending on RAM crisis.\n\n[1] https://github.com/cookiengineer/qwen-reasoning-trainer"}, {"id": 50556596, "au": "endgame", "dom": 12, "sr": 2, "sc": 12.85, "ep": 12.85, "bs": 0.0, "d": 4, "age": 7.19, "grav": 54.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 56, "qw": 41, "k": 5547, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "models_tasks", "flbl": "Models & Tasks (Benchmarks)", "urls": ["https://github.com/anthropics/claude-code/issues/53262", "https://news.ycombinator.com/item?id=49502774"], "ig": 1.35, "fa": 2.77, "gp": 1.232, "bl": 0.0, "ds": 0.0, "txt": "Anthropic used to charge you API rates if it saw a HERMES.md in the repo you were working on, even if you had a subscription: https://github.com/anthropics/claude-code/issues/53262\n\nAnother commenter here: https://news.ycombinator.com/item?id=49502774\n\n> I made it to a third round interview at anthropic in 2024 and they had me build a web crawler as their programming test. Part way through I started on making it respect robots.txt and I could immediately tell they were no longer interested in me.\n\nEverything but the core models seems to be some mixture of slapdash, petty, and reckless. I would absolutely believe they'd train on customer conversations. Where else would those customers go?"}, {"id": 50556404, "au": "chriddyp", "dom": 1, "sr": 3, "sc": 9.36, "ep": 9.36, "bs": 0.0, "d": 0, "age": 7.79, "grav": 60.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 137, "qw": 0, "k": 177, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "qwen_flash", "flbl": "Qwen & Flash (27b)", "urls": ["https://plotly.com/blog/nex-n2-6-plotly-data-analytics-bench/"], "ig": 1.805, "fa": 1.58, "gp": 0.428, "bl": 0.0, "ds": 0.0, "txt": "Very excited to see more post-training happening on these open models. Looking forward to trying this one out once it makes its way onto OpenRouter.\n\nQwen 27B really punches above its weight. 27B is small enough to fit on a Mac Mini / Macbook Pro which is very exciting.\n\nStarting to see more promising examples of companies post-training. From my evals [1], I've tested 3 so far:\n\n1. Fireworks' Ember-1 (postrained on Kimi K3, improved score by 10% in my evals)\n\n2. Particle AI's Particle-1 (fine-tuned on DeepSeek V4.1 Flash, also a 10% improvement and a bit cheaper and faster)\n\n3. Nex AGI's Nex-N2.6 (post-trained on GLM 5.3 Flash. Didn't show an improvement in my eval, and had a couple runaway loops that made it expensive).\n\nWith Thinking Machines' western open model release (Inkling Small) a few weeks ago, I expect we'll see more of this, especially out of western companies.\n\n[1] https://plotly.com/blog/nex-n2-6-plotly-data-analytics-bench..."}, {"id": 50554114, "au": "jacquesm", "dom": 53, "sr": 4, "sc": 8.99, "ep": 8.99, "bs": 0.0, "d": 4, "age": 13.29, "grav": 135.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 149, "qw": 0, "k": 248096, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "epistemic_gold", "facet": "models_tasks", "flbl": "Models & Tasks (Benchmarks)", "urls": ["http://www.incompleteideas.net/IncIdeas/BitterLesson.html"], "ig": 1.478, "fa": 1.18, "gp": 1.485, "bl": 0.0, "ds": 0.0, "txt": "That mirrors my experience exactly. I keep a couple of older models (and much larger ones as well) for when I want to do stuff that is unrelated to computer programming because the models that are really good at that tend to fare less well at other stuff. I suspect that there is a boundary where maximizing benchmarks for coding at the expense of general knowledge is going to give you a model that is really fast and good but 'narrow' and that this may also lead to loss of performance when applied to coding tasks that are less well represented in the training set (such as, for instance, DSP code). This is a variation on 'the bitter lesson', short term you can make gains like this but long term leveraging compute and data will give you something better. I'm really happy I didn't waste half a life on engineered AI because I would be really quite miserable if I had.\n\nhttp://www.incompleteideas.net/IncIdeas/BitterLesson.html"}, {"id": 50556784, "au": "robertkarl", "dom": 82, "sr": 5, "sc": 7.82, "ep": 7.82, "bs": 0.0, "d": 1, "age": 6.51, "grav": 47.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 97, "qw": 0, "k": 368, "kpp": 9.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "llm_train", "flbl": "LLM & Train (Data)", "urls": [], "ig": 1.777, "fa": 0.95, "gp": 0.648, "bl": 0.0, "ds": 0.0, "txt": "DaisyRose gets 2.5 points out of 100 more on my 86-task bench, than Qwen 3.8 Swift 1.5. at the cost of 5.5 hours vs. 7.8 hours for Daisy.\n\nswift run: 24GB VRAM / 4090 / llama.cpp / 5.5 hours / score 0.87 / medium reasoning / iq3_s / 128k context @ q4\n\nDaisy Rose: 48GB VRAM / A6000 / sglang / 7.8 hours / score .898 / medium reasoning / nvfp4 / 256k context at fp8\n\npi for all tasks\n\nDaisy emitted 1.92M tokens and Swift 1.5 ... didn't. 1.04M there\n\ngiven multiple advantages in terms of kv cache size/quant, decode speed, time, and model quant: DaisyRose marginally beat out another base Qwen finetune running in half the VRAM.\n\nbenchmaxxing imo.\n\nedit: formatting"}, {"id": 50559737, "au": "spwa4", "dom": 35, "sr": 6, "sc": 7.17, "ep": 7.32, "bs": 0.0, "d": 6, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 147, "qw": 0, "k": 1186, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "llm_train", "flbl": "LLM & Train (Data)", "urls": [], "ig": 1.494, "fa": 0.95, "gp": 0.758, "bl": 0.0, "ds": 0.0, "txt": "Exactly, it's a frustrating bit of theory. The basic observation is that there's a huge weakness in current ML algorithms: humans are about 1 000 000 TIMES more sample efficient than an LLM. Which means it is possible to train and run a model that's in most ways better than ChatGPT ... on a 386, and just millions of tokens (if you don't mind ~15 years training time), so let's say a first-gen i7 in a month.\n\nAnd it's not just much more efficient in compute, it's obviously not necessary to collect the data in the first place. Which would be another huge saving (the other thing big ML companies imagine is their moat)\n\nUnfortunately people have been constantly trying to do it since at least 1950 and we're still not anywhere close to understanding any of it.\n\nNow where's that French guy that built a 5G base station out of ... I want to say a VCR? We have need of him."}, {"id": 50558155, "au": "ben_w", "dom": 43, "sr": 7, "sc": 6.69, "ep": 6.98, "bs": 0.0, "d": 7, "age": 3.24, "grav": 19.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 75, "qw": 24, "k": 30242, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "dna_learn", "flbl": "Dna & Learn (Believe)", "urls": ["https://en.wikipedia.org/wiki/Denis_Noble"], "ig": 1.012, "fa": 1.04, "gp": 1.13, "bl": 0.0, "ds": 0.0, "txt": "> argues against the idea that DNA is instructions and everything else in the body passively takes orders and has no input and no feedback\n\nThere is feedback between body and DNA; it's at every level from how a foetus gets head and feet in the right place to how it repairs injuries as an adult to how exercise triggers muscle growth.\n\nThat isn't doesn't mean there's storgage beyond DNA. There might be some signal molecules which also survive going via sperm and eggs, but they also can't carry much data, and they'd be read by mechanisms generated by the DNA.\n\nhttps://en.wikipedia.org/wiki/Denis_Noble"}, {"id": 50553604, "au": "mips_avatar", "dom": 73, "sr": 8, "sc": 6.52, "ep": 6.52, "bs": 0.0, "d": 1, "age": 14.29, "grav": 151.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 61, "qw": 0, "k": 2866, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "training_hard", "flbl": "Training & Hard (Nodes)", "urls": [], "ig": 1.179, "fa": 0.95, "gp": 0.722, "bl": 0.0, "ds": 0.0, "txt": "You'd probably end up spending more on pcie h200s.  They're not that much cheaper than 8x sxm nodes and they only have 4 way nvlink. At the scale these guys were training at you'd probably want at a minimum an 8x nvlinked node for the trainer, even though you could technically fit the full training and optimizer states on a 4x h200 node."}, {"id": 50558985, "au": "networked", "dom": 30, "sr": 9, "sc": 6.26, "ep": 6.7, "bs": 0.0, "d": 3, "age": 1.36, "grav": 8.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 29, "qw": 45, "k": 16448, "kpp": 6.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "llm_train", "flbl": "LLM & Train (Data)", "urls": ["https://x.com/tautologer/status/2051014130593591620", "https://en.wikipedia.org/wiki/Large_language_model\u0023Tokenization"], "ig": 1.044, "fa": 1.04, "gp": 0.886, "bl": 0.0, "ds": 0.0, "txt": "The strawberry question was never a strong indicator of intelligence, and now the answer is in the training data.\nThis Twitter dialogue illustrates:\n\n> @tautologer: asking an llm how many letters are in a word is like asking a person what wavelength of light a color is\n\n> @Voltlighter: I could have memorized that the frequency of green light is 550 Hz just like an LLM could memorize that strawberry has three Rs\n\n> @tautologer: exactly\n\nhttps://x.com/tautologer/status/2051014130593591620\n\nWikipedia explains how an LLM's tokenizer works: https://en.wikipedia.org/wiki/Large_language_model\u0023Tokenizat...."}, {"id": 50557788, "au": "Taek", "dom": 27, "sr": 10, "sc": 6.23, "ep": 6.67, "bs": 0.0, "d": 2, "age": 4.06, "grav": 25.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 78, "qw": 0, "k": 8913, "kpp": 5.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "models_tasks", "flbl": "Models & Tasks (Benchmarks)", "urls": [], "ig": 1.592, "fa": 0.56, "gp": 0.921, "bl": 0.0, "ds": 0.0, "txt": "Me and a couple of other top engineers have noticed that the latest round of models (everything after Gemini 3.0, GPT 5.6, Fable 5.0) seems to be less intelligent and less capable of solving unusual tasks. For example, Gemini 4 is a major regression vs 3 on being able to transcribe my girlfriend (who has a very thick, rapid, coastal Colombian Spanish dialect).\n\nThey are getting much better at the common case. But it feels like we're moving away from AGI and RSI as a tradeoff."}, {"id": 50551775, "au": "xlayn", "dom": 62, "sr": 11, "sc": 5.3, "ep": 5.44, "bs": 0.0, "d": 0, "age": 16.75, "grav": 195.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 821, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "qwen_flash", "flbl": "Qwen & Flash (27b)", "urls": [], "ig": 1.117, "fa": 0.34, "gp": 1.275, "bl": 0.0, "ds": 0.0, "txt": "Snap, no gguf to download, will wait for one to appear to test, any improvement over an already good model is good news.\n\n\"18 days on 144 H200 GPUs\" insane.. didn't thought so much hardware would be needed to train Qwen."}, {"id": 50554845, "au": "0x69420", "dom": 79, "sr": 12, "sc": 5.2, "ep": 5.2, "bs": 0.0, "d": 0, "age": 11.98, "grav": 115.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 65, "qw": 0, "k": 490, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "qwen_flash", "flbl": "Qwen & Flash (27b)", "urls": [], "ig": 1.341, "fa": 0.28, "gp": 0.859, "bl": 0.0, "ds": 0.0, "txt": "3.8 27B is an interesting choice. on the face of it, doing RL on it feels like refrying twice-cooked pork then stuffing it in the microwave for good measure. the fact that even one benchmark (tb4.1) increased more than marginally is kind of miraculous. would be interesting to see where \"miles\" would take eg. 3.8 flash next, which is already impressive despite being an under-trained architectural preview."}, {"id": 50557219, "au": "serf", "dom": 76, "sr": 13, "sc": 5.07, "ep": 5.22, "bs": 0.0, "d": 3, "age": 5.44, "grav": 37.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 69, "qw": 29, "k": 11509, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "dna_learn", "flbl": "Dna & Learn (Believe)", "urls": [], "ig": 1.295, "fa": 0.42, "gp": 0.676, "bl": 0.0, "ds": 0.0, "txt": ">But seriously. If there were a cheaper and reliable way, I'm sure the authors would have mentioned it instead of H200 SXM modules. They're trying to brag about cheap training.\n\nshit reasoning.\n\nthe big dogs use all sorts of weird (usually better) shit because they have access to it.\n\nthe opposite is also true. The H200 SXMs are available, some custom TPU purpose built for your needs isn't.\n\nor , in other words, \"if there were they'd have done it!\" begs us to believe the concept that everyone out there is doing things as optimally as possible, with perfect access."}, {"id": 50551867, "au": "octoberfranklin", "dom": 72, "sr": 14, "sc": 4.54, "ep": 4.83, "bs": 0.0, "d": 0, "age": 16.6, "grav": 192.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 43, "qw": 0, "k": 1925, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "training_hard", "flbl": "Training & Hard (Nodes)", "urls": [], "ig": 0.814, "fa": 0.56, "gp": 0.912, "bl": 0.0, "ds": 0.0, "txt": "FWIW that is about $331,000 on low-onboarding-grief clouds (e.g. vast.ai) right now using the SXM variants they used.\n\nYou might be able to shave that down using a different flavor of H200 (like PCIe) but it would take more hours, so benefits are unclear."}, {"id": 50552684, "au": "jacquesm", "dom": 51, "sr": 15, "sc": 4.49, "ep": 4.64, "bs": 0.0, "d": 2, "age": 15.47, "grav": 172.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 109, "qw": 0, "k": 248096, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "training_hard", "flbl": "Training & Hard (Nodes)", "urls": [], "ig": 1.301, "fa": 0.28, "gp": 0.541, "bl": 0.0, "ds": 0.0, "txt": "Yes, I've seen that, but I wonder what is missing because I find it hard to believe that you can just do some RL and then end up with a model that is better across the board. I would find it far more believable if you outperformed on the benchmark that was your goal (assuming you selected training data to give you an edge there) and underperformed on things that you were not optimizing for. But since it all moves in one direction (better) I feel there must be some kind of unknown at play here. Even so, task specific AI is definitely the future, you don't hire a plumber to do your bookkeeping either..."}, {"id": 50551690, "au": "robertkarl", "dom": 81, "sr": 16, "sc": 4.16, "ep": 4.3, "bs": 0.0, "d": 0, "age": 16.85, "grav": 197.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 368, "kpp": 9.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "qwen_flash", "flbl": "Qwen & Flash (27b)", "urls": [], "ig": 0.917, "fa": 0.34, "gp": 0.813, "bl": 0.0, "ds": 0.0, "txt": "I look forward to testing this against my private eval set to determine if it's benchmaxxing or actual improvement based on just 1200 tasks. downloading it now"}, {"id": 50556789, "au": "mips_avatar", "dom": 71, "sr": 17, "sc": 3.96, "ep": 3.96, "bs": 0.0, "d": 2, "age": 6.5, "grav": 47.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 2866, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.754, "fa": 0.68, "gp": 0.172, "bl": 0.0, "ds": 0.0, "txt": "Do you guys support any unusual topologies? I’ve always wondered about maybe using an 8x rtx pro 6000 node for inference rollouts for cost."}, {"id": 50552360, "au": "jacquesm", "dom": 49, "sr": 18, "sc": 3.95, "ep": 4.25, "bs": 0.0, "d": 0, "age": 15.85, "grav": 179.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 57, "qw": 0, "k": 248096, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "training_hard", "flbl": "Training & Hard (Nodes)", "urls": [], "ig": 0.958, "fa": 0.28, "gp": 0.826, "bl": 0.0, "ds": 0.0, "txt": "I always wonder what you lose when you start maxing out some specific benchmark. It is really hard to do this in a balanced way and I would love if everybody that did these kind of efforts would take the time to also list the before/afters of a number of other benchmarks that they did not use in their training."}, {"id": 50553826, "au": "mik1998", "dom": 52, "sr": 19, "sc": 3.79, "ep": 4.23, "bs": 0.0, "d": 3, "age": 13.85, "grav": 144.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 75, "qw": 0, "k": 506, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "models_tasks", "flbl": "Models & Tasks (Benchmarks)", "urls": [], "ig": 1.502, "fa": 0.0, "gp": 0.484, "bl": 0.0, "ds": 0.0, "txt": "I agree with you and I think, personally, that the heavy post-training like here makes the model more capable in coding but less capable for certain unbenchmarkable tasks, like prose or interpreting prompts correctly. I've been noticing that small models have been gradually being pushed towards programming and are slowly becoming _worse_ at some non-programming tasks, not better; e.g. new Deepseek models appear to be much worse at interpreting metaphors and overall feel more autistic than previous ones."}, {"id": 50557654, "au": "Balinares", "dom": 80, "sr": 20, "sc": 3.29, "ep": 3.65, "bs": 0.0, "d": 1, "age": 4.39, "grav": 28.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 885, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "qwen_flash", "flbl": "Qwen & Flash (27b)", "urls": [], "ig": 1.181, "fa": 0.28, "gp": 0.055, "bl": 0.0, "ds": 0.0, "txt": "I had the same thought. Their described process of identifying gaps and post-training on high-quality inputs specifically designed to close those gaps is very interesting. I wonder if that's possibly the secret ingredient in the frontier lab sauce."}, {"id": 50552188, "au": "woah", "dom": 2, "sr": 21, "sc": 3.17, "ep": 3.83, "bs": 0.0, "d": 0, "age": 16.11, "grav": 183.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 11504, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "training_hard", "flbl": "Training & Hard (Nodes)", "urls": [], "ig": 1.106, "fa": 0.0, "gp": 0.852, "bl": 0.0, "ds": 0.0, "txt": "The heavy reliance on eval datasets showcased here and also evidenced by the frontier lab's high payments for such data cast doubt on the claims that AI will become self-improving soon"}, {"id": 50557952, "au": "ben_w", "dom": 28, "sr": 22, "sc": 3.15, "ep": 3.59, "bs": 0.0, "d": 3, "age": 3.69, "grav": 22.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 23, "k": 30242, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "dna_learn", "flbl": "Dna & Learn (Believe)", "urls": [], "ig": 1.02, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> They are getting much better at the common case. But it feels like we're moving away from AGI and RSI as a tradeoff.\n\nWe can but hope.\n\nOn the flip side, being good at just maths may solve whatever difference it is that makes all biological brains learn from fewer examples than all machine learning."}, {"id": 50558011, "au": "ben_w", "dom": 34, "sr": 23, "sc": 3.13, "ep": 6.61, "bs": 3.05, "d": 5, "age": 3.55, "grav": 21.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 126, "qw": 0, "k": 30242, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "dna_learn", "flbl": "Dna & Learn (Believe)", "urls": [], "ig": 1.623, "fa": 0.62, "gp": 0.712, "bl": 1.15, "ds": 0.0, "txt": "Cars didn't exist 150 years ago, yet we do not need the trillion miles of experience that it took Tesla to reach merely a small geofenced region where a steering wheel is not needed; how much would a human need for the same? A thousand miles as a learner? A hundred?\n\nTen thousand generations of fire and our jaws still have not fully adapted to cooked food, and yet our minds can learn to cope with it just fine; just one demonstration of why not to pour water on boiling oil can be sufficient.\n\nAnd our genome has to cover our whole body, cell metabolism upwards, not specifically our brains.\n\nThere is some stuff our genome gives us, our minds, but it cannot be much. There isn't room for much in our DNA."}, {"id": 50558593, "au": "DeathArrow", "dom": 84, "sr": 24, "sc": 2.94, "ep": 3.16, "bs": 0.0, "d": 0, "age": 2.19, "grav": 13.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 11446, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "llm_train", "flbl": "LLM & Train (Data)", "urls": [], "ig": 1.005, "fa": 0.28, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "One pet project of mine would be - if I had the resources, of course - to get a simple but decent model and post train it intensely for just one language and one task.\n\nFor example doing backend projects using C\u0023 or Go."}, {"id": 50552603, "au": "nblintao", "dom": 50, "sr": 25, "sc": 2.88, "ep": 3.55, "bs": 0.0, "d": 1, "age": 15.55, "grav": 173.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 0, "k": 2, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_tasks", "flbl": "Models & Tasks (Benchmarks)", "urls": [], "ig": 1.169, "fa": 0.28, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Good point! First of all, none of the benchmark tasks were used in training, though the training data was designed to improve capabilities on tasks like TB4.1. If you consider TB4.1 the main target, the blog actually shows before/after results on several other benchmarks, with no regressions and even some improvements."}, {"id": 50554042, "au": "harry8", "dom": 4, "sr": 26, "sc": 2.7, "ep": 3.58, "bs": 0.0, "d": 2, "age": 13.44, "grav": 137.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 9020, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "llm_train", "flbl": "LLM & Train (Data)", "urls": [], "ig": 0.591, "fa": 0.0, "gp": 1.51, "bl": 0.0, "ds": 0.0, "txt": "The frontier labs are using all their customers' logs to train. It's the best training set there is."}, {"id": 50556560, "au": "anon373839", "dom": 14, "sr": 27, "sc": 2.35, "ep": 3.45, "bs": 0.0, "d": 4, "age": 7.29, "grav": 55.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 5092, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "llm_train", "flbl": "LLM & Train (Data)", "urls": [], "ig": 0.985, "fa": 0.28, "gp": 0.23, "bl": 0.0, "ds": 0.0, "txt": "I think if you read the legal agreements adversarially, there are a lot of cracks in them the labs can exploit. For example, what about derivative data such as LLM-generated summaries of your sessions? Do the training settings preclude use of that?"}, {"id": 50553366, "au": "pkoiralap", "dom": 61, "sr": 28, "sc": 2.3, "ep": 2.74, "bs": 0.0, "d": 0, "age": 14.66, "grav": 158.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 20, "qw": 0, "k": 130, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "qwen_flash", "flbl": "Qwen & Flash (27b)", "urls": ["https://huggingface.co/sabicap/sabi-noema", "https://huggingface.co/RadixArk/DaisyRose-27B"], "ig": 0.683, "fa": 0.0, "gp": 0.783, "bl": 0.0, "ds": 0.0, "txt": "Sabi-noema also looks like a close competitor in the same space. Built from qwen3.8 and made better.\n\nhttps://huggingface.co/sabicap/sabi-noema\n\nAlso HF model here:\nhttps://huggingface.co/RadixArk/DaisyRose-27B"}, {"id": 50553176, "au": "banghua13", "dom": 57, "sr": 29, "sc": 2.2, "ep": 5.6, "bs": 2.52, "d": 5, "age": 14.89, "grav": 162.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 1, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_tasks", "flbl": "Models & Tasks (Benchmarks)", "urls": [], "ig": 1.291, "fa": 0.56, "gp": 0.668, "bl": 0.95, "ds": 0.0, "txt": "If you carefully curate the data, plus the original model isn't saturated for RL post-training, it's possible to improve targeted benchmarks without regression on other metrics. This experiment is done with terminal bench 4.1 as a target, and the regression on other benchmarks has been carefully controlled through data + infra design."}, {"id": 50556230, "au": "jhancock", "dom": 11, "sr": 30, "sc": 2.04, "ep": 2.92, "bs": 0.0, "d": 3, "age": 8.36, "grav": 67.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 3662, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "training_hard", "flbl": "Training & Hard (Nodes)", "urls": [], "ig": 0.831, "fa": 0.0, "gp": 0.664, "bl": 0.0, "ds": 0.0, "txt": "Both OpenAI and Anthropic have setting that allow (at least paid customers) to ensure their data is not used for training. Do you have reason to believe this setting is not what most user believe it is?"}, {"id": 50556365, "au": "harry8", "dom": 19, "sr": 31, "sc": 2.03, "ep": 3.36, "bs": 0.0, "d": 4, "age": 7.96, "grav": 62.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 114, "qw": 0, "k": 9020, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "llm_train", "flbl": "LLM & Train (Data)", "urls": [], "ig": 1.257, "fa": 0.0, "gp": 0.277, "bl": 0.0, "ds": 0.0, "txt": "Seriously who the f@&k actually believes that? The mind boggles that people actually say “there’s a setting.” Is it next to the one that says they won’t break the law and infringe copyright to train their models?\n\nSam Altman, would you actually believe anything he said if he had an incentive to lie to you?\n\nRieman hypothesis story was not secret. How do you even entertain this stuff for a second? Even if it were in your financial interest to not understand it’s just so very stark.\n\nThe AI companies will tell whatever lie helps them and won’t blink when caught and there will be no consequences because we’ve seen it. Repeatedly. There isn’t a grey area…"}, {"id": 50557217, "au": "techcode", "dom": 54, "sr": 32, "sc": 1.92, "ep": 2.58, "bs": 0.0, "d": 4, "age": 5.45, "grav": 37.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 89, "qw": 0, "k": 173, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "dna_learn", "flbl": "Dna & Learn (Believe)", "urls": [], "ig": 1.1, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "As electronics/software/systems engineer with brain that's on the spectrum (ADHD, no autism diagnosis ... yet).\n\nThe \"Worse at interpreting metaphors and feel more autistic\" to me sounds representative of the IT field?\n\nObviously - not all of us are on the spectrum. But my (biased) observations suggest that occurance of neurodiversity/spectrum is higher in IT (or more broadly STEM) than in other fields.\n\nAs in - perhaps that (different neuro-wiring, different way of looking at things...etc) is what makes one a better as programming and things of similar nature?"}, {"id": 50557358, "au": "DeathArrow", "dom": 85, "sr": 33, "sc": 1.85, "ep": 2.51, "bs": 0.0, "d": 0, "age": 5.1, "grav": 34.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 53, "qw": 0, "k": 11446, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "qwen_flash", "flbl": "Qwen & Flash (27b)", "urls": [], "ig": 1.069, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Since some talented people with more modest means were able to do such a job, I wonder why Alibaba didn't do something like this when they trained the model.\n\nThey left a lot of performance on the table.\n\nWhich makes me wonder if such kind of optimizations are possible for other models like Deepseek v4.1 Flash 1017."}, {"id": 50552785, "au": "reissbaker", "dom": 55, "sr": 34, "sc": 1.69, "ep": 2.79, "bs": 0.0, "d": 3, "age": 15.34, "grav": 170.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 65, "qw": 0, "k": 6261, "kpp": 4.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "training_hard", "flbl": "Training & Hard (Nodes)", "urls": [], "ig": 1.186, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Why do you find it hard to believe that you can do some RL and improve across the board (albeit less strongly on other semi-related tasks than your objective)? That's the idea behind generalization: it's not perfect but you get a little bit of cross-task generalization, so if you just keep spamming more RL environments you can hill-climb to AGI. That's what the labs are doing!"}, {"id": 50556183, "au": "visarga", "dom": 6, "sr": 35, "sc": 1.54, "ep": 3.08, "bs": 0.0, "d": 4, "age": 8.52, "grav": 69.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 13926, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "llm_train", "flbl": "LLM & Train (Data)", "urls": [], "ig": 1.163, "fa": 0.0, "gp": 0.238, "bl": 0.0, "ds": 0.0, "txt": "It is longitudinal data with LLM responses to human tasks and outcomes showing up later in the stream, you can use hindsight to see how a LLM response fared, humans come back and bring those outcomes to continue iterating."}, {"id": 50553820, "au": "anon373839", "dom": 3, "sr": 36, "sc": 1.47, "ep": 2.57, "bs": 0.0, "d": 1, "age": 13.86, "grav": 144.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 48, "qw": 0, "k": 5092, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_tasks", "flbl": "Models & Tasks (Benchmarks)", "urls": [], "ig": 0.817, "fa": 0.0, "gp": 0.448, "bl": 0.0, "ds": 0.0, "txt": "The frontier labs want you to believe that their models are magically gaining intelligence that generalizes to new areas with each new release. But it’s an illusion: the models are post-trained on a HUGE array of hand-curated datasets for specific tasks, with good enough coverage that it feels general."}, {"id": 50553651, "au": "mips_avatar", "dom": 69, "sr": 37, "sc": 1.46, "ep": 2.48, "bs": 0.0, "d": 0, "age": 14.21, "grav": 150.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 2866, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "training_hard", "flbl": "Training & Hard (Nodes)", "urls": [], "ig": 0.594, "fa": 0.0, "gp": 0.751, "bl": 0.0, "ds": 0.0, "txt": "How did you guys set up the RL topology? Were you guys doing individual RL nodes (4xh200 rollout/4xh200 train) or did you have dedicated trainer and rollout nodes?"}, {"id": 50558100, "au": "ben_w", "dom": 16, "sr": 38, "sc": 1.04, "ep": 2.58, "bs": 0.0, "d": 5, "age": 3.36, "grav": 20.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 82, "qw": 0, "k": 30242, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "training_hard", "flbl": "Training & Hard (Nodes)", "urls": [], "ig": 0.972, "fa": 0.0, "gp": 0.204, "bl": 0.0, "ds": 0.0, "txt": "I'm not saying to trust the companies here, but there are other reasons to make sure people don't do that.\n\nAI are now tool users. If you give ChatGPT your password, you should expect that instance of ChatGPT to use it. Given the current state of affairs, HuggingFace etc., this will likely go badly wrong and break something.\n\nAnd of course we don't want vibe coded software written by someone who gives their LLM a hard coded password because they don't know any better."}, {"id": 50553282, "au": "jacquesm", "dom": 58, "sr": 39, "sc": 0.96, "ep": 2.51, "bs": 0.0, "d": 6, "age": 14.76, "grav": 159.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 70, "qw": 0, "k": 248096, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "training_hard", "flbl": "Training & Hard (Nodes)", "urls": [], "ig": 1.066, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Ok, so the obvious question then is: this seems (I'm not saying it is, it just looks like a small thing compared to training up a model from scratch) a relatively trivial undertaking for the authors of the original model, if there was this much left in the tank why didn't they do something similar? Or is there some step here that only this team can perform? Or is it simply a matter of economics?"}, {"id": 50559393, "au": "xtiansimon", "dom": 10, "sr": 40, "sc": 0.91, "ep": 1.36, "bs": 0.0, "d": 5, "age": 0.56, "grav": 5.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 1181, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.577, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Yeah. I can think of several people who use LLMs to write business processes/procedures. Like writing logical code, they are writing the rules and descriptions _of work_. It’s the killer app for small businesses and I guess for managers in corporate firms."}, {"id": 50552484, "au": "drdaeman", "dom": 65, "sr": 41, "sc": 0.67, "ep": 2.6, "bs": 1.19, "d": 1, "age": 15.67, "grav": 175.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 8542, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "dna_learn", "flbl": "Dna & Learn (Believe)", "urls": [], "ig": 0.669, "fa": 0.0, "gp": 0.709, "bl": 0.45, "ds": 0.0, "txt": "Rather than waiting, ask your assistant to quantize for you. It could be not the best quantization possible but it’s relatively quick, and I had an overall positive experience."}, {"id": 50557629, "au": "Balinares", "dom": 86, "sr": 42, "sc": 0.66, "ep": 1.68, "bs": 0.0, "d": 1, "age": 4.47, "grav": 28.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 885, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "qwen_flash", "flbl": "Qwen & Flash (27b)", "urls": [], "ig": 0.717, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "They did. Qwen 3.8 27b is a post-trained Qwen 3.6.\n\nMind you, it's still bonkers how much runway 3.8 still had in it considering how implausibly capable it is for its weight."}, {"id": 50554790, "au": "trescenzi", "dom": 47, "sr": 43, "sc": 0.54, "ep": 2.08, "bs": 0.0, "d": 2, "age": 12.05, "grav": 116.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 1317, "kpp": 4.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "llm_train", "flbl": "LLM & Train (Data)", "urls": [], "ig": 0.473, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I’ve gotten recruiting emails to be a human grader of Claude coded projects. 6 month contract at $150/hour 40hrs/week. Not insanely expansive but also not cheap."}, {"id": 50556463, "au": "ipaddr", "dom": 15, "sr": 44, "sc": 0.53, "ep": 2.07, "bs": 0.0, "d": 4, "age": 7.61, "grav": 58.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 8368, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "training_hard", "flbl": "Training & Hard (Nodes)", "urls": [], "ig": 0.483, "fa": 0.0, "gp": 0.643, "bl": 0.0, "ds": 0.0, "txt": "Both tell you not to include password/tokens in chat.  Why would it matter if they weren't training"}, {"id": 50555030, "au": "bavell", "dom": 36, "sr": 45, "sc": 0.39, "ep": 1.93, "bs": 0.0, "d": 5, "age": 11.61, "grav": 109.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 1685, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "training_hard", "flbl": "Training & Hard (Nodes)", "urls": [], "ig": 0.738, "fa": 0.0, "gp": 0.139, "bl": 0.0, "ds": 0.0, "txt": "Instead of pre-training, I'd say it's more like a better architecture, training regime, higher fidelity data, and perhaps better initial \"weights\"."}, {"id": 50556291, "au": "jpardoe", "dom": 23, "sr": 46, "sc": 0.29, "ep": 1.61, "bs": 0.0, "d": 3, "age": 8.16, "grav": 64.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 23, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_tasks", "flbl": "Models & Tasks (Benchmarks)", "urls": [], "ig": 0.419, "fa": 0.22, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "That depends on the customer. How can you detect the ones that are making smart decisions and guiding the agent correctly towards better outcomes? If you could know that then the problem would already be solved."}, {"id": 50552779, "au": "drdaeman", "dom": 67, "sr": 47, "sc": 0.14, "ep": 1.68, "bs": 0.0, "d": 3, "age": 15.35, "grav": 170.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 8542, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "qwen_flash", "flbl": "Qwen & Flash (27b)", "urls": [], "ig": 0.717, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "My bad, I haven’t really looked yet (and haven’t asked any assistants), thought it’s BF16 safetensors as usual, and for those I used to quantize to ggufs with just a couple commands."}, {"id": 50557958, "au": "duskdozer", "dom": 22, "sr": 48, "sc": -0.08, "ep": 1.02, "bs": 0.0, "d": 4, "age": 3.67, "grav": 22.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 59, "qw": 0, "k": 1723, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "dna_learn", "flbl": "Dna & Learn (Believe)", "urls": [], "ig": 0.435, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Even if you believe they honor it, which you shouldn't, all they have to do it make an update and change the setting to a new opt-out version, and then -poof- you've \"consented\" just long enough for them to feed your entire account history in. I mean how many times do companies have to do these things until people learn?"}, {"id": 50555462, "au": "XenophileJKO", "dom": 5, "sr": 49, "sc": -0.16, "ep": 1.38, "bs": 0.0, "d": 3, "age": 10.46, "grav": 93.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 922, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "qwen_flash", "flbl": "Qwen & Flash (27b)", "urls": [], "ig": 0.263, "fa": 0.0, "gp": 0.526, "bl": 0.0, "ds": 0.0, "txt": "I don't think your data is as valuable as you think it is.\n\nI would not want a model trained on user conversations."}, {"id": 50558734, "au": "olejorgenb", "dom": 17, "sr": 50, "sc": -0.22, "ep": 1.33, "bs": 0.0, "d": 5, "age": 1.92, "grav": 11.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 902, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "training_hard", "flbl": "Training & Hard (Nodes)", "urls": [], "ig": 0.564, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Because the session transcripts are stored on disk (and optionally in cloud). And if they end up in the chat they could end up as input to other services."}, {"id": 50553515, "au": "its_down_again", "dom": 45, "sr": 51, "sc": -0.41, "ep": 1.13, "bs": 0.0, "d": 1, "age": 14.44, "grav": 154.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 78, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "qwen_flash", "flbl": "Qwen & Flash (27b)", "urls": [], "ig": 0.48, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Curious, where did you see the numbers on how much frontier labs are paying for eval data?"}, {"id": 50556081, "au": "staplers", "dom": 39, "sr": 52, "sc": -0.62, "ep": 1.01, "bs": 1.19, "d": 8, "age": 8.88, "grav": 73.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 1610, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.431, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Monkeys couldnt be taught how to do it. Thus the analogy stands. Our brain architecture allows for more precise instructional retention"}, {"id": 50557434, "au": "MisterMunchkin", "dom": 9, "sr": 53, "sc": -0.63, "ep": 0.91, "bs": 0.0, "d": 4, "age": 4.91, "grav": 32.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 1038, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "llm_train", "flbl": "LLM & Train (Data)", "urls": [], "ig": 0.387, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "So you’re telling me you haven’t uploaded any internal company documents or discussed any of your company projects?\n\nWhy do you think they’re getting into consulting, right after ingesting everyone’s statements of work?"}, {"id": 50559587, "au": "DoctorOetker", "dom": 44, "sr": 54, "sc": -0.78, "ep": 0.85, "bs": 1.19, "d": 7, "age": 0.22, "grav": 4.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 1969, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.363, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "this comment displays a total lack of understanding of both genetics as well as basic information theory"}, {"id": 50554059, "au": "octoberfranklin", "dom": 78, "sr": 55, "sc": -0.8, "ep": 0.75, "bs": 0.0, "d": 4, "age": 13.4, "grav": 137.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 1925, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "models_tasks", "flbl": "Models & Tasks (Benchmarks)", "urls": [], "ig": 0.317, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "No, and we get way too many low-effort \"how does this compare to $FOO\" comments that serve only to improve brand recognition of $FOO.\n\nOnce you realize people are doing it you see it everywhere."}, {"id": 50554255, "au": "StilesCrisis", "dom": 32, "sr": 56, "sc": -0.8, "ep": 1.42, "bs": 1.19, "d": 3, "age": 13.05, "grav": 131.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 1694, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_tasks", "flbl": "Models & Tasks (Benchmarks)", "urls": [], "ig": 0.604, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Humans generalize much more quickly than models? We don't require millions of curated examples to learn a concept?"}, {"id": 50556138, "au": "Bnjoroge", "dom": 7, "sr": 57, "sc": -0.8, "ep": 1.12, "bs": 1.19, "d": 4, "age": 8.7, "grav": 71.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 321, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "llm_train", "flbl": "LLM & Train (Data)", "urls": [], "ig": 0.324, "fa": 0.0, "gp": 0.246, "bl": 0.45, "ds": 0.0, "txt": "it's pretty valuable, and there's a huge demand for it from data labs depending on the kind of data. Agent traces are also pretty valuable"}, {"id": 50552473, "au": "octoberfranklin", "dom": 75, "sr": 58, "sc": -0.8, "ep": 2.77, "bs": 3.05, "d": 2, "age": 15.69, "grav": 176.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 51, "qw": 0, "k": 1925, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "models_tasks", "flbl": "Models & Tasks (Benchmarks)", "urls": [], "ig": 1.179, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Savings would likely be larger with magic beans such as floobarbaz, no?\n\nBut seriously.  If there were a cheaper and reliable way, I'm sure the authors would have mentioned it instead of H200 SXM modules.  They're trying to brag about cheap training.\n\nMaybe you wanted to use an opportunity to shill tranium."}, {"id": 50552729, "au": "smallerize", "dom": 66, "sr": 59, "sc": -0.8, "ep": 0.74, "bs": 1.19, "d": 2, "age": 15.42, "grav": 171.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 1092, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.316, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "It is already quantized. You need to convert to GGUF format though. Did your assistant explain this wrong?"}, {"id": 50558207, "au": "doublerabbit", "dom": 68, "sr": 60, "sc": -0.8, "ep": 2.57, "bs": 3.05, "d": 1, "age": 3.12, "grav": 18.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 1795, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "qwen_flash", "flbl": "Qwen & Flash (27b)", "urls": [], "ig": 0.681, "fa": 0.34, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Only \"18 days on 144 H200 GPUs\". It costs me £5k a month just to keep 2xH200's on."}, {"id": 50552875, "au": "jacquesm", "dom": 56, "sr": 61, "sc": -0.8, "ep": 0.63, "bs": 1.19, "d": 4, "age": 15.23, "grav": 167.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 248096, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "models_tasks", "flbl": "Models & Tasks (Benchmarks)", "urls": [], "ig": 0.27, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "You can hill climb but you will (or at least, I think you will!) lose generality.\n\nAnd no, that won't get you to AGI, that is a completely different goal."}, {"id": 50558019, "au": "d-lowl", "dom": 18, "sr": 62, "sc": -0.8, "ep": 0.44, "bs": 1.19, "d": 5, "age": 3.53, "grav": 21.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 43, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "training_hard", "flbl": "Training & Hard (Nodes)", "urls": [], "ig": 0.189, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "You don't want your password to be used as an input to some tool call do you?"}, {"id": 50558387, "au": "endgame", "dom": 13, "sr": 63, "sc": -1.45, "ep": 0.54, "bs": 1.99, "d": 5, "age": 2.69, "grav": 16.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 22, "qw": 0, "k": 5547, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://news.ycombinator.com/item?id=50370121", "https://sunshowers.io/posts/anthropic-mononoke-2/"], "ig": 0.231, "fa": 0.0, "gp": 0.0, "bl": 0.75, "ds": 0.0, "txt": "And it's too late for me to edit my first post, but there was also the ripping-off of Verinf ( https://news.ycombinator.com/item?id=50370121 ), and Mononoke ( https://sunshowers.io/posts/anthropic-mononoke-2/ ) too."}, {"id": 50552521, "au": "gardnr", "dom": 59, "sr": 64, "sc": -1.77, "ep": 1.28, "bs": 3.05, "d": 1, "age": 15.62, "grav": 175.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 1571, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "models_tasks", "flbl": "Models & Tasks (Benchmarks)", "urls": [], "ig": 0.203, "fa": 0.28, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Check the article. It’s the first graphic that has other benchmarks."}, {"id": 50558687, "au": "BobbyTables2", "dom": 29, "sr": 65, "sc": -1.85, "ep": 2.39, "bs": 4.24, "d": 2, "age": 2.0, "grav": 12.1, "surf": 11.4, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 84, "qw": 0, "k": 2657, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "dna_learn", "flbl": "Dna & Learn (Believe)", "urls": [], "ig": 1.017, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "I’ve been suspecting that as a stochastic parrot cannot reason…\n\nEarly LLMs couldn’t answer how many R’s in strawberry.  Now they can… Perhaps they just recognize the question and know which “helper” to use?\n\nHowever, I find Claude Opus connects the dots in large codebases in ways that aren’t simple parlour tricks…\n\nBut who knows, maybe our own reasoning isn’t all that we think it is.  Our ability to spell words isn’t too different - many patterns fuzzily drilled into the head until we can spell most things…"}, {"id": 50555082, "au": "LoganDark", "dom": 37, "sr": 66, "sc": -2.52, "ep": 0.53, "bs": 3.05, "d": 6, "age": 11.49, "grav": 108.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 4830, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "qwen_flash", "flbl": "Qwen & Flash (27b)", "urls": [], "ig": 0.224, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "All of that stuff was still trained by evolution, though."}, {"id": 50555513, "au": "gegtik", "dom": 38, "sr": 67, "sc": -3.41, "ep": 0.83, "bs": 4.24, "d": 7, "age": 10.34, "grav": 92.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 506, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.351, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Hmm perhaps I learned to drive in the womb from my moms epigenetic driving genes"}, {"id": 50555600, "au": "octoberfranklin", "dom": 41, "sr": 68, "sc": -3.5, "ep": 0.74, "bs": 4.24, "d": 5, "age": 10.08, "grav": 88.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 1925, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "dna_learn", "flbl": "Dna & Learn (Believe)", "urls": [], "ig": 0.314, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "In ~8G weights of DNA?\n\nLol.  That's less than 1 milliFable at 1-bit quantization."}, {"id": 50554933, "au": "nblintao", "dom": 70, "sr": 69, "sc": -3.54, "ep": 0.7, "bs": 4.24, "d": 1, "age": 11.84, "grav": 113.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 2, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "training_hard", "flbl": "Training & Hard (Nodes)", "urls": [], "ig": 0.297, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Dedicated rollout and trainer nodes, with RDMA transfers between them."}, {"id": 50557121, "au": "techcode", "dom": 25, "sr": 70, "sc": -3.58, "ep": 0.66, "bs": 4.24, "d": 4, "age": 5.69, "grav": 39.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 173, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.28, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "All the hours that went into watching \"Only Fools And Horses\" will finally pay off."}, {"id": 50552317, "au": "lumost", "dom": 74, "sr": 71, "sc": -3.65, "ep": 0.59, "bs": 4.24, "d": 1, "age": 15.9, "grav": 180.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 11846, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "models_tasks", "flbl": "Models & Tasks (Benchmarks)", "urls": [], "ig": 0.252, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Savings would likely be larger with alternative accelerators such as trainium, no?"}, {"id": 50554907, "au": "p-e-w", "dom": 33, "sr": 72, "sc": -3.66, "ep": 0.58, "bs": 4.24, "d": 4, "age": 11.88, "grav": 113.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 7597, "kpp": 4.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.247, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Because there is four billion years of evolutionary pre-training."}, {"id": 50556569, "au": "outside1234", "dom": 21, "sr": 73, "sc": -3.71, "ep": 0.53, "bs": 4.24, "d": 6, "age": 7.26, "grav": 55.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 8290, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.225, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "He’s also not necessarily wrong.  The guy is a rat and everyone here knows it."}, {"id": 50558767, "au": "Bluestein", "dom": 8, "sr": 74, "sc": -3.84, "ep": 0.4, "bs": 4.24, "d": 5, "age": 1.86, "grav": 11.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 13651, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.172, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "This is what the \"subscription subsidy\" is buying (and penetration).-"}, {"id": 50552697, "au": "jacquesm", "dom": 60, "sr": 75, "sc": -3.86, "ep": 0.38, "bs": 4.24, "d": 2, "age": 15.46, "grav": 172.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 248096, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "llm_train", "flbl": "LLM & Train (Data)", "urls": [], "ig": 0.162, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Yes, they all go up. I am wondering what was lost."}, {"id": 50559469, "au": "cainxinth", "dom": 26, "sr": 76, "sc": -4.56, "ep": 0.87, "bs": 5.43, "d": 2, "age": 0.45, "grav": 5.0, "surf": 27.6, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 9873, "kpp": 5.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "training_hard", "flbl": "Training & Hard (Nodes)", "urls": [], "ig": 0.351, "fa": 0.0, "gp": 0.032, "bl": 2.05, "ds": 0.0, "txt": "A large enough array of specific datasets means the model does have general coverage. The question is how close are we to that?"}, {"id": 50554635, "au": "boardendgrain", "dom": 24, "sr": 77, "sc": -6.18, "ep": 0.57, "bs": 6.76, "d": 3, "age": 12.38, "grav": 121.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.244, "fa": 0.0, "gp": 0.0, "bl": 2.55, "ds": 0.0, "txt": "Time to do all business in cockney ryming slang!"}, {"id": 50552828, "au": "phs318u", "dom": 77, "sr": 78, "sc": -6.69, "ep": 0.6, "bs": 7.29, "d": 3, "age": 15.29, "grav": 169.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 10, "k": 4671, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.256, "fa": 0.0, "gp": 0.0, "bl": 2.75, "ds": 0.0, "txt": "> Maybe you wanted to use an opportunity to shill tranium.\n\nThis was unnecessary and against HN guidelines to engage in good faith."}, {"id": 50555697, "au": "jodrellblank", "dom": 42, "sr": 79, "sc": -7.56, "ep": 1.19, "bs": 8.74, "d": 6, "age": 9.89, "grav": 86.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": -1, "lu": 1, "w": 39, "qw": 0, "k": 14934, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "dna_learn", "flbl": "Dna & Learn (Believe)", "urls": ["https://www.youtube.com/watch?v=NAPhBt8VJCM"], "ig": 0.506, "fa": 0.0, "gp": 0.0, "bl": 3.3, "ds": 0.0, "txt": "Maybe not just DNA. \"Something needs to speed evolution up\" - Denis Noble, Professor of Biology argues against the idea that DNA is instructions and everything else in the body passively takes orders and has no input and no feedback - https://www.youtube.com/watch?v=NAPhBt8VJCM"}, {"id": 50551777, "au": "XCSme", "dom": 83, "sr": 80, "sc": -7.79, "ep": 0.0, "bs": 6.89, "d": 0, "age": 16.74, "grav": 195.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 3321, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "qwen_flash", "flbl": "Qwen & Flash (27b)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.917, "bl": 2.6, "ds": 0.0, "txt": "Is it post-training or bench-maxxing?"}, {"id": 50556435, "au": "SubiculumCode", "dom": 20, "sr": 81, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 5, "age": 7.71, "grav": 59.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 1, "qw": 0, "k": 7809, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Dude."}, {"id": 50554044, "au": "0xWTF", "dom": 31, "sr": 82, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 13.43, "grav": 137.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 628, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "How is that different from you?"}, {"id": 50553172, "au": "charcircuit", "dom": 48, "sr": 83, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 14.9, "grav": 162.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 3, "qw": 10, "k": 2420, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://github.com/karpathy/autoresearch"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": ">doubt on the claims that AI will become self-improving soon\n\nIt already happened. https://github.com/karpathy/autoresearch"}, {"id": 50557857, "au": "apples_oranges", "dom": 63, "sr": 84, "sc": -10.92, "ep": 0.0, "bs": 8.88, "d": 1, "age": 3.9, "grav": 24.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 3, "qw": 0, "k": 1733, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://huggingface.co/bartowski/RadixArk_DaisyRose-27B-GGUF"], "ig": -0.95, "fa": 0.0, "gp": 0.13, "bl": 3.35, "ds": 0.0, "txt": "https://huggingface.co/bartowski/RadixArk_DaisyRose-27B-GGUF i just downloaded this"}, {"id": 50553724, "au": "dimes", "dom": 46, "sr": 85, "sc": -10.94, "ep": 0.0, "bs": 8.88, "d": 2, "age": 14.06, "grav": 148.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 0, "qw": 0, "k": 536, "kpp": 5.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://getlatka.com/companies/mercor"], "ig": -0.95, "fa": 0.0, "gp": 0.117, "bl": 3.35, "ds": 0.0, "txt": "https://getlatka.com/companies/mercor"}, {"id": 50557588, "au": "0_____0", "dom": 40, "sr": 86, "sc": -12.7, "ep": 0.0, "bs": 10.47, "d": 9, "age": 4.57, "grav": 29.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": -1, "lu": 1, "w": 7, "qw": 0, "k": 4106, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://youtu.be/RZ_0ImDYrPY"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.95, "ds": 0.0, "txt": "I present to you: Orangutan Driving Golf Cart\n\nhttps://youtu.be/RZ_0ImDYrPY"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "top_signal";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 40);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 40);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 40);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `${shown.length} of ${pool.length} comments` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const proofDrawer = document.getElementById("proofDrawer");
+  const expBtn = document.getElementById("exploreToggleBtn");
+  const eviBtn = document.getElementById("evidenceToggleBtn");
+
+  if (expBtn && labDrawer) {
+    expBtn.addEventListener("click", () => {
+      labDrawer.open = !labDrawer.open;
+    });
+    labDrawer.addEventListener("toggle", () => {
+      const isOpen = labDrawer.open;
+      expBtn.classList.toggle("active", isOpen);
+      expBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  if (eviBtn && proofDrawer) {
+    eviBtn.addEventListener("click", () => {
+      proofDrawer.open = !proofDrawer.open;
+    });
+    proofDrawer.addEventListener("toggle", () => {
+      const isOpen = proofDrawer.open;
+      eviBtn.classList.toggle("active", isOpen);
+      eviBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

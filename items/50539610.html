@@ -1,0 +1,1385 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50539610 // Microsoft's ONNX Runtime has disappeared from GitHub — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+      text-transform: lowercase;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      text-transform: lowercase;
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .kpi-cell {
+      padding: 8px 0;
+    }
+    .kpi-label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 4px 0;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer:not([open]) {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary,
+    details.proof-drawer > summary {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+    }
+    table.ablation th {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: normal;
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    button.nav-btn,
+    button.mode-tab,
+    button.topbar-toggle {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: rgb(0, 0, 0);
+      cursor: pointer;
+      text-decoration: none;
+      line-height: inherit;
+      vertical-align: baseline;
+      transition: color 0.12s ease;
+      text-transform: lowercase;
+    }
+    button.nav-btn:hover,
+    button.nav-btn.active,
+    button.mode-tab:hover,
+    button.mode-tab.active,
+    button.topbar-toggle:hover,
+    button.topbar-toggle.active {
+      color: rgb(255, 255, 255);
+      text-decoration: none;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      padding: 14px;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; row-gap: 4px; }
+      .topbar-right { font-size: 8pt; padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+        <span class="pagetop" id="modeTabs">
+          <button type="button" class="nav-btn mode-tab active" data-mode="top_signal" role="tab" aria-selected="true">Top 40</button> | <button type="button" class="nav-btn mode-tab" data-mode="hn_top40" role="tab" aria-selected="false">HN Top 40</button>
+        </span>
+      </div>
+      <div class="topbar-right">
+        <button type="button" class="nav-btn topbar-toggle" id="exploreToggleBtn" aria-expanded="false">explore</button> | <button type="button" class="nav-btn topbar-toggle" id="evidenceToggleBtn" aria-expanded="false">evidence</button>
+      </div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://github.com/microsoft/onnxruntime">Microsoft's ONNX Runtime has disappeared from GitHub</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=github.com"><span class="sitestr">github.com</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">428 points</span> by <a href="https://news.ycombinator.com/user?id=nvader">nvader</a> <span class="age" title="2026-11-17T23:18:49.000Z"><a href="https://news.ycombinator.com/item?id=50539610">17 hours ago</a></span> | <a href="https://news.ycombinator.com/item?id=50539610">89&nbsp;comments</a> | 88.8% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Evidence</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">89</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 80 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">11.2%</div>
+          <div class="kpi-sub">10 comments (4 Gold / 4.5%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">88.8%</div>
+          <div class="kpi-sub">33 chatter &bull; 44 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">10</div>
+        <div class="kpi-sub">23% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.866</div>
+        <div class="kpi-sub">3 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">16</div>
+          <div class="kpi-sub">HN POS 9..24 (18.0% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="color: rgb(90, 90, 88); margin-top: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Explore</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 89-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 89)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (4)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (6)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (33)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (2)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (44)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..89) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 27)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (roseway4, 11.1h); largest subtree (@eddythompson80) occupies 16 slots (HN POS 9..24).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (89)</option>
+          <option value="onnx_microsoft">Onnx &amp; Microsoft (Inference) (27)</option>
+          <option value="builds_repos">Builds &amp; Repos (Pipelines) (24)</option>
+          <option value="telemetry_recent">Telemetry &amp; Recent (Source) (17)</option>
+          <option value="general_commentary">General Commentary (21)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, microsoft, github, runtime, onnx, disappeared...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50539610 + GITHUB.COM + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50539610, "story_title": "Microsoft's ONNX Runtime has disappeared from GitHub", "story_url": "https://github.com/microsoft/onnxruntime", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50539610, "story_title": "Microsoft's ONNX Runtime has disappeared from GitHub", "story_url": "https://github.com/microsoft/onnxruntime", "points": 428, "story_author": "nvader", "article_source": "fallback_metadata", "t1_ref_utc": "2026-11-18T16:43:19+00:00", "t2_ref_utc": "2026-11-18T16:43:19+00:00", "delta_minutes": 0.0, "story_anchors": ["microsoft", "github", "runtime", "onnx", "disappeared", "recent", "fork", "models", "package", "builds", "depending", "else", "instead", "library", "offline", "pipelines", "thanks", "web", "packages", "repo", "repos", "onnxruntime"], "facet_labels": {"onnx_microsoft": "Onnx & Microsoft (Inference)", "telemetry_recent": "Telemetry & Recent (Source)", "builds_repos": "Builds & Repos (Pipelines)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "onnx_microsoft", "label": "Onnx & Microsoft (Inference)", "count": 27, "top_terms": ["onnx", "microsoft", "inference", "runtime"]}, {"slug": "telemetry_recent", "label": "Telemetry & Recent (Source)", "count": 17, "top_terms": ["telemetry", "recent", "source", "disabled"]}, {"slug": "builds_repos", "label": "Builds & Repos (Pipelines)", "count": 24, "top_terms": ["builds", "repos", "pipelines", "packages"]}], "counts": {"total_comments": 89, "live_t2_comments": 89, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 80, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 1, "pages_fetched": 1}, "sha256": {"corpus.json": "490a5354868e9764ba962d2102ce6d06cc15fecba102fb24dfa7b11dfab79dd1"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 4, "grounded_analysis": 6, "crowd_chatter": 33, "bullshit_or_flamewar": 44, "meme_or_snark": 2}, "facets": {"onnx_microsoft": 27, "general_commentary": 21, "builds_repos": 24, "telemetry_recent": 17}, "facet_options": [{"slug": "onnx_microsoft", "label": "Onnx & Microsoft (Inference)", "count": 27}, {"slug": "builds_repos", "label": "Builds & Repos (Pipelines)", "count": 24}, {"slug": "telemetry_recent", "label": "Telemetry & Recent (Source)", "count": 17}, {"slug": "general_commentary", "label": "General Commentary", "count": 21}], "facet_diagnostics": [{"slug": "onnx_microsoft", "label": "Onnx & Microsoft (Inference)", "count": 27, "useful": 5, "useful_pct": 18.5, "terms": "onnx, microsoft, inference, runtime"}, {"slug": "builds_repos", "label": "Builds & Repos (Pipelines)", "count": 24, "useful": 3, "useful_pct": 12.5, "terms": "builds, repos, pipelines, packages"}, {"slug": "telemetry_recent", "label": "Telemetry & Recent (Source)", "count": 17, "useful": 0, "useful_pct": 0.0, "terms": "telemetry, recent, source, disabled"}, {"slug": "general_commentary", "label": "General Commentary", "count": 21, "useful": 2, "useful_pct": 9.5, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 12}, {"category": "code_repository", "count": 10}, {"category": "primary_technical_doc", "count": 1}, {"category": "github_artifact", "count": 1}], "story_anchors": ["microsoft", "github", "runtime", "onnx", "disappeared", "recent", "fork", "models", "package", "builds", "depending", "else", "instead", "library", "offline", "pipelines", "thanks", "web"], "largest_root": {"root_id": 50540608, "author": "eddythompson80", "slots": 16, "start_dom": 9, "end_dom": 24, "share_pct": 18.0, "top_dom1_age": 11.1, "top_dom1_author": "roseway4"}, "buried_cutoff": 27, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50543994, "au": "robertknight", "dom": 60, "sr": 1, "sc": 10.54, "ep": 10.54, "bs": 0.0, "d": 1, "age": 7.22, "grav": 54.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 48, "qw": 0, "k": 125, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": ["https://github.com/robertknight/rten"], "ig": 1.27, "fa": 2.08, "gp": 1.121, "bl": 0.0, "ds": 0.0, "txt": "I maintain RTen (https://github.com/robertknight/rten). It is a good drop-in replacement for ONNX Runtime for many use cases where you are running inference on CPU (there is no GPU support yet). There is no Python or NodeJS API at present, though you could get an agent to build a small wrapper quite easily."}, {"id": 50540709, "au": "cookiengineer", "dom": 74, "sr": 2, "sc": 10.01, "ep": 10.01, "bs": 0.0, "d": 1, "age": 15.26, "grav": 168.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 20, "qw": 5, "k": 7948, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://github.com/syntax-syndicate/onnxruntime", "https://web.archive.org/web/20261113082932/https://github.com/microsoft/onnxruntime"], "ig": 0.925, "fa": 2.35, "gp": 0.787, "bl": 0.0, "ds": 0.0, "txt": "For others:\n\n> https://github.com/syntax-syndicate/onnxruntime\n\nCheck the web archive link for commit hashes, the syntax-syndicate fork seems to be the remaining legit fork.\n\n[1] https://web.archive.org/web/20261113082932/https://github.co..."}, {"id": 50547718, "au": "coffee_am", "dom": 66, "sr": 3, "sc": 9.77, "ep": 9.92, "bs": 0.0, "d": 1, "age": 0.97, "grav": 7.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 48, "qw": 0, "k": 15, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": ["https://github.com/gomlx/gomlx", "https://github.com/gomlx/onnx-gomlx"], "ig": 1.353, "fa": 2.08, "gp": 0.56, "bl": 0.0, "ds": 0.0, "txt": "Yet another alternative: convert your `.onnx` file to GoMLX [0] using onnx-gomlx [1].\n\nFor CPUs using SIMD it's significantly faster than ONNX. For NVidia GPUs, depending on the model, you can use an XLA backend. On Apple you can use an MLX backend (but it supports Neon/SME as well).\n\n- [0] : https://github.com/gomlx/gomlx\n- [1] : https://github.com/gomlx/onnx-gomlx"}, {"id": 50548433, "au": "mdaniel", "dom": 7, "sr": 4, "sc": 9.43, "ep": 9.43, "bs": 0.0, "d": 3, "age": 0.09, "grav": 3.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 28, "qw": 0, "k": 8145, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "builds_repos", "flbl": "Builds & Repos (Pipelines)", "urls": ["https://github.com/microsoft/onnxruntime-github-actions", "https://github.com/intel/onnxruntime/commit/cc8a72e1009d32295b23e666d7eebd9350e1e2b4"], "ig": 0.881, "fa": 2.35, "gp": 0.459, "bl": 0.0, "ds": 0.0, "txt": "Not just the repos, they yanked their GHA, too https://github.com/microsoft/onnxruntime-github-actions is now 404 (I spotted it while poking around in the Intel fork cited elsewhere and noticed https://github.com/intel/onnxruntime/commit/cc8a72e1009d3229... which drew my attention)"}, {"id": 50545392, "au": "coffee_am", "dom": 41, "sr": 5, "sc": 7.27, "ep": 7.27, "bs": 0.0, "d": 1, "age": 4.43, "grav": 28.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 15, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 1.371, "fa": 1.23, "gp": 0.377, "bl": 0.0, "ds": 0.0, "txt": "Thanks for the article, very interesting. But not likely the exact cause (maybe a variation), according to it:\n\n```\nDisclosure timeline:\n\n2026-03-07 - bug found\n2026-03-10 - reported to MSRC (\u0023109845)\n2026-05-19 - patch 6a8f021b (\u002328408) merged\n2026-05-29 - patch 77d32c3a (\u002328709) merged\n2026-06-12 - onnxruntime v1.27.0 released, including both patches\n```"}, {"id": 50540243, "au": "Heliodex", "dom": 55, "sr": 6, "sc": 5.75, "ep": 5.75, "bs": 0.0, "d": 0, "age": 16.32, "grav": 187.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 19, "qw": 0, "k": 174, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "builds_repos", "flbl": "Builds & Repos (Pipelines)", "urls": ["https://github.com/intel/onnxruntime"], "ig": 0.827, "fa": 0.75, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "The closest/furthest ahead fork I could find is https://github.com/intel/onnxruntime for anyone else needing it, though that's with Intel's OpenVINO modifications"}, {"id": 50540653, "au": "antimora", "dom": 62, "sr": 7, "sc": 5.65, "ep": 5.95, "bs": 0.0, "d": 1, "age": 15.39, "grav": 170.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 19, "qw": 0, "k": 3423, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": ["https://github.com/tracel-ai/burn-onnx"], "ig": 0.826, "fa": 0.75, "gp": 1.289, "bl": 0.0, "ds": 0.0, "txt": "https://github.com/tracel-ai/burn-onnx\n\nI maintain this project at the moment.\n\nIt convert ONNX models into native, backend-agnostic Burn code for inference and fine-tuning."}, {"id": 50540401, "au": "momojo", "dom": 28, "sr": 8, "sc": 5.6, "ep": 5.6, "bs": 0.0, "d": 1, "age": 15.93, "grav": 180.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 54, "qw": 13, "k": 479, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": [], "ig": 1.438, "fa": 0.76, "gp": 0.036, "bl": 0.0, "ds": 0.0, "txt": "> The ONNX Runtime (ORT) is the most widely used engine for serving deep\nlearning models in production. It is common for people to download ONNX\nmodels from public repositories, such as Hugging Face, and to serve them to\ntheir customers without too much scrutiny. In March 2026, we noticed a\nparser flaw: an ONNX model can cause ORT to read from arbitrary file paths\n(or memory addresses) without validations."}, {"id": 50542414, "au": "pjmlp", "dom": 44, "sr": 9, "sc": 5.04, "ep": 5.04, "bs": 0.0, "d": 2, "age": 10.7, "grav": 97.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 73, "qw": 0, "k": 134000, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "builds_repos", "flbl": "Builds & Repos (Pipelines)", "urls": [], "ig": 1.4, "fa": 0.34, "gp": 0.537, "bl": 0.0, "ds": 0.0, "txt": "I don't get it, this is exactly how I have been mostly working since around 2010.\n\nNothing that lands on CI/CD pipelines is able to download anything directly from Internet, rather internal repos based on Nexus, Artfactory and similar.\n\nAdditionally everything that gets uploaded into them needs to have an approval process for the most part.\n\nSo, not only already exists, it is an intermediate process, and you can even pay depending on the features."}, {"id": 50540670, "au": "tekacs", "dom": 86, "sr": 10, "sc": 4.7, "ep": 4.92, "bs": 0.0, "d": 0, "age": 15.34, "grav": 170.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 4923, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": [], "ig": 1.396, "fa": 0.28, "gp": 0.583, "bl": 0.0, "ds": 0.0, "txt": "So... all of these also vanished.\n\n   microsoft/\n     ├─> onnxruntime-genai                  — generative AI runtime\n     ├─> onnxruntime-extensions             — custom operators\n     ├─> onnxruntime-inference-examples     — inference samples\n     ├─> onnxruntime-training-examples      — training samples\n     ├─> onnxruntime-swift-package-manager  — Swift package distribution\n     └─> onnxruntime-web-benchmark          — browser benchmark tool\n\n(possible they were gone earlier, but e.g. onnxruntime-extensions had a push yesterday)"}, {"id": 50540608, "au": "eddythompson80", "dom": 9, "sr": 11, "sc": 3.92, "ep": 3.92, "bs": 0.0, "d": 0, "age": 15.5, "grav": 172.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 3449, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "telemetry_recent", "flbl": "Telemetry & Recent (Source)", "urls": [], "ig": 0.397, "fa": 0.28, "gp": 1.51, "bl": 0.0, "ds": 0.0, "txt": "FYI - ONNX will automatically exfiltrate data about your application with no way to opt out other than building it from source with telemetry disabled. Maybe you could block DNS too."}, {"id": 50540135, "au": "spdustin", "dom": 27, "sr": 12, "sc": 3.59, "ep": 3.74, "bs": 0.0, "d": 0, "age": 16.51, "grav": 191.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 20, "qw": 0, "k": 4889, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "telemetry_recent", "flbl": "Telemetry & Recent (Source)", "urls": ["https://phrack.org/issues/73/backdoor-attacks-against-machine-learning-irl_md\u0023article"], "ig": 0.881, "fa": 0.0, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "I wonder if they found new vectors that backdoor'ed models could exploit, like that discussed in the most recent Phrack [^0]\n\n[0]: https://phrack.org/issues/73/backdoor-attacks-against-machin..."}, {"id": 50548375, "au": "gbdubs", "dom": 10, "sr": 13, "sc": 3.36, "ep": 3.51, "bs": 0.0, "d": 1, "age": 0.17, "grav": 4.0, "surf": 39.8, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 90, "qw": 0, "k": 6, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "telemetry_recent", "flbl": "Telemetry & Recent (Source)", "urls": [], "ig": 1.149, "fa": 0.28, "gp": 0.008, "bl": 0.0, "ds": 0.0, "txt": "I don't think this is true, with an env var of `ORT_DISABLE_TELEMETRY=1 stops sending telemetry on all of the builds I tested.\n\nThe flag/telemetry client doesn't exist on v1.28.0, and when I tested on v1.29.0, v1.30.0, v1.31.0, v1.31.1 and v1.32.0 running on MacOS, all built from source locally at those various checkpoints, I don't see the any of the telemetry infrastructure built (device ID is unset, no network queue created, no network session storage created).\n\nCould you provide more context on what the issue here was/is? I might be missing it."}, {"id": 50540942, "au": "rtpg", "dom": 43, "sr": 14, "sc": 3.34, "ep": 3.49, "bs": 0.0, "d": 1, "age": 14.73, "grav": 159.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 21243, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "builds_repos", "flbl": "Builds & Repos (Pipelines)", "urls": [], "ig": 0.806, "fa": 0.28, "gp": 0.55, "bl": 0.0, "ds": 0.0, "txt": "I do wish I could pay some money for a package manager intermediary that \"magically\" handles things (for example defaulting to not promoting things until 2 weeks have passed), has better perf, and generally just does the right things.\n\nOf course I wouldn't pay _that_ much money for it."}, {"id": 50539658, "au": "nvader", "dom": 29, "sr": 15, "sc": 3.11, "ep": 3.33, "bs": 0.0, "d": 0, "age": 17.31, "grav": 206.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 43, "qw": 0, "k": 2348, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "builds_repos", "flbl": "Builds & Repos (Pipelines)", "urls": [], "ig": 0.706, "fa": 0.0, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "We found out about this this morning, when evals started failing in our pipelines. I've been looking around, but it doesn't seem like there was any advance warning about this.\n\nDoes anyone know why or how a repository with 22k stars just went dark?"}, {"id": 50540373, "au": "hiddenvulkcan", "dom": 25, "sr": 16, "sc": 2.8, "ep": 3.24, "bs": 0.0, "d": 0, "age": 15.98, "grav": 181.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 24, "qw": 0, "k": 19, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "builds_repos", "flbl": "Builds & Repos (Pipelines)", "urls": ["https://opensourcemalware.com/blog/agent-framework-pypi-compromised"], "ig": 0.671, "fa": 0.0, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "Maybe related to one of their packages that was compromised? Not sure if GitHub was the attack vector, but possibly tidying stuff up\n\nSource: https://opensourcemalware.com/blog/agent-framework-pypi-comp..."}, {"id": 50541981, "au": "Gluber", "dom": 67, "sr": 17, "sc": 2.58, "ep": 3.02, "bs": 0.0, "d": 0, "age": 11.95, "grav": 114.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 60, "qw": 0, "k": 40, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": [], "ig": 1.004, "fa": 0.0, "gp": 0.458, "bl": 0.0, "ds": 0.0, "txt": "It seemed to have stalled in investment before i think. Performance especially for CPU only models ( there are some use cases for this ) seemed to have lagged a lot, behind what properly hand optimized code could do.\n\nThe gpu work was mostly handed of e.g to TensorRT and that also seems since the push for more general LLM models have not really improved."}, {"id": 50544900, "au": "kreco", "dom": 45, "sr": 18, "sc": 2.41, "ep": 3.37, "bs": 0.0, "d": 3, "age": 5.4, "grav": 36.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 101, "qw": 0, "k": 325, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "builds_repos", "flbl": "Builds & Repos (Pipelines)", "urls": [], "ig": 1.433, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It baffles me that this is not the default.\n\nI mean, sure for hobby project you don't want to setup/pay some intermediate repos.\n\nBut for anything else you just want control, if new version of an app is released, someone needs to actively bring it to the intermediate repository.\n\nThis is tangential, but that's also why being able to import a package from a git url in some language is extremely risky (your github repo could change owners at any time).\nAt least the code should only know about the package id, and whatever \"package manager\" is install should link it to a repository."}, {"id": 50542245, "au": "ameliaquining", "dom": 15, "sr": 19, "sc": 2.38, "ep": 3.34, "bs": 0.0, "d": 4, "age": 11.21, "grav": 104.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 29, "qw": 0, "k": 4200, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "telemetry_recent", "flbl": "Telemetry & Recent (Source)", "urls": ["https://www.astralcodexten.com/p/if-its-worth-your-time-to-lie-its"], "ig": 0.264, "fa": 0.9, "gp": 0.108, "bl": 0.0, "ds": 0.0, "txt": "Top-level comment said \"no way to opt out other than building it from source with telemetry disabled\", so if that's not true then this is important to know. See https://www.astralcodexten.com/p/if-its-worth-your-time-to-l..."}, {"id": 50542273, "au": "roseway4", "dom": 1, "sr": 20, "sc": 2.15, "ep": 3.07, "bs": 0.0, "d": 0, "age": 11.11, "grav": 102.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 13, "qw": 0, "k": 1134, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": ["https://socket.dev/blog/agent-framework-pypi-package-compromised-with-credential-stealer", "https://github.com/microsoft/agent-framework"], "ig": 0.597, "fa": 0.0, "gp": 1.149, "bl": 0.0, "ds": 0.0, "txt": "Microsoft Agent Framework has been compromised[0]. The repo is also offline[1]. Possibly related?\n\n[0] https://socket.dev/blog/agent-framework-pypi-package-comprom...\n\n[1] https://github.com/microsoft/agent-framework"}, {"id": 50542309, "au": "refulgentis", "dom": 18, "sr": 21, "sc": 1.94, "ep": 2.6, "bs": 0.0, "d": 4, "age": 11.01, "grav": 101.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 4973, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "telemetry_recent", "flbl": "Telemetry & Recent (Source)", "urls": [], "ig": 0.767, "fa": 0.28, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I don’t understand what you mean. I’ve maintained a decently popular ONNX wrapper for years, had 0 idea there was telemetry, and this is quite useful info to have, particularly because it would be a PITA to rebuild binaries right now."}, {"id": 50541961, "au": "nullpoint420", "dom": 14, "sr": 22, "sc": 1.68, "ep": 2.56, "bs": 0.0, "d": 3, "age": 11.99, "grav": 115.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 447, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "telemetry_recent", "flbl": "Telemetry & Recent (Source)", "urls": [], "ig": 0.528, "fa": 0.28, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "Not to be that guy but I don't think this is the gotcha y'all think it is. I didn't know that ONNX had telemetry.\n\nedit: I seem to have misunderstood the intent of the parent comments. Apologies"}, {"id": 50541146, "au": "these", "dom": 71, "sr": 23, "sc": 1.67, "ep": 2.55, "bs": 0.0, "d": 0, "age": 14.12, "grav": 149.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 24, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": [], "ig": 0.755, "fa": 0.0, "gp": 0.532, "bl": 0.0, "ds": 0.0, "txt": "Not to take away from the fact that I don't like that this was done, but in my experience development on ONNX has been pretty slow recently. I moved away from a few months back because I felt bug fixes were coming in pretty slow, despite being reported."}, {"id": 50543140, "au": "malikolivier", "dom": 47, "sr": 24, "sc": 1.44, "ep": 2.76, "bs": 0.0, "d": 2, "age": 8.8, "grav": 72.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 84, "qw": 0, "k": 277, "kpp": 4.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "builds_repos", "flbl": "Builds & Repos (Pipelines)", "urls": [], "ig": 1.11, "fa": 0.0, "gp": 0.106, "bl": 0.0, "ds": 0.0, "txt": "Such solutions exist. Some people are building it on their own. Some people just commit all their dependencies in their repository.\n\nIf you want it enforced for a whole team, with caching on top, that's\nwhere registry proxies come in (Artifactory, Nexus, and similar). The big\nones take real effort to set up, while lighter ones may be all you need.\n\nVendoring your dependencies into the repo is the low-tech option that survives an upstream repo vanishing.\n\nDisclosure: I work at a company which sells such solutions."}, {"id": 50544417, "au": "xpct", "dom": 22, "sr": 25, "sc": 1.03, "ep": 2.13, "bs": 0.0, "d": 1, "age": 6.34, "grav": 45.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 770, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "telemetry_recent", "flbl": "Telemetry & Recent (Source)", "urls": [], "ig": 0.907, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Does it use network for anything else? Or does it run a \"am I online\" check on startup?\n\nIt's a bit disappointing to me that software which I expect to be fully offline, sometimes isn't."}, {"id": 50541032, "au": "rwiggins", "dom": 46, "sr": 26, "sc": 0.91, "ep": 1.35, "bs": 0.0, "d": 2, "age": 14.45, "grav": 154.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 1525, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.422, "fa": 0.0, "gp": 0.248, "bl": 0.0, "ds": 0.0, "txt": "Doesn't Artifactory provide exactly that? Along with having a bunch of features that are generally the right things.\n\nThough I'm pretty sure their enterprise pricing is \"give us a call.\" Maybe your last sentence was a nod to this."}, {"id": 50540746, "au": "giancarlostoro", "dom": 36, "sr": 27, "sc": 0.88, "ep": 2.13, "bs": 0.0, "d": 2, "age": 15.16, "grav": 166.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 79, "qw": 0, "k": 23190, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": [], "ig": 0.907, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Considering Microsoft co-developed ONNX with Facebook... I think that the more likely scenario is they took it dark after learning that it has security issues, but they should really have left a message or something, this is amateur hour tier. GitHub repos should let you leave a \"Sorry we've hidden our repo, we learned about security issues\" which kind of doesn't help anyone either... since now they have to find help elsewhere, and fall victim to sketchy 'forks' from other people..."}, {"id": 50540533, "au": "proc0", "dom": 82, "sr": 28, "sc": 0.77, "ep": 1.87, "bs": 0.0, "d": 0, "age": 15.68, "grav": 175.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 2765, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "builds_repos", "flbl": "Builds & Repos (Pipelines)", "urls": [], "ig": 0.682, "fa": 0.0, "gp": 0.183, "bl": 0.0, "ds": 0.0, "txt": "omg, I just built something depending on this. Hopefully the web version is still cached in NPM."}, {"id": 50548034, "au": "WhyNotHugo", "dom": 6, "sr": 29, "sc": 0.63, "ep": 2.03, "bs": 0.0, "d": 2, "age": 0.56, "grav": 5.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 6901, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "builds_repos", "flbl": "Builds & Repos (Pipelines)", "urls": [], "ig": 0.863, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Removing the public repository like this breaks all downstream builds, pipelines, etc.\n\nDistribution packages no longer build."}, {"id": 50541898, "au": "Arainach", "dom": 69, "sr": 30, "sc": 0.62, "ep": 1.72, "bs": 0.0, "d": 1, "age": 12.22, "grav": 118.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 10947, "kpp": 4.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "builds_repos", "flbl": "Builds & Repos (Pipelines)", "urls": [], "ig": 0.734, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "No.  Even if a license required all contributors to agree to change the license, there's no requirement to keep it available on Github."}, {"id": 50540975, "au": "antimora", "dom": 65, "sr": 31, "sc": 0.58, "ep": 2.12, "bs": 0.0, "d": 3, "age": 14.62, "grav": 157.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 3423, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "builds_repos", "flbl": "Builds & Repos (Pipelines)", "urls": [], "ig": 0.902, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The graph is converted into Rust code that calls Burn APIs but the weights are converted into Burn's format, called burnpack (similar to safetensors but instead of JSON we use CBOR for weights meta data)."}, {"id": 50540489, "au": "quietbritishjim", "dom": 32, "sr": 32, "sc": 0.55, "ep": 1.94, "bs": 0.0, "d": 2, "age": 15.75, "grav": 177.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 8152, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "builds_repos", "flbl": "Builds & Repos (Pipelines)", "urls": [], "ig": 0.826, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "If I understand your implication, that's not what \"supply chain attack\" normally means. That term means attacking the mechanism that delivers your packages to deliver a different, more compromised, package. If the package itself is already compromised then that's just a straightforward dependency vulnerability."}, {"id": 50540605, "au": "UncleOxidant", "dom": 59, "sr": 33, "sc": 0.47, "ep": 3.2, "bs": 1.19, "d": 0, "age": 15.51, "grav": 172.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 11702, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": [], "ig": 0.79, "fa": 0.0, "gp": 0.926, "bl": 0.45, "ds": 0.0, "txt": "Aren't there other ONNX runtimes out there? A quick google search shows a few written in Rust: Tract, RTen, WONNX, Burn&Candle. Also, IIRC there's a Julia-based one as well."}, {"id": 50540876, "au": "mrguyorama", "dom": 84, "sr": 34, "sc": 0.41, "ep": 1.51, "bs": 0.0, "d": 0, "age": 14.88, "grav": 161.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 16, "qw": 0, "k": 14006, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "builds_repos", "flbl": "Builds & Repos (Pipelines)", "urls": ["https://mvnrepository.com/artifact/com.microsoft.onnxruntime/onnxruntime/versions"], "ig": 0.538, "fa": 0.0, "gp": 0.169, "bl": 0.0, "ds": 0.0, "txt": "The Maven package is still available, and the most recent version is from a few days ago:\n\nhttps://mvnrepository.com/artifact/com.microsoft.onnxruntime..."}, {"id": 50539953, "au": "binsquare", "dom": 35, "sr": 35, "sc": 0.38, "ep": 1.92, "bs": 0.0, "d": 1, "age": 16.83, "grav": 197.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 1113, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": [], "ig": 0.817, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "it's called \"Open Neural Network Exchange (ONNX)\", perhaps microsoft is taking a page from OpenAI on what open meanings."}, {"id": 50543836, "au": "CodeCompost", "dom": 5, "sr": 36, "sc": 0.22, "ep": 1.76, "bs": 0.0, "d": 1, "age": 7.55, "grav": 58.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 761, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": [], "ig": 0.748, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Why are you assuming a compromise? Microsoft Ignite is happening and they announced a bunch of stuff. They're probably consolidating repos."}, {"id": 50541752, "au": "gabriela_c", "dom": 68, "sr": 37, "sc": 0.19, "ep": 1.52, "bs": 1.19, "d": 0, "age": 12.61, "grav": 124.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 20, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.349, "fa": 0.0, "gp": 0.487, "bl": 0.45, "ds": 0.0, "txt": "As a former (tiny patch, pre-AI) contributor, didn't they have a license that requires everybody's approval to do this?"}, {"id": 50542350, "au": "magnio", "dom": 2, "sr": 38, "sc": 0.07, "ep": 1.61, "bs": 0.0, "d": 1, "age": 10.87, "grav": 99.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 3462, "kpp": 9.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": [], "ig": 0.592, "fa": 0.0, "gp": 0.149, "bl": 0.0, "ds": 0.0, "txt": "Without any official communications, Occam's razor means we can assume at least one admin account in Microsoft GitHub org got compromised."}, {"id": 50541545, "au": "katbyte", "dom": 52, "sr": 39, "sc": -0.62, "ep": 1.9, "bs": 1.19, "d": 3, "age": 13.11, "grav": 132.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 3452, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "telemetry_recent", "flbl": "Telemetry & Recent (Source)", "urls": [], "ig": 0.808, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "No that’s forking, vendoring usually means keeping a local copy of a library in /vendor that is automatically committed - rust and golang have first class support for this"}, {"id": 50542031, "au": "logicchains", "dom": 85, "sr": 40, "sc": -0.87, "ep": 1.43, "bs": 1.19, "d": 0, "age": 11.82, "grav": 113.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 9916, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": [], "ig": 0.552, "fa": 0.0, "gp": 0.088, "bl": 0.45, "ds": 0.0, "txt": "Now Jensen's gone they can start dismantling the infrastructure that allows people to run models on their own hardware."}, {"id": 50540943, "au": "craigacp", "dom": 77, "sr": 41, "sc": -1.19, "ep": 1.9, "bs": 1.99, "d": 0, "age": 14.72, "grav": 159.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 27, "qw": 0, "k": 45, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "builds_repos", "flbl": "Builds & Repos (Pipelines)", "urls": ["https://onnxruntime.ai"], "ig": 0.645, "fa": 0.0, "gp": 0.266, "bl": 0.75, "ds": 0.0, "txt": "How odd. https://onnxruntime.ai is still up, and the packages still appear to be on PyPI, Maven Central etc. Guess I won't submit the PR I was working on tonight then."}, {"id": 50544082, "au": "robjam", "dom": 61, "sr": 42, "sc": -1.34, "ep": 2.72, "bs": 2.52, "d": 2, "age": 7.06, "grav": 52.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 3, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "telemetry_recent", "flbl": "Telemetry & Recent (Source)", "urls": [], "ig": 1.157, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "I've used your library ocr to read serial numbers on an IoT device on a mobile phone. It was really responsive and faster than tesseractjs in a web worker. Just wanted to say thanks for such well thought software!"}, {"id": 50543228, "au": "citizenpaul", "dom": 63, "sr": 43, "sc": -1.44, "ep": 1.29, "bs": 1.19, "d": 2, "age": 8.65, "grav": 70.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 2707, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": [], "ig": 0.55, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "This looks awesome, i may be using this in prod very soon. Ive had some ONNX issues this looks to solve"}, {"id": 50540064, "au": "robjam", "dom": 31, "sr": 44, "sc": -1.55, "ep": 2.51, "bs": 2.52, "d": 2, "age": 16.64, "grav": 193.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 3, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": [], "ig": 1.067, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "That would be my guess also. About 6 months ago the azure-functions-host repo disappeared for a while (I got a concerning automated email from GitHub from my forked repo citing a ToS violation)."}, {"id": 50540756, "au": "ytxm", "dom": 64, "sr": 45, "sc": -1.6, "ep": 1.13, "bs": 1.19, "d": 2, "age": 15.13, "grav": 166.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 73, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "builds_repos", "flbl": "Builds & Repos (Pipelines)", "urls": [], "ig": 0.482, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Have used it with wasm and it's lovely, but I was kindof disappointed to learn internally it's basically another serialisation format. I imagined gigabytes of generated Rust code hehe"}, {"id": 50543518, "au": "binocularis", "dom": 48, "sr": 46, "sc": -1.64, "ep": 2.42, "bs": 2.52, "d": 2, "age": 8.14, "grav": 64.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 64, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "builds_repos", "flbl": "Builds & Repos (Pipelines)", "urls": [], "ig": 1.029, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "I’ve been using StableBuild for this sort of thing. It’s not exactly what you’re describing, but might be relevant.\n\nYou basically point your builds at it instead of the upstream repos. Once you’ve pulled something, it keeps that version around, even if it gets deleted or changed upstream.\n\nNot sure if that covers what you need, but it’s worked well for me."}, {"id": 50540499, "au": "KirinDave", "dom": 50, "sr": 47, "sc": -2.41, "ep": 0.33, "bs": 1.19, "d": 1, "age": 15.74, "grav": 177.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 17067, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "builds_repos", "flbl": "Builds & Repos (Pipelines)", "urls": [], "ig": 0.139, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "If it were me, I would take the hint and maybe not trust a vendored version right now?"}, {"id": 50540126, "au": "Axodouble", "dom": 76, "sr": 48, "sc": -2.47, "ep": 1.68, "bs": 3.05, "d": 0, "age": 16.53, "grav": 191.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 13, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "telemetry_recent", "flbl": "Telemetry & Recent (Source)", "urls": [], "ig": 0.54, "fa": 0.0, "gp": 0.283, "bl": 1.15, "ds": 0.0, "txt": "Maybe related to the recent release of MAI? Or the Microsoft AI models?"}, {"id": 50547923, "au": "Galus", "dom": 26, "sr": 49, "sc": -2.53, "ep": 2.42, "bs": 3.84, "d": 0, "age": 0.71, "grav": 6.0, "surf": 34.2, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 19, "qw": 0, "k": 4, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "telemetry_recent", "flbl": "Telemetry & Recent (Source)", "urls": ["https://www.reddit.com/r/selfhosted/comments/1xnbujt/psa_immich_machine_learning_has_microsoft/"], "ig": 0.57, "fa": 0.28, "gp": 0.192, "bl": 1.45, "ds": 0.0, "txt": "Meanwhile, Immich (The self-hosted photos alternative), is also apologizing for the telemetry making its way into a recent update. See: https://www.reddit.com/r/selfhosted/comments/1xnbujt/psa_imm..."}, {"id": 50545630, "au": "nullbio", "dom": 75, "sr": 50, "sc": -2.56, "ep": 1.59, "bs": 3.05, "d": 0, "age": 3.99, "grav": 25.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 1154, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "builds_repos", "flbl": "Builds & Repos (Pipelines)", "urls": [], "ig": 0.654, "fa": 0.0, "gp": 0.037, "bl": 1.15, "ds": 0.0, "txt": "Time to back up everything offline - Github forks won't stick around either."}, {"id": 50545697, "au": "giancarlostoro", "dom": 38, "sr": 51, "sc": -2.9, "ep": 1.69, "bs": 3.05, "d": 4, "age": 3.88, "grav": 24.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 23190, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "builds_repos", "flbl": "Builds & Repos (Pipelines)", "urls": [], "ig": 0.719, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "After those voluntary exit packages, I'm inclined to believe this. Foolish gamble on Microsoft's part."}, {"id": 50544404, "au": "logophobia", "dom": 21, "sr": 52, "sc": -2.97, "ep": 1.62, "bs": 3.05, "d": 3, "age": 6.36, "grav": 45.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 283, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": [], "ig": 0.689, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Doesn't help that alternative runtime implementations are often a bit behind the standard."}, {"id": 50541084, "au": "tadfisher", "dom": 20, "sr": 53, "sc": -3.06, "ep": 1.53, "bs": 3.05, "d": 2, "age": 14.31, "grav": 152.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 7095, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": [], "ig": 0.652, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "They probably mean \"ONNX Runtime\", which has unfortunately become synonymous with ONNX-the-standard."}, {"id": 50542123, "au": "callmekit", "dom": 88, "sr": 54, "sc": -3.1, "ep": 1.04, "bs": 3.05, "d": 1, "age": 11.57, "grav": 109.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 491, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": [], "ig": 0.445, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "The onnx repo is just a spec. Microsoft's ONNX Runtime is an implementation of the spec."}, {"id": 50547128, "au": "throwuxiytayq", "dom": 8, "sr": 55, "sc": -3.32, "ep": 1.0, "bs": 2.78, "d": 2, "age": 1.68, "grav": 10.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 1452, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": [], "ig": 0.426, "fa": 0.0, "gp": 0.0, "bl": 1.05, "ds": 0.0, "txt": "Even if so, then that's an enormous fuckup - deleting the repo is not an acceptable option for migration."}, {"id": 50544874, "au": "pluc", "dom": 23, "sr": 56, "sc": -3.32, "ep": 0.84, "bs": 3.05, "d": 2, "age": 5.43, "grav": 37.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 7028, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": [], "ig": 0.359, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Oh you must not be familiar with Microsoft"}, {"id": 50540449, "au": "dangoodmanUT", "dom": 42, "sr": 57, "sc": -3.32, "ep": 2.0, "bs": 4.24, "d": 0, "age": 15.83, "grav": 178.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 1477, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "builds_repos", "flbl": "Builds & Repos (Pipelines)", "urls": [], "ig": 0.142, "fa": 0.0, "gp": 1.15, "bl": 1.6, "ds": 0.0, "txt": "This is why we vendor everything.\n\nYou never know when it's going to vanish"}, {"id": 50544572, "au": "Yoric", "dom": 37, "sr": 58, "sc": -3.32, "ep": 0.61, "bs": 3.05, "d": 3, "age": 6.01, "grav": 42.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 7389, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": [], "ig": 0.259, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Yeah, not sure how many people remain at Microsoft who actually know how things work."}, {"id": 50539668, "au": "FesterCluck", "dom": 30, "sr": 59, "sc": -3.32, "ep": 1.08, "bs": 4.24, "d": 1, "age": 17.3, "grav": 206.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 185, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.178, "fa": 0.0, "gp": 0.46, "bl": 1.6, "ds": 0.0, "txt": "Probably being used in supply chains, and got attacked."}, {"id": 50540720, "au": "cjbgkagh", "dom": 51, "sr": 60, "sc": -3.32, "ep": 0.99, "bs": 4.24, "d": 2, "age": 15.23, "grav": 168.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 6011, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": [], "ig": 0.421, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "I believe vendoring in this context means forking it and serving it from your own repo."}, {"id": 50542312, "au": "anon291", "dom": 79, "sr": 61, "sc": -3.33, "ep": 0.91, "bs": 4.24, "d": 0, "age": 10.99, "grav": 101.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 3009, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "telemetry_recent", "flbl": "Telemetry & Recent (Source)", "urls": [], "ig": 0.324, "fa": 0.0, "gp": 0.103, "bl": 1.6, "ds": 0.0, "txt": "Better delete all the open source matrix multipliers because we're making it illegal"}, {"id": 50545343, "au": "coffee_am", "dom": 54, "sr": 62, "sc": -3.47, "ep": 1.56, "bs": 5.04, "d": 0, "age": 4.51, "grav": 29.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 12, "qw": 0, "k": 15, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://opensource.googleblog.com/2026/11/supercharging-xla-inference-xla-serving-engine.html", "https://xla-serving.readthedocs.io/en/latest/"], "ig": 0.256, "fa": 0.0, "gp": 0.663, "bl": 1.9, "ds": 0.0, "txt": "Interesting timing, just after the release of the competing XLA Serving, see [0], [1].\n\n[0] - https://opensource.googleblog.com/2026/11/supercharging-xla-...\n[1] - https://xla-serving.readthedocs.io/en/latest/"}, {"id": 50540927, "au": "plagiarist", "dom": 24, "sr": 63, "sc": -3.53, "ep": 0.71, "bs": 4.24, "d": 1, "age": 14.77, "grav": 160.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 1818, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "telemetry_recent", "flbl": "Telemetry & Recent (Source)", "urls": [], "ig": 0.303, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Yikes. Another bad actor who thinks they are entitled to data."}, {"id": 50541931, "au": "genxy", "dom": 57, "sr": 64, "sc": -3.53, "ep": 0.71, "bs": 4.24, "d": 2, "age": 12.09, "grav": 116.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 1093, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.302, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Note to people downloading these archives, there is a high likelihood that they contain malware."}, {"id": 50542214, "au": "mscdex", "dom": 16, "sr": 65, "sc": -3.67, "ep": 0.57, "bs": 4.24, "d": 4, "age": 11.29, "grav": 105.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 151, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "telemetry_recent", "flbl": "Telemetry & Recent (Source)", "urls": [], "ig": 0.243, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "I'm just passing information for anyone who wants to disable it without recompiling anything."}, {"id": 50539884, "au": "Neywiny", "dom": 33, "sr": 66, "sc": -3.8, "ep": 0.44, "bs": 4.24, "d": 1, "age": 16.95, "grav": 199.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 2081, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": [], "ig": 0.186, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Why do you think star amount has anything to do with ability to go dark?"}, {"id": 50543194, "au": "brookst", "dom": 3, "sr": 67, "sc": -3.82, "ep": 0.42, "bs": 4.24, "d": 2, "age": 8.71, "grav": 71.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 15639, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "builds_repos", "flbl": "Builds & Repos (Pipelines)", "urls": [], "ig": 0.178, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Or a contributor to both of these related repos?"}, {"id": 50541741, "au": "kenferry", "dom": 53, "sr": 68, "sc": -4.09, "ep": 0.15, "bs": 4.24, "d": 3, "age": 12.64, "grav": 125.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 2111, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.065, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "But if we think they took it down because of security issues…"}, {"id": 50548505, "au": "nullpoint420", "dom": 17, "sr": 69, "sc": -4.52, "ep": 0.57, "bs": 5.09, "d": 5, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 447, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.243, "fa": 0.0, "gp": 0.0, "bl": 1.92, "ds": 0.0, "txt": "Yeah I read your tone wrong, that's on me. Sorry"}, {"id": 50541794, "au": "mscdex", "dom": 12, "sr": 70, "sc": -7.5, "ep": 1.11, "bs": 8.61, "d": 2, "age": 12.47, "grav": 122.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 151, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "telemetry_recent", "flbl": "Telemetry & Recent (Source)", "urls": [], "ig": 0.474, "fa": 0.0, "gp": 0.0, "bl": 3.25, "ds": 0.0, "txt": "Same with setting `ORT_DISABLE_TELEMETRY=1` in the environment before loading the library."}, {"id": 50540554, "au": "tokyovigilante", "dom": 73, "sr": 71, "sc": -8.24, "ep": 0.0, "bs": 6.89, "d": 0, "age": 15.64, "grav": 175.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 0, "qw": 0, "k": 45, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://github.com/syntax-syndicate/onnxruntime"], "ig": -0.95, "fa": 0.0, "gp": 0.609, "bl": 2.6, "ds": 0.0, "txt": "https://github.com/syntax-syndicate/onnxruntime"}, {"id": 50540974, "au": "numpad0", "dom": 19, "sr": 72, "sc": -8.58, "ep": 0.0, "bs": 6.89, "d": 1, "age": 14.63, "grav": 157.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 9595, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.372, "bl": 2.6, "ds": 0.0, "txt": "Isn't ONNX itself not MS specific?"}, {"id": 50540045, "au": "matt3210", "dom": 81, "sr": 73, "sc": -8.83, "ep": 0.0, "bs": 6.89, "d": 0, "age": 16.67, "grav": 194.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 1305, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.201, "bl": 2.6, "ds": 0.0, "txt": "Someone with a copy should soft fork it"}, {"id": 50540115, "au": "tomrod", "dom": 80, "sr": 74, "sc": -8.84, "ep": 0.0, "bs": 6.89, "d": 0, "age": 16.56, "grav": 192.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 18258, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.192, "bl": 2.6, "ds": 0.0, "txt": "Very concerning!"}, {"id": 50541620, "au": "hluska", "dom": 83, "sr": 75, "sc": -8.94, "ep": 0.0, "bs": 6.89, "d": 0, "age": 12.92, "grav": 129.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 5, "qw": 0, "k": 7356, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://github.com/microsoft/agent-framework/"], "ig": -0.95, "fa": 0.0, "gp": 0.128, "bl": 2.6, "ds": 0.0, "txt": "agent-framework is down as well:\n\nhttps://github.com/microsoft/agent-framework/"}, {"id": 50542929, "au": "sph", "dom": 78, "sr": 76, "sc": -9.02, "ep": 0.0, "bs": 6.89, "d": 0, "age": 9.32, "grav": 78.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 33678, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.072, "bl": 2.6, "ds": 0.0, "txt": "Microsoft, please, I can’t have popcorn every day."}, {"id": 50542393, "au": "rdevilla", "dom": 4, "sr": 77, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 10.77, "grav": 98.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 447, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "onnx_microsoft", "flbl": "Onnx & Microsoft (Inference)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "that's not how you use occam's razor."}, {"id": 50541989, "au": "tclancy", "dom": 34, "sr": 78, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 11.94, "grav": 114.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 5564, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "From a pure lumens perspective it seems obvious."}, {"id": 50545970, "au": "_bent", "dom": 40, "sr": 79, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 3.4, "grav": 20.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 0, "qw": 24, "k": 417, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "> Disclosure timeline:\n\n>\n\n> 2026-03-07 - bug found\n\n> 2026-03-10 - reported to MSRC (\u0023109845)\n\n> 2026-05-19 - patch 6a8f021b (\u002328408) merged\n\n> 2026-05-29 - patch 77d32c3a (\u002328709) merged\n\n> 2026-06-12 - onnxruntime v1.27.0 released, including both patches"}, {"id": 50542817, "au": "gabriela_c", "dom": 70, "sr": 80, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 9.65, "grav": 83.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 1, "qw": 0, "k": 20, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Thanks!"}, {"id": 50540072, "au": "gtirloni", "dom": 87, "sr": 81, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 0, "age": 16.63, "grav": 193.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 2, "qw": 0, "k": 12549, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://github.com/onnx/onnx"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "It's here: https://github.com/onnx/onnx"}, {"id": 50540095, "au": "russdill", "dom": 89, "sr": 82, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 16.59, "grav": 192.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 4082, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "builds_repos", "flbl": "Builds & Repos (Pipelines)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "This is not the same package."}, {"id": 50545333, "au": "vrighter", "dom": 39, "sr": 83, "sc": -10.15, "ep": 0.0, "bs": 8.88, "d": 0, "age": 4.54, "grav": 29.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 5, "qw": 0, "k": 962, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://phrack.org/issues/73/backdoor-attacks-against-machine-learning-irl_md\u0023article"], "ig": -0.95, "fa": 0.0, "gp": 0.666, "bl": 3.35, "ds": 0.0, "txt": "https://phrack.org/issues/73/backdoor-attacks-against-machin...\n\nI think it's because of this"}, {"id": 50541189, "au": "esafak", "dom": 49, "sr": 84, "sc": -11.11, "ep": 0.0, "bs": 8.88, "d": 2, "age": 14.01, "grav": 147.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 5, "qw": 0, "k": 8779, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://github.com/artifact-keeper"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.35, "ds": 0.0, "txt": "I have not tried it myself: https://github.com/artifact-keeper"}, {"id": 50540735, "au": "jcelerier", "dom": 56, "sr": 85, "sc": -11.11, "ep": 0.0, "bs": 8.88, "d": 1, "age": 15.19, "grav": 167.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 4, "qw": 0, "k": 11931, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://sourceforge.net/projects/onnx-runtime.mirror/files/"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.35, "ds": 0.0, "txt": "Sourceforge got your back https://sourceforge.net/projects/onnx-runtime.mirror/files/"}, {"id": 50543084, "au": "SknCode", "dom": 72, "sr": 86, "sc": -11.64, "ep": 0.0, "bs": 9.41, "d": 1, "age": 8.92, "grav": 73.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 4, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "builds_repos", "flbl": "Builds & Repos (Pipelines)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.55, "ds": 0.0, "txt": "What do you use instead?"}, {"id": 50547927, "au": "Galus", "dom": 13, "sr": 87, "sc": -12.97, "ep": 2.0, "bs": 14.97, "d": 3, "age": 0.71, "grav": 6.0, "surf": 19.2, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 18, "qw": 0, "k": 4, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "telemetry_recent", "flbl": "Telemetry & Recent (Source)", "urls": ["https://www.reddit.com/r/selfhosted/comments/1xnbujt/psa_immich_machine_learning_has_microsoft/"], "ig": 0.511, "fa": 0.28, "gp": 0.0, "bl": 5.65, "ds": 0.0, "txt": "Immich (The self-hosted photos alternative), is also apologizing for the telemetry making its way into a recent update. See: https://www.reddit.com/r/selfhosted/comments/1xnbujt/psa_imm..."}, {"id": 50541593, "au": "henryteeare", "dom": 11, "sr": 88, "sc": -13.03, "ep": 0.0, "bs": 11.26, "d": 1, "age": 13.01, "grav": 131.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 29, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "telemetry_recent", "flbl": "Telemetry & Recent (Source)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.318, "bl": 4.25, "ds": 0.0, "txt": "onnxruntime.disable_telemetry_events() works doesn't it?"}, {"id": 50548481, "au": "redsaber", "dom": 58, "sr": 89, "sc": -13.35, "ep": 0.0, "bs": 11.13, "d": 0, "age": 0.05, "grav": 3.6, "surf": 52.6, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 1, "qw": 0, "k": 44, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.011, "bl": 4.2, "ds": 0.0, "txt": "still 404"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "top_signal";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 40);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 40);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 40);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `${shown.length} of ${pool.length} comments` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const proofDrawer = document.getElementById("proofDrawer");
+  const expBtn = document.getElementById("exploreToggleBtn");
+  const eviBtn = document.getElementById("evidenceToggleBtn");
+
+  if (expBtn && labDrawer) {
+    expBtn.addEventListener("click", () => {
+      labDrawer.open = !labDrawer.open;
+    });
+    labDrawer.addEventListener("toggle", () => {
+      const isOpen = labDrawer.open;
+      expBtn.classList.toggle("active", isOpen);
+      expBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  if (eviBtn && proofDrawer) {
+    eviBtn.addEventListener("click", () => {
+      proofDrawer.open = !proofDrawer.open;
+    });
+    proofDrawer.addEventListener("toggle", () => {
+      const isOpen = proofDrawer.open;
+      eviBtn.classList.toggle("active", isOpen);
+      eviBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

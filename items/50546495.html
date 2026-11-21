@@ -1,0 +1,1386 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50546495 // Exponential Behavior in Magic: The Gathering — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+      text-transform: lowercase;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      text-transform: lowercase;
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .kpi-cell {
+      padding: 8px 0;
+    }
+    .kpi-label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 4px 0;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer:not([open]) {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary,
+    details.proof-drawer > summary {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+    }
+    table.ablation th {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: normal;
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    button.nav-btn,
+    button.mode-tab,
+    button.topbar-toggle {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: rgb(0, 0, 0);
+      cursor: pointer;
+      text-decoration: none;
+      line-height: inherit;
+      vertical-align: baseline;
+      transition: color 0.12s ease;
+      text-transform: lowercase;
+    }
+    button.nav-btn:hover,
+    button.nav-btn.active,
+    button.mode-tab:hover,
+    button.mode-tab.active,
+    button.topbar-toggle:hover,
+    button.topbar-toggle.active {
+      color: rgb(255, 255, 255);
+      text-decoration: none;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      padding: 14px;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; row-gap: 4px; }
+      .topbar-right { padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+        <span class="pagetop" id="modeTabs">
+          <button type="button" class="nav-btn mode-tab active" data-mode="top_signal" role="tab" aria-selected="true">Top 40</button> | <button type="button" class="nav-btn mode-tab" data-mode="hn_top40" role="tab" aria-selected="false">HN Top 40</button>
+        </span>
+      </div>
+      <div class="topbar-right">
+        <button type="button" class="nav-btn topbar-toggle" id="exploreToggleBtn" aria-expanded="false">explore</button> | <button type="button" class="nav-btn topbar-toggle" id="evidenceToggleBtn" aria-expanded="false">evidence</button>
+      </div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://levineuwirth.org/essays/exponential-magic/">Exponential Behavior in Magic: The Gathering</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=levineuwirth.org"><span class="sitestr">levineuwirth.org</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">56 points</span> by <a href="https://news.ycombinator.com/user?id=neuwirth">neuwirth</a> <span class="age" title="2026-11-18T14:07:09.000Z"><a href="https://news.ycombinator.com/item?id=50546495">1 day ago</a></span> | <a href="https://news.ycombinator.com/item?id=50546495">33&nbsp;comments</a> | 78.8% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Evidence</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">33</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 29 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">21.2%</div>
+          <div class="kpi-sub">7 comments (1 Gold / 3.0%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">78.8%</div>
+          <div class="kpi-sub">16 chatter &bull; 10 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">2</div>
+        <div class="kpi-sub">7% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.853</div>
+        <div class="kpi-sub">4 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">8</div>
+          <div class="kpi-sub">HN POS 6..13 (24.2% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="color: rgb(90, 90, 88); margin-top: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Explore</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 33-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 33)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (1)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (6)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (16)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (10)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..33) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 25)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (khaliostr, 3.1h); largest subtree (@gravitronic) occupies 8 slots (HN POS 6..13).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (33)</option>
+          <option value="loop_player">Loop &amp; Player (Combo) (11)</option>
+          <option value="cards_fun">Cards &amp; Fun (Play) (9)</option>
+          <option value="rust_engines">Rust &amp; Engines (Gorge) (4)</option>
+          <option value="computer_mtg">Computer &amp; Mtg (Games) (4)</option>
+          <option value="general_commentary">General Commentary (5)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, magic, turn, player, exponential, engine...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50546495 + LEVINEUWIRTH.ORG + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50546495, "story_title": "Exponential Behavior in Magic: The Gathering", "story_url": "https://levineuwirth.org/essays/exponential-magic/", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50546495, "story_title": "Exponential Behavior in Magic: The Gathering", "story_url": "https://levineuwirth.org/essays/exponential-magic/", "points": 56, "story_author": "neuwirth", "article_source": "fetched_url", "t1_ref_utc": "2026-11-19T16:58:00+00:00", "t2_ref_utc": "2026-11-19T16:58:00+00:00", "delta_minutes": 0.0, "story_anchors": ["magic", "turn", "player", "exponential", "engine", "state", "rules", "tokens", "creatures", "ways", "number", "card", "played", "software", "create", "amount", "play", "token", "computer", "deck", "board", "games", "cards", "behavior", "gathering"], "facet_labels": {"loop_player": "Loop & Player (Combo)", "rust_engines": "Rust & Engines (Gorge)", "cards_fun": "Cards & Fun (Play)", "computer_mtg": "Computer & Mtg (Games)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "loop_player", "label": "Loop & Player (Combo)", "count": 11, "top_terms": ["loop", "player", "combo", "magic"]}, {"slug": "rust_engines", "label": "Rust & Engines (Gorge)", "count": 4, "top_terms": ["rust", "engines", "gorge", "hang"]}, {"slug": "cards_fun", "label": "Cards & Fun (Play)", "count": 9, "top_terms": ["cards", "fun", "play", "game"]}, {"slug": "computer_mtg", "label": "Computer & Mtg (Games)", "count": 4, "top_terms": ["computer", "mtg", "games", "money"]}], "counts": {"total_comments": 33, "live_t2_comments": 33, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 29, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "b9278d518714d1ede78ea1479184f0b2e2bd61bdedac25e31b8f7ae6961f5466"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 1, "grounded_analysis": 6, "crowd_chatter": 16, "bullshit_or_flamewar": 10}, "facets": {"rust_engines": 4, "loop_player": 11, "cards_fun": 9, "computer_mtg": 4, "general_commentary": 5}, "facet_options": [{"slug": "loop_player", "label": "Loop & Player (Combo)", "count": 11}, {"slug": "cards_fun", "label": "Cards & Fun (Play)", "count": 9}, {"slug": "rust_engines", "label": "Rust & Engines (Gorge)", "count": 4}, {"slug": "computer_mtg", "label": "Computer & Mtg (Games)", "count": 4}, {"slug": "general_commentary", "label": "General Commentary", "count": 5}], "facet_diagnostics": [{"slug": "loop_player", "label": "Loop & Player (Combo)", "count": 11, "useful": 3, "useful_pct": 27.3, "terms": "loop, player, combo, magic"}, {"slug": "cards_fun", "label": "Cards & Fun (Play)", "count": 9, "useful": 3, "useful_pct": 33.3, "terms": "cards, fun, play, game"}, {"slug": "rust_engines", "label": "Rust & Engines (Gorge)", "count": 4, "useful": 1, "useful_pct": 25.0, "terms": "rust, engines, gorge, hang"}, {"slug": "computer_mtg", "label": "Computer & Mtg (Games)", "count": 4, "useful": 0, "useful_pct": 0.0, "terms": "computer, mtg, games, money"}, {"slug": "general_commentary", "label": "General Commentary", "count": 5, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 4}, {"category": "low_cred_or_joke", "count": 3}, {"category": "code_repository", "count": 1}, {"category": "primary_technical_doc", "count": 1}], "story_anchors": ["magic", "turn", "player", "exponential", "engine", "state", "rules", "tokens", "creatures", "ways", "number", "card", "played", "software", "create", "amount", "play", "token"], "largest_root": {"root_id": 50561241, "author": "gravitronic", "slots": 8, "start_dom": 6, "end_dom": 13, "share_pct": 24.2, "top_dom1_age": 3.1, "top_dom1_author": "khaliostr"}, "buried_cutoff": 25, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50560076, "au": "khaliostr", "dom": 1, "sr": 1, "sc": 9.56, "ep": 9.56, "bs": 0.0, "d": 0, "age": 3.14, "grav": 19.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 136, "qw": 0, "k": 2, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "rust_engines", "flbl": "Rust & Engines (Gorge)", "urls": ["https://github.com/witchesofthehill/manabrew"], "ig": 1.27, "fa": 2.08, "gp": 0.449, "bl": 0.0, "ds": 0.0, "txt": "There's a bit of an open source Magic renaissance going on lately, which I find really cool.\n\nForge has been around forever, but we've managed to get it running in the browser via WASM with Manabrew [1]. I'm one of the maintainers, and we're mostly building it because we wanted a nicer way to play Commander with friends.\n\nMeanwhile, Phase and Ironsmith are working on new engines in Rust, Gorge is building one in Go alongside a bot and cross-engine testing tools, and people are starting to collaborate across projects.\n\nMagic is such a ridiculously difficult game to implement that I think it's pretty amazing how many people are tackling it in their spare time.\n\nIf you're into Magic and software engineering, come hang out with us. There's a lot going on and plenty of room for more people to get involved :)\n\n[1] https://github.com/witchesofthehill/manabrew"}, {"id": 50560030, "au": "hnedeotes", "dom": 33, "sr": 2, "sc": 5.96, "ep": 5.96, "bs": 0.0, "d": 0, "age": 3.21, "grav": 19.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 611, "qw": 0, "k": 308, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "loop_player", "flbl": "Loop & Player (Combo)", "urls": ["https://aethersummon.com"], "ig": 1.443, "fa": 0.9, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I think that for these situations you need to create a model of execution that can understand these interactions so that it can move beyond the linear mode of going through every option. \nI'm designing Aether Summon (https://aethersummon.com) and currently building the native clients to play (which have the hearthstone/arena like game play).\n\nI haven't yet introduced complex mechanics that can lead to infinite combos or exponential triggering, but for combos my idea is to have the human/AI operator declare itself that it's going to combo, so the game/client register that intention and then \"records\" the actions that lead to the combo, in doing so, and for a combo to be declared, it has to do a few checks, e.g., on each full cycle of combo (that can be 1 or more sequences of actions) the state of the game had to move irrevocably to an increase in some stats (life increase, aether increase, creature count increase, etc) and the conditions to re-do the cycle are present. If this is true then it should mean that you're in a combo, as the engine is deterministic (except for some random effects, but if they don't target you then it should recognize the combo without issues, for instance if on each cycle you remove 3 scrolls out of your opponent's tome, it doesn't matter for the repeatability of the combo, it will just go down to 0 and future ones won't do any \"side-effects\" in practi"}, {"id": 50562298, "au": "apitman", "dom": 14, "sr": 3, "sc": 5.27, "ep": 5.27, "bs": 0.0, "d": 0, "age": 0.42, "grav": 4.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 92, "qw": 16, "k": 13777, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "loop_player", "flbl": "Loop & Player (Combo)", "urls": [], "ig": 1.203, "fa": 0.7, "gp": 0.306, "bl": 0.0, "ds": 0.0, "txt": "> The game is remarkably complex, even Turing complete, with intricate keywords and a daunting amount of mechanics\n\nSoftware engineers can learn a lot from the way complexity exists in MTG. The number of mechanics is huge, but relatively shallow. Once you learn a pretty small set of core rules (tapping, mana, turn phases, the stack, etc), you can add new mechanics to your knowledge easily, usually be reading a small chunk of text.\n\nYou normally only have a handful of mechanics interacting with each other, and usually only need to look up one or two you're not familiar with in a game. It's sort of like a plugin system. Reminds me of Unix too."}, {"id": 50559487, "au": "chokma", "dom": 23, "sr": 4, "sc": 4.65, "ep": 4.65, "bs": 0.0, "d": 0, "age": 4.06, "grav": 25.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 109, "qw": 0, "k": 297, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "cards_fun", "flbl": "Cards & Fun (Play)", "urls": [], "ig": 1.353, "fa": 0.34, "gp": 0.342, "bl": 0.0, "ds": 0.0, "txt": "A friend implemented his version of MTG with the old expansions (about up to Ice Age + interesting later cards), including single player campaign, online multiplayer & play against the machine. It works quite well, but major issues during play testing was network sync and handling different resolutions for artwork and text over artwork. And the bugs in specific card implementations that could take a game down.\n\nThe \"AI\" will look a couple of moves ahead, but is restricted on time and CPU performance so having a 100 tokens with an ability in play that can be activated in every game phase is a challenge, like the article says.\n\nNow he \"just\" needs a license from Wizards/Hasbro ;)"}, {"id": 50560055, "au": "gpugreg", "dom": 24, "sr": 5, "sc": 4.6, "ep": 4.6, "bs": 0.0, "d": 0, "age": 3.18, "grav": 19.3, "surf": 11.3, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 32, "qw": 0, "k": 375, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "loop_player", "flbl": "Loop & Player (Combo)", "urls": ["https://scryfall.com/card/eoe/15/exalted-sunborn", "https://scryfall.com/card/cn2/111/followed-footsteps"], "ig": 0.829, "fa": 0.62, "gp": 0.61, "bl": 0.0, "ds": 0.0, "txt": "Another fun combo with an even higher growth rate is Exalted Sunborn [1] + Followed Footsteps [2].\n\nAfter one turn, you have 3 creatures. Next turn, you have 11. Then 2059. Then 66185228434044942951864067458396061614989522267577311297802947435570493724401440549267868490798926773634494383968047143923956857140205406402740536087446083831052036848232439995904404992798007514718326043410570379830870463780085260619444417205199197123751210704970352727833755425876102776028267313405809429548880554782040765277562828362884238325465448520348307574943345990309941642666926723379729598185834735054732500415409883868361423159913770812218772711901772249553153402287759789517121744336755350465901655205184917370974202405586941211065395540765567663193297173367254230313612244182941999500402388195450053080385547.\n\nIt gets out of hand quickly.\n\n[1] https://scryfall.com/card/eoe/15/exalted-sunborn\n\n[2] https://scryfall.com/card/cn2/111/followed-footsteps"}, {"id": 50562335, "au": "brightball", "dom": 9, "sr": 6, "sc": 4.4, "ep": 4.4, "bs": 0.0, "d": 1, "age": 0.38, "grav": 4.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 162, "qw": 0, "k": 17475, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "cards_fun", "flbl": "Cards & Fun (Play)", "urls": [], "ig": 1.289, "fa": 0.34, "gp": 0.274, "bl": 0.0, "ds": 0.0, "txt": "As somebody that played back in the 90s (and gave away my cards that would be worth a $30-40k today... sigh) - it's critical to the gameplay.\n\nIf everybody has every card then the game just comes down to people grabbing the most powerful deck combinations and playing them. The work to actually acquire the cards, play with creative combinations that you come up with based on what you have available, etc is where the real fun and challenge of the game comes from. It's the \"resource limiter\" constraint.\n\nI enjoyed playing one of the old iPhone versions before the latest one came out and when they wanted to kill it, they just gave everybody every card as a \"gift\". It went from fun and challenging to just stupid overnight.\n\nThe days of kids having binders of cards at their local comic book store and trading with each other were a great time. Now it seems like people just save up and order from somebody selling online."}, {"id": 50560953, "au": "amluto", "dom": 15, "sr": 7, "sc": 4.13, "ep": 4.13, "bs": 0.0, "d": 0, "age": 2.02, "grav": 12.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 80, "qw": 0, "k": 25296, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "cards_fun", "flbl": "Cards & Fun (Play)", "urls": [], "ig": 1.191, "fa": 0.28, "gp": 0.365, "bl": 0.0, "ds": 0.0, "txt": "Surely this particular problem can theoretically be (mostly) addressed by an engine that tracks the number of copies of a given card or stack of cards (card plus attached tokens, etc).\n\nI say mostly because:\n\n- Surely there are ways to create N token creatures with a range of counters such that there are still exponentially many different stacks.\n\n- A fast-enough growing pile could require exponentially many bits to store (or more than exponential).\n\nBut at least the particular problem in the OP could be addressed."}, {"id": 50561274, "au": "InsidiousWombat", "dom": 11, "sr": 8, "sc": 3.78, "ep": 3.93, "bs": 0.0, "d": 1, "age": 1.59, "grav": 10.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 78, "qw": 0, "k": 515, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "computer_mtg", "flbl": "Computer & Mtg (Games)", "urls": [], "ig": 1.15, "fa": 0.28, "gp": 0.294, "bl": 0.0, "ds": 0.0, "txt": "collectible bard games have been engineered specifically for that, extracting as much money as possible. Not to just have a good product and sell it, maybe even at premium, but to make sure there is constant churn of them\n\nWhen a guy responsible for MTG got a gig for Valve to do their computer card game it was disaster, PC gamers got shocked by the absolute greed of the business model compared to even existing popular computer card games like hearthstone"}, {"id": 50561976, "au": "HelloNurse", "dom": 25, "sr": 9, "sc": 3.77, "ep": 3.92, "bs": 0.0, "d": 1, "age": 0.77, "grav": 6.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 28, "qw": 0, "k": 3463, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "rust_engines", "flbl": "Rust & Engines (Gorge)", "urls": ["https://scryfall.com/card/plst/WOC-22/court-of-vantress"], "ig": 0.917, "fa": 0.62, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "There are many variants of this superexponential growth pattern, like Court of Vantress (https://scryfall.com/card/plst/WOC-22/court-of-vantress) repeatedly creating token copies of token-doubling enchantments like Anointed Procession, Parallel Lives or Doubling Season."}, {"id": 50559951, "au": "7373737373", "dom": 30, "sr": 10, "sc": 3.65, "ep": 10.81, "bs": 7.16, "d": 1, "age": 3.32, "grav": 20.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 2, "w": 132, "qw": 0, "k": 2584, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "computer_mtg", "flbl": "Computer & Mtg (Games)", "urls": ["https://youtube.com/watch?v=29P243ggtU8", "https://youtube.com/watch?v=hdaiKwKN50U", "https://wiki.bbchallenge.org/wiki/Cryptids"], "ig": 1.481, "fa": 2.57, "gp": 0.0, "bl": 2.7, "ds": 0.0, "txt": "In the 3 Card Blind format (played with only 3 vs 3 cards, the optimal play wins, short intro: https://youtube.com/watch?v=29P243ggtU8), there exists a game in the tournament history which no one has been able to solve due to the sheer combinatorial explosion of possibilities, the Hangarback Walker game: https://youtube.com/watch?v=hdaiKwKN50U\n\nIt is also possible to represent small Turing machines with unsolved halting status (\"Cryptids\" https://wiki.bbchallenge.org/wiki/Cryptids) as a legally reachable board state (Example: https://web.archive.org/web/20241222020126/https://aesort.co...). It's unlikely anyone will manage to do that in a tournament, but it is conceivable that the outcome of a specific game will remain undetermined by any judge (unless the math or computer science problem it represents is solved).\n\nIn practice, what makes MtG games in common formats (especially optimally) unsolvable is the large amount of hidden information, and combinatorial \"predictive firewall\" of random deck shuffles and the vast card pool."}, {"id": 50561241, "au": "gravitronic", "dom": 6, "sr": 11, "sc": 3.36, "ep": 3.65, "bs": 0.0, "d": 0, "age": 1.64, "grav": 10.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 55, "qw": 0, "k": 2600, "kpp": 5.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "cards_fun", "flbl": "Cards & Fun (Play)", "urls": [], "ig": 1.073, "fa": 0.0, "gp": 0.779, "bl": 0.0, "ds": 0.0, "txt": "MTGO biggest drawback is you need to pay real money for the virtual cards, and sometimes they cost more than the paper cards themselves.\n\nEndstep.cc is a newcomer to the field.. it runs the forge engine on the server and allows online play.  It is now my favorite place to play my favorite format (pauper)"}, {"id": 50562662, "au": "mock-possum", "dom": 13, "sr": 12, "sc": 3.04, "ep": 3.49, "bs": 0.0, "d": 1, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 14, "k": 2465, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "computer_mtg", "flbl": "Computer & Mtg (Games)", "urls": [], "ig": 0.634, "fa": 0.7, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> MTGO biggest drawback is you need to pay real money for the virtual cards\n\nWhich comes hard on the heels of MTG’s biggest drawback, which is needing to pay real money for real cards, priced according to both the current meta and artificial rarity."}, {"id": 50553579, "au": "brudgers", "dom": 29, "sr": 13, "sc": 2.89, "ep": 3.04, "bs": 0.0, "d": 0, "age": 17.96, "grav": 219.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 52656, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "loop_player", "flbl": "Loop & Player (Combo)", "urls": [], "ig": 0.586, "fa": 0.0, "gp": 1.143, "bl": 0.0, "ds": 0.0, "txt": "related, Magic the Gathering is Turing Complete.\n\nWhich to me suggests that one will encounter the halting problem in theory if not in practice."}, {"id": 50562685, "au": "olivergregory", "dom": 19, "sr": 14, "sc": 2.56, "ep": 2.78, "bs": 0.0, "d": 1, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 104, "qw": 0, "k": 68, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "loop_player", "flbl": "Loop & Player (Combo)", "urls": [], "ig": 1.183, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Every card, permanent, spell, etc. is an object in Magic. So I’m using a set multimap, with the key being the zone the card is in. Those filters you mention are actually cheap until you get unrealistic numbers like those that let you win this turn or the next one. You could create an index of the mana cost, the types, but that ends up being over-engineered.\n\nI’ve tested using an ECS just for handling the core of the objects, but that lead nowhere event though it seemed a good fit from some perspectives.\n\nI’m not surprised that an array is actually efficient after trying so many implementations."}, {"id": 50562438, "au": "StableAlkyne", "dom": 7, "sr": 15, "sc": 2.28, "ep": 2.95, "bs": 0.0, "d": 1, "age": 0.27, "grav": 4.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 64, "qw": 0, "k": 1832, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "cards_fun", "flbl": "Cards & Fun (Play)", "urls": [], "ig": 1.18, "fa": 0.0, "gp": 0.119, "bl": 0.0, "ds": 0.0, "txt": "I've been really enjoying Tabletop Simulator for EDH with friends. It's mostly manual (some automatic stuff like turn tracking, cascading, scrying, mulligans, etc), but as fun as the paper card game\n\nGranted, we all play bracket 3 or so. Since you're importing decks you could always bring out some crazy deck with moxes everywhere... But nobody does that because it's just low stakes fun"}, {"id": 50561063, "au": "bob1029", "dom": 20, "sr": 16, "sc": 2.13, "ep": 2.13, "bs": 0.0, "d": 0, "age": 1.89, "grav": 11.5, "surf": 19.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 24526, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "computer_mtg", "flbl": "Computer & Mtg (Games)", "urls": [], "ig": 0.816, "fa": 0.0, "gp": 0.144, "bl": 0.0, "ds": 0.0, "txt": "The problem with MTG is that it's like a computer program that is constantly evolving its own instruction set and business logic.\n\nBuilding a rule system that can capture MTG means building a rule system that can modify itself."}, {"id": 50561239, "au": "lbo", "dom": 16, "sr": 17, "sc": 2.05, "ep": 2.49, "bs": 0.0, "d": 0, "age": 1.64, "grav": 10.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 75, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "loop_player", "flbl": "Loop & Player (Combo)", "urls": [], "ig": 0.527, "fa": 0.34, "gp": 0.195, "bl": 0.0, "ds": 0.0, "txt": "Does anyone know what the strongest existing AI magic player is considered to be? I’ve made one that has an 85% winrate over Forge, but am looking for any new challengers"}, {"id": 50560360, "au": "rappatic", "dom": 18, "sr": 18, "sc": 1.64, "ep": 2.44, "bs": 0.0, "d": 0, "age": 2.77, "grav": 16.7, "surf": 13.2, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 1463, "kpp": 8.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "loop_player", "flbl": "Loop & Player (Combo)", "urls": [], "ig": 0.923, "fa": 0.0, "gp": 0.188, "bl": 0.0, "ds": 0.0, "txt": "I imagine we can do better than a flat array to represent the permanents on the battlefield. Lots of cards filter permanents by type, mana cost, etc. Building a consideration for this into the data structure is a natural idea."}, {"id": 50562643, "au": "6510", "dom": 12, "sr": 19, "sc": 1.31, "ep": 2.19, "bs": 0.0, "d": 2, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 68, "qw": 0, "k": 1995, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "cards_fun", "flbl": "Cards & Fun (Play)", "urls": [], "ig": 0.933, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I remember a sub community of people hoarding, buying and selling unopened boxes and a sub community of big spenders who would adjust what they were willing to pay for a box based on the number of readily available unopened boxes from a series. If the number declined others were afraid to miss out, increased their bid until the hoarders wouldn't sell anymore. The more they bid the less likely to get it."}, {"id": 50560864, "au": "banannaise", "dom": 32, "sr": 20, "sc": 1.3, "ep": 2.47, "bs": 0.0, "d": 2, "age": 2.14, "grav": 12.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 2301, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "loop_player", "flbl": "Loop & Player (Combo)", "urls": [], "ig": 1.051, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Bonus fun fact: If you create an optional infinite loop where you control all the parts, you can simply declare how many times the loop executes, rather than performing all the steps repeatedly. This is part of the tournament rules. Want to run the loop eleven billion times? You can!"}, {"id": 50562346, "au": "apitman", "dom": 8, "sr": 21, "sc": 0.67, "ep": 2.21, "bs": 0.0, "d": 1, "age": 0.37, "grav": 4.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 13777, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "loop_player", "flbl": "Loop & Player (Combo)", "urls": [], "ig": 0.862, "fa": 0.0, "gp": 0.128, "bl": 0.0, "ds": 0.0, "txt": "There are at least a few ways to play for free without paying, with access to every card in the game's history. If you want to join official events and have access to a wider player base then yes, it costs."}, {"id": 50560394, "au": "khaliostr", "dom": 4, "sr": 22, "sc": 0.5, "ep": 3.16, "bs": 2.52, "d": 2, "age": 2.72, "grav": 16.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 115, "qw": 0, "k": 2, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "rust_engines", "flbl": "Rust & Engines (Gorge)", "urls": [], "ig": 1.346, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "Thanks! I actually came across Arcana not too long ago, so it's really nice to meet its author here. And bonus points for Rust\n\nWe started porting Forge to Rust ourselves, but quickly realised what we'd gotten ourselves into, so we went and built forge-wasm instead.\n\nIf you're curious, we've got a small engine spec that lets Manabrew work with different rules engines. Ironsmith (also Rust) already works, and we've got partial support for Phase.rs and Gorge. Would be fun to try Arcana too!\n\nThere's also a Discord where a bunch of us working on these engines hang out and compare notes. You should drop by sometime, I suspect we'd have quite a bit to talk about :)"}, {"id": 50562458, "au": "zemvpferreira", "dom": 10, "sr": 23, "sc": 0.37, "ep": 1.47, "bs": 0.0, "d": 2, "age": 0.24, "grav": 4.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 2742, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "cards_fun", "flbl": "Cards & Fun (Play)", "urls": [], "ig": 0.626, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "That’s one part to enjoy. The other part is the game itself, which for many people (myself included) is great fun without having to worry about buying more boosters to dig for more powerful cards."}, {"id": 50559489, "au": "JTbane", "dom": 31, "sr": 24, "sc": -0.05, "ep": 1.49, "bs": 0.0, "d": 1, "age": 4.06, "grav": 25.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 43, "qw": 0, "k": 1322, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "loop_player", "flbl": "Loop & Player (Combo)", "urls": [], "ig": 0.636, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "One of the coolest things about MtG is if you set up an infinite loop that is voluntary (like, able to be ended) that often puts you in a winning position. However, if it is a true involuntary infinite loop the game ends in a draw."}, {"id": 50561424, "au": "IMeMoot", "dom": 21, "sr": 25, "sc": -0.25, "ep": 3.3, "bs": 2.52, "d": 1, "age": 1.43, "grav": 9.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 48, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "cards_fun", "flbl": "Cards & Fun (Play)", "urls": [], "ig": 0.99, "fa": 0.34, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "That's just regular software updates for an evolving game. It's not special to MTG. The problem with MTG is there are 30,000 unique cards, each possibly requiring a custom implementation and each possibly interacting with every other card in odd ways that creates a huge surface area for bugs to occur."}, {"id": 50560255, "au": "neuwirth", "dom": 3, "sr": 26, "sc": -1.02, "ep": 0.47, "bs": 1.19, "d": 1, "age": 2.91, "grav": 17.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 134, "kpp": 12.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.128, "fa": 0.0, "gp": 0.117, "bl": 0.45, "ds": 0.0, "txt": "This looks awesome. Will definitely check it out and see if there's anything from my little project here I can contribute!"}, {"id": 50560140, "au": "7373737373", "dom": 26, "sr": 27, "sc": -2.72, "ep": 2.25, "bs": 3.58, "d": 1, "age": 3.06, "grav": 18.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": -1, "lu": 1, "w": 32, "qw": 0, "k": 2584, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "loop_player", "flbl": "Loop & Player (Combo)", "urls": ["https://youtube.com/watch?v=x3dE-NJ1UDQ"], "ig": 0.959, "fa": 0.0, "gp": 0.0, "bl": 1.35, "ds": 0.0, "txt": "See also this Matt Parker video on the Astral Dragon, Parallel Lives and Miirym, Sentinel Wyrm combo which results in a number of tokens only (approximately) representable by a huge (beyond astronomical) power tower: https://youtube.com/watch?v=x3dE-NJ1UDQ"}, {"id": 50561670, "au": "algo_trader", "dom": 2, "sr": 28, "sc": -4.3, "ep": 0.38, "bs": 4.24, "d": 1, "age": 1.15, "grav": 7.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 562, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.122, "fa": 0.0, "gp": 0.066, "bl": 1.6, "ds": 0.0, "txt": "Have you had legal challenges?\n\nAre you just crossing your fingers for now?"}, {"id": 50560926, "au": "shaolinspirit", "dom": 5, "sr": 29, "sc": -4.69, "ep": 0.2, "bs": 4.24, "d": 1, "age": 2.06, "grav": 12.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 153, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "rust_engines", "flbl": "Rust & Engines (Gorge)", "urls": [], "ig": 0.084, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "This looks amazing. I will definitely try it out"}, {"id": 50561440, "au": "world2vec", "dom": 27, "sr": 30, "sc": -7.93, "ep": 0.55, "bs": 8.48, "d": 0, "age": 1.42, "grav": 9.1, "surf": 24.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 2848, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.194, "fa": 0.0, "gp": 0.063, "bl": 3.2, "ds": 0.0, "txt": "Off-topic: Thought it was gwern's website for a second"}, {"id": 50561878, "au": "thom", "dom": 17, "sr": 31, "sc": -10.38, "ep": 0.49, "bs": 10.87, "d": 0, "age": 0.9, "grav": 6.8, "surf": 32.2, "fade": "c00", "dt": 0, "ut": -1, "lu": 1, "w": 14, "qw": 0, "k": 9954, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://www.youtube.com/watch?v=AGXG5rNe_tI"], "ig": 0.155, "fa": 0.0, "gp": 0.085, "bl": 4.1, "ds": 0.0, "txt": "I feel like this is probably my only opportunity on HN to post this classic:\n\nhttps://www.youtube.com/watch?v=AGXG5rNe_tI"}, {"id": 50561972, "au": "bob1029", "dom": 22, "sr": 32, "sc": -10.52, "ep": 0.0, "bs": 6.89, "d": 2, "age": 0.78, "grav": 6.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 24526, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "cards_fun", "flbl": "Cards & Fun (Play)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "I am referring to a single session of play."}, {"id": 50560756, "au": "deadnomore", "dom": 28, "sr": 33, "sc": -13.47, "ep": 0.0, "bs": 11.13, "d": 0, "age": 2.27, "grav": 13.6, "surf": 16.1, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 66, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.076, "bl": 4.2, "ds": 0.0, "txt": "It’s a finite state machine, it’s very expressive."}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "top_signal";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 40);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 40);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 40);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `${shown.length} of ${pool.length} comments` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const proofDrawer = document.getElementById("proofDrawer");
+  const expBtn = document.getElementById("exploreToggleBtn");
+  const eviBtn = document.getElementById("evidenceToggleBtn");
+
+  if (expBtn && labDrawer) {
+    expBtn.addEventListener("click", () => {
+      labDrawer.open = !labDrawer.open;
+    });
+    labDrawer.addEventListener("toggle", () => {
+      const isOpen = labDrawer.open;
+      expBtn.classList.toggle("active", isOpen);
+      expBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  if (eviBtn && proofDrawer) {
+    eviBtn.addEventListener("click", () => {
+      proofDrawer.open = !proofDrawer.open;
+    });
+    proofDrawer.addEventListener("toggle", () => {
+      const isOpen = proofDrawer.open;
+      eviBtn.classList.toggle("active", isOpen);
+      eviBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

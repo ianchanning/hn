@@ -1,0 +1,1385 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50513160 // Universal XSS in uBlock Origin from website-driven element picker — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+    }
+    .kpi-cell {
+      padding: 16px 16px 14px;
+      border-right: 1px solid rgb(205, 205, 200);
+    }
+    .kpi-cell:last-child { border-right: 0; }
+    .kpi-label {
+      font: 600 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 8px 0 4px;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      font-size: 12px;
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 6px;
+      corner-shape: bevel;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer > summary.hn-summary {
+      list-style: none;
+      cursor: pointer;
+      display: block;
+      padding: 2px 0;
+      margin: 0;
+      background: transparent;
+      border: 0;
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      user-select: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: rgb(255, 255, 253);
+      border: 1px solid rgb(13, 13, 13);
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+    }
+    table.ablation th {
+      background: rgb(236, 236, 231);
+      font: 700 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgb(60, 60, 58);
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 6px;
+      corner-shape: bevel;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    .mode-tabs {
+      gap: 6px;
+      padding: 0 8px;
+      margin-bottom: 8px;
+    }
+    button.mode-tab {
+      appearance: none;
+      border-width: 0px;
+      border-radius: 4px;
+      background: rgb(246, 246, 239);
+      color: rgb(130, 130, 130);
+      cursor: pointer;
+      padding: 6px 14px;
+      transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+    }
+    button.mode-tab:hover {
+      background: rgb(240, 240, 235);
+      color: rgb(13, 13, 13);
+    }
+    button.mode-tab.active {
+      background: rgb(246, 246, 239);
+      color: rgb(13, 13, 13);
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      border-top: 3px solid rgb(13, 13, 13);
+      padding-top: 14px;
+      margin-top: 36px;
+      font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpi-cell { border-bottom: 1px solid rgb(205, 205, 200); }
+      .mode-tabs button.mode-tab {
+        flex: 1;
+        text-align: center;
+        padding: 7px 8px;
+      }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; }
+      .topbar-right { font-size: 8pt; padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+      </div>
+      <div class="topbar-right">&nbsp;</div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://iter.ca/post/ubo-uxss/">Universal XSS in uBlock Origin from website-driven element picker</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=iter.ca"><span class="sitestr">iter.ca</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">585 points</span> by <a href="https://news.ycombinator.com/user?id=zaik">zaik</a> <span class="age" title="2026-11-16T02:04:48.000Z"><a href="https://news.ycombinator.com/item?id=50513160">17 hours ago</a></span> | <a href="https://news.ycombinator.com/item?id=50513160">150&nbsp;comments</a> | 85.3% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">01 // EVIDENCE</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">150</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 121 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">14.7%</div>
+          <div class="kpi-sub">22 comments (6 Gold / 4.0%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">85.3%</div>
+          <div class="kpi-sub">76 chatter &bull; 46 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">4</div>
+        <div class="kpi-sub">10% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.773</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">47</div>
+          <div class="kpi-sub">HN POS 1..47 (31.3% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="margin-top:10px;font:600 11px/1.5 ui-monospace,Menlo,monospace;color:rgb(70,70,68)"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">02 // EXPLORE</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 150-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 150)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (6)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (16)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (76)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (6)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (46)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..150) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 45)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (ByteOfWood, 16.3h); largest subtree (@ByteOfWood) occupies 47 slots (HN POS 1..47).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="mode-tabs" id="modeTabs" role="tablist" aria-label="Ranking view">
+        <button type="button" class="mode-tab active" data-mode="hn_top40" role="tab" aria-selected="true">HN Top 40</button>
+        <button type="button" class="mode-tab" data-mode="top_signal" role="tab" aria-selected="false">Epistemic Top 40</button>
+      </div>
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (150)</option>
+          <option value="extensions_xul">Extensions &amp; Xul (Browser) (38)</option>
+          <option value="ublock_origin">Ublock &amp; Origin (Malware) (31)</option>
+          <option value="user_website">User &amp; Website (Browser) (26)</option>
+          <option value="password_bitwarden">Password &amp; Bitwarden (Extension) (17)</option>
+          <option value="iframe_dom">Iframe &amp; Dom (Boundary) (15)</option>
+          <option value="general_commentary">General Commentary (23)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, ublock, origin, picker, create, element...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50513160 + ITER.CA + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50513160, "story_title": "Universal XSS in uBlock Origin from website-driven element picker", "story_url": "https://iter.ca/post/ubo-uxss/", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50513160, "story_title": "Universal XSS in uBlock Origin from website-driven element picker", "story_url": "https://iter.ca/post/ubo-uxss/", "points": 585, "story_author": "zaik", "article_source": "fetched_url", "t1_ref_utc": "2026-11-16T19:18:53+00:00", "t2_ref_utc": "2026-11-16T19:18:53+00:00", "delta_minutes": 0.0, "story_anchors": ["ublock", "origin", "picker", "create", "element", "ubo", "website", "uuid", "user", "firefox", "page", "web", "iframe", "extension", "moz-extension", "block", "default", "resources", "site", "accessible", "adding", "control", "fixed", "javascript", "src"], "facet_labels": {"extensions_xul": "Extensions & Xul (Browser)", "ublock_origin": "Ublock & Origin (Malware)", "password_bitwarden": "Password & Bitwarden (Extension)", "iframe_dom": "Iframe & Dom (Boundary)", "user_website": "User & Website (Browser)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "extensions_xul", "label": "Extensions & Xul (Browser)", "count": 38, "top_terms": ["extensions", "xul", "browser", "security"]}, {"slug": "ublock_origin", "label": "Ublock & Origin (Malware)", "count": 31, "top_terms": ["ublock", "origin", "malware", "blocking"]}, {"slug": "password_bitwarden", "label": "Password & Bitwarden (Extension)", "count": 17, "top_terms": ["password", "bitwarden", "extension", "works"]}, {"slug": "iframe_dom", "label": "Iframe & Dom (Boundary)", "count": 15, "top_terms": ["iframe", "dom", "boundary", "pointing"]}, {"slug": "user_website", "label": "User & Website (Browser)", "count": 26, "top_terms": ["user", "website", "browser", "allows"]}], "counts": {"total_comments": 150, "live_t2_comments": 150, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 121, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 1, "pages_fetched": 1}, "sha256": {"corpus.json": "9493f4ad7131788375571c6aacd5bf82929bac0ce129898dfe11b701729e956c"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 6, "grounded_analysis": 16, "crowd_chatter": 76, "bullshit_or_flamewar": 46, "meme_or_snark": 6}, "facets": {"ublock_origin": 31, "extensions_xul": 38, "password_bitwarden": 17, "user_website": 26, "general_commentary": 23, "iframe_dom": 15}, "facet_options": [{"slug": "extensions_xul", "label": "Extensions & Xul (Browser)", "count": 38}, {"slug": "ublock_origin", "label": "Ublock & Origin (Malware)", "count": 31}, {"slug": "user_website", "label": "User & Website (Browser)", "count": 26}, {"slug": "password_bitwarden", "label": "Password & Bitwarden (Extension)", "count": 17}, {"slug": "iframe_dom", "label": "Iframe & Dom (Boundary)", "count": 15}, {"slug": "general_commentary", "label": "General Commentary", "count": 23}], "facet_diagnostics": [{"slug": "extensions_xul", "label": "Extensions & Xul (Browser)", "count": 38, "useful": 11, "useful_pct": 28.9, "terms": "extensions, xul, browser, security"}, {"slug": "ublock_origin", "label": "Ublock & Origin (Malware)", "count": 31, "useful": 7, "useful_pct": 22.6, "terms": "ublock, origin, malware, blocking"}, {"slug": "user_website", "label": "User & Website (Browser)", "count": 26, "useful": 0, "useful_pct": 0.0, "terms": "user, website, browser, allows"}, {"slug": "password_bitwarden", "label": "Password & Bitwarden (Extension)", "count": 17, "useful": 4, "useful_pct": 23.5, "terms": "password, bitwarden, extension, works"}, {"slug": "iframe_dom", "label": "Iframe & Dom (Boundary)", "count": 15, "useful": 0, "useful_pct": 0.0, "terms": "iframe, dom, boundary, pointing"}, {"slug": "general_commentary", "label": "General Commentary", "count": 23, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 14}, {"category": "github_artifact", "count": 4}], "story_anchors": ["ublock", "origin", "picker", "create", "element", "ubo", "website", "uuid", "user", "firefox", "page", "web", "iframe", "extension", "moz-extension", "block", "default", "resources"], "largest_root": {"root_id": 50513505, "author": "ByteOfWood", "slots": 47, "start_dom": 1, "end_dom": 47, "share_pct": 31.3, "top_dom1_age": 16.3, "top_dom1_author": "ByteOfWood"}, "buried_cutoff": 45, "rescue_top_k": 30, "ablations": [], "tournament": [], "comments": [{"id": 50514967, "au": "cdman", "dom": 104, "sr": 1, "sc": 10.42, "ep": 10.42, "bs": 0.0, "d": 1, "age": 11.97, "grav": 115.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 46, "qw": 0, "k": 303, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": ["https://github.com/dhowe/AdNauseam/commit/0e757ee3d1fd1b5406bf49f807f8e94b78c98b65", "https://github.com/gorhill/uBlock/commit/bf69cf7405d7d9e7e4bd1143726988a482629b18"], "ig": 1.18, "fa": 2.35, "gp": 0.655, "bl": 0.0, "ds": 0.0, "txt": "I had the same question. This commit: https://github.com/dhowe/AdNauseam/commit/0e757ee3d1fd1b5406... seems to be similar to the one fixing the issue with uBlock Origin: https://github.com/gorhill/uBlock/commit/bf69cf7405d7d9e7e4b... (look at the changes in src/js/resources/utils.js), so I think the answer is \"yes, it's affected\" and also \"yes, it's fixed in the latest release\"."}, {"id": 50515069, "au": "asimovDev", "dom": 120, "sr": 2, "sc": 10.29, "ep": 10.29, "bs": 0.0, "d": 0, "age": 11.65, "grav": 110.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 26, "qw": 0, "k": 588, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": ["https://github.com/uBlockOrigin/uBOL-home/commit/e01ffb036d9c77a0ffa5976f418c8f7ef24f9a74"], "ig": 1.114, "fa": 2.35, "gp": 0.669, "bl": 0.0, "ds": 0.0, "txt": "I like how the latest commit on uBO Lite's repository is \"create SECURITY.md\" https://github.com/uBlockOrigin/uBOL-home/commit/e01ffb036d9...\n\nno advisory still on the github page unlike the big sibling's mv2 repo"}, {"id": 50517578, "au": "swozey", "dom": 19, "sr": 3, "sc": 8.44, "ep": 8.44, "bs": 0.0, "d": 5, "age": 5.51, "grav": 37.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 255, "qw": 0, "k": 3457, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "epistemic_gold", "facet": "password_bitwarden", "flbl": "Password & Bitwarden (Extension)", "urls": [], "ig": 1.963, "fa": 0.95, "gp": 0.77, "bl": 0.0, "ds": 0.0, "txt": "It's definitely not better, 1p is by far the best manager, but it works fine. I still have 1p installed because I was paying yearly and I'm running bitwarden in a container that sometimes I forget to restart, etc so its more manual, but I don't think 1passwors was worth the yearly fee before their Omarchy donations etc, and I don't even want to think about how much money I've paid to 1password for storing a 3mb database for me for 10 years.\n\nI had been wanting to get my passwords off the cloud for 5 years and just finally did it. Everything transferred fine, but sometimes a UX or chrome extension glitch happens and I'll wind up storing a new pass in 1p instead of bitwarden. Before my subscription ends in 6 months I'll just dump 1p again and import it and fully delete the app once I can't log in again.\n\nYou just aren't getting that super smooth 1p UX. It's more like a linux app that has quirks, weird design decisions, etc. Like its 2 clicks to copy password, not just clicking \"copy password\" like in 1password. And after 10+ years of 1p UX over and over every day it's a bit jarring but its a LOT better than lastpass was 10 years ago and totally fine. It, generally, looks and acts almost exactly like 1p.\n\nThe container is super simple, I just start it and open bitwarden. I have never had to troubleshoot it and it starts almost instantly and is ready to use.\n\nUse tailscale and put "}, {"id": 50519795, "au": "brycewray", "dom": 26, "sr": 4, "sc": 8.24, "ep": 8.39, "bs": 0.0, "d": 3, "age": 2.35, "grav": 14.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 39, "qw": 19, "k": 1552, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": ["https://releases.1password.com/b5x/stable/\u00231password-in-the-browser-8.12.0"], "ig": 1.416, "fa": 1.32, "gp": 0.895, "bl": 0.0, "ds": 0.0, "txt": "As I recall reading at the time this occurred, the additional Prism.js code apparently was mistakenly left behind from a particular inter-version development test. This was fixed in a subsequent 1Password update. The first release notes mentioning the fix[0] were for v.8.12.0:\n\n> We’ve fixed an issue where the 1Password extension could break syntax highlighting for code blocks on some websites.\n\n[0]: https://releases.1password.com/b5x/stable/\u00231password-in-the-..."}, {"id": 50513854, "au": "btown", "dom": 3, "sr": 5, "sc": 7.95, "ep": 8.25, "bs": 0.0, "d": 1, "age": 15.31, "grav": 169.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 40, "qw": 0, "k": 20103, "kpp": 5.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": ["https://mjtsai.com/blog/2026/01/07/1password-browser-extension-code-injection/"], "ig": 1.406, "fa": 1.24, "gp": 0.974, "bl": 0.0, "ds": 0.0, "txt": "Setting aside data leaks, this also causes bugs in extensions to potentially affect websites en masse. For instance, as recently as this January, 1Password began injecting prism.js globally on all pages, breaking many <code> blocks for at least 20 days: https://mjtsai.com/blog/2026/01/07/1password-browser-extensi..."}, {"id": 50513460, "au": "ethersteeds", "dom": 115, "sr": 6, "sc": 7.45, "ep": 7.45, "bs": 0.0, "d": 0, "age": 16.41, "grav": 189.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 45, "qw": 22, "k": 446, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": ["https://news.ycombinator.com/item?id=50454639"], "ig": 1.372, "fa": 1.04, "gp": 0.868, "bl": 0.0, "ds": 0.0, "txt": "> But the attacker website can itself hook the XHR made from inside the no-fetch-if hook to extract the random extension UUID.\n\nOh great. I recently learned[0] that some Firefox extensions can be tricked into leaking their install-unique UUID, which can then be used as a tracking identifier. Today I learn that any site can get my unique uBO UUID by hooking fetch('/adsbygoogle.js').\n\nThat is... an ironic disaster.\n\n[0] https://news.ycombinator.com/item?id=50454639"}, {"id": 50514615, "au": "esprehn", "dom": 2, "sr": 7, "sc": 6.85, "ep": 7.29, "bs": 0.0, "d": 1, "age": 12.99, "grav": 130.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 87, "qw": 0, "k": 1963, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": ["https://developer.mozilla.org/en-US/docs/Glossary/Top_layer"], "ig": 1.574, "fa": 0.9, "gp": 0.709, "bl": 0.0, "ds": 0.0, "txt": "I've always regretted we didn't push harder on an extension overlay API. It was supposed to be based on Top Layer, but the primitive version of that API was never added and the things that were added can't be effectively used to attach subtrees for extensions.\n\nhttps://developer.mozilla.org/en-US/docs/Glossary/Top_layer\n\nAs a fun fact the Devtools also have a separate \"Overlay Page\" to draw on top of the web page for specifically this reason. The date picker on some platforms similarly uses an overlay page. This machinery was just never exposed to extensions."}, {"id": 50515367, "au": "user070223", "dom": 87, "sr": 8, "sc": 6.53, "ep": 6.53, "bs": 0.0, "d": 0, "age": 10.73, "grav": 97.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 66, "qw": 0, "k": 366, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": ["https://github.com/gorhill/uBlock/wiki/Blocking-mode"], "ig": 1.458, "fa": 0.62, "gp": 0.919, "bl": 0.0, "ds": 0.0, "txt": "I've 3rd party frames blocked by default, which is good reminder to everyone that you can up one your blocking game with increasing the blocking mode level as described here https://github.com/gorhill/uBlock/wiki/Blocking-mode.\n\nOne can have keyboard shortcut which automatically reduces that blocking level(may cause refresh) if something not right, or enable on domain basis. I got used to enabling stuff when have issues and it's not mentally taxing"}, {"id": 50516358, "au": "chmod775", "dom": 109, "sr": 9, "sc": 6.4, "ep": 6.62, "bs": 0.0, "d": 2, "age": 7.92, "grav": 62.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 205, "qw": 0, "k": 14915, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 1.763, "fa": 0.34, "gp": 1.039, "bl": 0.0, "ds": 0.0, "txt": "The entire point of browser extensions is to operate outside the default sandbox. They're browser extensions, not browser content extensions.\n\nOn one hand we're widening what a tab may do, throwing dozens of permission prompts at users until they're fatigued, on the other we're trying to lock down extensions to the point of making them redundant. I wouldn't be surprised if by the time manifest v5 rolls around, tabs and extensions will be indistinguishable.\n\nAt that point someone will create a chrome mod \"SuperExtensions\", sourcing extensions from a third-party marketplace that is worse and less secure in every way than what we had in 2020, but at least gives people control over the software that runs on their hardware with actually useful exensions again. Such as adblock that doesn't suck. Or an extension that neuters spyware built into browsers.\n\nBut of course it wasn't about those extensions at all. It was all about security, not Alphabet's bottom line. Because we can trust people to vote, drive, drink, and do plenty of things, but we can't trust them to decide what software runs on their computer. The paternalistic security argument of the technological infant. Honi soit qui mal y pense.\n\nEdit: Sorry for the only tangentially related rant."}, {"id": 50514661, "au": "ButlerianJihad", "dom": 149, "sr": 10, "sc": 6.25, "ep": 6.25, "bs": 0.0, "d": 0, "age": 12.87, "grav": 128.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 284, "qw": 0, "k": 804, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": 1.977, "fa": 0.34, "gp": 0.434, "bl": 0.0, "ds": 0.0, "txt": "I used uBlock Origin and I enjoyed the relief, I must say. But, it did slightly nag at me that I was \"ripping off resources\" from the very sites that I should've been supporting in that way. I mean, if I go and visit every day and get some benefit out of them, their webmaster team deserves a cut of the proceeds, at least, yeah? But I am a freeloader by nature and unfortunately, the Internet spawned a generation of freeloaders. Not that there's anything wrong with freeloading. I've always supported RMS and the F/OSS vision. (Those licenses are not freeload licenses!)\n\nAnyway, Edge is ramping up some decent protection against tracking and ad-annoyances. Again, I'm posting on the wrong thread, wrong site about these alternatives. But I've found Edge already blocking stuff that was blasting through my Chrome sessions.\n\nAnd then there's Chrome, which offers two levels of Safe Browsing protection, as of November 2026. Have we enabled the highest AI-heuristic-powered levels of safety for yourself? Are we at high risk of malware attacks because we're klicking on sketchie linkies all day? Yeah... but we're too paranoid to touch Google kit anyway? Google also has the Advanced Protection Program we can enroll in, if we're a palestinian reporter or Elon Musk type.\n\nJust another reminder that many don't think about: if we are adding extensions to our browser like there's no tomorrow, all of"}, {"id": 50513986, "au": "negura", "dom": 133, "sr": 11, "sc": 5.53, "ep": 5.75, "bs": 0.0, "d": 0, "age": 14.97, "grav": 163.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 47, "qw": 0, "k": 967, "kpp": 5.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": 1.413, "fa": 0.28, "gp": 1.123, "bl": 0.0, "ds": 0.0, "txt": "The concept of browser extensions seems terrible in general. There are many that ship with malware, botnets, infostealers etc. uBlock Origin even requires a compiled .wasm module. It's unwise to grant that level of complexity from third party devs permission over something as sensitive as your web browser."}, {"id": 50517279, "au": "rafram", "dom": 32, "sr": 12, "sc": 5.48, "ep": 6.36, "bs": 0.0, "d": 4, "age": 6.08, "grav": 43.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 208, "qw": 0, "k": 6079, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 1.848, "fa": 0.28, "gp": 0.841, "bl": 0.0, "ds": 0.0, "txt": "No, the opposite. Firefox WebExtensions inherit the two main security features that XUL extensions used to separate page content from extension code. But in the XUL extension days, if page content did manage to control an extension, it could directly take over your machine and execute any code with full filesystem access.\n\n(The two security features are X-ray vision and cross-origin access controls. The former makes it so extension code doesn’t see the page’s modifications to built-in properties. For example, if my extension calls document.createRange(), but the page has overwritten that method, my code will see the original and not the modified version. But if I call document.wrappedJSObject.createRange(), I ask to get the page’s version, which might be malicious. The latter just means that objects created by extensions and made accessible to the page can’t actually be used by it unless the extension explicitly exports them. Both of these are still active for WebExtensions.)\n\nLotta rose-tinted glasses when people remember the XUL extension days. It was an extraordinarily risky and fragile architecture. Every single extension had full control over your machine, and every major Firefox update broke most extensions (or made them break Firefox), because the main way to inject your logic into the browser was monkey-patching."}, {"id": 50513852, "au": "forgotmypw17", "dom": 29, "sr": 13, "sc": 4.99, "ep": 6.09, "bs": 0.0, "d": 2, "age": 15.32, "grav": 169.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 54, "qw": 0, "k": 6527, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": ["https://repo.palemoon.org/MoonchildProductions/UXP", "https://www.palemoon.org/", "https://www.basilisk-browser.org/faq.html"], "ig": 1.367, "fa": 0.62, "gp": 0.766, "bl": 0.0, "ds": 0.0, "txt": "XUL extensions basically have full access to the entire browser's UI and internals, which allows for some very powerful extensions.\n\nIf this sounds appealing to you, you may be happy to know that XUL lives on as Unified XUL Platform (UXP) and is still supported by currently maintained browsers.\n\nUXP: https://repo.palemoon.org/MoonchildProductions/UXP\n\nPale Moon: https://www.palemoon.org/\n\nBasilisk: https://www.basilisk-browser.org/faq.html\n\nSeaMonkey: https://www.seamonkey-project.org/"}, {"id": 50513849, "au": "tech234a", "dom": 116, "sr": 14, "sc": 4.87, "ep": 5.46, "bs": 0.0, "d": 1, "age": 15.33, "grav": 169.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 32, "qw": 0, "k": 7429, "kpp": 7.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": ["https://browserleaks.com/chrome"], "ig": 1.073, "fa": 0.62, "gp": 0.808, "bl": 0.0, "ds": 0.0, "txt": "Chromium used static IDs for web accessible resources until very recently, and even now it's only optional for extensions to use dynamic IDs. This page enumerates extensions with non-dynamic URLs in Chromium: https://browserleaks.com/chrome"}, {"id": 50513505, "au": "ByteOfWood", "dom": 1, "sr": 15, "sc": 4.66, "ep": 5.1, "bs": 0.0, "d": 0, "age": 16.3, "grav": 187.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 72, "qw": 0, "k": 47, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "password_bitwarden", "flbl": "Password & Bitwarden (Extension)", "urls": [], "ig": 1.35, "fa": 0.0, "gp": 1.33, "bl": 0.0, "ds": 0.0, "txt": "I never really loved how extensions have to put their interfaces in the website's DOM if they want to be able to work with the page's elements, like this selector, or a password manager's suggested logins. Especially in the password manager's scenario, it could leak what accounts you have to a given website to that website itself, if the page is looking for new DOM elements. Not exactly a showstopper vulnerability, but it's not a good thing."}, {"id": 50519709, "au": "cstrahan", "dom": 18, "sr": 16, "sc": 4.41, "ep": 4.85, "bs": 0.0, "d": 7, "age": 2.47, "grav": 14.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 175, "qw": 0, "k": 1144, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "password_bitwarden", "flbl": "Password & Bitwarden (Extension)", "urls": [], "ig": 1.757, "fa": 0.0, "gp": 0.496, "bl": 0.0, "ds": 0.0, "txt": "I use BitWarden, and I share the disappointment in the browser extension UI/UX.\n\nToo many clicks to do something trivial. Have to click the tiny hamburger icon to the right of an entry to get to “View” or “Edit”. If I’m viewing an entry but then want to edit, I have to mouse over diagonally to click the “Edit” button in the bottom left corner.\n\nThe View vs Edit distinction is pointless friction. Let me edit the fields directly. Or at least make it less tedious.\n\nClicking the entry itself should take you to Edit, not perform the fill password action. If I wanted to fill, I can do that with a keyboard shortcut or via the overlay when a password field has focus. Thus, edit is the most common reason I’d want to interact with an entry in the extension pop up. But I have to precisely mouse over to click the hamburger icon to next click Edit/View.\n\nThese are “small things”, but then again a paper cut is a “small thing” too — doesn’t mean I’d be happy to have a dozen paper cuts every day."}, {"id": 50514082, "au": "AlexAplin", "dom": 80, "sr": 17, "sc": 4.31, "ep": 8.45, "bs": 3.26, "d": 2, "age": 14.72, "grav": 159.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 8, "qw": 0, "k": 175, "kpp": 5.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": ["https://github.com/gorhill/uBlock/security/advisories/GHSA-cmqw-9r2w-6wv2"], "ig": 0.284, "fa": 2.35, "gp": 0.751, "bl": 1.231, "ds": 0.0, "txt": "The advisory page says 1.75.2 and lower, patched in 1.75.4: https://github.com/gorhill/uBlock/security/advisories/GHSA-c..."}, {"id": 50515565, "au": "jjav", "dom": 128, "sr": 18, "sc": 4.27, "ep": 4.93, "bs": 0.0, "d": 1, "age": 10.14, "grav": 89.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 53, "qw": 11, "k": 8773, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": 1.331, "fa": 0.42, "gp": 0.416, "bl": 0.0, "ds": 0.0, "txt": "> Haven't used any uBlock for many years. Use DNS based blocking.\n\nYou're missing out (or rather, getting a lot more ads and trackers and spyware).\n\nDNS blocking is complementary, and a good thing to also have. Some sites are best blocked at that level becuase they are pure evil.\n\nBut DNS blocking will miss most of the spyware/adware/malware that uBlock Origin can handle."}, {"id": 50513869, "au": "usr1106", "dom": 122, "sr": 19, "sc": 4.05, "ep": 4.19, "bs": 0.0, "d": 0, "age": 15.28, "grav": 168.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 55, "qw": 0, "k": 4889, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "password_bitwarden", "flbl": "Password & Bitwarden (Extension)", "urls": [], "ig": 1.419, "fa": 0.0, "gp": 0.592, "bl": 0.0, "ds": 0.0, "txt": "Haven't used any uBlock for many years. Use DNS based blocking.\n\nFor many years I was a happy user of CAD (Cookie Auto Delete). Unfortunately it seems unmaintained. I have now stopped to install it. Don't understand enough of modern browsers to even have an educated guess what kind of vulnerabilities could be buried in the old code."}, {"id": 50516716, "au": "TeMPOraL", "dom": 135, "sr": 20, "sc": 3.97, "ep": 5.22, "bs": 0.0, "d": 2, "age": 7.15, "grav": 53.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 118, "qw": 0, "k": 116599, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 1.819, "fa": 0.0, "gp": 0.65, "bl": 0.0, "ds": 0.0, "txt": "That's an argument in favor of extensions. Most of the examples you listed are features that oppose the interests of most commercial players on the market, including but not limited to, many multinational corporations. If they were all first-party features of the browser, Firefox would've been dead a long time ago.\n\nAs it is, they're just voluntary extra software that Firefox neither bundles nor recommends explicitly, which keeps both the browsers and extensions safe - merely supporting arbitrary extensions in general is not enough to create focused market pushback against the browser (and gives Fx some leverage, mostly around \"accessibility\"), while individual extensions are too small a target to fight.\n\nIt's a good separation of concerns, and a somewhat stable  equilibrium."}, {"id": 50513778, "au": "tux", "dom": 102, "sr": 21, "sc": 3.94, "ep": 3.94, "bs": 0.0, "d": 0, "age": 15.53, "grav": 173.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 944, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "user_website", "flbl": "User & Website (Browser)", "urls": [], "ig": 1.394, "fa": 0.0, "gp": 0.458, "bl": 0.0, "ds": 0.0, "txt": "I recommend to delete old forefox profiles and create new once, than install new fixed uBlock0. You should always use separate profiles for all tasks with hardened user.js anyway. Don’t forget to save your bookmarks. Anynew profile creates new UUID."}, {"id": 50513586, "au": "wtallis", "dom": 28, "sr": 22, "sc": 3.87, "ep": 5.41, "bs": 0.0, "d": 1, "age": 16.12, "grav": 183.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 75, "qw": 0, "k": 22090, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 1.557, "fa": 0.0, "gp": 1.208, "bl": 0.0, "ds": 0.0, "txt": "Did XUL extensions in Firefox prior to WebExtensions have a different way of interacting with the page contents? I know they tended to integrate better with the host browser's UI and inherited more of the host OS's UI conventions as a result, but the web back then didn't require as many CSS-based ad blocking rules (domain/URL-based rules worked for almost everything) so I don't remember what the element picker UI was like on eg. AdBlock Plus or Adblock 0.5."}, {"id": 50515656, "au": "contravariant", "dom": 93, "sr": 23, "sc": 3.64, "ep": 3.64, "bs": 0.0, "d": 1, "age": 9.88, "grav": 86.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 60, "qw": 0, "k": 9255, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "user_website", "flbl": "User & Website (Browser)", "urls": [], "ig": 1.303, "fa": 0.0, "gp": 0.397, "bl": 0.0, "ds": 0.0, "txt": "The other way round it looks like a website's javascript being allowed to interfere with extensions is also a bit of a problem. I can't really think of a reason you'd want to let it interecept requests to a moz-extension: URL or allow it to make an iframe for one.\n\nNeither could be considered a security bug, but it's a bit odd the entire interface is wide open."}, {"id": 50516385, "au": "ada-h00k", "dom": 134, "sr": 24, "sc": 3.55, "ep": 3.84, "bs": 0.0, "d": 1, "age": 7.83, "grav": 61.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 125, "qw": 0, "k": 226, "kpp": 5.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "user_website", "flbl": "User & Website (Browser)", "urls": [], "ig": 1.596, "fa": 0.0, "gp": 0.063, "bl": 0.0, "ds": 0.0, "txt": "The solution would be to properly implement the features that enough users want into the browser. After all, extensions are usually just a stopgap measure. Firefox could also simply build in an ad blocker that works just as well as uBlock Origin. For password managers, they could simply build an API into the browser that password managers could then use to integrate with the browser. Then there would be no need for an extra extension. The same goes for things like add-ons to download videos from sites that prevent it, such as YouTube or similar streaming sites. If Firefox simply had a built-in feature to scrape video files from websites and save them normally via the right-click menu, no one would install dubious extensions for that purpose."}, {"id": 50519861, "au": "QuantumNomad_", "dom": 17, "sr": 25, "sc": 3.36, "ep": 4.02, "bs": 0.0, "d": 7, "age": 2.27, "grav": 13.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 124, "qw": 0, "k": 1459, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "password_bitwarden", "flbl": "Password & Bitwarden (Extension)", "urls": [], "ig": 1.312, "fa": 0.28, "gp": 0.092, "bl": 0.0, "ds": 0.0, "txt": "1Password does make it much nicer to organize all kinds of passwords and keys in a way that nothing else I’ve tried even comes near to.\n\nEspecially the ability to create sorts of documents that contain as many custom sections as you want. At the top I put an intro text to explain to myself a bit of context and then I have fields with for example paths to files like ssh keys and for each of those a field with the password for that ssh key.\n\nI also store software license keys in documents in 1Password.\n\nAnd I have documents that contain cli commands for some operations that require different passwords each in order followed by the corresponding passwords, and interleaved with longer sections of text providing explanations and context."}, {"id": 50515263, "au": "numpad0", "dom": 138, "sr": 26, "sc": 3.27, "ep": 3.71, "bs": 0.0, "d": 2, "age": 11.03, "grav": 101.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 9595, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.756, "fa": 0.68, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Start it today... The best time to plant that tree may have been 15 years ago, you may still have 5 years for it to be viable if you start now. There no need to wait until the quote matures to start panicking."}, {"id": 50517565, "au": "mimasama", "dom": 86, "sr": 27, "sc": 3.24, "ep": 3.24, "bs": 0.0, "d": 1, "age": 5.54, "grav": 38.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 164, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "iframe_dom", "flbl": "Iframe & Dom (Boundary)", "urls": [], "ig": 1.379, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It used to be. The \"legacy\" version of uBO intended for Pale Moon and pre-Quantum Firefox had the add-on living in chrome://ublock0 (the picker is in chrome://ublock0/content/epicker.html), and the iframe for the element picker injected into a website's DOM is an HTMLDocument pointing to about:blank."}, {"id": 50519130, "au": "moi2388", "dom": 45, "sr": 28, "sc": 3.01, "ep": 5.4, "bs": 0.85, "d": 5, "age": 3.22, "grav": 19.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 86, "qw": 0, "k": 1501, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "grounded_analysis", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 1.576, "fa": 0.28, "gp": 0.619, "bl": 0.32, "ds": 0.0, "txt": "1. Correct. Open is peekable, closed is not.\n\n2. Extensions can do whatever the user lets them. A web page however can not access a content script closed shadow root\n\n3. Prototype pollution also cannot occur since content scripts run before the page\n\n4. Window.find() also does not work if you run the content script in an isolated world, as you should.\n\nIf you do all of the above, a web page cannot access data from your content script closed shadow root.\n\nBrowser extensions can. Running untrusted browser extensions is extremely dangerous."}, {"id": 50519106, "au": "mac-attack", "dom": 89, "sr": 29, "sc": 2.95, "ep": 3.1, "bs": 0.0, "d": 1, "age": 3.25, "grav": 19.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 147, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "user_website", "flbl": "User & Website (Browser)", "urls": [], "ig": 1.318, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Same. There's friction initially, but most users visit the same sites regardless, so the effort drops dramatically over time.\n\nAs an added benefit, you unconsciously get a feel for what connections are useful for the user versus useful for the advertiser and can make global blocks/allows as you see fit."}, {"id": 50516026, "au": "charcircuit", "dom": 58, "sr": 30, "sc": 2.72, "ep": 2.94, "bs": 0.0, "d": 4, "age": 8.89, "grav": 73.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 63, "qw": 0, "k": 2420, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "user_website", "flbl": "User & Website (Browser)", "urls": [], "ig": 1.253, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Imagine trying to poison datasets to make ChatGPT respond that it is James Bond when a user asks \"Who are you?\" I personally can't see how that would be possible to do. OpenAI explicitly trains it so that it knows it is ChatGPT, they provide it in the system prompt, and it would be caught before they released the model if it did somehow happen."}, {"id": 50513816, "au": "forgotmypw17", "dom": 76, "sr": 31, "sc": 2.72, "ep": 3.75, "bs": 0.0, "d": 0, "age": 15.41, "grav": 171.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 6527, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": 0.696, "fa": 0.34, "gp": 0.79, "bl": 0.0, "ds": 0.0, "txt": "For those checking (I still had the vulnerable version), you should be at these versions or higher:\n\nuBlock Origin: 1.75.4\n\nuBO Lite: 2026.1110.1816"}, {"id": 50513700, "au": "akersten", "dom": 85, "sr": 32, "sc": 2.63, "ep": 2.78, "bs": 0.0, "d": 0, "age": 15.76, "grav": 177.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 11030, "kpp": 9.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "iframe_dom", "flbl": "Iframe & Dom (Boundary)", "urls": [], "ig": 0.751, "fa": 0.0, "gp": 0.699, "bl": 0.0, "ds": 0.0, "txt": "So this seems totally solvable by the create-rule element living in the browser chrome instead of the website DOM... why aren't we doing that?"}, {"id": 50513497, "au": "afavour", "dom": 92, "sr": 33, "sc": 2.55, "ep": 3.79, "bs": 0.0, "d": 0, "age": 16.32, "grav": 187.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 30458, "kpp": 6.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 1.018, "fa": 0.0, "gp": 0.966, "bl": 0.0, "ds": 0.0, "txt": "I understand why folks railed against web extension lock downs that blocked directly editing page content but this is a great example of why it’s a powder keg."}, {"id": 50515146, "au": "AnthonyMouse", "dom": 141, "sr": 34, "sc": 2.38, "ep": 3.27, "bs": 0.0, "d": 3, "age": 11.4, "grav": 106.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 123, "qw": 0, "k": 39844, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "user_website", "flbl": "User & Website (Browser)", "urls": [], "ig": 1.38, "fa": 0.0, "gp": 0.015, "bl": 0.0, "ds": 0.0, "txt": "We're talking about bugs here. If the website has a bug you're not just compromising one user. Input sanitizing bug, or the site even just makes the mistake of hosting user-uploaded content on the same domain as the main site, and the attacker can upload javascript that then gets run under the origin of the main site. Attacker can now capture other users' passwords or otherwise take control over their accounts because the user visited the main site with the bug rather than needing to visit the attacker's. Many of those passwords will have been reused on other sites.\n\nMeanwhile an extension can't do anything the browser can't do, so why is it a problem for the extension but not the browser itself?"}, {"id": 50520771, "au": "ByteOfWood", "dom": 42, "sr": 35, "sc": 2.22, "ep": 2.66, "bs": 0.0, "d": 4, "age": 1.14, "grav": 7.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 47, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "iframe_dom", "flbl": "Iframe & Dom (Boundary)", "urls": [], "ig": 1.134, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "This is correct, I just checked with Bitwarden. They use an iframe with the extension's src, nested within a closed shadow DOM. I was not able to get any data from the extension's iframe, although the site can still detect the specific extension is in use which could be used for fingerprinting."}, {"id": 50514908, "au": "mook", "dom": 36, "sr": 36, "sc": 2.22, "ep": 3.76, "bs": 0.0, "d": 2, "age": 12.11, "grav": 117.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 93, "qw": 0, "k": 1897, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 1.6, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "XUL extensions could essentially open pop-up windows (the way context menus do), so yes. It can be fully transparent if needed, I believe.\n\nYou can probably drop an absolutely positioned block (relative to the browser chrome, outside the tabbrowser) too, but I think that didn't work in some older versions?\n\nNote that this is all based on very vague memories, so may be off… Also, both scenarios don't bother injecting anything inside the content. This unfortunately means you need to do some annoying math to position things correctly (in particular if funny DPIs are involved)."}, {"id": 50516051, "au": "charcircuit", "dom": 68, "sr": 37, "sc": 2.19, "ep": 2.33, "bs": 0.0, "d": 4, "age": 8.82, "grav": 72.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 2420, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "iframe_dom", "flbl": "Iframe & Dom (Boundary)", "urls": [], "ig": 0.993, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I'm simply pointing out that modern LLMs do not just regurgitate what was most common in the dataset for the base model. Especially when we are talking about how it is structuring the output of a generic task it's doing."}, {"id": 50515143, "au": "zelphirkalt", "dom": 150, "sr": 38, "sc": 2.04, "ep": 3.29, "bs": 0.0, "d": 1, "age": 11.41, "grav": 107.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 98, "qw": 0, "k": 8535, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": 1.401, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "You'd trust Google to protect you, if you were a Palestinian journalist? Haha, tell me you are joking, please.\n\nSupporting RMS and feeling like blocking ads is \"ripping off resources\" from websites? How did you make those 2 things square up in your mind? They are like opposites! And then more of the same, talking about MS Edge. Also talking about Google Chrome and not at least Chromium, or better Ungoogled Chromium.\n\nAnd why does one need to \"enroll\" in something something Google anyways, in order to get what should be in the default package?\n\nIt all sounds very unreflected."}, {"id": 50513566, "au": "GCUMstlyHarmls", "dom": 98, "sr": 39, "sc": 1.97, "ep": 3.36, "bs": 0.0, "d": 1, "age": 16.17, "grav": 184.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 612, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": 1.276, "fa": 0.0, "gp": 0.25, "bl": 0.0, "ds": 0.0, "txt": "Wonder what the over-under is on a page exploiting your `block-element` interface if you happen to open it (I guess you could sort of encourage that interaction) vs explicitly getting served malware eg \"Discover-Tech’s Controlium\"."}, {"id": 50513374, "au": "taylorfinley", "dom": 48, "sr": 40, "sc": 1.96, "ep": 3.35, "bs": 0.0, "d": 0, "age": 16.62, "grav": 193.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 1884, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": 0.959, "fa": 0.0, "gp": 0.76, "bl": 0.0, "ds": 0.0, "txt": "Really love the \"I wrote all the prose, gpt wrote the POC\" disclaimer, I would love to see more of those kinds of signals on human authored content."}, {"id": 50517922, "au": "WhyNotHugo", "dom": 46, "sr": 41, "sc": 1.87, "ep": 2.75, "bs": 0.0, "d": 1, "age": 4.88, "grav": 32.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 6901, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "password_bitwarden", "flbl": "Password & Bitwarden (Extension)", "urls": [], "ig": 1.172, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "A password manager should prompt the user to pick which extension to share, and send only that to the browser extension itself.\n\nI'm aware that several show all accounts in the DOM itself _and then_ prompt to disclosed only the secret material, but that's honestly not great design."}, {"id": 50513484, "au": "TZubiri", "dom": 144, "sr": 42, "sc": 1.87, "ep": 2.53, "bs": 0.0, "d": 0, "age": 16.36, "grav": 188.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 2155, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "user_website", "flbl": "User & Website (Browser)", "urls": [], "ig": 0.975, "fa": 0.0, "gp": 0.164, "bl": 0.0, "ds": 0.0, "txt": "Software professionals should uninstall a javascript plugin that runs on every website whose purpose is to consume content more comfortably."}, {"id": 50517429, "au": "mimasama", "dom": 35, "sr": 43, "sc": 1.75, "ep": 2.41, "bs": 0.0, "d": 2, "age": 5.78, "grav": 40.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 55, "qw": 0, "k": 164, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "iframe_dom", "flbl": "Iframe & Dom (Boundary)", "urls": [], "ig": 1.006, "fa": 0.0, "gp": 0.032, "bl": 0.0, "ds": 0.0, "txt": "At the very least the author's method doesn't seem to work for the \"legacy\" version of uBlock Origin here in Pale Moon since the iframe uBO adds to the DOM is an HTMLDocument pointing to about:blank. There are also no moz-extension:// shenanigans since uBO lives in chrome:// which can't be accessed from content I believe"}, {"id": 50516015, "au": "anthk", "dom": 112, "sr": 44, "sc": 1.73, "ep": 2.83, "bs": 0.0, "d": 0, "age": 8.92, "grav": 74.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 5373, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 1.145, "fa": 0.0, "gp": 0.1, "bl": 0.0, "ds": 0.0, "txt": "I prefer the builtin Rust based (more performing) ad blocking engine from Waterfox and on top of these, instead of UBo, I uset NoScript. The most secure code it's the one which doesn't run."}, {"id": 50514977, "au": "cdman", "dom": 146, "sr": 45, "sc": 1.59, "ep": 2.84, "bs": 0.0, "d": 2, "age": 11.94, "grav": 114.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 45, "qw": 0, "k": 303, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": 1.209, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "^^^ This. As someone who worked in the computer security for years: the second best thing for security (after turning on automatic updates for your OS / software that you use) is to block ads. They are chock full with scams in addition to plain old malware."}, {"id": 50517453, "au": "jonhohle", "dom": 70, "sr": 46, "sc": 1.58, "ep": 2.68, "bs": 0.0, "d": 0, "age": 5.72, "grav": 39.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 8203, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": 0.979, "fa": 0.0, "gp": 0.261, "bl": 0.0, "ds": 0.0, "txt": "UBlock (and possily many more) leaks its UUID? So by installing an ad blocker, you’ve just given websites a unique fingerprint to reliably track you?"}, {"id": 50513889, "au": "etherlink", "dom": 123, "sr": 47, "sc": 1.5, "ep": 5.19, "bs": 2.52, "d": 1, "age": 15.21, "grav": 167.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 56, "qw": 0, "k": 13, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "user_website", "flbl": "User & Website (Browser)", "urls": [], "ig": 1.409, "fa": 0.34, "gp": 0.626, "bl": 0.95, "ds": 0.0, "txt": "DNS-based ad-blocking is very ineffective in the modern web browsing scenarios. You might block most ads from your local news site, although YouTube, Twitch, Facebook and any other major site has more sophisticated ad-networks which require ad-blocking at the browser level.\n\nYou've been required to use a browser based ad-blocked on YouTube for over 5 years now."}, {"id": 50517329, "au": "abcd_f", "dom": 90, "sr": 48, "sc": 1.47, "ep": 2.57, "bs": 0.0, "d": 0, "age": 5.99, "grav": 42.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 8, "k": 2642, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": 0.918, "fa": 0.0, "gp": 0.282, "bl": 0.0, "ds": 0.0, "txt": "Hoooold on ...\n\n> the extension internal UUID which is random per-installation\n\n... and it's possible for a loaded page to figure it out. It sure sounds like this gives us a stable unique tracking ID ... ?"}, {"id": 50513327, "au": "SoftTalker", "dom": 106, "sr": 49, "sc": 1.46, "ep": 2.56, "bs": 0.0, "d": 0, "age": 16.72, "grav": 195.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 26686, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": 0.79, "fa": 0.0, "gp": 0.488, "bl": 0.0, "ds": 0.0, "txt": "uBlock Origin has broad permission to inspect and modify anything on a page (it needs it, to do what it does). This would seem to make any vulnerability easier to exploit."}, {"id": 50514132, "au": "negura", "dom": 142, "sr": 50, "sc": 1.43, "ep": 2.97, "bs": 0.0, "d": 2, "age": 14.59, "grav": 156.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 967, "kpp": 5.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 0.926, "fa": 0.28, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Individual websites can't be granted permission over your entire browser, they operate in a sandbox (then again firefox for example has a relatively insecure sandbox)."}, {"id": 50516230, "au": "bita_nidir", "dom": 101, "sr": 51, "sc": 1.42, "ep": 2.52, "bs": 0.0, "d": 0, "age": 8.32, "grav": 66.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 192, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": 0.965, "fa": 0.0, "gp": 0.177, "bl": 0.0, "ds": 0.0, "txt": "Guys, go to about:addons > cog > check for updates, and update your uBlock Origin. Mine had not auto updated."}, {"id": 50515187, "au": "techpression", "dom": 54, "sr": 52, "sc": 1.42, "ep": 1.86, "bs": 0.0, "d": 2, "age": 11.3, "grav": 105.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 668, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.392, "fa": 0.28, "gp": 0.097, "bl": 0.0, "ds": 0.0, "txt": "Only if it’s part of a benchmark that matters, which is the reason we are where we are today, good writing is not benchmarked enough."}, {"id": 50516281, "au": "its-summertime", "dom": 88, "sr": 53, "sc": 1.34, "ep": 2.73, "bs": 0.0, "d": 1, "age": 8.13, "grav": 64.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 1225, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": 0.954, "fa": 0.0, "gp": 0.339, "bl": 0.0, "ds": 0.0, "txt": "I'm not to test it, however, would ublock consider it a 3rd party frame, especially when it is a frame src that ublock itself injects into pages?"}, {"id": 50517764, "au": "wlesieutre", "dom": 9, "sr": 54, "sc": 1.27, "ep": 2.81, "bs": 0.0, "d": 7, "age": 5.13, "grav": 34.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 74, "qw": 0, "k": 25535, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 1.196, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Prior to that the Windows version was a somewhat half-baked thing made by a contractor and didn't keep parity with the Mac version. It was better than nothing if you had to use Windows sometimes, but you wouldn't have bought it just for that version.\n\nBut with the VC funding came a change from B2C sales to Mac users who wanted good software to targeting B2B enterprise customers who wanted a feature checklist across their fleet, Windows included."}, {"id": 50516785, "au": "stratos123", "dom": 113, "sr": 55, "sc": 1.27, "ep": 2.52, "bs": 0.0, "d": 1, "age": 7.02, "grav": 52.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 662, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 1.07, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "NoScript breaks most websites, and while I'm willing to believe WaterFox's impl is more performant, it probably has just as many or more hidden security problems as UBlock, since fewer eyes have looked at it."}, {"id": 50515027, "au": "AnthonyMouse", "dom": 97, "sr": 56, "sc": 1.27, "ep": 2.68, "bs": 0.0, "d": 1, "age": 11.78, "grav": 112.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 39844, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "user_website", "flbl": "User & Website (Browser)", "urls": [], "ig": 1.04, "fa": 0.0, "gp": 0.164, "bl": 0.0, "ds": 0.0, "txt": "Chrome itself can let go of multiple remote code execution CVEs in the same month, but an extension bug that allows XSS is a powder keg?"}, {"id": 50514191, "au": "madeofpalk", "dom": 140, "sr": 57, "sc": 1.27, "ep": 2.45, "bs": 0.0, "d": 2, "age": 14.4, "grav": 153.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 24881, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "user_website", "flbl": "User & Website (Browser)", "urls": [], "ig": 1.041, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Well no not really. There’s strong cross-origin restrictions in browsers to prevent anything bad happening just because you visit a website.\n\nWeb extensions are troubling because they tend to have pretty unfettered access to one of the most sensitive parts of your computer."}, {"id": 50519580, "au": "hiccuphippo", "dom": 61, "sr": 58, "sc": 1.27, "ep": 2.44, "bs": 0.0, "d": 5, "age": 2.65, "grav": 15.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 61, "qw": 0, "k": 2240, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": 0.626, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "People already ask it to write in a natural way that doesn't look like AI, wouldn't adding a disclaimer that it's not AI the most effective way to not look AI? I've seen people do a 180 from dissing something for looking AI to praising it when they learn it was not, even when the claims are unverifiable.\nWouldn't AI learn that and use it?"}, {"id": 50518763, "au": "swozey", "dom": 21, "sr": 59, "sc": 1.27, "ep": 2.27, "bs": 0.0, "d": 7, "age": 3.65, "grav": 22.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 3457, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "password_bitwarden", "flbl": "Password & Bitwarden (Extension)", "urls": [], "ig": 0.968, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "My chrome extension for bitwarden is probably the buggiest thing, but I just upgraded to Golden Gate and that broke my touchID so it may be related. HAlf the time I click it it doesnt open the UI at all"}, {"id": 50518213, "au": "def_true_false", "dom": 20, "sr": 60, "sc": 1.27, "ep": 2.22, "bs": 0.0, "d": 6, "age": 4.42, "grav": 28.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 299, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "password_bitwarden", "flbl": "Password & Bitwarden (Extension)", "urls": [], "ig": 0.943, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The Bitwarden extension has a setting that shows a separate copy username and copy password buttons, instead of the menu that contains both."}, {"id": 50515918, "au": "jimmydorry", "dom": 108, "sr": 61, "sc": 1.27, "ep": 2.2, "bs": 0.0, "d": 1, "age": 9.19, "grav": 77.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 1062, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 0.936, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "That sounds like a halving of performance for marginal security gain, when we have such glaring holes like extensions having unfettered access to all network requests made by the browser (the gap that manifest v3 moved towards closing)."}, {"id": 50513917, "au": "wtallis", "dom": 31, "sr": 62, "sc": 1.27, "ep": 2.17, "bs": 0.0, "d": 3, "age": 15.13, "grav": 166.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 22090, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 0.703, "fa": 0.0, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "That doesn't really answer the question. Sure, XUL extensions have better access to the internals of the browser. But does that translate into XUL extensions being able to better isolate their own internals from being accessed by untrusted websites?"}, {"id": 50519657, "au": "norenh", "dom": 83, "sr": 63, "sc": 1.27, "ep": 2.13, "bs": 0.0, "d": 2, "age": 2.54, "grav": 15.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 189, "kpp": 4.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": 0.908, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "After quite a lot of trying, I came to the same conclusion.\nHowever, removing and adding it again does work which will give you the latest version."}, {"id": 50516018, "au": "charcircuit", "dom": 65, "sr": 64, "sc": 1.27, "ep": 2.04, "bs": 0.0, "d": 4, "age": 8.91, "grav": 73.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 2420, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": 0.869, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "For simple problems yes. Look up the term \"blue teaming.\" If researchers ask AI to generate a summary of a vulnerability and then it randomly ads a disclaimer that is something that can be trained out of the model."}, {"id": 50515174, "au": "techpression", "dom": 22, "sr": 65, "sc": 1.27, "ep": 2.0, "bs": 0.0, "d": 3, "age": 11.34, "grav": 105.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 668, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "user_website", "flbl": "User & Website (Browser)", "urls": [], "ig": 0.849, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Same here, it’s sad how they went from working flawlessly with a quick and clean client, to whatever it is today. Sometimes I get three or more popups when trying sign in (many after the login has already been completed)…"}, {"id": 50516817, "au": "ada-h00k", "dom": 136, "sr": 66, "sc": 1.27, "ep": 1.98, "bs": 0.0, "d": 3, "age": 6.99, "grav": 52.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 62, "qw": 0, "k": 226, "kpp": 5.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "user_website", "flbl": "User & Website (Browser)", "urls": [], "ig": 0.843, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "A browser should not be concerned with the interests of commercial players. Software should, first and foremost, take the interests of users into account.\nIf they try to do something against Firefox, we have to fight back. Just going along with it and giving in will only lead, in the long run, to the Internet becoming even more broken than it already is."}, {"id": 50515774, "au": "badsectoracula", "dom": 99, "sr": 67, "sc": 1.27, "ep": 1.88, "bs": 0.0, "d": 1, "age": 9.58, "grav": 82.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 94, "qw": 0, "k": 8809, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 0.802, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Uh no it isn't, being able to edit the page contents is the entire purpose of this extension (and many others), the issue here is that because there is no other way for an extension to provide a UI to the user it also has to do that by modifying the page - which is something a malicious page can take advantage of.\n\nThe solution here isn't \"extensions shouldn't be allowed to modify the page\" but \"extensions should have some means of creating their own UI so they don't have to modify the page for their UI\"."}, {"id": 50516336, "au": "dust-jacket", "dom": 16, "sr": 68, "sc": 1.27, "ep": 1.62, "bs": 0.0, "d": 6, "age": 7.98, "grav": 62.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 365, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "password_bitwarden", "flbl": "Password & Bitwarden (Extension)", "urls": [], "ig": 0.466, "fa": 0.0, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "I find this kind of claim baffling.\n\nAs someone who uses one for work and the other for personal pws, I'm puzzled about what you're doing in the UI of either that makes BW even all that different, let alone 'horrific'"}, {"id": 50517074, "au": "Multicomp", "dom": 131, "sr": 69, "sc": 1.27, "ep": 1.61, "bs": 0.0, "d": 2, "age": 6.46, "grav": 46.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 2644, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "iframe_dom", "flbl": "Iframe & Dom (Boundary)", "urls": [], "ig": 0.344, "fa": 0.28, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "or they, like me, found 6.1 to be a regression in capabilities compared to 5.6. 5.6 Luna likewise is a bigger model than 6.1 luna"}, {"id": 50514644, "au": "dawnerd", "dom": 4, "sr": 70, "sc": 1.27, "ep": 2.79, "bs": 1.19, "d": 2, "age": 12.91, "grav": 129.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 9709, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "iframe_dom", "flbl": "Iframe & Dom (Boundary)", "urls": [], "ig": 0.426, "fa": 0.0, "gp": 1.234, "bl": 0.45, "ds": 0.0, "txt": "Speaking of 1pass, their overall software quality has taken a massive nosedive. I’m almost at the point of ditching them."}, {"id": 50514260, "au": "esseph", "dom": 117, "sr": 71, "sc": 1.27, "ep": 1.59, "bs": 0.0, "d": 1, "age": 14.21, "grav": 150.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 2855, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "user_website", "flbl": "User & Website (Browser)", "urls": [], "ig": 0.265, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I found that by having \"Do Not Track\" enabled in my browser, I went from nearly untrackable, to within 0.12% of the population.\n\nIronic."}, {"id": 50513946, "au": "Banou", "dom": 39, "sr": 72, "sc": 1.27, "ep": 2.76, "bs": 1.19, "d": 1, "age": 15.06, "grav": 165.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 14, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "password_bitwarden", "flbl": "Password & Bitwarden (Extension)", "urls": [], "ig": 0.841, "fa": 0.0, "gp": 0.541, "bl": 0.45, "ds": 0.0, "txt": "In the case of password managers, amy decent one will put their DOM elements in a closed shadowDOM root, which prevents the page scripts from interacting with it entirely."}, {"id": 50515276, "au": "forgotmypw17", "dom": 33, "sr": 73, "sc": 1.27, "ep": 2.25, "bs": 0.85, "d": 4, "age": 10.97, "grav": 100.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 6527, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "user_website", "flbl": "User & Website (Browser)", "urls": [], "ig": 0.957, "fa": 0.0, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "My intuition was yes, but research says otherwise. They have had their own vulnerabilities. Basically, anywhere anything interacts with site code, there's potential for vulnerabilities. It might be better, but the extensions still read HTML from the page, and... guess what can happen then?"}, {"id": 50516133, "au": "benhurmarcel", "dom": 24, "sr": 74, "sc": 1.27, "ep": 2.57, "bs": 1.19, "d": 2, "age": 8.59, "grav": 69.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 3152, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 0.797, "fa": 0.0, "gp": 0.483, "bl": 0.45, "ds": 0.0, "txt": "1password importing a third-party script on all webpages also had me chasing a CSP policy console error on a web app I was making."}, {"id": 50518883, "au": "nvme0n1p1", "dom": 66, "sr": 75, "sc": 1.27, "ep": 2.19, "bs": 0.85, "d": 5, "age": 3.51, "grav": 21.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 1308, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "user_website", "flbl": "User & Website (Browser)", "urls": [], "ig": 0.934, "fa": 0.0, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "You seem misguided. A blue team doesn't prove the non-existence of vulnerabilities. It's just a way to try to get ahead in the cat-and-mouse game with attackers.\n\nThis is like saying \"car crashes are solved. look up the term \"airbags\""}, {"id": 50517638, "au": "10111001", "dom": 55, "sr": 76, "sc": 1.26, "ep": 1.26, "bs": 0.0, "d": 3, "age": 5.38, "grav": 36.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 24, "k": 739, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.196, "fa": 0.28, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> Only if it’s part of a benchmark that matters, which is the reason we are where we are today, good writing is not benchmarked enough.\n\nIt's that the problem? \"Good writing\" is benchmarked, but we get writing the over-fits the benchmark?"}, {"id": 50513981, "au": "usr1106", "dom": 124, "sr": 77, "sc": 1.26, "ep": 2.85, "bs": 1.59, "d": 2, "age": 14.99, "grav": 163.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 43, "qw": 0, "k": 4889, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "user_website", "flbl": "User & Website (Browser)", "urls": [], "ig": 0.854, "fa": 0.0, "gp": 0.579, "bl": 0.6, "ds": 0.0, "txt": "I have not used Facebook for many years. My Youtube usage is well less than an hour per month. Those are shitty businesses I don't want to waste my time with. Generally my Web usage is going down. I hate most of the internet these days."}, {"id": 50513660, "au": "MOARDONGZPLZ", "dom": 50, "sr": 78, "sc": 1.18, "ep": 1.18, "bs": 0.0, "d": 2, "age": 15.86, "grav": 179.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 61, "qw": 0, "k": 1710, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": 0.425, "fa": 0.0, "gp": 0.125, "bl": 0.0, "ds": 0.0, "txt": "I wouldn’t say that, but it’s honest. And I’ll read the write up and reserve judgement until I’m done or decide it’s not worth continuing. When AI writes the article and there’s a disclaimer, I won’t read it. Saw one the other day: I used ai to write this, if you have a problem with that, stop reading. Of course, I did stop reading (and flagged the post)."}, {"id": 50516017, "au": "whywhywhywhy", "dom": 96, "sr": 79, "sc": 1.13, "ep": 1.13, "bs": 0.0, "d": 1, "age": 8.92, "grav": 73.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 11350, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 0.419, "fa": 0.0, "gp": 0.1, "bl": 0.0, "ds": 0.0, "txt": "The issue isn't modifying the page, the issue is the page is able to interact with the modifier."}, {"id": 50516429, "au": "72deluxe", "dom": 125, "sr": 80, "sc": 0.96, "ep": 0.96, "bs": 0.0, "d": 3, "age": 7.74, "grav": 60.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 2783, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "user_website", "flbl": "User & Website (Browser)", "urls": [], "ig": 0.411, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I think being very conscious in what you are looking at and reading or using the Internet mainly for research like we used to do back in the day (Geocities obscure sites!) is probably the solution. The alternative is GIGO"}, {"id": 50514195, "au": "forgotmypw17", "dom": 34, "sr": 81, "sc": 0.9, "ep": 1.75, "bs": 0.85, "d": 4, "age": 14.39, "grav": 153.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 6527, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 0.743, "fa": 0.0, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "Yes, with caveats. They could have UI that the websites couldn't access, but the fact that they interacted with website content could still expose them to attacks."}, {"id": 50515768, "au": "hackerbone", "dom": 107, "sr": 82, "sc": 0.84, "ep": 2.04, "bs": 1.19, "d": 0, "age": 9.61, "grav": 82.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 4, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "iframe_dom", "flbl": "Iframe & Dom (Boundary)", "urls": [], "ig": 0.714, "fa": 0.0, "gp": 0.248, "bl": 0.45, "ds": 0.0, "txt": "Browsers should implement something like a sandboxed DOM where execution is limited to a snapshot of the DOM. This would prevent most of the client side related vulnerabilities."}, {"id": 50518439, "au": "uptrails", "dom": 95, "sr": 83, "sc": 0.84, "ep": 3.36, "bs": 2.52, "d": 1, "age": 4.12, "grav": 26.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 56, "qw": 0, "k": 154, "kpp": 5.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "password_bitwarden", "flbl": "Password & Bitwarden (Extension)", "urls": [], "ig": 1.411, "fa": 0.0, "gp": 0.029, "bl": 0.95, "ds": 0.0, "txt": "The concern was much less about vulns and a lot more about the pattern of monetizing free extensions by siphoning off browsing history, injecting ads, etc. This was very common; even some \"privacy\" extensions would do that.\n\nAnother worry was the possibility of extensions being hijacked or sold and then doing something outright malicious, e.g. stealing passwords / cryptocurrency."}, {"id": 50515140, "au": "flomo", "dom": 37, "sr": 84, "sc": 0.72, "ep": 1.92, "bs": 1.19, "d": 2, "age": 11.42, "grav": 107.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 2575, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 0.816, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Yes. There was even an XUL extension which loaded ActiveX controls, except without IE's malfunctional 'security zones'. Honestly, that was always a massive security blindspot."}, {"id": 50514023, "au": "canicollectongo", "dom": 137, "sr": 85, "sc": 0.72, "ep": 3.23, "bs": 2.52, "d": 1, "age": 14.9, "grav": 162.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 47, "qw": 0, "k": 2, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "user_website", "flbl": "User & Website (Browser)", "urls": [], "ig": 1.243, "fa": 0.0, "gp": 0.217, "bl": 0.95, "ds": 0.0, "txt": "Th day no browser allows it is the day I make the vibe-browser. A browser that scraps all the content of every website, and tells an AI to present it without the garbage.\n\nThis extensions exist to solve a problem where the alternative will NOT involve playing nice about it."}, {"id": 50514391, "au": "nvme0n1p1", "dom": 126, "sr": 86, "sc": 0.6, "ep": 0.6, "bs": 0.0, "d": 3, "age": 13.74, "grav": 142.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 1308, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "user_website", "flbl": "User & Website (Browser)", "urls": [], "ig": 0.257, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It's great that you don't use the internet. We're all happy for you. Other people do use the internet, and they shouldn't get their advice on how to use the internet from someone who doesn't use the internet."}, {"id": 50515598, "au": "DarkmSparks", "dom": 132, "sr": 87, "sc": 0.19, "ep": 1.38, "bs": 1.19, "d": 0, "age": 10.04, "grav": 88.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 536, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 0.544, "fa": 0.0, "gp": 0.072, "bl": 0.45, "ds": 0.0, "txt": "so this is the security infrastructure manifestv3 created?\n\nI'm no expert but that doesn't seem very secure to me, maybe there was alterior motives."}, {"id": 50515029, "au": "gib444", "dom": 13, "sr": 88, "sc": 0.15, "ep": 1.34, "bs": 1.19, "d": 4, "age": 11.76, "grav": 112.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 603, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "password_bitwarden", "flbl": "Password & Bitwarden (Extension)", "urls": [], "ig": 0.347, "fa": 0.0, "gp": 0.36, "bl": 0.45, "ds": 0.0, "txt": "Genuine question: is it actually better, or have you not discovered its own issues? Ie did you did a decent comparison and analysis before migrating?"}, {"id": 50514534, "au": "burgerone", "dom": 114, "sr": 89, "sc": 0.12, "ep": 1.31, "bs": 1.19, "d": 0, "age": 13.23, "grav": 134.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 200, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": 0.45, "fa": 0.0, "gp": 0.174, "bl": 0.45, "ds": 0.0, "txt": "I'm thoroughly disappointed that a vulnerability as trivial as this requires AI assistance. The poster already had all the important information at hand."}, {"id": 50516506, "au": "mattashii", "dom": 47, "sr": 90, "sc": 0.1, "ep": 1.29, "bs": 1.19, "d": 1, "age": 7.58, "grav": 58.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 21, "k": 1626, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "password_bitwarden", "flbl": "Password & Bitwarden (Extension)", "urls": [], "ig": 0.549, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "> have to put their interfaces in the website's DOM if they want to be able to work with the page's elements\n\nCan't the extension use the sidebar?  I know Tree Style Tab uses it, so why couldn't an extension put the selector there?"}, {"id": 50520125, "au": "satvikpendem", "dom": 51, "sr": 91, "sc": -0.07, "ep": 1.13, "bs": 1.19, "d": 3, "age": 1.91, "grav": 11.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 17841, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": 0.479, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Not sure why your opinion was flagged, some people don't want to read AI written content as you mentioned."}, {"id": 50516060, "au": "drcongo", "dom": 23, "sr": 92, "sc": -0.08, "ep": 2.97, "bs": 3.05, "d": 4, "age": 8.8, "grav": 72.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 6336, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "password_bitwarden", "flbl": "Password & Bitwarden (Extension)", "urls": [], "ig": 0.852, "fa": 0.34, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Same. My favourite is the one offering to save the login that you've just filled from a saved login while simultaneously using 12GB of RAM. What an absolute clown car 1Password has become."}, {"id": 50513630, "au": "xp84", "dom": 145, "sr": 93, "sc": -0.14, "ep": 2.91, "bs": 3.05, "d": 1, "age": 15.95, "grav": 180.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 9789, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 0.632, "fa": 0.34, "gp": 0.313, "bl": 1.15, "ds": 0.0, "txt": "It’s not about comfort. It’s basic security at this point. 2026 web ads are cancer."}, {"id": 50515479, "au": "noname120", "dom": 15, "sr": 94, "sc": -0.21, "ep": 0.98, "bs": 1.19, "d": 5, "age": 10.42, "grav": 93.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 2172, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "password_bitwarden", "flbl": "Password & Bitwarden (Extension)", "urls": [], "ig": 0.263, "fa": 0.0, "gp": 0.25, "bl": 0.45, "ds": 0.0, "txt": "I did this, the UX of Bitwarden’s UI is horrific and I switched back after holding for a year."}, {"id": 50517347, "au": "ceejayoz", "dom": 7, "sr": 95, "sc": -0.27, "ep": 2.78, "bs": 3.05, "d": 5, "age": 5.95, "grav": 41.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 10, "qw": 0, "k": 97846, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": ["https://1password.com/blog/accel-partnership"], "ig": 0.359, "fa": 0.68, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "They took $200M outside investment in 2019.\n\nhttps://1password.com/blog/accel-partnership\n\nEnshittification began shortly thereafter."}, {"id": 50518700, "au": "creatonez", "dom": 30, "sr": 96, "sc": -0.31, "ep": 0.88, "bs": 1.19, "d": 3, "age": 3.74, "grav": 23.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 3643, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "iframe_dom", "flbl": "Iframe & Dom (Boundary)", "urls": [], "ig": 0.374, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Pale Moon is backporting theater, I would highly recommend against using a browser that is jam-packed with so many bugs."}, {"id": 50514200, "au": "charcircuit", "dom": 56, "sr": 97, "sc": -0.33, "ep": 0.86, "bs": 1.19, "d": 2, "age": 14.38, "grav": 153.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 2420, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.275, "fa": 0.0, "gp": 0.146, "bl": 0.45, "ds": 0.0, "txt": "No, it won't. That is not how things work after all the fine tuning and alignment that gets done."}, {"id": 50520669, "au": "briaoeuidhtns", "dom": 73, "sr": 98, "sc": -0.42, "ep": 0.77, "bs": 1.19, "d": 3, "age": 1.27, "grav": 8.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 7, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 0.328, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "they may not allow directly checking extensions, but I'm almost positive the trick in the article still works"}, {"id": 50514472, "au": "alex1138", "dom": 100, "sr": 99, "sc": -0.45, "ep": 0.75, "bs": 1.19, "d": 1, "age": 13.47, "grav": 138.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 534, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 0.318, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "A la Chrome/manifest 3? Not sure if we're on the same page here or if you mean something else"}, {"id": 50516059, "au": "charcircuit", "dom": 60, "sr": 100, "sc": -0.47, "ep": 0.72, "bs": 1.19, "d": 4, "age": 8.8, "grav": 72.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 2420, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": 0.306, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "But it has. Typically people have to do some kind of jailbreak or ask in a funny manner to get it to go around its training."}, {"id": 50514740, "au": "Maxion", "dom": 94, "sr": 101, "sc": -0.48, "ep": 2.57, "bs": 3.05, "d": 1, "age": 12.61, "grav": 124.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 2653, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": 0.786, "fa": 0.0, "gp": 0.498, "bl": 1.15, "ds": 0.0, "txt": "Malicious ads are a whole 'nother attack vector that is probably a larger issue."}, {"id": 50517253, "au": "ck2", "dom": 111, "sr": 102, "sc": -0.76, "ep": 2.29, "bs": 3.05, "d": 0, "age": 6.13, "grav": 43.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 15, "qw": 0, "k": 32324, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "iframe_dom", "flbl": "Iframe & Dom (Boundary)", "urls": ["https://github.com/gorhill/uBlock/wiki/Dynamic-filtering:-Benefits-of-blocking-3rd-party-iframe-tags"], "ig": 0.941, "fa": 0.0, "gp": 0.053, "bl": 1.15, "ds": 0.0, "txt": "possible workaround\n\n      * * 3p-frame block\n\nDynamic filtering: Benefits of blocking 3rd party iframe tags (by default)\n\n* https://github.com/gorhill/uBlock/wiki/Dynamic-filtering:-Be..."}, {"id": 50514145, "au": "hiccuphippo", "dom": 53, "sr": 103, "sc": -0.86, "ep": 0.33, "bs": 1.19, "d": 1, "age": 14.53, "grav": 155.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 2240, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": 0.141, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "If there's enough of them and AI trains on it, then AI will write that disclaimer itself to make itself more believable."}, {"id": 50514898, "au": "lucumo", "dom": 69, "sr": 104, "sc": -0.88, "ep": 0.31, "bs": 1.19, "d": 2, "age": 12.15, "grav": 117.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 3453, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "password_bitwarden", "flbl": "Password & Bitwarden (Extension)", "urls": [], "ig": 0.133, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "If it works, we'll see people lying about it long before AI trains on it."}, {"id": 50521722, "au": "eps", "dom": 75, "sr": 105, "sc": -0.88, "ep": 0.31, "bs": 1.19, "d": 5, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 10211, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": 0.132, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "But that's even better!\n\nYou can track by any of these IDs rather than by their combination."}, {"id": 50514737, "au": "renehsz", "dom": 103, "sr": 106, "sc": -1.31, "ep": 1.74, "bs": 3.05, "d": 0, "age": 12.62, "grav": 125.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 460, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": 0.543, "fa": 0.0, "gp": 0.317, "bl": 1.15, "ds": 0.0, "txt": "Is AdNauseam (a fork of uBlock Origin) also affected?"}, {"id": 50514203, "au": "kqp", "dom": 38, "sr": 107, "sc": -1.32, "ep": 3.05, "bs": 4.37, "d": 1, "age": 14.38, "grav": 153.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 655, "kpp": 7.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "iframe_dom", "flbl": "Iframe & Dom (Boundary)", "urls": [], "ig": 1.028, "fa": 0.0, "gp": 0.436, "bl": 1.65, "ds": 0.0, "txt": "This leak doesn’t exist. The injection goes in a sandboxed iframe, which is protected from the rest of the page by the same security boundary that prevents them from puppeteering your bank’s pages in an iframe they’ve embedded themselves."}, {"id": 50520862, "au": "buckle8017", "dom": 74, "sr": 108, "sc": -1.7, "ep": 1.34, "bs": 3.05, "d": 4, "age": 1.03, "grav": 7.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 208, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "user_website", "flbl": "User & Website (Browser)", "urls": [], "ig": 0.572, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "it doesn't, Firefox assigns random ids to each install"}, {"id": 50515157, "au": "trvz", "dom": 5, "sr": 109, "sc": -1.84, "ep": 2.53, "bs": 4.37, "d": 3, "age": 11.38, "grav": 106.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 765, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "user_website", "flbl": "User & Website (Browser)", "urls": [], "ig": 1.013, "fa": 0.0, "gp": 0.103, "bl": 1.65, "ds": 0.0, "txt": "Same. User of 15 years. Solid native apps turned into buggy Electron mess. I'd be fine with Electron if it weren't buggy. Wi-Fi server went away. 25% price increase this year and they do stupid sports sponsorships now."}, {"id": 50514232, "au": "forgotmypw17", "dom": 44, "sr": 110, "sc": -2.32, "ep": 0.72, "bs": 3.05, "d": 4, "age": 14.28, "grav": 151.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 10, "qw": 79, "k": 6527, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM", "https://speakerdeck.com/masatokinugawa/shadow-dom-and-security-exploring-the-boundary-between-light-and-shadow"], "ig": 0.308, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": ">The {mode: \"open\"} argument gives the page a way to break the encapsulation of your shadow DOM. If you don't want to give the page this ability, pass {mode: \"closed\"} instead, and then shadowRoot returns null.\n\n>However, you should not consider this a strong security mechanism, because there are ways it can be evaded, for example by browser extensions running in the page. It's more of an indication that the page should not access the internals of your shadow DOM tree.\n\nhttps://developer.mozilla.org/en-US/docs/Web/API/Web_compone...\n\nThis presentation talks about using window.find() and other methods:\n\nhttps://speakerdeck.com/masatokinugawa/shadow-dom-and-securi..."}, {"id": 50515481, "au": "saagarjha", "dom": 25, "sr": 111, "sc": -2.58, "ep": 1.66, "bs": 4.24, "d": 2, "age": 10.41, "grav": 93.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 62079, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 0.35, "fa": 0.0, "gp": 0.576, "bl": 1.6, "ds": 0.0, "txt": "I’m very confused why 1Password should be doing syntax highlighting for code at all…"}, {"id": 50519832, "au": "jareklupinski", "dom": 27, "sr": 112, "sc": -2.7, "ep": 0.35, "bs": 3.05, "d": 2, "age": 2.31, "grav": 13.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 8, "qw": 31, "k": 3226, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://en.wikipedia.org/wiki/PRISM"], "ig": 0.149, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "> 1Password began injecting prism.js globally on all pages\n\nhttps://en.wikipedia.org/wiki/PRISM\n\n> PRISM is a code name for a program under which the United States National Security Agency (NSA) collects internet communications from various U.S. internet companies.\n\npeople are really bad at naming things XD"}, {"id": 50514194, "au": "moi2388", "dom": 43, "sr": 113, "sc": -2.78, "ep": 0.27, "bs": 3.05, "d": 3, "age": 14.39, "grav": 153.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 1501, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 0.114, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "From a page, which loads after the extension? How?"}, {"id": 50513891, "au": "olibhel", "dom": 79, "sr": 114, "sc": -3.07, "ep": 1.17, "bs": 4.24, "d": 1, "age": 15.21, "grav": 167.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 59, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 0.355, "fa": 0.0, "gp": 0.23, "bl": 1.6, "ds": 0.0, "txt": "After the update, I still have 1.76.2 on the firefox dev edition on mac."}, {"id": 50515059, "au": "LoganDark", "dom": 147, "sr": 115, "sc": -3.16, "ep": 1.08, "bs": 4.24, "d": 3, "age": 11.67, "grav": 110.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 4830, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "user_website", "flbl": "User & Website (Browser)", "urls": [], "ig": 0.193, "fa": 0.22, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "That depends on the OS / software in question."}, {"id": 50514364, "au": "nvme0n1p1", "dom": 64, "sr": 116, "sc": -3.28, "ep": 0.96, "bs": 4.24, "d": 3, "age": 13.84, "grav": 144.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 1308, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.326, "fa": 0.0, "gp": 0.133, "bl": 1.6, "ds": 0.0, "txt": "Alignment is solved? Fantastic news! Pray tell, where can I read more?"}, {"id": 50515079, "au": "db48x", "dom": 105, "sr": 117, "sc": -3.41, "ep": 0.83, "bs": 4.24, "d": 1, "age": 11.61, "grav": 109.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 8465, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "user_website", "flbl": "User & Website (Browser)", "urls": [], "ig": 0.353, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Assume that it is until you have read through the source and proven otherwise."}, {"id": 50516011, "au": "cubefox", "dom": 82, "sr": 118, "sc": -3.41, "ep": 0.83, "bs": 4.24, "d": 1, "age": 8.93, "grav": 74.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 8109, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 0.351, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Apparently it's not possible to manually update extensions on Firefox for Android."}, {"id": 50514787, "au": "praash", "dom": 59, "sr": 119, "sc": -3.49, "ep": 0.75, "bs": 4.24, "d": 3, "age": 12.44, "grav": 122.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 536, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.249, "fa": 0.0, "gp": 0.114, "bl": 1.6, "ds": 0.0, "txt": "Fine tuning and alignment has not prevented other kinds of hallucinations either."}, {"id": 50515734, "au": "account42", "dom": 143, "sr": 120, "sc": -3.52, "ep": 0.72, "bs": 4.24, "d": 1, "age": 9.71, "grav": 83.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 11147, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 0.307, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Yes we should only grant that level of access to hostile advertising megacorporations."}, {"id": 50517094, "au": "malfist", "dom": 6, "sr": 121, "sc": -3.77, "ep": 1.4, "bs": 5.17, "d": 4, "age": 6.41, "grav": 46.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 55, "qw": 0, "k": 9495, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": 0.596, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "I wonder how much of this is to be blamed on ai psychosis C-suites have. Everybody I know has been complaining that the push from the c suite down is to ship ship ship with AI. Proper engineering is seen as a waste of time, along with testing and future thinking. Companies just ship more and more untested slop"}, {"id": 50515287, "au": "Cockbrand", "dom": 14, "sr": 122, "sc": -3.77, "ep": 1.4, "bs": 5.17, "d": 5, "age": 10.93, "grav": 100.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 1514, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "password_bitwarden", "flbl": "Password & Bitwarden (Extension)", "urls": [], "ig": 0.423, "fa": 0.0, "gp": 0.28, "bl": 1.95, "ds": 0.0, "txt": "Not GP, but I did the same about 3 years ago when 1PW transitioned from 7 to 8: it works decently, but the UI/UX is not as polished compared to how 1PW was back then. No technical issues at all, just not as smooth. It's still fine and not something I notice any more."}, {"id": 50514490, "au": "jumperabg", "dom": 52, "sr": 123, "sc": -3.79, "ep": 0.45, "bs": 4.24, "d": 2, "age": 13.4, "grav": 137.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 56, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": 0.19, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "This might be the last vulnerability of the year with human prose in it."}, {"id": 50514015, "au": "Telaneo", "dom": 139, "sr": 124, "sc": -3.84, "ep": 0.4, "bs": 4.24, "d": 1, "age": 14.92, "grav": 162.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 2324, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 0.036, "fa": 0.0, "gp": 0.214, "bl": 1.6, "ds": 0.0, "txt": "The same can be said about websites themselves."}, {"id": 50516996, "au": "fg137", "dom": 110, "sr": 125, "sc": -3.85, "ep": 0.39, "bs": 4.24, "d": 2, "age": 6.62, "grav": 48.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 1531, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "user_website", "flbl": "User & Website (Browser)", "urls": [], "ig": 0.167, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "You see, the company behind the most used browser isn't motivated by this."}, {"id": 50514095, "au": "spopejoy", "dom": 81, "sr": 126, "sc": -3.96, "ep": 0.28, "bs": 4.24, "d": 2, "age": 14.69, "grav": 158.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 794, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": 0.12, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "This happened to me. Apparently you have to update twice to get to 1.76.4."}, {"id": 50515025, "au": "Banou", "dom": 41, "sr": 127, "sc": -4.06, "ep": 1.51, "bs": 5.57, "d": 3, "age": 11.78, "grav": 112.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 14, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 1, "tier": "meme_or_snark", "facet": "iframe_dom", "flbl": "Iframe & Dom (Boundary)", "urls": [], "ig": 0.641, "fa": 0.0, "gp": 0.0, "bl": 2.1, "ds": 0.0, "txt": "I didn't go into full details but it's usually a combination of shadowDOM plus Iframe for the security boundary"}, {"id": 50514796, "au": "swozey", "dom": 12, "sr": 128, "sc": -4.12, "ep": 1.05, "bs": 5.17, "d": 3, "age": 12.41, "grav": 121.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 3457, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.447, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "Took me 10 minutes to set up vaultwarden in a docker container and migrate all my 1p to it last time they pissed me off earlier this year"}, {"id": 50519620, "au": "Ikersl", "dom": 91, "sr": 129, "sc": -4.6, "ep": 0.96, "bs": 5.57, "d": 0, "age": 2.6, "grav": 15.6, "surf": 12.5, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 1, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "user_website", "flbl": "User & Website (Browser)", "urls": [], "ig": 0.383, "fa": 0.0, "gp": 0.043, "bl": 2.1, "ds": 0.0, "txt": "its nuts that an ad blocker could have such vulnerabilities"}, {"id": 50516260, "au": "wontforgetdisda", "dom": 130, "sr": 130, "sc": -6.0, "ep": 0.75, "bs": 6.76, "d": 1, "age": 8.21, "grav": 65.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.32, "fa": 0.0, "gp": 0.0, "bl": 2.55, "ds": 0.0, "txt": "Either they started long ago or used solely free Copilot.."}, {"id": 50514085, "au": "forgotmypw17", "dom": 40, "sr": 131, "sc": -8.11, "ep": 0.5, "bs": 8.61, "d": 2, "age": 14.71, "grav": 159.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 6527, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "iframe_dom", "flbl": "Iframe & Dom (Boundary)", "urls": [], "ig": 0.214, "fa": 0.0, "gp": 0.0, "bl": 3.25, "ds": 0.0, "txt": "Shadow DOM is not a security boundary, and can be bypassed."}, {"id": 50517999, "au": "planteur", "dom": 71, "sr": 132, "sc": -8.15, "ep": 0.0, "bs": 6.89, "d": 1, "age": 4.77, "grav": 31.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 6, "qw": 0, "k": 18, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": ["https://news.ycombinator.com/item?id=46904361"], "ig": -0.95, "fa": 0.34, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Related: “LinkedIn checks for 2953 browser extensions”\nhttps://news.ycombinator.com/item?id=46904361"}, {"id": 50516380, "au": "jaharios", "dom": 148, "sr": 133, "sc": -8.15, "ep": 0.0, "bs": 6.89, "d": 1, "age": 7.85, "grav": 61.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 2, "qw": 0, "k": 160, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://news.ycombinator.com/item?id=50101813"], "ig": -0.95, "fa": 0.34, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Welcome to 2026 https://news.ycombinator.com/item?id=50101813"}, {"id": 50513792, "au": "maplet", "dom": 121, "sr": 134, "sc": -8.81, "ep": 0.0, "bs": 6.89, "d": 0, "age": 15.48, "grav": 172.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 54, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.217, "bl": 2.6, "ds": 0.0, "txt": "Good day to use EWW"}, {"id": 50514074, "au": "l2dy", "dom": 77, "sr": 135, "sc": -8.85, "ep": 0.0, "bs": 6.89, "d": 1, "age": 14.74, "grav": 159.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 5, "qw": 0, "k": 3451, "kpp": 9.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://github.com/gorhill/uBlock/security/advisories/GHSA-cmqw-9r2w-6wv2"], "ig": -0.95, "fa": 0.0, "gp": 0.186, "bl": 2.6, "ds": 0.0, "txt": "The advisory says 1.75.4 is patched. https://github.com/gorhill/uBlock/security/advisories/GHSA-c..."}, {"id": 50514334, "au": "jethro_tell", "dom": 63, "sr": 136, "sc": -8.91, "ep": 0.0, "bs": 6.89, "d": 3, "age": 13.97, "grav": 146.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 2934, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.146, "bl": 2.6, "ds": 0.0, "txt": "Uh, ok"}, {"id": 50514466, "au": "shevy-java", "dom": 62, "sr": 137, "sc": -8.91, "ep": 0.0, "bs": 6.89, "d": 3, "age": 13.49, "grav": 138.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 2084, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "ublock_origin", "flbl": "Ublock & Origin (Malware)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.144, "bl": 2.6, "ds": 0.0, "txt": "Of course AI could."}, {"id": 50513413, "au": "qn8bdebq", "dom": 49, "sr": 138, "sc": -8.92, "ep": 0.0, "bs": 6.89, "d": 1, "age": 16.51, "grav": 191.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 8, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.139, "bl": 2.6, "ds": 0.0, "txt": "Instant vote of confidence, yes!"}, {"id": 50514754, "au": "denkmoon", "dom": 57, "sr": 139, "sc": -8.96, "ep": 0.0, "bs": 6.89, "d": 3, "age": 12.55, "grav": 124.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 4554, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.114, "bl": 2.6, "ds": 0.0, "txt": "Why not? Genuinely not seeing it."}, {"id": 50515724, "au": "tasuki", "dom": 129, "sr": 140, "sc": -8.97, "ep": 0.0, "bs": 6.89, "d": 0, "age": 9.72, "grav": 84.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 12, "k": 5510, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.108, "bl": 2.6, "ds": 0.0, "txt": "> GPT-5.6 Sol did most of the hard work of finding the issue\n\nI wonder why 5.6 rather than 6.1 ?"}, {"id": 50515420, "au": "Fordec", "dom": 11, "sr": 141, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 4, "age": 10.59, "grav": 95.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 2342, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "And dump money into Omarchy"}, {"id": 50515106, "au": "paganel", "dom": 67, "sr": 142, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 3, "age": 11.52, "grav": 108.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 10, "k": 14399, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "> after all the fine tuning and alignment that gets done.\n\nThis does indeed sound like religious belief."}, {"id": 50520389, "au": "deepsun", "dom": 72, "sr": 143, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 1.6, "grav": 10.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 5090, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "extensions_xul", "flbl": "Extensions & Xul (Browser)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "In Chrome only. Firefox doesn't allow that."}, {"id": 50514204, "au": "forgotmypw17", "dom": 78, "sr": 144, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 14.38, "grav": 153.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 6527, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Thank you, I corrected my comment."}, {"id": 50519671, "au": "cubefox", "dom": 84, "sr": 145, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 3, "age": 2.51, "grav": 15.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 8109, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "That might remove custom settings though."}, {"id": 50517012, "au": "RetroTechie", "dom": 118, "sr": 146, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 6.59, "grav": 48.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 2295, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "\"I found\"\n\nHow?"}, {"id": 50515735, "au": "cheschire", "dom": 127, "sr": 147, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 9.71, "grav": 83.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 6366, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "user_website", "flbl": "User & Website (Browser)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "SponsorBlock, set to allowed on YouTube only."}, {"id": 50517583, "au": "malfist", "dom": 8, "sr": 148, "sc": -9.88, "ep": 0.85, "bs": 10.73, "d": 6, "age": 5.49, "grav": 37.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 9495, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 1, "tier": "meme_or_snark", "facet": "iframe_dom", "flbl": "Iframe & Dom (Boundary)", "urls": [], "ig": 0.362, "fa": 0.0, "gp": 0.0, "bl": 4.05, "ds": 0.0, "txt": "Right, but what part of VC funding means ditching native apps for electron? Enshitification usually means exploitation, this is just change for change's sake"}, {"id": 50517886, "au": "esseph", "dom": 119, "sr": 149, "sc": -11.11, "ep": 0.0, "bs": 8.88, "d": 3, "age": 4.93, "grav": 32.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 0, "qw": 0, "k": 2855, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://coveryourtracks.eff.org/", "https://amiunique.org/", "https://browserleaks.com/"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.35, "ds": 0.0, "txt": "https://coveryourtracks.eff.org/\n\nhttps://amiunique.org/\n\nhttps://browserleaks.com/"}, {"id": 50517611, "au": "ceejayoz", "dom": 10, "sr": 150, "sc": -14.34, "ep": 0.0, "bs": 12.11, "d": 7, "age": 5.44, "grav": 37.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 97846, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 4, "meme": 1, "tier": "meme_or_snark", "facet": "iframe_dom", "flbl": "Iframe & Dom (Boundary)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 4.57, "ds": 0.0, "txt": "Ditching native apps means ditching native developers?"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 40);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 40);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 40);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `${shown.length} of ${pool.length} comments` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

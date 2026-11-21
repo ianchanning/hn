@@ -1,0 +1,1364 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50512779 // Nimony: A New Compiler for Nim — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .kpi-cell {
+      padding: 8px 0;
+    }
+    .kpi-label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 4px 0;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer > summary.hn-summary {
+      list-style: none;
+      cursor: pointer;
+      display: block;
+      padding: 2px 0;
+      margin: 0;
+      background: transparent;
+      border: 0;
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      user-select: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+    }
+    table.ablation th {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: normal;
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    .mode-tabs {
+      gap: 6px;
+      padding: 0 8px;
+      margin-bottom: 8px;
+    }
+    button.mode-tab {
+      appearance: none;
+      border-width: 0px;
+      border-radius: 4px;
+      background: rgb(246, 246, 239);
+      color: rgb(130, 130, 130);
+      cursor: pointer;
+      padding: 6px 14px;
+      transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+    }
+    button.mode-tab:hover {
+      background: rgb(240, 240, 235);
+      color: rgb(13, 13, 13);
+    }
+    button.mode-tab.active {
+      background: rgb(246, 246, 239);
+      color: rgb(13, 13, 13);
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      padding: 14px;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .mode-tabs button.mode-tab {
+        flex: 1;
+        text-align: center;
+        padding: 7px 8px;
+      }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; }
+      .topbar-right { font-size: 8pt; padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+      </div>
+      <div class="topbar-right">&nbsp;</div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://nimony.org/">Nimony: A New Compiler for Nim</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=nimony.org"><span class="sitestr">nimony.org</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">135 points</span> by <a href="https://news.ycombinator.com/user?id=Fervicus">Fervicus</a> <span class="age" title="2026-11-16T01:05:22.000Z"><a href="https://news.ycombinator.com/item?id=50512779">2 days ago</a></span> | <a href="https://news.ycombinator.com/item?id=50512779">66&nbsp;comments</a> | 93.9% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">Evidence</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">66</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 51 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">6.1%</div>
+          <div class="kpi-sub">4 comments (1 Gold / 1.5%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">93.9%</div>
+          <div class="kpi-sub">35 chatter &bull; 27 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">2</div>
+        <div class="kpi-sub">3% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.913</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">12</div>
+          <div class="kpi-sub">HN POS 5..16 (18.2% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="color: rgb(90, 90, 88); margin-top: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">Explore</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 66-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 66)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (1)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (3)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (35)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (27)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..66) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 25)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (stakhanov, 5.4h); largest subtree (@polotics) occupies 12 slots (HN POS 5..16).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="mode-tabs" id="modeTabs" role="tablist" aria-label="Ranking view">
+        <button type="button" class="mode-tab active" data-mode="hn_top40" role="tab" aria-selected="true">HN Top 40</button>
+        <button type="button" class="mode-tab" data-mode="top_signal" role="tab" aria-selected="false">Epistemic Top 40</button>
+      </div>
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (66)</option>
+          <option value="compiler_nim">Compiler &amp; Nim (Language) (24)</option>
+          <option value="python_migration">Python &amp; Migration (Objects) (14)</option>
+          <option value="buttons_fast">Buttons &amp; Fast (Websites) (9)</option>
+          <option value="biggest_json">Biggest &amp; Json (Data) (7)</option>
+          <option value="counting_reference">Counting &amp; Reference (Borrow) (5)</option>
+          <option value="general_commentary">General Commentary (7)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, nimony, compiler, code, types, language...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50512779 + NIMONY.ORG + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50512779, "story_title": "Nimony: A New Compiler for Nim", "story_url": "https://nimony.org/", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50512779, "story_title": "Nimony: A New Compiler for Nim", "story_url": "https://nimony.org/", "points": 135, "story_author": "Fervicus", "article_source": "fetched_url", "t1_ref_utc": "2026-11-17T15:52:36+00:00", "t2_ref_utc": "2026-11-17T15:52:36+00:00", "delta_minutes": 0.0, "story_anchors": ["nimony", "compiler", "code", "types", "language", "value", "compile", "nim", "languages", "thanks", "easy", "error", "memory", "nice", "cool", "features", "gives", "python", "default"], "facet_labels": {"compiler_nim": "Compiler & Nim (Language)", "python_migration": "Python & Migration (Objects)", "biggest_json": "Biggest & Json (Data)", "counting_reference": "Counting & Reference (Borrow)", "buttons_fast": "Buttons & Fast (Websites)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "compiler_nim", "label": "Compiler & Nim (Language)", "count": 24, "top_terms": ["compiler", "nim", "language", "cool"]}, {"slug": "python_migration", "label": "Python & Migration (Objects)", "count": 14, "top_terms": ["python", "migration", "objects", "existing"]}, {"slug": "biggest_json", "label": "Biggest & Json (Data)", "count": 7, "top_terms": ["biggest", "json", "data", "java"]}, {"slug": "counting_reference", "label": "Counting & Reference (Borrow)", "count": 5, "top_terms": ["counting", "reference", "borrow", "checker"]}, {"slug": "buttons_fast", "label": "Buttons & Fast (Websites)", "count": 9, "top_terms": ["buttons", "fast", "websites", "design"]}], "counts": {"total_comments": 66, "live_t2_comments": 66, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 51, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "87b14e095e3cade2ce53e2f098f3d0b63085112616114e0a54a768284f08b31c"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 1, "grounded_analysis": 3, "crowd_chatter": 35, "bullshit_or_flamewar": 27}, "facets": {"python_migration": 14, "compiler_nim": 24, "biggest_json": 7, "buttons_fast": 9, "counting_reference": 5, "general_commentary": 7}, "facet_options": [{"slug": "compiler_nim", "label": "Compiler & Nim (Language)", "count": 24}, {"slug": "python_migration", "label": "Python & Migration (Objects)", "count": 14}, {"slug": "buttons_fast", "label": "Buttons & Fast (Websites)", "count": 9}, {"slug": "biggest_json", "label": "Biggest & Json (Data)", "count": 7}, {"slug": "counting_reference", "label": "Counting & Reference (Borrow)", "count": 5}, {"slug": "general_commentary", "label": "General Commentary", "count": 7}], "facet_diagnostics": [{"slug": "compiler_nim", "label": "Compiler & Nim (Language)", "count": 24, "useful": 1, "useful_pct": 4.2, "terms": "compiler, nim, language, cool"}, {"slug": "python_migration", "label": "Python & Migration (Objects)", "count": 14, "useful": 1, "useful_pct": 7.1, "terms": "python, migration, objects, existing"}, {"slug": "buttons_fast", "label": "Buttons & Fast (Websites)", "count": 9, "useful": 0, "useful_pct": 0.0, "terms": "buttons, fast, websites, design"}, {"slug": "biggest_json", "label": "Biggest & Json (Data)", "count": 7, "useful": 2, "useful_pct": 28.6, "terms": "biggest, json, data, java"}, {"slug": "counting_reference", "label": "Counting & Reference (Borrow)", "count": 5, "useful": 0, "useful_pct": 0.0, "terms": "counting, reference, borrow, checker"}, {"slug": "general_commentary", "label": "General Commentary", "count": 7, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 4}, {"category": "code_repository", "count": 1}, {"category": "github_artifact", "count": 1}], "story_anchors": ["nimony", "compiler", "code", "types", "language", "value", "compile", "nim", "languages", "thanks", "easy", "error", "memory", "nice", "cool", "features", "gives", "python"], "largest_root": {"root_id": 50528552, "author": "polotics", "slots": 12, "start_dom": 5, "end_dom": 16, "share_pct": 18.2, "top_dom1_age": 5.4, "top_dom1_author": "stakhanov"}, "buried_cutoff": 25, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50531903, "au": "lcnmrn", "dom": 62, "sr": 1, "sc": 8.88, "ep": 8.88, "bs": 0.0, "d": 0, "age": 1.34, "grav": 8.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 29, "qw": 0, "k": 838, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "python_migration", "flbl": "Python & Migration (Objects)", "urls": ["https://github.com/lucianmarin/stricta"], "ig": 1.01, "fa": 2.08, "gp": 0.396, "bl": 0.0, "ds": 0.0, "txt": "This feels archaic to me after seeing what is possible with Stricta. You get full Python syntax as low level as possible, safe, strict, no ARC/GC, memory access. https://github.com/lucianmarin/stricta"}, {"id": 50529666, "au": "stakhanov", "dom": 1, "sr": 2, "sc": 5.29, "ep": 5.29, "bs": 0.0, "d": 0, "age": 5.4, "grav": 36.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 75, "qw": 0, "k": 1940, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "compiler_nim", "flbl": "Compiler & Nim (Language)", "urls": [], "ig": 1.427, "fa": 0.34, "gp": 0.671, "bl": 0.0, "ds": 0.0, "txt": "When I was doing the rounds roughly 10 years ago, trying to find a new programming language to learn, my money for \"next big thing\" landed on nim.  I did some personal projects and absolutely loved it but, unfortunately, opportunities to work \"on the clock\" in nim never materialised and then rust started eating the world.\n\nThanks, Andreas Rumpf, for sticking with it for all these years:  This seems like a great opportunity for me to get back into nim."}, {"id": 50529474, "au": "ZoomZoomZoom", "dom": 29, "sr": 3, "sc": 5.23, "ep": 5.23, "bs": 0.0, "d": 1, "age": 5.88, "grav": 41.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 57, "qw": 0, "k": 2160, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "biggest_json", "flbl": "Biggest & Json (Data)", "urls": ["https://nim-lang.github.io/Nim/tables.html"], "ig": 1.412, "fa": 0.62, "gp": 0.101, "bl": 0.0, "ds": 0.0, "txt": "I suspect you're talking about heterogenous containers which are antithetical to a strongly typed language but nevertheless are supported via std/json's JsonNode dynamic data.\n\nIn Nim regular hash maps (called tables here) have pretty regular accessors via `[]` `[]=` overloads (`foo[\"frob\"]=42`), plus additional routines such as `.get(otherwise)`.\n\nhttps://nim-lang.github.io/Nim/tables.html\n\nDon't know why are you conflating objects in your question."}, {"id": 50531779, "au": "netbioserror", "dom": 34, "sr": 4, "sc": 5.1, "ep": 5.1, "bs": 0.0, "d": 2, "age": 1.51, "grav": 9.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 179, "qw": 0, "k": 1506, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "biggest_json", "flbl": "Biggest & Json (Data)", "urls": [], "ig": 1.89, "fa": 0.0, "gp": 0.452, "bl": 0.0, "ds": 0.0, "txt": "It has a scoped responsibility, does mostly compute and data processing. Invoked by a PHP backend, single-threaded, we get parallelism at invocation rather than internally. So we can saturate server threads optionally if we need to.\n\nBiggest win: Single-owner scoped lifetimes by default with no annotations plus expression-oriented value semantics makes it eminently readable. Basically no memory semantics, all business logic. (It does processing of proprietary binary data including a lot of math.) Extraordinarily easy to maintain, refactor, add features. Valgrind confirms no orphaned blocks in some of our biggest test scenarios, it's impressive. Full compile-time evaluation is nice too, easy to slurp a whole file at compile-time and have it accessible in a normal binding, and writing generic procedures is obvious and simple.\n\nBiggest pain point: Hard to say, the only friction I've really ever run into is its weak tooling. I just use Make for build scripting (invoking the compiler directly instead of using Nimble) and Sublime's built-in features for refactoring. It's small enough that print-debugging works, but I occasionally dip into FlameGraph. Nimsuggest has some...dealbreaking quirks, but successors are in the works."}, {"id": 50531471, "au": "afavour", "dom": 17, "sr": 5, "sc": 4.05, "ep": 4.05, "bs": 0.0, "d": 0, "age": 1.88, "grav": 11.5, "surf": 5.2, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 97, "qw": 0, "k": 30458, "kpp": 6.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "compiler_nim", "flbl": "Compiler & Nim (Language)", "urls": [], "ig": 1.465, "fa": 0.0, "gp": 0.42, "bl": 0.0, "ds": 0.0, "txt": "I’m curious if this closes the door on Nim’s capability to output C code which you then compile yourself. I first discovered Nim when I was looking for something that could work with Apple’s requirements to embed bitcode in iOS apps, it meant you had to use their specific version of LLVM and that ruled out a lot of languages. It always seemed like a really unique feature (though IIRC Haxe has something similar).\n\nApple has long since removed that requirement so it doesn’t really matter anyway and I wouldn’t blame the Nim folks if it’s gone, these seem like a great set of improvements."}, {"id": 50529934, "au": "PMunch", "dom": 27, "sr": 6, "sc": 3.75, "ep": 3.9, "bs": 0.0, "d": 1, "age": 4.69, "grav": 30.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 130, "qw": 0, "k": 609, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "compiler_nim", "flbl": "Compiler & Nim (Language)", "urls": [], "ig": 1.564, "fa": 0.0, "gp": 0.154, "bl": 0.0, "ds": 0.0, "txt": "Nim is very strict about types, which is probably what you remember. Things that are typically expressed as a dictionary/object in JavaScript and Python are better represented as a fully typed tree of objects in Nim. The language of course supports the data-structure dictionary/hashmap/table (called Table in Nim) which is \"anything hashable\" -> \"any type\" lookup. This is what's used for things like `myTable[\"hello\"] = 5` for storing the number 5 for the key \"hello\". However because of the strict types you can't mix which types they map to without creating some sort of wrapper type that gives you the alternatives you're allowed to use. Many people reach for Nims JsonNode type to fill this gap for small collections of string/number/array/dictionary since it already is such a wrapper type."}, {"id": 50532014, "au": "stakhanov", "dom": 14, "sr": 7, "sc": 3.66, "ep": 3.66, "bs": 0.0, "d": 5, "age": 1.21, "grav": 8.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 214, "qw": 0, "k": 1940, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "python_migration", "flbl": "Python & Migration (Objects)", "urls": [], "ig": 1.462, "fa": 0.0, "gp": 0.152, "bl": 0.0, "ds": 0.0, "txt": "I think it's all about corpus weight.\n\nWhen Python did the migration, it had a good flow of new investments coming into it and delivered good reasons for why those should go to Python 3 rather than 2.  At the same time, it also already had a base of existing investments in Python 2 delivering better ROI without the added cost of a migration, and the sum of that exceeded the critical mass it took to make it economical to keep both versions of the ecosystem around.\n\nWith Perl you are seeing what it looks like when you have zero new investments coming in and no good reasons for why new investments should go to Raku.  (Because: Just use Python).  You do still have a non-negligible base of existing investments in Perl 5 and those deliver better ROI without the added cost of a migration.  So my prediction is that Perl 5 will stick around, and Raku is dead on arrival.\n\nWith Nim it might be the other way around: Good reasons for why new investments should go to Nim 3 rather than Nim 2, and not all that much existing investment in Nim 2.  If Nim 3 sees healthy adoption, it might well be more economical to re-deploy ecosystem maintenance to Nim 3 and migrate most of the existing code, rather than keep two versions of the ecosystem going."}, {"id": 50529214, "au": "jphoward", "dom": 26, "sr": 8, "sc": 3.48, "ep": 3.78, "bs": 0.0, "d": 0, "age": 6.55, "grav": 47.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 656, "kpp": 6.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "biggest_json", "flbl": "Biggest & Json (Data)", "urls": [], "ig": 1.116, "fa": 0.0, "gp": 0.796, "bl": 0.0, "ds": 0.0, "txt": "I love Nim but my only problem with it previously was support for dictionaries/objects felt really weird?  There was some sort of JSON structure as I recall,  but it didn't seem anywhere near as easy to use as the analogous structures in Python/JS.  Am I misremembering?  Has this been improved?"}, {"id": 50530160, "au": "pietroppeter", "dom": 20, "sr": 9, "sc": 3.47, "ep": 3.47, "bs": 0.0, "d": 0, "age": 4.12, "grav": 26.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 119, "qw": 0, "k": 1196, "kpp": 4.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "compiler_nim", "flbl": "Compiler & Nim (Language)", "urls": [], "ig": 1.302, "fa": 0.0, "gp": 0.28, "bl": 0.0, "ds": 0.0, "txt": "I think Nim is a great fit for the AI era. let me explain\n\nAlways appreciated how Nim gives you a low cognitive load: it is easy to reason about, does not get in the way of doing stuff, you focus on what you need to do it and rarely on how you do it (specifics of the language).\n\nI think this is a great advantage in this era of automatic/AI assisted programming. The fact that the language is very readable also helps for the moments when you need/want to read the code.\n\nNimony btw is a very cool way to evolve the mainline compiler and looking forward to use this in main Nim (but it is also something nice to experiment with)"}, {"id": 50529848, "au": "girvo", "dom": 3, "sr": 10, "sc": 3.11, "ep": 3.33, "bs": 0.0, "d": 0, "age": 4.92, "grav": 32.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 13471, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "compiler_nim", "flbl": "Compiler & Nim (Language)", "urls": [], "ig": 0.751, "fa": 0.34, "gp": 0.414, "bl": 0.0, "ds": 0.0, "txt": "It’s super exciting. It’s basically adding all the features I wished Nim had, and I’ve been using Nim in anger since the v0.10 days!"}, {"id": 50529115, "au": "badsectoracula", "dom": 53, "sr": 11, "sc": 2.87, "ep": 2.87, "bs": 0.0, "d": 1, "age": 6.88, "grav": 50.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 74, "qw": 0, "k": 8809, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "buttons_fast", "flbl": "Buttons & Fast (Websites)", "urls": [], "ig": 1.073, "fa": 0.0, "gp": 0.24, "bl": 0.0, "ds": 0.0, "txt": "Everyone has a different taste.\n\nPersonally i like the site's design, it looks like from late 2000s / early 2010s with its gradient rounded buttons, 1px offsets and chiseled text - i even clicked randomly on buttons because of how \"buttony\" they look :-P.\n\nIME this isn't what LLMs make by default, so if nothing else, i doubt it was a single prompt and most likely it was adjusted to fit the author's taste (that it sounds like doesn't align with yours)."}, {"id": 50532389, "au": "Beretta_Vexee", "dom": 13, "sr": 12, "sc": 2.77, "ep": 2.92, "bs": 0.0, "d": 5, "age": 0.76, "grav": 6.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 51, "qw": 0, "k": 1240, "kpp": 4.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "python_migration", "flbl": "Python & Migration (Objects)", "urls": [], "ig": 1.241, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It was largely a question of the existing codebase. It took years to convert all the obscure scientific libraries from Python 2 to Python 3.\n\nThe migration was no easy task. So all the projects already written in Python 2 remained on version 2. Until the day they reached a dead end and were forced to migrate."}, {"id": 50531607, "au": "drob518", "dom": 41, "sr": 13, "sc": 2.68, "ep": 2.68, "bs": 0.0, "d": 1, "age": 1.71, "grav": 10.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 2959, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "python_migration", "flbl": "Python & Migration (Objects)", "urls": [], "ig": 0.317, "fa": 0.68, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "386 only? You’re very rare indeed these days. Didn’t the Linux kernel also recently move past 386 only systems?"}, {"id": 50532039, "au": "tokai", "dom": 22, "sr": 14, "sc": 2.55, "ep": 2.7, "bs": 0.0, "d": 2, "age": 1.18, "grav": 8.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 10691, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "buttons_fast", "flbl": "Buttons & Fast (Websites)", "urls": [], "ig": 1.149, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Ai writes nim pretty well. Its close enough to other languages that llms can manage to write performant code with few issues. There are some gotchas, but the fast compile times and good error messages makes it easy to iterate fast for the bots."}, {"id": 50529933, "au": "ilaksh", "dom": 56, "sr": 15, "sc": 2.27, "ep": 2.42, "bs": 0.0, "d": 1, "age": 4.69, "grav": 30.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 69, "qw": 0, "k": 10839, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "buttons_fast", "flbl": "Buttons & Fast (Websites)", "urls": [], "ig": 0.537, "fa": 0.34, "gp": 0.128, "bl": 0.0, "ds": 0.0, "txt": "It looks good on my phone and everything loads virtually instantly.\n\nIt has a clean theme. The only knock I can see is that the buttons are a little retro. But I like them .\n\nBecause of how fast every link loads and uncluttered the design is (not a single ad of any sort), I think it's better than 90% of websites.\n\nThe fact that your fashion sense weighs other trend aesthetics so much over those things.."}, {"id": 50529167, "au": "heavensteeth", "dom": 51, "sr": 16, "sc": 1.83, "ep": 2.57, "bs": 0.0, "d": 1, "age": 6.7, "grav": 49.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 388, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "compiler_nim", "flbl": "Compiler & Nim (Language)", "urls": [], "ig": 0.958, "fa": 0.0, "gp": 0.219, "bl": 0.0, "ds": 0.0, "txt": "<button class=\"nav-btn\" onclick=\"navigateToPage('index.html')\">Home<\/button>\n\n   ... \n\n   // Navigation functionality\n   function navigateToPage(filename) {\n       window.location.href = filename;\n   }\n\nWhat shockingly poor code. Just disgraceful.\n\nThis is bad for accessibility, bad for compatibility, and serves no purpose at all."}, {"id": 50533122, "au": "setr", "dom": 31, "sr": 17, "sc": 1.75, "ep": 2.41, "bs": 0.0, "d": 3, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 43, "qw": 0, "k": 5584, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "python_migration", "flbl": "Python & Migration (Objects)", "urls": [], "ig": 1.028, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The difference isn’t between JS/Python; objects exist in many languages with various representations, JS happens to model objects using dictionaries.\n\nSo it’s really the case that JS conflates objects/dictionaries, so only people familiar with only JS would know what you mean"}, {"id": 50529437, "au": "ZoomZoomZoom", "dom": 6, "sr": 18, "sc": 1.2, "ep": 1.93, "bs": 0.0, "d": 1, "age": 5.97, "grav": 41.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 21, "qw": 0, "k": 2160, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "python_migration", "flbl": "Python & Migration (Objects)", "urls": ["https://nim-lang.org/blog/2026/10/28/nim-240.html"], "ig": 0.823, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "BTW, Sum types (along with incremental compilation, SSO strings and other thing) have been recently added to Nim 2 with the 2.4.0 release: https://nim-lang.org/blog/2026/10/28/nim-240.html"}, {"id": 50530642, "au": "suncore", "dom": 49, "sr": 19, "sc": 0.84, "ep": 0.84, "bs": 0.0, "d": 1, "age": 3.15, "grav": 19.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 69, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "counting_reference", "flbl": "Counting & Reference (Borrow)", "urls": [], "ig": 0.357, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "If I understand correctly, it still does have reference counting so you don't have to fight the borrow checker if you don't want to."}, {"id": 50531880, "au": "deepsquirrelnet", "dom": 4, "sr": 20, "sc": 0.72, "ep": 1.38, "bs": 0.0, "d": 0, "age": 1.37, "grav": 8.9, "surf": 7.5, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 1920, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "python_migration", "flbl": "Python & Migration (Objects)", "urls": [], "ig": 0.524, "fa": 0.0, "gp": 0.1, "bl": 0.0, "ds": 0.0, "txt": "I did my first \"real\" nim project this year. I'd been tinkering with it here and there, but found a chance to use it. I'm coming from mostly python experience and found it to be a really nice experience."}, {"id": 50531144, "au": "pjmlp", "dom": 9, "sr": 21, "sc": 0.42, "ep": 0.86, "bs": 0.0, "d": 4, "age": 2.29, "grav": 13.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 134000, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "biggest_json", "flbl": "Biggest & Json (Data)", "urls": [], "ig": 0.282, "fa": 0.0, "gp": 0.139, "bl": 0.0, "ds": 0.0, "txt": "Speaking from the stand of Java and .NET breaking changes, it is not, some folks will cling to the old world no matter what.\n\nCheck how many deployments (products even) are still being done in Java 8, or .NET Framework."}, {"id": 50530127, "au": "pietroppeter", "dom": 54, "sr": 22, "sc": 0.34, "ep": 1.44, "bs": 0.0, "d": 1, "age": 4.2, "grav": 26.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 1196, "kpp": 4.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "compiler_nim", "flbl": "Compiler & Nim (Language)", "urls": [], "ig": 0.558, "fa": 0.0, "gp": 0.091, "bl": 0.0, "ds": 0.0, "txt": "I think there was very little effort put on this specific website. The effort has gone in the compiler itself (and the mainline compiler). Not that it would not benefit for a better website"}, {"id": 50528772, "au": "pjmlp", "dom": 37, "sr": 23, "sc": 0.29, "ep": 2.36, "bs": 1.19, "d": 0, "age": 7.68, "grav": 59.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 134000, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "python_migration", "flbl": "Python & Migration (Objects)", "urls": [], "ig": 0.64, "fa": 0.0, "gp": 0.588, "bl": 0.45, "ds": 0.0, "txt": "Looking interesting, I like the improvements over what Nim used to be.\n\nThe big question is naturally the adoption curve, given the breaking changes."}, {"id": 50529196, "au": "aktenlage", "dom": 36, "sr": 24, "sc": 0.13, "ep": 1.32, "bs": 1.19, "d": 0, "age": 6.61, "grav": 48.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 405, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "counting_reference", "flbl": "Counting & Reference (Borrow)", "urls": [], "ig": 0.251, "fa": 0.0, "gp": 0.504, "bl": 0.45, "ds": 0.0, "txt": "Does anyone already have experience, how the developer experience is? Error messages, debugging and so on?"}, {"id": 50529347, "au": "arcanemachiner", "dom": 52, "sr": 25, "sc": 0.1, "ep": 1.42, "bs": 0.0, "d": 2, "age": 6.2, "grav": 44.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 3170, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "compiler_nim", "flbl": "Compiler & Nim (Language)", "urls": [], "ig": 0.606, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Ha, that is bad. This is what happens when you use the cheap LLMs. (At least, I hope Opus 5.5 isn't pulling stunts that are this bad... It's not that bad when I look at my code.)"}, {"id": 50529129, "au": "jimbob45", "dom": 45, "sr": 26, "sc": -0.3, "ep": 1.99, "bs": 1.19, "d": 0, "age": 6.83, "grav": 50.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 2914, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "compiler_nim", "flbl": "Compiler & Nim (Language)", "urls": [], "ig": 0.522, "fa": 0.0, "gp": 0.528, "bl": 0.45, "ds": 0.0, "txt": "Nim still has the GC, right? It always seemed like a slightly better Golang, much worse Dlang in that respect."}, {"id": 50532326, "au": "ptx", "dom": 42, "sr": 27, "sc": -0.41, "ep": 0.93, "bs": 1.19, "d": 2, "age": 0.82, "grav": 6.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 5241, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.295, "fa": 0.0, "gp": 0.161, "bl": 0.45, "ds": 0.0, "txt": "There are still 32-bit applications running on 64-bit operating systems which you might want to extend."}, {"id": 50528552, "au": "polotics", "dom": 5, "sr": 28, "sc": -0.46, "ep": 2.28, "bs": 1.19, "d": 0, "age": 8.31, "grav": 66.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 2934, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "compiler_nim", "flbl": "Compiler & Nim (Language)", "urls": [], "ig": 0.579, "fa": 0.0, "gp": 0.632, "bl": 0.45, "ds": 0.0, "txt": "This is great! Congrats to the Nim team for keeping the pedal to the metal!\n\nSum-types, borrow-checking...  Nim 3 is beautiful."}, {"id": 50532075, "au": "michaelsbradley", "dom": 16, "sr": 29, "sc": -0.47, "ep": 1.07, "bs": 0.0, "d": 3, "age": 1.13, "grav": 7.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 6523, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "compiler_nim", "flbl": "Compiler & Nim (Language)", "urls": [], "ig": 0.456, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The Nimony compiler is a completely new codebase. Some language and compiler features were ported to the old codebase of the Nim 2 compiler."}, {"id": 50529507, "au": "jphoward", "dom": 30, "sr": 30, "sc": -0.64, "ep": 0.9, "bs": 0.0, "d": 2, "age": 5.81, "grav": 40.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 656, "kpp": 6.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "python_migration", "flbl": "Python & Migration (Objects)", "urls": [], "ig": 0.383, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I'm 'conflating' them because they're called objects in javascript, so people unfamiliar with Python know what I mean.\nOk thanks."}, {"id": 50531598, "au": "pjmlp", "dom": 11, "sr": 31, "sc": -0.89, "ep": 0.96, "bs": 1.19, "d": 6, "age": 1.72, "grav": 10.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 134000, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "biggest_json", "flbl": "Biggest & Json (Data)", "urls": [], "ig": 0.409, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "True, that doesn't mean that folks will feel like migrating, unless they see a value in doing so."}, {"id": 50531668, "au": "raffraffraff", "dom": 21, "sr": 32, "sc": -1.07, "ep": 1.51, "bs": 1.19, "d": 1, "age": 1.63, "grav": 10.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 4443, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "compiler_nim", "flbl": "Compiler & Nim (Language)", "urls": [], "ig": 0.644, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "I thought it would be the opposite, because you can't say: \"The AI was trained on a bazillion lines of idiomatic Nim 3 solving a wide range of common problems\""}, {"id": 50529059, "au": "DeathArrow", "dom": 38, "sr": 33, "sc": -1.11, "ep": 1.33, "bs": 1.19, "d": 1, "age": 7.0, "grav": 52.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 11446, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "compiler_nim", "flbl": "Compiler & Nim (Language)", "urls": [], "ig": 0.565, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "It's not a big issue since Nim didn't have a large following. If anything, it might help Nim to take off if it's good enough and user friendly enough."}, {"id": 50528764, "au": "brianush1", "dom": 60, "sr": 34, "sc": -1.2, "ep": 0.44, "bs": 1.19, "d": 2, "age": 7.7, "grav": 59.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 315, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "buttons_fast", "flbl": "Buttons & Fast (Websites)", "urls": [], "ig": 0.186, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "it's definitely LLM-made (if you look at the CSS, there's LLM-written comments) but it doesn't look like a one-shot prompt"}, {"id": 50531537, "au": "torginus", "dom": 12, "sr": 35, "sc": -1.2, "ep": 1.53, "bs": 1.19, "d": 4, "age": 1.8, "grav": 11.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 9470, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "python_migration", "flbl": "Python & Migration (Objects)", "urls": [], "ig": 0.429, "fa": 0.0, "gp": 0.36, "bl": 0.45, "ds": 0.0, "txt": "I'm not a Python guy, but my understanding was that the reason why Python 2 stuck around for so long was that some people preferred it over 3"}, {"id": 50528639, "au": "lobf", "dom": 50, "sr": 36, "sc": -1.31, "ep": 3.27, "bs": 3.05, "d": 0, "age": 8.0, "grav": 63.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 229, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "compiler_nim", "flbl": "Compiler & Nim (Language)", "urls": [], "ig": 0.677, "fa": 0.0, "gp": 1.161, "bl": 1.15, "ds": 0.0, "txt": "Nim is cool, but holy moly this web design is disgusting. Absolute one-shot prompting."}, {"id": 50532397, "au": "lcnmrn", "dom": 65, "sr": 37, "sc": -1.42, "ep": 1.02, "bs": 1.19, "d": 2, "age": 0.75, "grav": 6.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 838, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "compiler_nim", "flbl": "Compiler & Nim (Language)", "urls": [], "ig": 0.435, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Get the code and ask your LLM if it did, otherwise provide an edge case to be fixed."}, {"id": 50530853, "au": "jeremyjh", "dom": 28, "sr": 38, "sc": -1.65, "ep": 1.08, "bs": 1.19, "d": 2, "age": 2.75, "grav": 16.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 11665, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "compiler_nim", "flbl": "Compiler & Nim (Language)", "urls": [], "ig": 0.46, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "I wonder if this is more palatable with first-class sumtypes/ADTs in Nim 3? Or is that already what JsonNode essentially was?"}, {"id": 50531954, "au": "mirrir", "dom": 63, "sr": 39, "sc": -1.74, "ep": 0.85, "bs": 1.19, "d": 1, "age": 1.27, "grav": 8.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 91, "kpp": 6.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "python_migration", "flbl": "Python & Migration (Objects)", "urls": [], "ig": 0.24, "fa": 0.0, "gp": 0.195, "bl": 0.45, "ds": 0.0, "txt": "yes but that's your own project. its odd to not disclose that while calling other's work archaic."}, {"id": 50528996, "au": "konart", "dom": 55, "sr": 40, "sc": -1.83, "ep": 1.88, "bs": 3.05, "d": 1, "age": 7.12, "grav": 53.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 2274, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "buttons_fast", "flbl": "Buttons & Fast (Websites)", "urls": [], "ig": 0.249, "fa": 0.34, "gp": 0.223, "bl": 1.15, "ds": 0.0, "txt": "idk, looks like a classic design from 2010. See QIP or AIMP Classic."}, {"id": 50530768, "au": "christophilus", "dom": 8, "sr": 41, "sc": -1.96, "ep": 0.78, "bs": 1.19, "d": 3, "age": 2.9, "grav": 17.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 14196, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "python_migration", "flbl": "Python & Migration (Objects)", "urls": [], "ig": 0.331, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Might be, but Nim is statically typed, and we have LLMs now, so migration should be pretty trivial, is my guess."}, {"id": 50530308, "au": "eterps", "dom": 23, "sr": 42, "sc": -2.59, "ep": 1.56, "bs": 3.05, "d": 0, "age": 3.8, "grav": 23.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 12, "qw": 0, "k": 2568, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "compiler_nim", "flbl": "Compiler & Nim (Language)", "urls": ["https://nimony.org/stdlib/std/result.html", "https://nimony.org/stdlib/std/options.html"], "ig": 0.5, "fa": 0.0, "gp": 0.267, "bl": 1.15, "ds": 0.0, "txt": "Nice, it looks like it supports option and result types as well:\n\n- https://nimony.org/stdlib/std/result.html\n\n- https://nimony.org/stdlib/std/options.html"}, {"id": 50529033, "au": "DeathArrow", "dom": 48, "sr": 43, "sc": -2.88, "ep": 1.3, "bs": 3.05, "d": 0, "age": 7.05, "grav": 52.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 11446, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "counting_reference", "flbl": "Counting & Reference (Borrow)", "urls": [], "ig": 0.216, "fa": 0.0, "gp": 0.543, "bl": 1.15, "ds": 0.0, "txt": "Cool, now we can fight the borrow checker in Nim, too."}, {"id": 50532469, "au": "tokai", "dom": 19, "sr": 44, "sc": -3.39, "ep": 0.91, "bs": 3.05, "d": 1, "age": 0.66, "grav": 5.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 10691, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "compiler_nim", "flbl": "Compiler & Nim (Language)", "urls": [], "ig": 0.387, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Nimony still puts the C code in the .cache/ folder as nim does."}, {"id": 50532000, "au": "platinumrad", "dom": 64, "sr": 45, "sc": -3.63, "ep": 1.05, "bs": 4.24, "d": 1, "age": 1.22, "grav": 8.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 44, "k": 2313, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.318, "fa": 0.0, "gp": 0.206, "bl": 1.6, "ds": 0.0, "txt": "> Rust-Style Memory Safety (No GC / No ARC): Compile-time ownership and borrow checking with inferred BORROW / MUT_BORROW / MOVE parameter modes, non-lexical lifetimes (NLL), monomorphized deterministic @_drop_T / @_clone_T generation, compiler-lowered { i1, T } exception propagation, and runtime bounds traps—with zero garbage collection or reference counting overhead.\n\nThere is either a catch here or you(r LLM) has solved multiple open research problems."}, {"id": 50531599, "au": "txdv", "dom": 18, "sr": 46, "sc": -3.81, "ep": 1.17, "bs": 4.24, "d": 1, "age": 1.72, "grav": 10.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 536, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "buttons_fast", "flbl": "Buttons & Fast (Websites)", "urls": [], "ig": 0.37, "fa": 0.0, "gp": 0.206, "bl": 1.6, "ds": 0.0, "txt": "A lot of compilers nowadays compile to wasm, when you have wasm, you can compile to C."}, {"id": 50529543, "au": "brainwipe", "dom": 24, "sr": 47, "sc": -4.17, "ep": 1.17, "bs": 4.24, "d": 0, "age": 5.74, "grav": 39.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 643, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "compiler_nim", "flbl": "Compiler & Nim (Language)", "urls": [], "ig": 0.254, "fa": 0.0, "gp": 0.395, "bl": 1.6, "ds": 0.0, "txt": "Hopeful for the new compiler but wished they'd called it Nimoy!"}, {"id": 50530388, "au": "pjmlp", "dom": 39, "sr": 48, "sc": -4.25, "ep": 0.28, "bs": 4.24, "d": 2, "age": 3.62, "grav": 22.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 134000, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.12, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Only that the following might become even smaller."}, {"id": 50529156, "au": "jibalt", "dom": 46, "sr": 49, "sc": -4.58, "ep": 0.61, "bs": 5.04, "d": 1, "age": 6.72, "grav": 49.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 9, "qw": 0, "k": 268, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "counting_reference", "flbl": "Counting & Reference (Borrow)", "urls": ["https://nim-lang.org/docs/mm.html"], "ig": 0.258, "fa": 0.0, "gp": 0.0, "bl": 1.9, "ds": 0.0, "txt": "Optionally but not by default ... things have changed a lot:\n\nhttps://nim-lang.org/docs/mm.html"}, {"id": 50530224, "au": "brabel", "dom": 15, "sr": 50, "sc": -4.62, "ep": 0.34, "bs": 3.05, "d": 2, "age": 3.99, "grav": 25.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 8687, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "compiler_nim", "flbl": "Compiler & Nim (Language)", "urls": [], "ig": 0.143, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "How does this differ from this new compiler?"}, {"id": 50531433, "au": "simlevesque", "dom": 10, "sr": 51, "sc": -5.23, "ep": 0.55, "bs": 4.24, "d": 5, "age": 1.92, "grav": 11.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 4080, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "biggest_json", "flbl": "Biggest & Json (Data)", "urls": [], "ig": 0.234, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Nim 2 isn't as popular or ingrained as Java 8 or .NET Framework."}, {"id": 50528780, "au": "pjmlp", "dom": 61, "sr": 52, "sc": -5.28, "ep": 0.99, "bs": 5.17, "d": 3, "age": 7.66, "grav": 59.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 134000, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "buttons_fast", "flbl": "Buttons & Fast (Websites)", "urls": [], "ig": 0.42, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "Nowadays the brown background Claude design is everywhere, at least this one is somehow different.\n\nJust like when HTML templates started to be a business all websites looked the same."}, {"id": 50532171, "au": "Symmetry", "dom": 2, "sr": 53, "sc": -5.67, "ep": 0.87, "bs": 5.43, "d": 0, "age": 1.0, "grav": 7.2, "surf": 9.2, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 25, "k": 19480, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "compiler_nim", "flbl": "Compiler & Nim (Language)", "urls": [], "ig": 0.311, "fa": 0.0, "gp": 0.094, "bl": 2.05, "ds": 0.0, "txt": "> Nimony is case sensitive like most other modern programming languages. The reason for this is implementation simplicity. This might also be changed in the future.\n\nI've never been too annoyed by Nim's approach but I think this removes a complaint many people have."}, {"id": 50530066, "au": "gsoff", "dom": 57, "sr": 54, "sc": -7.07, "ep": 1.23, "bs": 6.76, "d": 1, "age": 4.33, "grav": 27.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 2, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "compiler_nim", "flbl": "Compiler & Nim (Language)", "urls": [], "ig": 0.523, "fa": 0.0, "gp": 0.0, "bl": 2.55, "ds": 0.0, "txt": "border-left: 3px solid color...;\n\nthis gives the design a cheap ai-template vibe"}, {"id": 50531622, "au": "stakhanov", "dom": 35, "sr": 55, "sc": -9.27, "ep": 0.0, "bs": 6.89, "d": 1, "age": 1.69, "grav": 10.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 0, "k": 1940, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Are you hiring?"}, {"id": 50530476, "au": "torginus", "dom": 7, "sr": 56, "sc": -9.27, "ep": 0.0, "bs": 6.89, "d": 2, "age": 3.44, "grav": 21.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 9470, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "python_migration", "flbl": "Python & Migration (Objects)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Is this a Python 2/3 situation?"}, {"id": 50531606, "au": "txdv", "dom": 33, "sr": 57, "sc": -9.27, "ep": 0.0, "bs": 6.89, "d": 1, "age": 1.71, "grav": 10.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 536, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "biggest_json", "flbl": "Biggest & Json (Data)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Load, scale?\n\nBiggest pain point? Biggest win?"}, {"id": 50532828, "au": "anthk", "dom": 43, "sr": 58, "sc": -9.27, "ep": 0.0, "bs": 6.89, "d": 2, "age": 0.25, "grav": 4.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 5373, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "i686 then."}, {"id": 50530678, "au": "vips7L", "dom": 47, "sr": 59, "sc": -9.27, "ep": 0.0, "bs": 6.89, "d": 2, "age": 3.09, "grav": 18.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 3737, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "counting_reference", "flbl": "Counting & Reference (Borrow)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Reference counting by default is GC."}, {"id": 50528757, "au": "asibahi", "dom": 58, "sr": 60, "sc": -9.27, "ep": 0.0, "bs": 6.89, "d": 1, "age": 7.73, "grav": 60.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 149, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "buttons_fast", "flbl": "Buttons & Fast (Websites)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Not everything you dont like is LLM-made."}, {"id": 50529541, "au": "xx_ns", "dom": 59, "sr": 61, "sc": -9.27, "ep": 0.0, "bs": 6.89, "d": 2, "age": 5.74, "grav": 39.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 5, "qw": 0, "k": 1227, "kpp": 11.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "buttons_fast", "flbl": "Buttons & Fast (Websites)", "urls": ["https://github.com/nim-lang/nimony-website/commits/master/"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "No, but this definitely is. https://github.com/nim-lang/nimony-website/commits/master/"}, {"id": 50532931, "au": "fishgoesblub", "dom": 66, "sr": 62, "sc": -9.27, "ep": 0.0, "bs": 6.89, "d": 1, "age": 0.16, "grav": 4.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 3, "k": 1022, "kpp": 5.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "compiler_nim", "flbl": "Compiler & Nim (Language)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "> All Rights Reserved\n\nNo thanks."}, {"id": 50531117, "au": "anthk", "dom": 40, "sr": 63, "sc": -11.17, "ep": 0.0, "bs": 9.2, "d": 0, "age": 2.33, "grav": 14.0, "surf": 4.5, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 5373, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "python_migration", "flbl": "Python & Migration (Objects)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.181, "bl": 3.473, "ds": 0.0, "txt": "No i386? We do exist."}, {"id": 50532125, "au": "angel-", "dom": 25, "sr": 64, "sc": -11.64, "ep": 0.0, "bs": 9.41, "d": 1, "age": 1.07, "grav": 7.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 3, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.55, "ds": 0.0, "txt": "Wouldn't stick with the biblical themes"}, {"id": 50531565, "au": "netbioserror", "dom": 32, "sr": 65, "sc": -12.19, "ep": 0.0, "bs": 10.15, "d": 0, "age": 1.77, "grav": 10.9, "surf": 5.8, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 1506, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "compiler_nim", "flbl": "Compiler & Nim (Language)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.128, "bl": 3.828, "ds": 0.0, "txt": "Using Nim in production, AMA."}, {"id": 50531818, "au": "esafak", "dom": 44, "sr": 66, "sc": -12.92, "ep": 0.0, "bs": 10.86, "d": 0, "age": 1.46, "grav": 9.4, "surf": 6.7, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 8779, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.119, "bl": 4.097, "ds": 0.0, "txt": "When is 1.0 slated to be released?"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 40);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 40);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 40);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `${shown.length} of ${pool.length} comments` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

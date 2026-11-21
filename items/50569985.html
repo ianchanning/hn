@@ -1,0 +1,1387 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>50569985 // GIMP now has UI tests - Better Signal News</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+      text-transform: lowercase;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      text-transform: lowercase;
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .kpi-cell {
+      padding: 8px 0;
+    }
+    .kpi-label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 4px 0;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer:not([open]) {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary,
+    details.proof-drawer > summary {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+    }
+    table.ablation th {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: normal;
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    button.nav-btn,
+    button.mode-tab,
+    button.topbar-toggle {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: rgb(0, 0, 0);
+      cursor: pointer;
+      text-decoration: none;
+      line-height: inherit;
+      vertical-align: baseline;
+      transition: color 0.12s ease;
+      text-transform: lowercase;
+    }
+    button.nav-btn:hover,
+    button.nav-btn.active,
+    button.mode-tab:hover,
+    button.mode-tab.active,
+    button.topbar-toggle:hover,
+    button.topbar-toggle.active {
+      color: rgb(255, 255, 255);
+      text-decoration: none;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      padding: 14px;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; row-gap: 4px; }
+      .topbar-right { padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">BS</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Better Signal News</a>
+        <span class="pagetop" id="modeTabs">
+          <button type="button" class="nav-btn mode-tab active" data-mode="top_signal" role="tab" aria-selected="true">Top 40</button> | <button type="button" class="nav-btn mode-tab" data-mode="hn_top40" role="tab" aria-selected="false">HN Top 40</button>
+        </span>
+      </div>
+      <div class="topbar-right">
+        <button type="button" class="nav-btn topbar-toggle" id="exploreToggleBtn" aria-expanded="false">explore</button> | <button type="button" class="nav-btn topbar-toggle" id="evidenceToggleBtn" aria-expanded="false">evidence</button>
+      </div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://www.gimp.org/news/2026/11/16/gimp-ui-tests/">GIMP now has UI tests</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=gimp.org"><span class="sitestr">gimp.org</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">103 points</span> by <a href="https://news.ycombinator.com/user?id=qtqtqt">qtqtqt</a> <span class="age" title="2026-11-20T04:00:24.000Z"><a href="https://news.ycombinator.com/item?id=50569985">4 hours ago</a></span> | <a href="https://news.ycombinator.com/item?id=50569985">84&nbsp;comments</a> | 91.7% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Evidence</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">84</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 62 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">8.3%</div>
+          <div class="kpi-sub">7 comments (0 Gold / 0.0%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">91.7%</div>
+          <div class="kpi-sub">46 chatter &bull; 30 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">0</div>
+        <div class="kpi-sub">0% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.873</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">39</div>
+          <div class="kpi-sub">HN POS 17..55 (46.4% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="color: rgb(90, 90, 88); margin-top: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Explore</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">CALIBRATE</div>
+              <h2>Signal Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 84-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Bullshit (Y) // Signal (X) </span>
+                <span class="sig">TAP POINT (N = 84)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (0)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (7)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (46)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (1)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (30)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>HN POS (1..84) (Y) // Age (Hours) (X)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 25)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (KingOfCoders, 0.1h); largest subtree (@rafram) occupies 39 slots (HN POS 17..55).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (84)</option>
+          <option value="text_pangram">Text &amp; Pangram (Test) (24)</option>
+          <option value="tests_gimp">Tests &amp; Gimp (Unit) (18)</option>
+          <option value="software_quality">Software &amp; Quality (Users) (15)</option>
+          <option value="agent_far">Agent &amp; Far (Tests) (12)</option>
+          <option value="value_eating">Value &amp; Eating (Farming) (7)</option>
+          <option value="general_commentary">General Commentary (8)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, gimp, tests, ui, test, user...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT</span>
+    <span>SOURCE: HN 50569985 + GIMP.ORG + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50569985, "story_title": "GIMP now has UI tests", "story_url": "https://www.gimp.org/news/2026/11/16/gimp-ui-tests/", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50569985, "story_title": "GIMP now has UI tests", "story_url": "https://www.gimp.org/news/2026/11/16/gimp-ui-tests/", "points": 103, "story_author": "qtqtqt", "article_source": "fetched_url", "t1_ref_utc": "2026-11-20T08:06:49+00:00", "t2_ref_utc": "2026-11-20T08:06:49+00:00", "delta_minutes": 0.0, "story_anchors": ["gimp", "tests", "ui", "test", "user", "testing", "tool", "improve", "software", "free", "apps", "claude", "else", "everything", "llm", "results", "stand"], "facet_labels": {"tests_gimp": "Tests & Gimp (Unit)", "software_quality": "Software & Quality (Users)", "value_eating": "Value & Eating (Farming)", "agent_far": "Agent & Far (Tests)", "text_pangram": "Text & Pangram (Test)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "tests_gimp", "label": "Tests & Gimp (Unit)", "count": 18, "top_terms": ["tests", "gimp", "unit", "toolkit"]}, {"slug": "software_quality", "label": "Software & Quality (Users)", "count": 15, "top_terms": ["software", "quality", "users", "photocraft"]}, {"slug": "value_eating", "label": "Value & Eating (Farming)", "count": 7, "top_terms": ["value", "eating", "farming", "tool"]}, {"slug": "agent_far", "label": "Agent & Far (Tests)", "count": 12, "top_terms": ["agent", "far", "tests", "choose"]}, {"slug": "text_pangram", "label": "Text & Pangram (Test)", "count": 24, "top_terms": ["text", "pangram", "test", "results"]}], "counts": {"total_comments": 84, "live_t2_comments": 84, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 62, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "03beee24d0fa55e41a0144ae82d14abffbff9a14bae3624ef902a914df7ef127"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"grounded_analysis": 7, "crowd_chatter": 46, "bullshit_or_flamewar": 30, "meme_or_snark": 1}, "facets": {"software_quality": 15, "text_pangram": 24, "tests_gimp": 18, "agent_far": 12, "value_eating": 7, "general_commentary": 8}, "facet_options": [{"slug": "text_pangram", "label": "Text & Pangram (Test)", "count": 24}, {"slug": "tests_gimp", "label": "Tests & Gimp (Unit)", "count": 18}, {"slug": "software_quality", "label": "Software & Quality (Users)", "count": 15}, {"slug": "agent_far", "label": "Agent & Far (Tests)", "count": 12}, {"slug": "value_eating", "label": "Value & Eating (Farming)", "count": 7}, {"slug": "general_commentary", "label": "General Commentary", "count": 8}], "facet_diagnostics": [{"slug": "text_pangram", "label": "Text & Pangram (Test)", "count": 24, "useful": 3, "useful_pct": 12.5, "terms": "text, pangram, test, results"}, {"slug": "tests_gimp", "label": "Tests & Gimp (Unit)", "count": 18, "useful": 1, "useful_pct": 5.6, "terms": "tests, gimp, unit, toolkit"}, {"slug": "software_quality", "label": "Software & Quality (Users)", "count": 15, "useful": 3, "useful_pct": 20.0, "terms": "software, quality, users, photocraft"}, {"slug": "agent_far", "label": "Agent & Far (Tests)", "count": 12, "useful": 0, "useful_pct": 0.0, "terms": "agent, far, tests, choose"}, {"slug": "value_eating", "label": "Value & Eating (Farming)", "count": 7, "useful": 0, "useful_pct": 0.0, "terms": "value, eating, farming, tool"}, {"slug": "general_commentary", "label": "General Commentary", "count": 8, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 6}], "story_anchors": ["gimp", "tests", "ui", "test", "user", "testing", "tool", "improve", "software", "free", "apps", "claude", "else", "everything", "llm", "results", "stand"], "largest_root": {"root_id": 50570355, "author": "rafram", "slots": 39, "start_dom": 17, "end_dom": 55, "share_pct": 46.4, "top_dom1_age": 0.1, "top_dom1_author": "KingOfCoders"}, "buried_cutoff": 25, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50571583, "au": "bayindirh", "dom": 2, "sr": 1, "sc": 6.1, "ep": 6.1, "bs": 0.0, "d": 1, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 22561, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "software_quality", "flbl": "Software & Quality (Users)", "urls": [], "ig": 0.98, "fa": 1.23, "gp": 0.201, "bl": 0.0, "ds": 0.0, "txt": "For some people GIMP is irrelevant for the last ~25 years. I was using it in 2000, I'm still using it in 2026.\n\nIt's a matter of getting used to things. I feel lost in Affinity tools, for example, despite having a license, I use them less and less."}, {"id": 50570894, "au": "yjftsjthsd-h", "dom": 62, "sr": 2, "sc": 5.98, "ep": 5.98, "bs": 0.0, "d": 2, "age": 1.62, "grav": 10.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 33, "qw": 11, "k": 35132, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "software_quality", "flbl": "Software & Quality (Users)", "urls": ["https://www.gtk.org/"], "ig": 0.924, "fa": 1.04, "gp": 0.579, "bl": 0.0, "ds": 0.0, "txt": "Well it is, regardless of the name (I think \"GTK\" officially doesn't stand for anything now); to quote https://www.gtk.org/ -\n\n>\nGTK is a free and open-source project maintained by GNOME and an active community of contributors.\n\nand\n\n> GTK and the GTK logo are trademarks of the GNOME Foundation."}, {"id": 50570736, "au": "ModernTimes", "dom": 56, "sr": 3, "sc": 5.83, "ep": 5.83, "bs": 0.0, "d": 0, "age": 2.08, "grav": 12.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 70, "qw": 0, "k": 99, "kpp": 5.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "software_quality", "flbl": "Software & Quality (Users)", "urls": ["https://getartcraft.com/apps/photocraft"], "ig": 1.437, "fa": 0.62, "gp": 0.473, "bl": 0.0, "ds": 0.0, "txt": "Timely, as I removed Gimp from my Macbook today after successfully testing PhotoCraft [1] for a week (the AI Photoshop clone written in open-source rust which has had an absured number of updates since you last tried it).\n\nIt makes me so HAPPY to remove the dinosaur Gimp, and to run \"Adobe\" software for free (it's good enough for me, maybe good enough for you). I expect to lose Internet points for saying that.\n\n[1] https://getartcraft.com/apps/photocraft"}, {"id": 50570880, "au": "basedpolymer", "dom": 5, "sr": 4, "sc": 5.79, "ep": 5.79, "bs": 0.0, "d": 0, "age": 1.65, "grav": 10.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 37, "qw": 0, "k": 47, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "text_pangram", "flbl": "Text & Pangram (Test)", "urls": ["https://www.pangram.com/history/be1f7073-5b2c-4431-9c5f-dae7cdbddd88?ucc=ozvjVKtnLky&utm_source=pangram_share&utm_medium=copy_link"], "ig": 0.842, "fa": 0.96, "gp": 0.744, "bl": 0.0, "ds": 0.0, "txt": "Pangram detects AI in the text at +40%. That's a bit disappointing coming from Gimp, which prohibits the use of AI.\n\nIt seems hypocritical and raises questions about whether the lead maintainers are following their own guidelines.\n\nedit : typo\n\nhttps://www.pangram.com/history/be1f7073-5b2c-4431-9c5f-dae7..."}, {"id": 50570355, "au": "rafram", "dom": 17, "sr": 5, "sc": 5.27, "ep": 5.27, "bs": 0.0, "d": 0, "age": 3.11, "grav": 18.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 6, "k": 6079, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "tests_gimp", "flbl": "Tests & Gimp (Unit)", "urls": [], "ig": 1.209, "fa": 0.42, "gp": 0.85, "bl": 0.0, "ds": 0.0, "txt": "> We have 13 tests at this time.\n\nDoes GIMP have a very restrictive AI policy or something? I get not wanting to ship a gigantic pile of UI tests without thorough review, but basically any model released in the last six months would be able to write UI tests covering every single control in an afternoon."}, {"id": 50571011, "au": "fragmede", "dom": 16, "sr": 6, "sc": 4.89, "ep": 5.04, "bs": 0.0, "d": 1, "age": 1.33, "grav": 8.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 42, "qw": 0, "k": 24391, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "text_pangram", "flbl": "Text & Pangram (Test)", "urls": ["https://x.com/max_spero_/status/2122032840204226687"], "ig": 0.566, "fa": 1.3, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Or maybe don't treat pangram as some sort of magic oracle on AI generated writing. Most recently they gave out a prize because their detector scored a poem from 2006 with the phase \"the night we ate whale\" repeated four thousand times, as 100% AI generated.\n\nhttps://x.com/max_spero_/status/2122032840204226687"}, {"id": 50571343, "au": "Nnnes", "dom": 12, "sr": 7, "sc": 4.71, "ep": 5.0, "bs": 0.0, "d": 3, "age": 0.58, "grav": 5.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 36, "qw": 32, "k": 54, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "text_pangram", "flbl": "Text & Pangram (Test)", "urls": ["https://gitlab.gnome.org/Infrastructure/gimp-web/-/commits/testing/content/news/2026/18-GIMP-UI-Tests/index.md"], "ig": 0.679, "fa": 1.04, "gp": 0.306, "bl": 0.0, "ds": 0.0, "txt": "Where did you get that quote from? It definitely looks like an LLM rewrite of a human-written paragraph from the post\n\n> Each test starts a real GIMP and does one small task. Then it reads the result from GIMP. If the result is not correct, the test fails and tells us what went wrong.\n\nYour quote doesn't appear in your Pangram link or in the commit history for the blog https://gitlab.gnome.org/Infrastructure/gimp-web/-/commits/t..."}, {"id": 50571414, "au": "zkmon", "dom": 4, "sr": 8, "sc": 4.06, "ep": 4.06, "bs": 0.0, "d": 0, "age": 0.39, "grav": 4.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 9, "k": 2325, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "text_pangram", "flbl": "Text & Pangram (Test)", "urls": [], "ig": 1.159, "fa": 0.42, "gp": 0.094, "bl": 0.0, "ds": 0.0, "txt": "> So it coult not tell us if a dialog opens,\n\nIt feels good when I see spelling mistakes. It feels organic, human-sourced, non-AI. It feels like a good old village again.\n\nBTW I love GIMP for everything it did to the world of graphics work. Such an awesome thing. Thank you folks."}, {"id": 50570515, "au": "locusofself", "dom": 47, "sr": 9, "sc": 3.74, "ep": 3.89, "bs": 0.0, "d": 1, "age": 2.65, "grav": 15.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 1235, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "tests_gimp", "flbl": "Tests & Gimp (Unit)", "urls": [], "ig": 0.92, "fa": 0.34, "gp": 0.524, "bl": 0.0, "ds": 0.0, "txt": "Not using AI to at least writes tests in this day and age is crazy work. I started a desktop application 2 months ago and it has almost 3,000 tests now, MANY of them UI tests."}, {"id": 50570789, "au": "plasticbugs", "dom": 57, "sr": 10, "sc": 3.67, "ep": 3.82, "bs": 0.0, "d": 1, "age": 1.92, "grav": 11.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 100, "qw": 0, "k": 361, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "software_quality", "flbl": "Software & Quality (Users)", "urls": [], "ig": 1.213, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I have a long history with Gimp. I created Gimpshop... the Gimp maintainers did not appreciate that little stunt, I'll tell ya! :D\n\nI have canceled my Adobe subscription as of last month and have fully moved over to Photocraft. Even if development of Photocraft stopped today, I would be able to do whatever I need to get done in Photoshop without paying Adobe or wrestling with Gimp. It's good enough for me as well. I had been using Adobe Photoshop for more than 30 years now and was bought in enough to spend a significant amount of effort making Gimp act like Photoshop. Bye Photoshop, bye Gimp, bye Gimpshop."}, {"id": 50570444, "au": "forgotmypw17", "dom": 39, "sr": 11, "sc": 3.46, "ep": 3.75, "bs": 0.0, "d": 2, "age": 2.87, "grav": 17.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 70, "qw": 0, "k": 6527, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agent_far", "flbl": "Agent & Far (Tests)", "urls": [], "ig": 1.283, "fa": 0.0, "gp": 0.509, "bl": 0.0, "ds": 0.0, "txt": "I recommend iterating on your prompts.\n\nProd your agent first until it can explain back to you what's wrong with the tests.\n\nThen ask your agent to write a better prompt for writing tests (and save it to an .md file)\n\nThen reference that .md file and iterate on the tests again. It may take a couple of tries, but I've had good results with this strategy.\n\nEnded up with a whole prompting framework."}, {"id": 50570588, "au": "timcambrant", "dom": 48, "sr": 12, "sc": 3.31, "ep": 3.97, "bs": 0.0, "d": 2, "age": 2.42, "grav": 14.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 83, "qw": 0, "k": 84, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "text_pangram", "flbl": "Text & Pangram (Test)", "urls": [], "ig": 1.552, "fa": 0.0, "gp": 0.219, "bl": 0.0, "ds": 0.0, "txt": "AI is a bit too excellent at writing tests. The number of tests doesn't really convey any information on test coverage. At least I've found that agents that naively improve codebases will write tests for pretty much anything, including irrelevant behavior that has little value in ensuring stability, security or correct behavior. It would probably help to run a test review stage with a strong model, where agents attempt to correct and consolidate tests to guard behavior rather than ensuring that theoretical code paths are followed."}, {"id": 50570757, "au": "raincole", "dom": 65, "sr": 13, "sc": 3.2, "ep": 3.2, "bs": 0.0, "d": 1, "age": 2.03, "grav": 12.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 67, "qw": 0, "k": 14394, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "value_eating", "flbl": "Value & Eating (Farming)", "urls": [], "ig": 0.88, "fa": 0.34, "gp": 0.114, "bl": 0.0, "ds": 0.0, "txt": "It'd be really interesting to look back the comparison between projects with strict non-AI policies (e.g. GIMP) and ArtCraft in 2027.\n\nMy personal prediction is that ArtCraft will blow all the old non-AI projects in similar fields out of the water and GIMP will be remembered as a thing of the past. But if I got proven wrong I'd be happy too: at least we will know the value of non-AI policies."}, {"id": 50570411, "au": "samuria", "dom": 38, "sr": 14, "sc": 3.11, "ep": 3.55, "bs": 0.0, "d": 1, "age": 2.96, "grav": 17.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 0, "k": 53, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "tests_gimp", "flbl": "Tests & Gimp (Unit)", "urls": [], "ig": 1.171, "fa": 0.0, "gp": 0.552, "bl": 0.0, "ds": 0.0, "txt": "It’s frustrating to create tests with models, not sure if it’s everyone’s experience, but every time I asked it to create tests, it makes the tests conform to the sometimes broken code. Rather than calling out what the logic/code is wrong, it will make the tests conform to whatever is already broken."}, {"id": 50570578, "au": "dllu", "dom": 60, "sr": 15, "sc": 2.9, "ep": 3.05, "bs": 0.0, "d": 0, "age": 2.45, "grav": 14.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 2174, "kpp": 6.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "tests_gimp", "flbl": "Tests & Gimp (Unit)", "urls": [], "ig": 1.15, "fa": 0.0, "gp": 0.238, "bl": 0.0, "ds": 0.0, "txt": "Funny how GIMP spawned the Gimp Toolkit, aka GTK, which is widely used in Linux, and yet GIMP's own UI seems to have long languished as a rather outdated design. Glad that they have tests, though, and hope they continue to improve it."}, {"id": 50570893, "au": "HlessClaudesman", "dom": 29, "sr": 16, "sc": 2.86, "ep": 3.3, "bs": 0.0, "d": 4, "age": 1.62, "grav": 10.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 71, "qw": 0, "k": 1951, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "value_eating", "flbl": "Value & Eating (Farming)", "urls": [], "ig": 1.182, "fa": 0.0, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "If you start with the assumption that AI is the devil, than rejecting the devil and all the fruit he offers is logical.\n\nIf you start with the assumption that AI is a tool, then finding uses for the tool is logical.\n\nSeems to me that some people really love riding a purity spiral, and collectively they have chosen a new tool to fill the role of the impure thing to be cast out."}, {"id": 50571263, "au": "flexagoon", "dom": 66, "sr": 17, "sc": 2.74, "ep": 2.89, "bs": 0.0, "d": 2, "age": 0.76, "grav": 6.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 2782, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agent_far", "flbl": "Agent & Far (Tests)", "urls": [], "ig": 1.231, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "GIMP is far from the best FOSS image editor for many use cases. IMO for many simple editing tasks that people usually need unless they're professional photo editors, even Inkscape, a primarily vector editor, is a better photo editor than GIMP."}, {"id": 50570784, "au": "echelon", "dom": 22, "sr": 18, "sc": 2.69, "ep": 3.35, "bs": 0.0, "d": 2, "age": 1.94, "grav": 11.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 22045, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "software_quality", "flbl": "Software & Quality (Users)", "urls": [], "ig": 1.088, "fa": 0.0, "gp": 0.55, "bl": 0.0, "ds": 0.0, "txt": "Meanwhile I'm watching a community of hundreds of agents reworking game engines and chat apps. And it's progressing fast.\n\nYou have to serve users, not hold code up as a sacred relic.\n\nOur own DNA was vibe coded. It's a mess. Stochastic hill climbing can get pretty far, and it can reach surprising fitness."}, {"id": 50570986, "au": "basedpolymer", "dom": 11, "sr": 19, "sc": 2.67, "ep": 3.55, "bs": 0.0, "d": 2, "age": 1.39, "grav": 9.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 92, "qw": 0, "k": 47, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "text_pangram", "flbl": "Text & Pangram (Test)", "urls": [], "ig": 1.51, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I think the text was originally written entirely by AI (the structure is typical). Then it was partially rewritten.\n\nSome clues that caught my attention on their own:\n\n“Each test launches a real instance of GIMP and performs a small task. Then it reads the result from GIMP. If the result is incorrect, the test fails and tells us what went wrong.”\n\nThat’s classic Claude; just like what I read every day. His approach to humanizing everything\n\nAnd Pangram IS conservative in its estimates of results. With a text this long, I have no doubt about its accuracy."}, {"id": 50570668, "au": "skydhash", "dom": 49, "sr": 20, "sc": 2.61, "ep": 3.05, "bs": 0.0, "d": 3, "age": 2.24, "grav": 13.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 54, "qw": 0, "k": 6709, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agent_far", "flbl": "Agent & Far (Tests)", "urls": [], "ig": 1.297, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "In my experience, designing tests cases to ensure that they're othogonal and verify your invariants (domain or technical) is very mentally taxing and not something you can truly delegate. The actual typing maybe, but testing is a lot of duplicate code and you can go far with just copy-pasting stuff around and building helpers."}, {"id": 50571536, "au": "KingOfCoders", "dom": 1, "sr": 21, "sc": 2.43, "ep": 3.23, "bs": 0.0, "d": 0, "age": 0.1, "grav": 3.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 67, "qw": 0, "k": 10377, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "text_pangram", "flbl": "Text & Pangram (Test)", "urls": [], "ig": 1.326, "fa": 0.0, "gp": 0.082, "bl": 0.0, "ds": 0.0, "txt": "I created all the designs for flyers, announcements, invitations etc. in Affinity for my wife. I migrated to Linux and didn't like any of the apps. I was lost.\n\nThen Affinity announced they'll add Linux support.\n\nBut for some time now my wife just uses Codex/Claude to do her day-to-day nothing special design work.\n\nI feel, just like ArtCraft, Gimp will not be relevant in some years (months?)."}, {"id": 50570631, "au": "skydhash", "dom": 40, "sr": 22, "sc": 2.38, "ep": 2.82, "bs": 0.0, "d": 3, "age": 2.34, "grav": 14.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 62, "qw": 0, "k": 6709, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agent_far", "flbl": "Agent & Far (Tests)", "urls": [], "ig": 0.479, "fa": 0.34, "gp": 0.501, "bl": 0.0, "ds": 0.0, "txt": "Prodding an agent vs doing interesting things with my time? What should I choose?\n\nTo be fair, some people like to prod. But, for me, I'd rather take hours reading manuals than do trial and error prodding for 30 minutes (even if I knew it would be that short). Yes it's not optimal in terms of time, but it's better for my soul and well being."}, {"id": 50571102, "au": "bigstrat2003", "dom": 32, "sr": 23, "sc": 2.28, "ep": 3.16, "bs": 0.0, "d": 3, "age": 1.08, "grav": 7.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 12, "k": 9780, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "software_quality", "flbl": "Software & Quality (Users)", "urls": [], "ig": 0.78, "fa": 0.42, "gp": 0.091, "bl": 0.0, "ds": 0.0, "txt": "> You have to serve users, not hold code up as a sacred relic.\n\nThey are serving users, by not allowing AI slop. Software developed by people and not an LLM is of much higher quality, and I'm glad they are taking a stand."}, {"id": 50570525, "au": "joegibbs", "dom": 64, "sr": 24, "sc": 2.06, "ep": 2.35, "bs": 0.0, "d": 0, "age": 2.62, "grav": 15.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 2126, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "value_eating", "flbl": "Value & Eating (Farming)", "urls": [], "ig": 0.602, "fa": 0.0, "gp": 0.646, "bl": 0.0, "ds": 0.0, "txt": "They made a blog post to announce that they’d written thirteen unit tests? Sure, there’s value in handmade software and all that but GIMP is not really a particularly excellent piece of software - if anything was to benefit from unleashing the agents it would be GIMP."}, {"id": 50570855, "au": "lukeify", "dom": 20, "sr": 25, "sc": 1.96, "ep": 3.28, "bs": 0.0, "d": 3, "age": 1.73, "grav": 10.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 11, "k": 897, "kpp": 5.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "text_pangram", "flbl": "Text & Pangram (Test)", "urls": [], "ig": 0.886, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "From the blame PR:\n\n> Of course, core developers don't need to check this monotomous checklist.\nThis is only useful for the newcomers.\n\nSo this is saying core devs already know not to use AI, only new developers shouldn't.\n\nIt's quaint at this point. Embrace the future."}, {"id": 50571128, "au": "bigstrat2003", "dom": 78, "sr": 26, "sc": 1.73, "ep": 2.39, "bs": 0.0, "d": 1, "age": 1.03, "grav": 7.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 9780, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "software_quality", "flbl": "Software & Quality (Users)", "urls": [], "ig": 1.018, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "AI bros can't stand the thought that not everyone agrees with them about LLMs. It's like a religion to them, they feel compelled to get everyone else on board. Never mind that if they are right, it will become apparent to everyone without them having to preach."}, {"id": 50571313, "au": "iLoveOncall", "dom": 83, "sr": 27, "sc": 1.73, "ep": 1.95, "bs": 0.0, "d": 0, "age": 0.64, "grav": 5.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 2382, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "tests_gimp", "flbl": "Tests & Gimp (Unit)", "urls": [], "ig": 0.829, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The tests should simply take a screenshot and send it to an LLM with the question \"Is the UI absolutely horrible?\". If the answer is yes then the UI is working as expected."}, {"id": 50570933, "au": "HiPhish", "dom": 41, "sr": 28, "sc": 1.58, "ep": 2.24, "bs": 0.0, "d": 4, "age": 1.52, "grav": 9.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 63, "qw": 17, "k": 749, "kpp": 5.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agent_far", "flbl": "Agent & Far (Tests)", "urls": [], "ig": 0.445, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> Yes it's not optimal in terms of time, but it's better for my soul and well being.\n\nIt is also optimal in terms of time in the long run. The prodder will have to prod over and over again because he has learned nothing. You on the other hand will actually understand what is going on and will be able to either do it yourself or give precise instructions to the machine next time. Don't let yourself become a meat proxy."}, {"id": 50570881, "au": "ngruhn", "dom": 33, "sr": 29, "sc": 1.39, "ep": 2.93, "bs": 0.0, "d": 3, "age": 1.65, "grav": 10.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 1632, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "text_pangram", "flbl": "Text & Pangram (Test)", "urls": [], "ig": 1.183, "fa": 0.0, "gp": 0.103, "bl": 0.0, "ds": 0.0, "txt": "At least DNA has a reward signal to clean up tech dept. Everything is use-it-or-loose-it. Don't use your eyes because it's always dark? Bye bye. Claude would maintain that as a fallback for all eternity."}, {"id": 50570570, "au": "Jolter", "dom": 69, "sr": 30, "sc": 1.34, "ep": 2.22, "bs": 0.0, "d": 1, "age": 2.47, "grav": 14.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 1970, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agent_far", "flbl": "Agent & Far (Tests)", "urls": [], "ig": 0.849, "fa": 0.0, "gp": 0.154, "bl": 0.0, "ds": 0.0, "txt": "I’d go so far as to say that in general, adding tests for legacy software before a refactor or rewrite is the perfect time to put the agent to work."}, {"id": 50570845, "au": "fishgoesblub", "dom": 77, "sr": 31, "sc": 1.23, "ep": 1.82, "bs": 0.0, "d": 0, "age": 1.77, "grav": 10.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 1022, "kpp": 5.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "tests_gimp", "flbl": "Tests & Gimp (Unit)", "urls": [], "ig": 0.66, "fa": 0.0, "gp": 0.183, "bl": 0.0, "ds": 0.0, "txt": "Great on GIMP for continuing on and attempting to improve things, you'd think the GIMP team killed people's dogs with some of these comments.."}, {"id": 50570686, "au": "hulitu", "dom": 46, "sr": 32, "sc": 1.21, "ep": 2.53, "bs": 0.0, "d": 2, "age": 2.18, "grav": 13.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 21, "k": 3890, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "software_quality", "flbl": "Software & Quality (Users)", "urls": [], "ig": 0.568, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> Rather than calling out what the logic/code is wrong, it will make the tests conform to whatever is already broken.\n\nIt is the same like humans: if they say your code is wrong, you will hire someone else who doesn't find so  many bugs. It doesn't look good."}, {"id": 50570952, "au": "raincole", "dom": 10, "sr": 33, "sc": 1.18, "ep": 2.72, "bs": 0.0, "d": 1, "age": 1.48, "grav": 9.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 14394, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "text_pangram", "flbl": "Text & Pangram (Test)", "urls": [], "ig": 0.265, "fa": 0.68, "gp": 0.108, "bl": 0.0, "ds": 0.0, "txt": "All the articles on HN that I suspected as AI-generated got ~100%. So a 40% means likely no AI in my dictionary."}, {"id": 50571051, "au": "basedpolymer", "dom": 14, "sr": 34, "sc": 0.95, "ep": 2.49, "bs": 0.0, "d": 2, "age": 1.21, "grav": 8.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 70, "qw": 0, "k": 47, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "text_pangram", "flbl": "Text & Pangram (Test)", "urls": [], "ig": 1.061, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Pangram is currently the most reliable tool for avoiding the flood of low-quality AI content on the internet.\nThere are independent studies on its effectiveness.\n\nI used it because I had strong suspicions about certain passages in this text. Otherwise, I would never have used my Pangram credits on this.\n\nAnyone who regularly reads AI-generated text will quickly recognize the few AI quirks in the text.\n\nHumans can do better. They DO better"}, {"id": 50570910, "au": "miksuko", "dom": 6, "sr": 35, "sc": 0.76, "ep": 2.3, "bs": 0.0, "d": 1, "age": 1.58, "grav": 9.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 36, "k": 12, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "text_pangram", "flbl": "Text & Pangram (Test)", "urls": [], "ig": 0.383, "fa": 0.42, "gp": 0.139, "bl": 0.0, "ds": 0.0, "txt": "AI detectors are notoriously unreliable. As someone who's read too much slop in the past few years, this doesn't strike me as AI. There's typos like \"coult\" instead of \"could\", and clunky sentences like this:\n\n> Furthermore such legacy tests directly hijacking core code come with their own problems, such as breaking all too often (and not because they detected a bug), all while not being able to detect whole categories of bugs."}, {"id": 50571017, "au": "cadamsdotcom", "dom": 13, "sr": 36, "sc": 0.55, "ep": 2.09, "bs": 0.0, "d": 1, "age": 1.31, "grav": 8.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 60, "qw": 0, "k": 2992, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "text_pangram", "flbl": "Text & Pangram (Test)", "urls": [], "ig": 0.888, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "At the risk of being obvious, Pangram has heavy incentive to give you something to say about the Pangrammyness of text you plug into Pangram.\n\nIf it mostly said \"nope! No AI here!\" you'd walk away and wouldn't Pangram your comment with mentions of Pangram, which would be a missed opportunity for you to give free brandgram awareness to Pangram.\n\nPangram!"}, {"id": 50570844, "au": "plant-ian", "dom": 72, "sr": 37, "sc": 0.48, "ep": 1.58, "bs": 0.0, "d": 1, "age": 1.78, "grav": 10.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 23, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "tests_gimp", "flbl": "Tests & Gimp (Unit)", "urls": [], "ig": 0.619, "fa": 0.0, "gp": 0.088, "bl": 0.0, "ds": 0.0, "txt": "It sounds like they are nearly end to end user interface (UI) tests, not just unit tests."}, {"id": 50571346, "au": "Aozora7", "dom": 79, "sr": 38, "sc": 0.48, "ep": 1.87, "bs": 0.0, "d": 2, "age": 0.57, "grav": 5.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 190, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "software_quality", "flbl": "Software & Quality (Users)", "urls": [], "ig": 0.797, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It has to be a religion, it can't just be that I prefer the quality of AI-assisted software over projects with no-AI policies.\n\nBesides, GIMP has always been unpopular long before AI."}, {"id": 50570925, "au": "Xirdus", "dom": 31, "sr": 39, "sc": 0.43, "ep": 0.87, "bs": 0.0, "d": 5, "age": 1.54, "grav": 9.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 1073, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "value_eating", "flbl": "Value & Eating (Farming)", "urls": [], "ig": 0.372, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "From what I've seen, it's less spiritualism and more \"they're taking our jobs!\" kind of fearmongering. Like all \"taking our jobs\" fears, whether it's logical or not depends purely on whether they're actually taking these jobs or not."}, {"id": 50570962, "au": "HiPhish", "dom": 51, "sr": 40, "sc": 0.37, "ep": 1.91, "bs": 0.0, "d": 2, "age": 1.46, "grav": 9.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 100, "qw": 0, "k": 749, "kpp": 5.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "software_quality", "flbl": "Software & Quality (Users)", "urls": [], "ig": 0.814, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Using AI to write tests in this day and age is crazy work. The machine is great at writing tests, but the quality of the tests is awful. It will write redundant tests, it will write tests that assert too many thing in one, it will not write tests that need to be tested. It's the part where I have to clean up the most every time. Quantity is not quality, and you really don't want to skip on the quality of your quality assurance. I'm writing a React + Django full-stack application, so there should be more than enough training data out there."}, {"id": 50570752, "au": "nomilk", "dom": 54, "sr": 41, "sc": 0.06, "ep": 1.38, "bs": 0.0, "d": 1, "age": 2.05, "grav": 12.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 8788, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "tests_gimp", "flbl": "Tests & Gimp (Unit)", "urls": [], "ig": 0.588, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "This raises questions of AI ethics; namely, is it conscionable to subject AI to GIMP’s UI?"}, {"id": 50570820, "au": "doginasuit", "dom": 44, "sr": 42, "sc": -0.05, "ep": 1.49, "bs": 0.0, "d": 3, "age": 1.84, "grav": 11.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 106, "qw": 0, "k": 1194, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "software_quality", "flbl": "Software & Quality (Users)", "urls": [], "ig": 0.633, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The problem I've had is even when it can explain back the issue, it still writes for itself awful instructions with extra fluff, strange points of focus, and borderline misinterpretations of what I said.\n\nMaybe that's not a big deal, they can still be generally useful, but they seem important to commit with the project if they will be used going forward. I hate the idea of a massive amount of slop riding along with the code, and slop begets slop.\n\nThe idea I'm chasing now is writing the documents myself with the hope that enough examples and a document about writing documents will be enough to allow it to write clearly."}, {"id": 50570681, "au": "0xcoffee", "dom": 42, "sr": 43, "sc": -0.22, "ep": 0.88, "bs": 0.0, "d": 4, "age": 2.19, "grav": 13.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 685, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agent_far", "flbl": "Agent & Far (Tests)", "urls": [], "ig": 0.376, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It's a good use of your time to ask the agent to reflect and update it's skills if you intervene to manually steer it. Why wouldn't you want it to learn from your guidance?"}, {"id": 50570864, "au": "mepiethree", "dom": 35, "sr": 44, "sc": -0.37, "ep": 1.18, "bs": 0.0, "d": 3, "age": 1.71, "grav": 10.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 571, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "software_quality", "flbl": "Software & Quality (Users)", "urls": [], "ig": 0.5, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Does free open source software “have to” serve users? You clearly aren’t the user they’re trying to serve. That’s okay though; there’s something for everyone."}, {"id": 50570685, "au": "YuechenLi", "dom": 81, "sr": 45, "sc": -0.45, "ep": 1.84, "bs": 1.19, "d": 0, "age": 2.18, "grav": 13.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 347, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "tests_gimp", "flbl": "Tests & Gimp (Unit)", "urls": [], "ig": 0.627, "fa": 0.0, "gp": 0.256, "bl": 0.45, "ds": 0.0, "txt": "Oh, haven't heard from GIMP in a long time, has there been significant UX improvement and have they carved out a niche like Krita yet?"}, {"id": 50570957, "au": "hackshack", "dom": 58, "sr": 46, "sc": -0.48, "ep": 1.01, "bs": 1.19, "d": 2, "age": 1.46, "grav": 9.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 109, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.43, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Same with VectorCraft. I spent over a decade looking for an Illustrator alternative. Muscle memory and specific workflows won out. VectorCraft is extremely close."}, {"id": 50570618, "au": "WD-42", "dom": 70, "sr": 47, "sc": -0.61, "ep": 0.93, "bs": 0.0, "d": 1, "age": 2.36, "grav": 14.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 7185, "kpp": 4.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "tests_gimp", "flbl": "Tests & Gimp (Unit)", "urls": [], "ig": 0.32, "fa": 0.0, "gp": 0.125, "bl": 0.0, "ds": 0.0, "txt": "Did you read the article? These aren’t unit tests. They are UI tests which are pretty hard to do well with desktop apps."}, {"id": 50571028, "au": "alex43578", "dom": 7, "sr": 48, "sc": -0.79, "ep": 0.84, "bs": 1.19, "d": 2, "age": 1.27, "grav": 8.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 711, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.359, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "That’s not really a clunky sentence. While it might not be Pulitzer-worthy, it clearly conveys a set of interconnected issues. Arbitrarily splitting it into a few sentences wouldn’t make it better."}, {"id": 50570762, "au": "Aozora7", "dom": 59, "sr": 49, "sc": -0.92, "ep": 0.93, "bs": 0.0, "d": 1, "age": 2.02, "grav": 12.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 190, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "software_quality", "flbl": "Software & Quality (Users)", "urls": [], "ig": 0.395, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Regular users would use a lot more open source software if more of it was like photocraft and less of it was like GIMP."}, {"id": 50570434, "au": "Waterluvian", "dom": 45, "sr": 50, "sc": -1.25, "ep": 1.48, "bs": 1.19, "d": 2, "age": 2.91, "grav": 17.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 54385, "kpp": 5.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "tests_gimp", "flbl": "Tests & Gimp (Unit)", "urls": [], "ig": 0.553, "fa": 0.0, "gp": 0.125, "bl": 0.45, "ds": 0.0, "txt": "It can’t magically know expectations.  If the code is well documented or there’s decent associated documentation, I’ve found it has no issue writing tests."}, {"id": 50570870, "au": "lukeify", "dom": 24, "sr": 51, "sc": -1.4, "ep": 1.11, "bs": 1.19, "d": 4, "age": 1.69, "grav": 10.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 897, "kpp": 5.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agent_far", "flbl": "Agent & Far (Tests)", "urls": [], "ig": 0.25, "fa": 0.0, "gp": 0.36, "bl": 0.45, "ds": 0.0, "txt": "At this point it's like the Amish. Sure I can respect their principles, but at the same time I find it bloody bizarre."}, {"id": 50570602, "au": "pnkzin", "dom": 3, "sr": 52, "sc": -1.5, "ep": 2.12, "bs": 2.52, "d": 0, "age": 2.39, "grav": 14.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 6, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "text_pangram", "flbl": "Text & Pangram (Test)", "urls": [], "ig": 0.698, "fa": 0.0, "gp": 0.33, "bl": 0.95, "ds": 0.0, "txt": "The first try is most difficult, 13 tests is good start. Because before the first test, we have to make reasonable test setting."}, {"id": 50571333, "au": "fuussssip", "dom": 30, "sr": 53, "sc": -1.64, "ep": 1.54, "bs": 2.52, "d": 5, "age": 0.6, "grav": 5.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 268, "qw": 0, "k": 30, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "value_eating", "flbl": "Value & Eating (Farming)", "urls": [], "ig": 0.656, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "I think you aren't being thoughtful enough.\n\nSomeone can believe AI was trained on material in a way that violated the consent of authors and artists and musicians. Someone can see the value of the tool, but not want that value to be primarily captured by megacorps. One can believe that the tool is having a deleterious effect on students, workers, and artists of all kinds, as it's being deployed. One can't be concerned about the added environmental effects, the impact to world markets, or the shortages it causes to consumer hardware. One can be worried about the copyright implications (can AI produce copyrighted material?) and not want to risk losing their IP. One can believe that art is necessarily a human enterprise, and art produced mechanically is just images and sounds, but not art nor music.\n\nNone of these are \"the tool is the devil\". All of these are \"the tool has externalities, and those externalities come with a cost I am not comfortable paying\".\n\nI'm a vegetarian. Not because I think eating meat is immoral, but because I believe factory farming causes undue suffering to animals and the people who raise and process those animals. So I make a choice for myself, in my own life, and don't moralize to others.\n\nIt's the same thing. Some folks are making choices for their own lives based on their values for those externalities. You value energy use differently than they do. "}, {"id": 50570901, "au": "mepiethree", "dom": 53, "sr": 54, "sc": -1.66, "ep": 1.08, "bs": 1.19, "d": 3, "age": 1.6, "grav": 10.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 571, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agent_far", "flbl": "Agent & Far (Tests)", "urls": [], "ig": 0.458, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Yeah if people can make a better and more popular Gimp in an afternoon, go do it.\n\nGimp has millions of downloads this month. They are doing something right."}, {"id": 50570649, "au": "slopinthebag", "dom": 73, "sr": 55, "sc": -1.95, "ep": 0.78, "bs": 1.19, "d": 1, "age": 2.28, "grav": 13.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 1372, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "text_pangram", "flbl": "Text & Pangram (Test)", "urls": [], "ig": 0.265, "fa": 0.0, "gp": 0.108, "bl": 0.45, "ds": 0.0, "txt": "we forget, but before AI this would have been at least 6 months of work, at least 50 meetings, and at least 7 separate sprints."}, {"id": 50570807, "au": "fuussssip", "dom": 23, "sr": 56, "sc": -1.95, "ep": 1.28, "bs": 2.52, "d": 3, "age": 1.87, "grav": 11.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 30, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "text_pangram", "flbl": "Text & Pangram (Test)", "urls": [], "ig": 0.447, "fa": 0.0, "gp": 0.159, "bl": 0.95, "ds": 0.0, "txt": "It's ok to have principles. Some folks have extremely valid reasons to hold a hard no stance on AI. It's not me, but I respect that position as principled, logical, and reasoned. Just a very different set of values from me."}, {"id": 50570797, "au": "fuussssip", "dom": 80, "sr": 57, "sc": -1.95, "ep": 1.22, "bs": 2.52, "d": 0, "age": 1.91, "grav": 11.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 30, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "tests_gimp", "flbl": "Tests & Gimp (Unit)", "urls": [], "ig": 0.391, "fa": 0.0, "gp": 0.208, "bl": 0.95, "ds": 0.0, "txt": "GIMP... didn't have ui tests before?\n\nI'm surprised, tbh. I understand that UI is very much an afterthought in GIMP, but I figured it'd still at least have tests."}, {"id": 50570906, "au": "weird-eye-issue", "dom": 8, "sr": 58, "sc": -1.95, "ep": 1.58, "bs": 3.05, "d": 1, "age": 1.59, "grav": 10.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 4017, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "text_pangram", "flbl": "Text & Pangram (Test)", "urls": [], "ig": 0.175, "fa": 0.34, "gp": 0.139, "bl": 1.15, "ds": 0.0, "txt": "\"The article detects AI in the text at +40%\"\n\nHuh?"}, {"id": 50570627, "au": "hulitu", "dom": 55, "sr": 59, "sc": -1.95, "ep": 1.51, "bs": 3.05, "d": 1, "age": 2.35, "grav": 14.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 22, "k": 3890, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "text_pangram", "flbl": "Text & Pangram (Test)", "urls": [], "ig": 0.645, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "> any model released in the last six months would be able to write UI tests covering every single control in an afternoon.\n\nMicrosoft also seems to use \"models\" to \"test\" its programs. Look how shitty they are."}, {"id": 50570863, "au": "adastra22", "dom": 37, "sr": 60, "sc": -1.95, "ep": 1.43, "bs": 3.05, "d": 4, "age": 1.71, "grav": 10.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 13514, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.269, "fa": 0.28, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Neither, if we really want to get technical. RL is directed whereas evolution is not."}, {"id": 50570837, "au": "aquafox", "dom": 82, "sr": 61, "sc": -2.43, "ep": 0.61, "bs": 3.05, "d": 0, "age": 1.8, "grav": 11.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 733, "kpp": 5.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "tests_gimp", "flbl": "Tests & Gimp (Unit)", "urls": [], "ig": 0.146, "fa": 0.0, "gp": 0.186, "bl": 1.15, "ds": 0.0, "txt": "GIMP doesn't need UI tests, but a more intuitive UI."}, {"id": 50570861, "au": "snissn", "dom": 84, "sr": 62, "sc": -2.52, "ep": 0.52, "bs": 3.05, "d": 0, "age": 1.72, "grav": 10.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 1336, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "tests_gimp", "flbl": "Tests & Gimp (Unit)", "urls": [], "ig": 0.223, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "\"GIMP now has UI\" would be big news"}, {"id": 50570923, "au": "basedpolymer", "dom": 9, "sr": 63, "sc": -3.33, "ep": 0.91, "bs": 4.24, "d": 2, "age": 1.55, "grav": 9.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 47, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "text_pangram", "flbl": "Text & Pangram (Test)", "urls": [], "ig": 0.387, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "I don't know how, but my iOS keyboard has completely replaced “Pangram” with something else..."}, {"id": 50571082, "au": "alex43578", "dom": 27, "sr": 64, "sc": -3.41, "ep": 1.76, "bs": 5.17, "d": 6, "age": 1.13, "grav": 7.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 93, "qw": 0, "k": 711, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "agent_far", "flbl": "Agent & Far (Tests)", "urls": [], "ig": 0.748, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "But there’s a dozen other invisible tradeoffs. It’s not a simple binary. The Amish don’t have their own grapes year round, for instance. The Amish would need to dedicate a major percentage of their population to farming, given the drastically lower productivity.\n\nOur food supply has perfectly healthy options. People choose to buy and eat junk, then blow up to 400lbs. You can gild the lily by arguing over organic vs Amish-grown in terms of micronutrients and traces of pesticides, but even an inorganic ear of corn is 10x healthier than what the average American eats."}, {"id": 50570617, "au": "qtqtqt", "dom": 68, "sr": 65, "sc": -3.47, "ep": 0.77, "bs": 4.24, "d": 1, "age": 2.36, "grav": 14.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 56, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.238, "fa": 0.0, "gp": 0.149, "bl": 1.6, "ds": 0.0, "txt": "They must have set up a reusable harness, and it's the most important part."}, {"id": 50570882, "au": "Xirdus", "dom": 21, "sr": 66, "sc": -3.54, "ep": 0.7, "bs": 4.24, "d": 4, "age": 1.65, "grav": 10.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 1073, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "text_pangram", "flbl": "Text & Pangram (Test)", "urls": [], "ig": 0.3, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "The future seems to be blocking external contributors and running the equivalent AI agents yourself."}, {"id": 50570732, "au": "ares623", "dom": 52, "sr": 67, "sc": -3.64, "ep": 0.6, "bs": 4.24, "d": 2, "age": 2.09, "grav": 12.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 2100, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "agent_far", "flbl": "Agent & Far (Tests)", "urls": [], "ig": 0.257, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Look, guys, you are literally allowed to fork and go ham on the code."}, {"id": 50570633, "au": "qtqtqt", "dom": 71, "sr": 68, "sc": -3.68, "ep": 0.56, "bs": 4.24, "d": 2, "age": 2.33, "grav": 14.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 56, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.237, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Especially given it isn't as easy as using Cypress."}, {"id": 50570615, "au": "altmanaltman", "dom": 74, "sr": 69, "sc": -3.71, "ep": 0.53, "bs": 4.24, "d": 1, "age": 2.37, "grav": 14.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 134, "k": 1057, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "tests_gimp", "flbl": "Tests & Gimp (Unit)", "urls": [], "ig": 0.224, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "The blog article doesn't say they have written thirteen unit tests.\n\n> *GIMP already has unit tests*. A unit test checks one small part of the code, for example how GIMP reads an XCF file. But our unit tests were not opening a real window. So it coult not tell us if a dialog opens, or if a menu item did its job.\n\n> Note that GIMP *already had tests of GUI code*, usually interacting directly with the core code, and sometimes even simulating input devices’ events (pointer movements, clicks, drags…). But nothing can beat interacting with the real interface. Furthermore such legacy tests directly hijacking core code come with their own problems, such as breaking all too often (and not because they detected a bug), all while not being able to detect whole categories of bugs.\n\n> UI tests check the program as a whole, in the same way as you use it."}, {"id": 50570638, "au": "alexey-salmin", "dom": 61, "sr": 70, "sc": -3.76, "ep": 0.48, "bs": 4.24, "d": 1, "age": 2.31, "grav": 13.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 2754, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "tests_gimp", "flbl": "Tests & Gimp (Unit)", "urls": [], "ig": 0.203, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Ah! I always thought it was Gnome Toolkit, didn't even bother to check. Thanks"}, {"id": 50570873, "au": "veltas", "dom": 63, "sr": 71, "sc": -3.86, "ep": 0.38, "bs": 4.24, "d": 2, "age": 1.68, "grav": 10.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 1823, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "tests_gimp", "flbl": "Tests & Gimp (Unit)", "urls": [], "ig": 0.16, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "It's GNOME Toolkit now, you're not wrong, but originally was GIMP."}, {"id": 50571295, "au": "raincole", "dom": 67, "sr": 72, "sc": -3.96, "ep": 1.21, "bs": 5.17, "d": 3, "age": 0.7, "grav": 6.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 14394, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "text_pangram", "flbl": "Text & Pangram (Test)", "urls": [], "ig": 0.515, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "Inkscape is what made me believe ArtCraft would be the clear winner, btw. It's very hard to imagine using Inkscape ever again since I tried VectorCraft. (And I'm fully aware that some Path Effects can only be done quickly in Inkscape.)"}, {"id": 50571540, "au": "thisismyanon2", "dom": 43, "sr": 73, "sc": -4.07, "ep": 0.17, "bs": 4.24, "d": 5, "age": 0.1, "grav": 3.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 56, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.074, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Perhaps because they're more interested in learning something themselves."}, {"id": 50570877, "au": "globular-toast", "dom": 34, "sr": 74, "sc": -4.22, "ep": 0.94, "bs": 5.17, "d": 3, "age": 1.66, "grav": 10.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 6292, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "value_eating", "flbl": "Value & Eating (Farming)", "urls": [], "ig": 0.328, "fa": 0.0, "gp": 0.119, "bl": 1.95, "ds": 0.0, "txt": "It wasn't vibe coded, it evolved over millions of years. And we ended up with our eating hole right next to our breathing hole because there's no way up back out of that \"decision\"."}, {"id": 50571526, "au": "wavemode", "dom": 28, "sr": 75, "sc": -4.32, "ep": 0.85, "bs": 5.17, "d": 5, "age": 0.12, "grav": 3.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 6577, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "software_quality", "flbl": "Software & Quality (Users)", "urls": [], "ig": 0.361, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "what's bizarre about it? if all you care about is things appearing on the screen then vibecode away. but some people also have strict requirements for the architecture/quality/performance of the code underneath."}, {"id": 50570679, "au": "aidenialislife", "dom": 76, "sr": 76, "sc": -4.33, "ep": 1.23, "bs": 5.57, "d": 2, "age": 2.21, "grav": 13.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 1, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "tests_gimp", "flbl": "Tests & Gimp (Unit)", "urls": [], "ig": 0.525, "fa": 0.0, "gp": 0.0, "bl": 2.1, "ds": 0.0, "txt": "Writing tests never was the hard part of the job anyway."}, {"id": 50570422, "au": "deskglass", "dom": 18, "sr": 77, "sc": -4.58, "ep": 0.46, "bs": 5.04, "d": 1, "age": 2.94, "grav": 17.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 8, "qw": 0, "k": 148, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "text_pangram", "flbl": "Text & Pangram (Test)", "urls": ["https://gitlab.gnome.org/GNOME/gimp/-/blob/master/.gitlab/merge_request_templates/default.md?plain=1\u0023L4"], "ig": 0.077, "fa": 0.0, "gp": 0.19, "bl": 1.9, "ds": 0.0, "txt": "Turns out you're right! No AI allowed\nhttps://gitlab.gnome.org/GNOME/gimp/-/blob/master/.gitlab/me..."}, {"id": 50571089, "au": "cadamsdotcom", "dom": 15, "sr": 78, "sc": -4.65, "ep": 0.43, "bs": 5.09, "d": 3, "age": 1.1, "grav": 7.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 2992, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "text_pangram", "flbl": "Text & Pangram (Test)", "urls": [], "ig": 0.185, "fa": 0.0, "gp": 0.0, "bl": 1.92, "ds": 0.0, "txt": "Thank you for your Pangram primer, I had no idea!\n\nPangram!"}, {"id": 50570899, "au": "Xirdus", "dom": 26, "sr": 79, "sc": -5.0, "ep": 1.36, "bs": 6.36, "d": 5, "age": 1.61, "grav": 10.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 1073, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "software_quality", "flbl": "Software & Quality (Users)", "urls": [], "ig": 0.404, "fa": 0.0, "gp": 0.286, "bl": 2.4, "ds": 0.0, "txt": "But there's no denying Amish food is much healthier and higher quality than regular store bought products (with some exceptions I guess)."}, {"id": 50570687, "au": "aidenialislife", "dom": 50, "sr": 80, "sc": -5.3, "ep": 1.46, "bs": 6.76, "d": 4, "age": 2.17, "grav": 13.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 1, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "agent_far", "flbl": "Agent & Far (Tests)", "urls": [], "ig": 0.621, "fa": 0.0, "gp": 0.0, "bl": 2.55, "ds": 0.0, "txt": "Designing for testing helps as well. Pure functions for core logic, coding against interfaces etc."}, {"id": 50571350, "au": "fuussssip", "dom": 25, "sr": 81, "sc": -6.3, "ep": 1.38, "bs": 7.68, "d": 5, "age": 0.56, "grav": 5.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 69, "qw": 0, "k": 30, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "value_eating", "flbl": "Value & Eating (Farming)", "urls": [], "ig": 0.501, "fa": 0.0, "gp": 0.141, "bl": 2.9, "ds": 0.0, "txt": "I liken it to my vegetarianism. I'm not morally against eating animals. I have no religious convictions about it either. I just look at factory farming and think \"that seems like torturing animals at scale to me\" and choose to not participate.\n\nThe people looking at AI and taking a \"none for me thanks\" stance are looking at externalities and saying they don't like them, and they dont like them enough to not participate."}, {"id": 50570599, "au": "hulitu", "dom": 75, "sr": 82, "sc": -6.45, "ep": 0.97, "bs": 7.42, "d": 1, "age": 2.4, "grav": 14.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 9, "k": 3890, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "text_pangram", "flbl": "Text & Pangram (Test)", "urls": [], "ig": 0.414, "fa": 0.0, "gp": 0.0, "bl": 2.8, "ds": 0.0, "txt": "> if anything was to benefit from unleashing the agents\n\nAI can write tests now ? For its own software ? Can it evaluate the results ? Correctly ? /s"}, {"id": 50570740, "au": "einichi", "dom": 19, "sr": 83, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 2.08, "grav": 12.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 0, "qw": 5, "k": 370, "kpp": 9.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "> for contributors without Developer role"}, {"id": 50570848, "au": "keybrd-intrrpt", "dom": 36, "sr": 84, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 3, "age": 1.77, "grav": 10.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 6, "k": 140, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "> Our own DNA was vibe coded.\n\nNo, that was Reinforcement Learning"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "top_signal";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Signal Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("SIGNAL (INFO + FALSIFIABILITY) →", W - 295, H - 7);
+    pCtx.fillText("↑ BULLSHIT", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 40);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 40);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 40);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `${shown.length} of ${pool.length} comments` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const proofDrawer = document.getElementById("proofDrawer");
+  const expBtn = document.getElementById("exploreToggleBtn");
+  const eviBtn = document.getElementById("evidenceToggleBtn");
+
+  if (expBtn && labDrawer) {
+    expBtn.addEventListener("click", () => {
+      labDrawer.open = !labDrawer.open;
+    });
+    labDrawer.addEventListener("toggle", () => {
+      const isOpen = labDrawer.open;
+      expBtn.classList.toggle("active", isOpen);
+      expBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  if (eviBtn && proofDrawer) {
+    eviBtn.addEventListener("click", () => {
+      proofDrawer.open = !proofDrawer.open;
+    });
+    proofDrawer.addEventListener("toggle", () => {
+      const isOpen = proofDrawer.open;
+      eviBtn.classList.toggle("active", isOpen);
+      eviBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

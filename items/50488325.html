@@ -1,0 +1,1259 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50488325 // FM-1 Workbench — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      background: rgb(247, 247, 245);
+      color: rgb(13, 13, 13);
+      font: 15px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+    }
+    .sheet-top {
+      border-top: 3px solid rgb(13, 13, 13);
+      border-bottom: 1px solid rgb(13, 13, 13);
+      padding: 16px 0 26px;
+    }
+    .eyebrow {
+      font: 600 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .eyebrow strong { color: rgb(255, 51, 0); }
+    h1 {
+      font-size: clamp(36px, 5.2vw, 72px);
+      line-height: 0.96;
+      letter-spacing: -0.045em;
+      margin: 18px 0 14px;
+      font-weight: 800;
+    }
+    h1 .accent { color: rgb(255, 51, 0); }
+    .sublead {
+      max-width: 920px;
+      font-size: 16px;
+      color: rgb(52, 52, 50);
+      margin: 0;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      font: 700 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 24px;
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+    }
+    .kpi-cell {
+      padding: 16px 16px 14px;
+      border-right: 1px solid rgb(205, 205, 200);
+    }
+    .kpi-cell:last-child { border-right: 0; }
+    .kpi-label {
+      font: 600 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 8px 0 4px;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      font-size: 12px;
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      background: rgb(13, 15, 17);
+      color: rgb(228, 232, 236);
+      border: 2px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 6px;
+      corner-shape: bevel;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(156, 166, 176);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      background: rgb(9, 11, 13);
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(180, 188, 196);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 58px;
+      background: rgb(20, 24, 28);
+      border-left: 3px solid rgb(0, 230, 118);
+      font: 12px/19px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(220, 226, 232);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 38px;
+    }
+
+    /* Collapsible 03A / 03B Justification Drawer */
+    details.proof-drawer {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 12px 0;
+    }
+    details.proof-drawer > summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      font: 700 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      user-select: none;
+    }
+    details.proof-drawer > summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary:hover { border-color: rgb(255, 51, 0); }
+    details.proof-drawer > summary .toggle-pill {
+      flex-shrink: 0;
+      padding: 3px 8px;
+      background: rgb(13, 13, 13);
+      color: rgb(247, 247, 245);
+      font-size: 10px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 16px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: rgb(255, 255, 253);
+      border: 1px solid rgb(13, 13, 13);
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+    }
+    table.ablation th {
+      background: rgb(236, 236, 231);
+      font: 700 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgb(60, 60, 58);
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      font: 600 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+      color: rgb(13, 13, 13);
+      padding: 7px 11px;
+      font: 600 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      box-shadow: 0 2px 0 rgb(13, 13, 13);
+    }
+    button.tab-btn.active {
+      background: rgb(13, 13, 13);
+      color: rgb(247, 247, 245);
+    }
+    button.tab-btn:hover {
+      border-color: rgb(255, 51, 0);
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      padding: 8px 11px;
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+      font: 600 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { flex: 1; min-width: 220px; font-weight: 400; }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border: 1px solid rgb(216, 216, 206);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      border-top: 3px solid rgb(13, 13, 13);
+      padding-top: 14px;
+      margin-top: 36px;
+      font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        background: rgb(239, 239, 234);
+        border: 1px solid rgb(13, 13, 13);
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        font-size: 17px;
+        margin: 0;
+        white-space: normal;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        background: rgb(13, 13, 13);
+        color: rgb(247, 247, 245);
+        font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-] HIDE"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+] SHOW"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpi-cell { border-bottom: 1px solid rgb(205, 205, 200); }
+      .filter-bar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .filter-bar select.sel-in {
+        width: 100%;
+        font-size: 16px;
+        padding: 8px 9px;
+      }
+      .filter-bar input.search-in {
+        grid-column: span 2;
+        width: 100%;
+        min-width: 0;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="sheet-top">
+    <div class="eyebrow">
+      <span>NYX OBSERVATORY // <a class="ext-link" href="https://news.ycombinator.com/item?id=50488325">HN ITEM 50488325</a> // OPEN.M-VAVE.COM</span>
+      <span><strong>BULLSHIT: 81.4%</strong>
+    </div>
+    <h1>Bullshit vs. <span class="accent">Epistemic.</span></h1>
+    <p class="sublead">
+      <strong>161</strong> Hacker News comments on <a class="ext-link" href="https://open.m-vave.com/fm1-workbench">FM-1 Workbench (open.m-vave.com)</a>.
+    </p>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary>
+      <span>01 // EVIDENCE</span>
+      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    </summary>
+    <p>
+      Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+      Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+    </p>
+    <div class="proof-body">
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">161</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 97 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">18.6%</div>
+          <div class="kpi-sub">30 comments (5 Gold / 3.1%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">81.4%</div>
+          <div class="kpi-sub">81 chatter &bull; 46 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">3</div>
+        <div class="kpi-sub">10% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.939</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">43</div>
+          <div class="kpi-sub">HN POS 44..86 (26.7% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="margin-top:10px;font:600 11px/1.5 ui-monospace,Menlo,monospace;color:rgb(70,70,68)"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary>
+      <span>02 // EXPLORE</span>
+      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / INTERACTIVE EQUATION</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p style="font-size:11.5px;line-height:1.42;color:rgb(85,85,82);margin:12px 0 0">
+              Drag any weight to watch the 161-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 161)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (5)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (25)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (81)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (4)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (46)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..161) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 48)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (@SamBam, 18.2h); largest subtree (@EmX_3000) occupies 43 slots (HN POS 44..86).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="modeSelect" class="sel-in" aria-label="Ranking view">
+          <option value="hn_top40">HN Top 40</option>
+          <option value="top_signal">Epistemic Top 50</option>
+          <option value="buried_gems">Buried Gems (HN POS &gt; 48)</option>
+          <option value="bullshit_traps">High-Karma / URL Traps Caught</option>
+          <option value="mod_morgue">Mod Rebukes &amp; Downvoted Morgue</option>
+          <option value="c5a_rescues">c5A Heterodox Rescues</option>
+        </select>
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (161)</option>
+          <option value="midi_gear">Midi &amp; Gear (Cheap) (32)</option>
+          <option value="firmware_music">Firmware &amp; Music (Device) (30)</option>
+          <option value="fm1_hardware">Fm-1 &amp; Hardware (Vibe) (30)</option>
+          <option value="midi_usb">Midi &amp; Usb (Mpc) (29)</option>
+          <option value="sound_synth">Sound &amp; Synth (Including) (21)</option>
+          <option value="general_commentary">General Commentary (19)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, open, dx7, fm-1, play, midi...">
+      </div>
+      <div id="resultMeta" style="font:600 11px/1.4 ui-monospace,Menlo,monospace;color:rgb(90,90,88);margin-bottom:10px"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50488325 + OPEN.M-VAVE.COM + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50488325, "story_title": "FM-1 Workbench", "story_url": "https://open.m-vave.com/fm1-workbench", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50488325, "story_title": "FM-1 Workbench", "story_url": "https://open.m-vave.com/fm1-workbench", "points": 248, "story_author": "simonebrunozzi", "article_source": "fetched_url", "t1_ref_utc": "2026-11-14T14:06:19+00:00", "t2_ref_utc": "2026-11-14T14:06:19+00:00", "delta_minutes": 0.0, "story_anchors": ["open", "dx7", "fm-1", "play", "midi", "fm1", "usb", "device", "step", "page", "platform", "support", "available", "playing", "bought", "hardware", "workbench", "apparently", "bunch", "controllers", "course", "devices", "electronic", "guitar", "honestly"], "facet_labels": {"midi_usb": "Midi & Usb (Mpc)", "firmware_music": "Firmware & Music (Device)", "sound_synth": "Sound & Synth (Including)", "fm1_hardware": "Fm-1 & Hardware (Vibe)", "midi_gear": "Midi & Gear (Cheap)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "midi_usb", "label": "Midi & Usb (Mpc)", "count": 29, "top_terms": ["midi", "usb", "mpc", "custom"]}, {"slug": "firmware_music", "label": "Firmware & Music (Device)", "count": 30, "top_terms": ["firmware", "music", "device", "couple"]}, {"slug": "sound_synth", "label": "Sound & Synth (Including)", "count": 21, "top_terms": ["sound", "synth", "including", "modulation"]}, {"slug": "fm1_hardware", "label": "Fm-1 & Hardware (Vibe)", "count": 30, "top_terms": ["fm-1", "hardware", "vibe", "little"]}, {"slug": "midi_gear", "label": "Midi & Gear (Cheap)", "count": 32, "top_terms": ["midi", "gear", "cheap", "china"]}], "counts": {"total_comments": 161, "live_t2_comments": 161, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 97, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "b54f42ae0af6b4b53bffd09d9a0f8c5c735792dcb4daf16ebecfc23acef60aa2"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 5, "grounded_analysis": 25, "crowd_chatter": 81, "bullshit_or_flamewar": 46, "meme_or_snark": 4}, "facets": {"sound_synth": 21, "firmware_music": 30, "midi_gear": 32, "midi_usb": 29, "fm1_hardware": 30, "general_commentary": 19}, "facet_options": [{"slug": "midi_gear", "label": "Midi & Gear (Cheap)", "count": 32}, {"slug": "firmware_music", "label": "Firmware & Music (Device)", "count": 30}, {"slug": "fm1_hardware", "label": "Fm-1 & Hardware (Vibe)", "count": 30}, {"slug": "midi_usb", "label": "Midi & Usb (Mpc)", "count": 29}, {"slug": "sound_synth", "label": "Sound & Synth (Including)", "count": 21}, {"slug": "general_commentary", "label": "General Commentary", "count": 19}], "facet_diagnostics": [{"slug": "midi_gear", "label": "Midi & Gear (Cheap)", "count": 32, "useful": 6, "useful_pct": 18.8, "terms": "midi, gear, cheap, china"}, {"slug": "firmware_music", "label": "Firmware & Music (Device)", "count": 30, "useful": 5, "useful_pct": 16.7, "terms": "firmware, music, device, couple"}, {"slug": "fm1_hardware", "label": "Fm-1 & Hardware (Vibe)", "count": 30, "useful": 4, "useful_pct": 13.3, "terms": "fm-1, hardware, vibe, little"}, {"slug": "midi_usb", "label": "Midi & Usb (Mpc)", "count": 29, "useful": 8, "useful_pct": 27.6, "terms": "midi, usb, mpc, custom"}, {"slug": "sound_synth", "label": "Sound & Synth (Including)", "count": 21, "useful": 7, "useful_pct": 33.3, "terms": "sound, synth, including, modulation"}, {"slug": "general_commentary", "label": "General Commentary", "count": 19, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 14}, {"category": "low_cred_or_joke", "count": 4}, {"category": "code_repository", "count": 2}, {"category": "primary_technical_doc", "count": 1}], "story_anchors": ["open", "dx7", "fm-1", "play", "midi", "fm1", "usb", "device", "step", "page", "platform", "support", "available", "playing", "bought", "hardware", "workbench", "apparently"], "largest_root": {"root_id": 50489042, "author": "EmX_3000", "slots": 43, "start_dom": 44, "end_dom": 86, "share_pct": 26.7, "top_dom1_age": 18.2, "top_dom1_author": "SamBam"}, "buried_cutoff": 48, "rescue_top_k": 32, "ablations": [], "tournament": [], "comments": [{"id": 50489163, "au": "EmX_3000", "dom": 113, "sr": 1, "sc": 12.31, "ep": 12.31, "bs": 0.0, "d": 1, "age": 17.66, "grav": 213.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 161, "qw": 0, "k": 193, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "sound_synth", "flbl": "Sound & Synth (Including)", "urls": ["https://csclub.uwaterloo.ca/~pbarfuss/FM_Synthesis_of_Real_Instruments.pdf"], "ig": 1.844, "fa": 2.35, "gp": 0.885, "bl": 0.0, "ds": 0.0, "txt": "I find it essential to have a MIDI CC knob box of some kind with FM. My MPC works in this capacity, I also bought an external one. Most FM synths support a huge number of MIDI CCs and FM really comes alive if you twiddle with the knobs during patch design, same as with other synths.\n\nThis link is a great practical guide, which has you look at waveforms in an audio editor and clone them using FM, one operator at a time. He walks you through making clones of several real life instruments, 6 operators is enough to sound quite good and 8 is even better. FM has a reputation for being computer-y sounding but it doesn't need to be. A lot of that is just baggage from default patches introduced decades ago with that fresh '80s sound, those patches from the DX-7 are still on the newest Yamaha flagship workstations. And as everybody knows the grand majority of sounds you hear in music are barely- or not-tweaked presets.\n\nhttps://csclub.uwaterloo.ca/~pbarfuss/FM_Synthesis_of_Real_I..."}, {"id": 50490037, "au": "raphlinus", "dom": 104, "sr": 2, "sc": 10.46, "ep": 10.46, "bs": 0.0, "d": 1, "age": 16.61, "grav": 193.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 41, "qw": 0, "k": 13889, "kpp": 7.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "sound_synth", "flbl": "Sound & Synth (Including)", "urls": ["https://github.com/AL-255/FM-1-RE"], "ig": 1.071, "fa": 2.06, "gp": 1.432, "bl": 0.0, "ds": 0.0, "txt": "Yes, it's all software, and FM synthesis is using the same engine as dexed. It's a Blackfin chip, which has pretty good throughput for DSP (digital signal processing). A ton more detail is at [1], including the operating system, which is a FreeRTOS-derived SMP kernel.\n\n[1]: https://github.com/AL-255/FM-1-RE"}, {"id": 50494842, "au": "snakeman", "dom": 121, "sr": 3, "sc": 9.56, "ep": 9.56, "bs": 0.0, "d": 1, "age": 6.67, "grav": 48.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 39, "qw": 0, "k": 3, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": ["https://github.com/jvitkauskas/m-bootloader"], "ig": 1.141, "fa": 2.08, "gp": 0.655, "bl": 0.0, "ds": 0.0, "txt": "Someone created a new bootloader that lowers the chance of bricking by adding a button hook on startup to get into flashing mode, even with a broken firmware:\nhttps://github.com/jvitkauskas/m-bootloader\n\nSounds like it's too late for you, but maybe others will find it useful. :)"}, {"id": 50492122, "au": "nlehuen", "dom": 120, "sr": 4, "sc": 8.13, "ep": 8.28, "bs": 0.0, "d": 0, "age": 13.7, "grav": 142.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 144, "qw": 0, "k": 227, "kpp": 4.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": ["https://thefirmwarehub.com"], "ig": 1.777, "fa": 1.12, "gp": 0.626, "bl": 0.0, "ds": 0.0, "txt": "I have purchased one and it has been a whole lot of fun.\n\nJust want to share a warning that you should be careful when playing with custom firmwares. https://thefirmwarehub.com for instance makes it super easy to flash the device straight from your web browser and try a bunch of new exciting stuff...\n\n... however it also makes it extremely easy to brick your FM-1. Just mistakenly close the browser tab while firmware flashing is going on and poof, the poor thing is gone.\n\nApparently I managed to put it in a state where soft recovery (some key combination to put the device in re ouvert mode) is not available and it requires special hardware methods (the FM-1 Transporter method).\n\nNot gonna lie, that is another kind of fun, and I got the hardware delivered today so I'll be at it soon, but in the meantime not much music was done.\n\nCaveat emptor!"}, {"id": 50490640, "au": "anigbrowl", "dom": 45, "sr": 5, "sc": 7.55, "ep": 7.55, "bs": 0.0, "d": 1, "age": 15.97, "grav": 181.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 123, "qw": 0, "k": 101686, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 1.691, "fa": 0.68, "gp": 1.134, "bl": 0.0, "ds": 0.0, "txt": "You are out of touch. All sorts of compact gear (even very expensive sequencers like the Oxi One) use 1/8\" MIDI jacks because modern consumers prefer compact. People are also used to charging with their laptop via USB, not easily done with AAs, which are also more bulky. It looks cheap because it is cheap, it costs about $60-80, which is half the price of a Volca.\n\nThere's a lot of excellent gear coming out of China. Behringer has their factories there, Donner has a range of recreations (not clones) of various classic Roland analog synths, and also make a wide variety of controllers, pedals, and other gear. Ashun Sound Machines makes the Hydrasynth and a few others, one of the most highly regarded digital synths on the market."}, {"id": 50490357, "au": "EmX_3000", "dom": 10, "sr": 6, "sc": 7.34, "ep": 7.34, "bs": 0.0, "d": 2, "age": 16.29, "grav": 187.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 126, "qw": 0, "k": 193, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": 1.63, "fa": 0.68, "gp": 1.083, "bl": 0.0, "ds": 0.0, "txt": "A good groovebox doesn't have to be crippled. Yamaha did an excellent job with their QY-series, the QY-70 and QY-100 being completely fully fledged sequencers with many advanced features in addition to having very groovebox-like functionality. I feel that we have actually gone backwards in the last 20 years especially. Grooveboxes are easier to use and get going with than they used to be but lack a lot of features they used to have. Why not at least throw in a MIDI event list editor these days? But they often don't. Peak groovebox was the Yamaha RS7000, it has never been improved upon. Same basic software roots that they had in the QY series and the Yamaha sequencers you used to get in their flagship workstations before the color touch-screen era."}, {"id": 50489042, "au": "EmX_3000", "dom": 44, "sr": 7, "sc": 7.11, "ep": 7.25, "bs": 0.0, "d": 0, "age": 17.84, "grav": 216.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 159, "qw": 0, "k": 193, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": ["https://www.m-vave.com/product?id=fm-1"], "ig": 1.711, "fa": 0.62, "gp": 1.011, "bl": 0.0, "ds": 0.0, "txt": "Downsides immediately jump out at me, it lacks real DIN MIDI ports, having those irritating 1/8\" jacks instead which require an adapter. Built in battery, hopefully not too difficult to replace. I vastly prefer AAs for this use case like the Volcas use. It has a fan, that's not good at all. It looks cheap (look at the bottom photo here https://www.m-vave.com/product?id=fm-1) and not sturdy. Similar to my Elektron Moden Cycles and my Polyend Tracker, a bit flimsy and cheap.\n\nI feel like the Chinese have made and sold enough music gear on behalf of other manufacturers over time that they can technically make the products, but I don't think they understand the market so they will be flawed and toy-grade for a while until they hire some consultants and carefully study the various portable MIDI gear that has succeeded over time. I'm not sure what the electronic music scene looks like in China but I would suspect most of the people involved still use non-Chinese gear and software."}, {"id": 50489470, "au": "diskzero", "dom": 153, "sr": 8, "sc": 7.05, "ep": 7.05, "bs": 0.0, "d": 2, "age": 17.24, "grav": 205.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 80, "qw": 0, "k": 2631, "kpp": 4.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": ["https://www.soundonsound.com/reviews/muse-research-receptor", "https://www.soundonsound.com/reviews/muse-research-receptor-2-pro-max"], "ig": 1.441, "fa": 0.62, "gp": 1.306, "bl": 0.0, "ds": 0.0, "txt": "There is/was; the Muse Research Receptor. It might be overly complex for what you are thinking of, but it existed.\n\nhttps://www.soundonsound.com/reviews/muse-research-receptor\n\nhttps://www.soundonsound.com/reviews/muse-research-receptor-...\n\nYou can pick them up, often fully loaded with plugins, for a few hundred dollars. I wrote parts of the system. They were running Linux and fun to hack on.\n\nI currently work in the professional audio industry and know of a few modern efforts underway to produce modern version of this, but I am not convinced there is market for such a device anymore."}, {"id": 50493149, "au": "EmX_3000", "dom": 81, "sr": 9, "sc": 6.88, "ep": 7.18, "bs": 0.0, "d": 5, "age": 11.46, "grav": 107.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 151, "qw": 0, "k": 193, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": 1.634, "fa": 0.68, "gp": 0.964, "bl": 0.0, "ds": 0.0, "txt": "My newish MPC is a host and while it offers a lot of added functions over old MPCs, it works nearly identically for the MIDI sequencing workflow. In the old days I had an MPC 2000 and then 2000XL, I still own both. The newer MPC is both much cheaper, but it also allows me to get as many ins and outs as I can fill my rack and desk up with and more, all at once. You had to pay a lot extra to get the MPC3000 with 2 ins and 4 outs (IIRC), like $4-5k.\n\nThey really nailed it by offering more than the old MPCs but making it all completely optional to use, and keeping nearly the same workflow as the old ones. Only thing new MPCs can't do is bulk SYSEX dumps and vomits, I still keep an old Yamaha portable unit for that (runs on a bunch of AAs) with a modern USB floppy converter replacing the drive."}, {"id": 50489387, "au": "embedding-shape", "dom": 37, "sr": 10, "sc": 6.34, "ep": 6.34, "bs": 0.0, "d": 1, "age": 17.35, "grav": 207.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 55, "qw": 30, "k": 21365, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": ["https://news.ycombinator.com/item?id=50482555"], "ig": 1.106, "fa": 1.04, "gp": 0.538, "bl": 0.0, "ds": 0.0, "txt": "> is a rare bright spot in post-LLM music tech\n\nIt was rare pre-LLMs, post-LLM seems more and more go this way actually. Just few hours I wrote this in a comment about established brands embracing the new user-firmware world:\n\n> [...] Erica Synths (big in both desktop gear and modular synths), Polyend, Akai/MPC, Moog and more. https://news.ycombinator.com/item?id=50482555\n\nMy personal guess (and hope I suppose) is that all of them go in this direction cough Elektron cough, which judging by the current wave, doesn't seem impossible."}, {"id": 50488678, "au": "shimman", "dom": 140, "sr": 11, "sc": 6.11, "ep": 6.11, "bs": 0.0, "d": 0, "age": 18.39, "grav": 227.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 83, "qw": 0, "k": 2041, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 1.431, "fa": 0.68, "gp": 0.555, "bl": 0.0, "ds": 0.0, "txt": "This device is really cool. Started to get into music production with a dawless setup and with an FM-1 you can use DX7 patches and with some firmware choices you can turn a $50 machine into a groove box.\n\nThink this bodes well for the future of Chinese consumer electronics. They have really been punching above their weight. Even the \"cheap\" guitar pedals are better than what you'd find with American/EU equivalent companies while being 60-80% cheaper.\n\nJust a shame that Chinese workers are too often exploited."}, {"id": 50494941, "au": "dyzone", "dom": 92, "sr": 12, "sc": 5.74, "ep": 5.74, "bs": 0.0, "d": 2, "age": 6.35, "grav": 45.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 128, "qw": 0, "k": 103, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "sound_synth", "flbl": "Sound & Synth (Including)", "urls": [], "ig": 1.62, "fa": 0.34, "gp": 0.666, "bl": 0.0, "ds": 0.0, "txt": "Mick gordon used ~16 hardware pedals to generate the iconic doom sound. He fed a simple sine wave as input to that chain of pedals and it generated that iconic bassy sound, and then he used that chain as his music instrument. There are people on youtube that have tried to recreate that in software synths, but they usually end up simulating what Mick's chain was doing by just using a bunch of randomizers and it doesn't sound as organic as Mick's setup. In his talk he mentioned that he was operating some of the components beyond their limits, so apparently the components were interacting with the real physical world in a way which isn't possible to do in software. Anyways, I doubt that matters for musicians that are not in the top 0.001%."}, {"id": 50491554, "au": "anigbrowl", "dom": 151, "sr": 13, "sc": 5.67, "ep": 5.82, "bs": 0.0, "d": 2, "age": 14.79, "grav": 160.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 85, "qw": 0, "k": 101686, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": 1.511, "fa": 0.28, "gp": 1.013, "bl": 0.0, "ds": 0.0, "txt": "There have been a whole bunch of them, and most of them fail because they spend so much effort on getting the box and the screen running with low-no latency that the actual control surface is usually an afterthought. Touchscreens are absolute ass for performance but most engineers don't appreciate that you need some sort of note input, at least 16 buttons to function as a sequencer, and at least  rotary encoders, and they have to be good encoders because musicians get carried away when they're jamming."}, {"id": 50490522, "au": "ost-ing", "dom": 137, "sr": 14, "sc": 5.58, "ep": 5.58, "bs": 0.0, "d": 0, "age": 16.11, "grav": 183.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 144, "qw": 0, "k": 1325, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 1.782, "fa": 0.0, "gp": 0.96, "bl": 0.0, "ds": 0.0, "txt": "The FM-1 is the hardware version of the millions of slop VSTs flooding the market and social media.\n\nEverything comes at a cost. The entshitification of everything, the total lack of intention.\n\nI’ve developed boutique hardware instruments and sold them to retailers around the world, so this affects me directly.\n\nIt removes financial incentives to do research and development in these areas because overnight someone can just duplicate or imitate your work.\n\nAnd its the height of hypocrisy from artists to call out for copyright protections of music, but then simultaneously support vibe coded software thats been trained on data thats probably stolen.\n\nI get the world is changing fast, but what its taught me is that people are ravenous and are willing to watch entire industries and maybe even society itself collapse if they think they can get a free short-term meal from it.\nPretty disheartening"}, {"id": 50490179, "au": "EmX_3000", "dom": 60, "sr": 15, "sc": 5.19, "ep": 5.63, "bs": 0.0, "d": 2, "age": 16.47, "grav": 190.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 211, "qw": 0, "k": 193, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": 1.79, "fa": 0.0, "gp": 0.985, "bl": 0.0, "ds": 0.0, "txt": "I bought a Polyend Tracker and it also has a toy-grade build. I love the instrument itself, they just open-sourced the whole software stack as it's going discontinued. But the device itself is cheap and the rubbery coating on the top panel is already starting to wear under the knob where I rest my hand. I want to build a custom enclosure that has a tilted screen, real MIDI ports, and a wooden top with a palm rest when the plastic eventually gives out or gets too gross, quite a few people have done custom enclosures even with internal batteries already.\n\nBut yeah the cheapness is an issue. Even older entry-grade gear, while often entirely plastic, is much more robust and with real ports, they often have one of those little plastic rakes that retains your power cable too. A three cent addition I'm sure but one which is great to have.\n\nI already have some groove boxes, what does this one bring to the table? Every groove box is annoying in its own way even the really good ones. I have yet to find something that does it all better than the good old MPC. I need a MIDI event list editor, very very few grooveboxes offer this. Only Emu/Ensoniq, Akai and Yamaha's did. Akai still offers it but I don't think their newer mini-MPC has this."}, {"id": 50488870, "au": "tlahtinen", "dom": 33, "sr": 16, "sc": 5.0, "ep": 5.0, "bs": 0.0, "d": 0, "age": 18.07, "grav": 221.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 38, "qw": 0, "k": 59, "kpp": 6.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": ["https://fartypants.github.io/fm1-nachtfahrt/emu/", "https://sbegueria.github.io/fm1-dub/emu/"], "ig": 1.244, "fa": 0.62, "gp": 0.214, "bl": 0.0, "ds": 0.0, "txt": "It's been a great little toy, I install a new firmware every couple of days. I especially enjoy the various generative firmwares.\n\nMany of them work in browser too, which is essential for choosing what to try next!\n\nSome faves:\n\nNACHTFART: https://fartypants.github.io/fm1-nachtfahrt/emu/\n\nDUB-1: https://sbegueria.github.io/fm1-dub/emu/"}, {"id": 50489368, "au": "embedding-shape", "dom": 29, "sr": 17, "sc": 5.0, "ep": 5.14, "bs": 0.0, "d": 1, "age": 17.39, "grav": 207.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 72, "qw": 24, "k": 21365, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "sound_synth", "flbl": "Sound & Synth (Including)", "urls": [], "ig": 1.188, "fa": 0.76, "gp": 0.127, "bl": 0.0, "ds": 0.0, "txt": "> Is this a useful device to get a feel for creating music, or is it only really useful if you already understand music theory or improvisation?\n\n\"Useful\" is a really subjective word when it comes to making music in general. Some template groove on a shit keyboard could be the base for a hit song (like Gorillaz' Clint Eastwood) while others don't make stuff unless in front of a modular synth with 100% control of everything.\n\nAny instrument can be fun without knowing music theory, as long as you're willing to trial and error for a bit, until you find what sounds good :)"}, {"id": 50492220, "au": "ghostly_s", "dom": 70, "sr": 18, "sc": 4.65, "ep": 5.31, "bs": 0.0, "d": 3, "age": 13.47, "grav": 138.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 3824, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 1.052, "fa": 0.68, "gp": 0.624, "bl": 0.0, "ds": 0.0, "txt": "Literally what are you talking about. the device is barely thick enough to fit a 3.5mm jack, DIN connectors were never on the table. frankly it's a bonus it has MIDI at all. who cares what your $2000 'proper' synths have."}, {"id": 50491520, "au": "Blackthorn", "dom": 158, "sr": 19, "sc": 4.63, "ep": 4.92, "bs": 0.0, "d": 1, "age": 14.85, "grav": 161.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 61, "qw": 29, "k": 5658, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 1.246, "fa": 0.42, "gp": 0.548, "bl": 0.0, "ds": 0.0, "txt": "> yet they go crazy about it.\n\nWell, of course. They're able to get the stuff they want to run off of the computer, and onto the device. Not everyone hates working in the box, but a lot of people do.\n\n> This also got companies like Behringer an idea that they can just release the hardware and people will create firmware for free. Genius.\n\nHonestly, this is great. Getting viable hardware with annoying shit like buttons and knobs is beyond the reach of a lot of developers, but writing software is not."}, {"id": 50492056, "au": "slim", "dom": 119, "sr": 20, "sc": 4.58, "ep": 4.95, "bs": 0.0, "d": 1, "age": 13.85, "grav": 144.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 94, "qw": 0, "k": 3202, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "sound_synth", "flbl": "Sound & Synth (Including)", "urls": [], "ig": 1.506, "fa": 0.28, "gp": 0.424, "bl": 0.0, "ds": 0.0, "txt": "My mental model is : each carrier is a sound (a harmonic). I can stack the sounds by chosing an algorithm with multiple carriers. So I start with one carrier and sculpt it by chosing frequency and envelope. This is the time I also activate it's modulators and try to tweak them to make the sound better. Modulators have very complex effects on the sound and I don't try to have a mental model of what they do, just empirical outlines. The next step is to add another carrier to the sound and continue tweaking the current and all the previous carriers."}, {"id": 50488801, "au": "SamBam", "dom": 1, "sr": 21, "sc": 4.56, "ep": 4.86, "bs": 0.0, "d": 0, "age": 18.19, "grav": 223.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 77, "qw": 0, "k": 12419, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": [], "ig": 1.017, "fa": 0.0, "gp": 1.7, "bl": 0.0, "ds": 0.0, "txt": "Our algorithms must all be feeding us the same things, I was about to buy one of these yesterday. I've been excited by the various Groovebox firmwares in particular.\n\nI play music by sight (poorly) and can improvise a little bit on guitar, and would love to understand music theory better but so far do not.\n\nIs this a useful device to get a feel for creating music, or is it only really useful if you already understand music theory or improvisation?"}, {"id": 50492763, "au": "brudgers", "dom": 84, "sr": 22, "sc": 4.25, "ep": 4.91, "bs": 0.0, "d": 1, "age": 12.23, "grav": 119.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 98, "qw": 0, "k": 52656, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": 1.42, "fa": 0.28, "gp": 0.532, "bl": 0.0, "ds": 0.0, "txt": "It has a speaker not a fan.\n\nIt has audio out and Midi over USB.\n\nIt has Blutooth Midi…use it as a controller. And it has Bluetooth audio…use it as a speaker…for example you can play a synth on you iPhone and monitor the output with an FM-1.\n\nThe battery lasts a reasonable time and it can be powered by USB…you don’t need a special wall-wart (or you can stay unplugged with an ordinary power bank).\n\nIn terms of build, I’d say its about as roadworthy as a Volca. At worst it’s no more fiddly. And the display is much much less cryptic."}, {"id": 50489132, "au": "unleaded", "dom": 9, "sr": 23, "sc": 4.18, "ep": 5.06, "bs": 0.0, "d": 1, "age": 17.71, "grav": 214.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 73, "qw": 0, "k": 1590, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "sound_synth", "flbl": "Sound & Synth (Including)", "urls": [], "ig": 1.117, "fa": 0.34, "gp": 1.01, "bl": 0.0, "ds": 0.0, "txt": "Grooveboxes can't really do anything that you haven't been able to do for 15 years with internet resources and pirated FL Studio (other DAWs are available). The main value is having a break from the computer & physical knobs to twiddle. If you value time away from the computer, something like Korg M01[D] on the [3]DS might be worth trying since you can't spend hours tweaking synth parameters (and I imagine it's much easier to sequence on)."}, {"id": 50488977, "au": "patwolf", "dom": 5, "sr": 24, "sc": 4.14, "ep": 4.58, "bs": 0.0, "d": 1, "age": 17.92, "grav": 218.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 65, "qw": 0, "k": 1289, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 1.372, "fa": 0.0, "gp": 0.937, "bl": 0.0, "ds": 0.0, "txt": "I have an FM-1, and it's definitely a fun device for the price and worth having just to putz around while sitting on the couch. However, I don't think it's the easiest way to get started creating music. I personally have gotten much more value out of a DAW like FL Studio. I've tried to go DAWless (groove boxes, samplers, trackers, etc), but I always end up back in FL Studio."}, {"id": 50491058, "au": "singingfish", "dom": 22, "sr": 25, "sc": 4.03, "ep": 4.69, "bs": 0.0, "d": 1, "age": 15.51, "grav": 172.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 102, "qw": 0, "k": 1249, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": [], "ig": 1.771, "fa": 0.0, "gp": 0.366, "bl": 0.0, "ds": 0.0, "txt": "I'm not your demographic - committed amateur muso mostly acoustic (saxophone) with a side interest in electronic music.  My seemingly sudden better understanding of the structure and uses of the diminished scale (have been looking into it on and off for a couple of years) may well coincide with the ease with which the Sloop firmware allows me to easily make interesting-to-me musical sequences.  However most of my musical activities involves playing sax in medium sized or big bands.  Mind you I can not understand song mode and how to save stuff yet, but that's a permanent problem I've had with every groovebox type thing I've tried."}, {"id": 50489664, "au": "EmX_3000", "dom": 154, "sr": 26, "sc": 3.91, "ep": 4.79, "bs": 0.0, "d": 3, "age": 16.97, "grav": 199.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 120, "qw": 0, "k": 193, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": 1.687, "fa": 0.0, "gp": 0.569, "bl": 0.0, "ds": 0.0, "txt": "That's a really cool. It doesn't look overly-complicated, just perfect actually. I might keep my eyes peeled for one of these things, I love scrounging around for old MIDI gear. Used to be a lot cheaper than it is these days, ironically. Build quality on most everything was top notch too.\n\nI'm sure a lot of professional musicians would probably prefer to use something less fragile than a laptop, something you can rack up, with no pesky desktop OS niggles to worry about during a show. As you know many instruments today are simply dedicated VST runners with a handy physical interface, see Roland's Boutique and Aira synths. I have an MPC One which I love, it can run proprietary VSTs. Maybe such convergences have killed the need for a dedicated box."}, {"id": 50489229, "au": "EmX_3000", "dom": 148, "sr": 27, "sc": 3.87, "ep": 4.97, "bs": 0.0, "d": 1, "age": 17.57, "grav": 211.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 110, "qw": 0, "k": 193, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "sound_synth", "flbl": "Sound & Synth (Including)", "urls": [], "ig": 1.285, "fa": 0.34, "gp": 0.675, "bl": 0.0, "ds": 0.0, "txt": "I'm surprised there isn't a sturdy generic VST-runner box with an interface to configure the MIDI in / out and which VSTs will run. A sort of headless generic synth. My Roland VariOS synth from ages ago which I got for like $50 works like this, you use a WIN32 or Classic Mac computer to load and configure the various synths (it has a couple emulators or workalikes for older synths, plus a crazy synth that chops up and munges incoming audio under MIDI control) and then you only need to power the 1U rack mounted module unless you're designing patches, in which case you have to attach a computer.\n\nSomething like this but for VSTs would be killer."}, {"id": 50488608, "au": "consumer451", "dom": 39, "sr": 28, "sc": 3.77, "ep": 3.99, "bs": 0.0, "d": 0, "age": 18.49, "grav": 229.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 86, "qw": 0, "k": 15043, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 1.486, "fa": 0.0, "gp": 0.346, "bl": 0.0, "ds": 0.0, "txt": "My first FM-1 is out for delivery. I once assisted in a 2\" tape studio, I have played with many synths, and yet I am so excited for this little thing.\n\nThis is such a cool hardware meme/software/ai dev thing that makes me very happy for the world.\n\nI am just about to start learning. If anyone could drop firmware knowledge aside from Baud Girl (cool af) ... I would appreciate it. I am mostly excited about Obervave, but I will have two FM-1's shortly... what is the best step sequencer firmware at the moment?"}, {"id": 50490192, "au": "fiatpandas", "dom": 127, "sr": 29, "sc": 3.48, "ep": 3.92, "bs": 0.0, "d": 0, "age": 16.45, "grav": 190.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 67, "qw": 0, "k": 1079, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 1.486, "fa": 0.0, "gp": 0.298, "bl": 0.0, "ds": 0.0, "txt": "FM-1 is an interesting case study. From what I understand, M-Vave saw what the community was doing with their device, and decided to go along with the flow by releasing an official SDK and a new \"open\" groovebox firmware, in addition to this Workbench tool.\n\nRight now, designing and mass-producing hardware is still a bit specialized, but creating software isn't. They have decided to embrace life as a creative hardware platform."}, {"id": 50489291, "au": "EmX_3000", "dom": 69, "sr": 30, "sc": 3.39, "ep": 4.27, "bs": 0.0, "d": 2, "age": 17.5, "grav": 209.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 107, "qw": 0, "k": 193, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 1.564, "fa": 0.0, "gp": 0.408, "bl": 0.0, "ds": 0.0, "txt": "It's not unfair. Looking at my home studio here I have nine different MIDI synths all set up, two require adapters, and for some reason one set of these sets of identical-looking adapters doesn't even work properly on one of my synths that needs 'em. The other takes both, one only likes one pair. It's a huge pain in the ass. Other issue is they come out easily, DIN has a very solid connection and it takes quite some force to remove the connector. Also I'm not entirely sure how good the isolation is on those little 1/8\" jacks, proper DIN MIDI connectors are all opto-isolated so you don't get ground loops."}, {"id": 50492675, "au": "brudgers", "dom": 24, "sr": 31, "sc": 3.29, "ep": 4.39, "bs": 0.0, "d": 1, "age": 12.43, "grav": 122.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 62, "qw": 0, "k": 52656, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": 1.362, "fa": 0.28, "gp": 0.269, "bl": 0.0, "ds": 0.0, "txt": "If you want to buy one, use Ali Express.\n\nEveryone else is just drop shipping them.\n\nEven without all the alternate firmware, they can be pretty inspiring because the DX7 can make awesome sounds and the FM1 has a better interface (a very very low bar).\n\nThere are more beginner friendly grooveboxes. The original Novation Circuit for example. But there aren’t (m)any cheaper ones."}, {"id": 50489791, "au": "alexjplant", "dom": 59, "sr": 32, "sc": 3.02, "ep": 4.34, "bs": 0.0, "d": 1, "age": 16.84, "grav": 197.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 80, "qw": 1, "k": 3326, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": 1.397, "fa": 0.0, "gp": 0.73, "bl": 0.0, "ds": 0.0, "txt": "> toy-grade\n\nThis thing is absolutely worth the $$$ once you install Sloop on it but I regret having bought one only because I'm getting way more mileage out of using a small game pad to drive the iOS port of Dirtywave M8 (and am probably going to buy a hardware unit when they restock). Personally I enjoy the tracker workflow and chopping samples infinitely more than doing the sequencer thing on a tiny screen but I can't argue that this unit is very powerful for how cheap it is."}, {"id": 50494860, "au": "otabdeveloper4", "dom": 94, "sr": 33, "sc": 2.99, "ep": 3.58, "bs": 0.0, "d": 2, "age": 6.62, "grav": 48.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 10, "k": 3236, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": [], "ig": 1.014, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> MIDI controllers + laptop are pretty much the ultimate musical instrument\n\nNo. Musical instruments are made to be played live. Laptops are an okay composition device but they aren't an instrument.\n\n(Yes, the FM-1 is a real instrument and can be played live. Not as good as a Korg Volca but it's half the price.)"}, {"id": 50489071, "au": "varispeed", "dom": 147, "sr": 34, "sc": 2.8, "ep": 3.9, "bs": 0.0, "d": 0, "age": 17.78, "grav": 215.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 68, "qw": 0, "k": 3192, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 1.361, "fa": 0.0, "gp": 0.482, "bl": 0.0, "ds": 0.0, "txt": "I find it fascinating. Basically people get ability to run AI made crap vst plugins in a calculator sized box and yet they go crazy about it.\n\nI wonder how long this will last.\n\nThis also got companies like Behringer an idea that they can just release the hardware and people will create firmware for free. Genius.\n\nedit: that reminds me I actually bought one too, but forgot about it. Still unopened."}, {"id": 50492932, "au": "brudgers", "dom": 116, "sr": 35, "sc": 2.75, "ep": 3.92, "bs": 0.0, "d": 1, "age": 11.89, "grav": 114.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 72, "qw": 0, "k": 52656, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sound_synth", "flbl": "Sound & Synth (Including)", "urls": [], "ig": 1.582, "fa": 0.0, "gp": 0.141, "bl": 0.0, "ds": 0.0, "txt": "Shallower algorithms  have fewer overtones and the overtones tend to be harmonic.\n\nDeeper algorithms have more overtones and often those overtones are enharmonic.\n\nBut also how you tune and mix plays a role…a shallow algorithm witH carriers tuned one way will sound consonant and with a different tuning will sound dissonant.\n\nOr to put it another way, FM is awesome for sound design but like everything in music it is hard to learn quickly."}, {"id": 50489112, "au": "robrain", "dom": 68, "sr": 36, "sc": 2.74, "ep": 3.85, "bs": 0.0, "d": 1, "age": 17.73, "grav": 214.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 296, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 1.158, "fa": 0.0, "gp": 0.775, "bl": 0.0, "ds": 0.0, "txt": "No comment on the general criticisms, but jacks for MIDI is unfair, I think. I probably get more annoyed at connecting DIN MIDI with the mix of equipment I’ve got since most of it uses jacks, not DINs, especially the things I’d connect to a M-Vave. I’m resisting the temptation to buy one right now."}, {"id": 50497134, "au": "Coeur", "dom": 32, "sr": 37, "sc": 2.64, "ep": 3.3, "bs": 0.0, "d": 1, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 45, "qw": 0, "k": 249, "kpp": 5.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": [], "ig": 1.404, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Piano playing is not like using a typewriter. It matters how you sit, the position of your body, arms and hands, and how you touch the keys. How to not become cramped.\n\nI'd recommend taking lessons with an experienced piano teacher instead of looking for a software solution."}, {"id": 50490114, "au": "Aboutplants", "dom": 110, "sr": 38, "sc": 2.51, "ep": 3.39, "bs": 0.0, "d": 0, "age": 16.54, "grav": 191.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 1880, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 1.343, "fa": 0.0, "gp": 0.159, "bl": 0.0, "ds": 0.0, "txt": "They will also be releasing a FM-2 (a slightly larger version but details are slim) later this year. No details on pricing either but assume it will be priced in similar respects to the FM-1 (little bit more for a little bit extra stuff)"}, {"id": 50492572, "au": "crq-yml", "dom": 2, "sr": 39, "sc": 2.26, "ep": 3.81, "bs": 0.0, "d": 1, "age": 12.66, "grav": 125.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 161, "qw": 0, "k": 488, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 1.437, "fa": 0.0, "gp": 0.296, "bl": 0.0, "ds": 0.0, "txt": "In general, all synthesizers are distractions from the essentials of music: listening and performing. They replace that with poking around at knobs and setting modes and it does give results, but it can feel really ungrounded when you haven't trained to get any of it to go through your hands directly. I have an FM-1 and yes, it's fun. But I would say the grooveboxes are roughly equal to DJing as a practice, which is to say, they definitely can inspire ideas and awareness, they just don't lead you to go really deep most of the time.\n\nThe thing to do for theory is basically to work on paper more, take careful notes and look for connections between one kind of theory and another, because often something that seems complex one way is simple in another. A groovebox can do this by presenting you with a palette of stuff that sounds good, and then you can go about breaking it down and studying it by hand."}, {"id": 50493316, "au": "SmirkingRevenge", "dom": 91, "sr": 40, "sc": 2.11, "ep": 3.28, "bs": 0.0, "d": 1, "age": 11.08, "grav": 102.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 1404, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 1.062, "fa": 0.0, "gp": 0.54, "bl": 0.0, "ds": 0.0, "txt": "MIDI controllers + laptop are pretty much the ultimate musical instrument - no piece of specialized gear really does anything objectively better.  It's just infinitely flexible.\n\nUsing gear like the FM-1 is more about enjoyment and focus and even the limitations."}, {"id": 50495260, "au": "mapmap", "dom": 14, "sr": 41, "sc": 2.08, "ep": 3.62, "bs": 0.0, "d": 2, "age": 5.38, "grav": 36.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 13, "k": 270, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 1.032, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": ">The main value is having a break from the computer & physical knobs to twiddle.\n\nDedicated hardware for creation could be healthy for a child (or anyone) struggling with too much screen based consumption. Can see this as an iPad alternative for long car rides."}, {"id": 50489221, "au": "root9876", "dom": 107, "sr": 42, "sc": 2.04, "ep": 3.15, "bs": 0.0, "d": 0, "age": 17.59, "grav": 211.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 24, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": 1.225, "fa": 0.0, "gp": 0.183, "bl": 0.0, "ds": 0.0, "txt": "FM-1 is really nice because it's basically a platform with Bluetooth, WiFi, screen, speaker, audio out, usb, rechargeable battery, knobs and buttons in ready to use package. You can build anything with it (considering small CPU and ram)."}, {"id": 50494825, "au": "Lio", "dom": 11, "sr": 43, "sc": 2.04, "ep": 3.58, "bs": 0.0, "d": 3, "age": 6.74, "grav": 49.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 60, "qw": 0, "k": 10451, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": 1.462, "fa": 0.0, "gp": 0.098, "bl": 0.0, "ds": 0.0, "txt": "I still love my QY70, which I’ve had since the 90s. The sequencer really is very good.\n\nIt’s basically a pocket workstation rather than a groovebox though, as it lacks realtime controls without an external MIDI controller.\n\nI’d argue that peak groovebox is probably an Akai MPC.\n\nI use my QY70 and a multitrack to work DAWless but I always wonder about a big workstation like a Korg Kronos."}, {"id": 50489162, "au": "Elfener", "dom": 101, "sr": 44, "sc": 2.01, "ep": 2.89, "bs": 0.0, "d": 0, "age": 17.66, "grav": 213.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 575, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": [], "ig": 0.707, "fa": 0.34, "gp": 0.179, "bl": 0.0, "ds": 0.0, "txt": "It seems they also have the SMK-37, which is not that much more expensive, but has actual keys so probably more useful for actually playing music, and apparently most alternative firmware support it too."}, {"id": 50489502, "au": "embedding-shape", "dom": 78, "sr": 45, "sc": 1.98, "ep": 3.52, "bs": 0.0, "d": 2, "age": 17.21, "grav": 204.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 62, "qw": 7, "k": 21365, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": 0.933, "fa": 0.42, "gp": 0.088, "bl": 0.0, "ds": 0.0, "txt": "> but jacks for MIDI is unfair, I think.\n\nFeels like studio setups are personal and individual enough that you can't say it's fair or unfair for someone else to care about specific features. Everything I own, including my own modular synth, has MIDI DIN ports on them, so I too look for that in new gear, but friend of mine too don't use MIDI for anything, obviously he doesn't look for that :)"}, {"id": 50490013, "au": "EmX_3000", "dom": 156, "sr": 46, "sc": 1.97, "ep": 5.21, "bs": 1.7, "d": 5, "age": 16.64, "grav": 193.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 196, "qw": 0, "k": 193, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 5, "meme": 0, "tier": "crowd_chatter", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": 1.763, "fa": 0.0, "gp": 0.734, "bl": 0.64, "ds": 0.0, "txt": "For me the main issue is the VST-as-a-service model which is already taking over. I don't sub or micro-transact. The Roland VariOS thing I have had very expensive instruments too, luckily mine came with the CF card with all the ones which exist. I've never hooked my MPC up to the Internet to get VSTs either, I'm quite happy with what I have actually. I have been fiddling with electronic music for a long long time, and I remember when VSTs hit the scene, I got VST-itis and must have pirated everything under the sun but that leads to choice paralysis (same as getting all the MAME ROMs back in the day). Now I'm happier getting more out of what I have by using my brain a bit. Having generic USB MIDI on the MPC has been amazing though, everything is so much tighter without having to daisy-chain and even Roger Linn is impressed by how tight the timing is. 9 ins and outs is incredible, if I need more I just attach another generic USB MIDI interface.\n\nIt's actually a golden age for the MIDI fan but there's a lot of complaining to be done too about aspects of it. Cheapness and hooking you to a store being two big ones."}, {"id": 50490674, "au": "alexjplant", "dom": 61, "sr": 47, "sc": 1.95, "ep": 4.33, "bs": 0.85, "d": 3, "age": 15.93, "grav": 180.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 3326, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 1.194, "fa": 0.34, "gp": 0.386, "bl": 0.32, "ds": 0.0, "txt": "Buy an old Thinkpad, put NixOS + Renoise on it (without a browser and with a very primitive WM), and build a QMK/Vial keyboard with encoders. It'll cost you $200 and get you everything it sounds like you want."}, {"id": 50489070, "au": "kelvie", "dom": 6, "sr": 48, "sc": 1.72, "ep": 3.26, "bs": 0.0, "d": 2, "age": 17.78, "grav": 215.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 73, "qw": 0, "k": 573, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": [], "ig": 1.297, "fa": 0.0, "gp": 0.149, "bl": 0.0, "ds": 0.0, "txt": "If the OP is a software developer it's actually helpful to download a custom firmware's source code and have an LLM teach you how to use the firmware to play music and learn music theory at the same time, on one of the groove boxes.\n\nE.g. it'll tell you how to activate the arpeggiator, as well as what an arpeggio is, what notes comprise each chord, scales, etc, which are all programmed into the firmware."}, {"id": 50490715, "au": "simjnd", "dom": 138, "sr": 49, "sc": 1.72, "ep": 2.97, "bs": 0.0, "d": 1, "age": 15.9, "grav": 179.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 68, "qw": 0, "k": 990, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 1.152, "fa": 0.0, "gp": 0.179, "bl": 0.0, "ds": 0.0, "txt": "I'm not sure this webpage replaces owning the FM-1 itself though? If you're interested in this page you're most likely interested in the FM-1 and/or already have one. There are millions of online samplers you can already use, the purpose of these devices isn't to do something necessarily unique, it's making music creation more tactile and constrained, and that's not something this webpage can do IMO."}, {"id": 50488747, "au": "swiftcoder", "dom": 36, "sr": 50, "sc": 1.7, "ep": 2.95, "bs": 0.0, "d": 0, "age": 18.28, "grav": 225.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 11204, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": [], "ig": 0.881, "fa": 0.0, "gp": 0.606, "bl": 0.0, "ds": 0.0, "txt": "The explosion of firmwares for this device, and the manufacturers embrace thereof, is a rare bright spot in post-LLM music tech"}, {"id": 50493414, "au": "jimmyjazz14", "dom": 152, "sr": 51, "sc": 1.63, "ep": 3.97, "bs": 0.8, "d": 2, "age": 10.82, "grav": 98.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 87, "qw": 0, "k": 991, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 1.488, "fa": 0.0, "gp": 0.324, "bl": 0.3, "ds": 0.0, "txt": "Its been tried in the past but most VSTs are compiled for windows or mac which tends to come with its own pitfalls for running on micro computers like would be required.  Personally I always liked Native Instruments NKS concept which still requires a computer but allows you to manage compatible VST on the the midi controllers that support it.  I have one and have been able to use a mac mini headless with it for live performance and its better than any \"real\" synth I have ever used for most things."}, {"id": 50491851, "au": "lc9er", "dom": 8, "sr": 52, "sc": 1.62, "ep": 3.16, "bs": 0.0, "d": 2, "age": 14.26, "grav": 151.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 56, "qw": 0, "k": 535, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": [], "ig": 1.346, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I have one, too. I think the groovebox firmwares are fun for sketching out ideas. Some people create fully developed songs, but I don’t know, I think the more targeted firmwares are more interesting.\n\nFirmware like Obervave, Hortator, X0X, and FMini-1, with their limited scope and greater depth I find to be more useful, at least as part of a bigger workflow."}, {"id": 50492066, "au": "Applejinx", "dom": 150, "sr": 53, "sc": 1.56, "ep": 3.1, "bs": 0.0, "d": 3, "age": 13.83, "grav": 144.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 96, "qw": 0, "k": 3750, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 1.318, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Friends of mine are making sndstation, I was going to mention it. That's Baconpaul, and that's the demo that got me to buy a cheap linux handheld :)\n\nIt's not so much for CLAP, as it is 'make little synths and games and grooveboxes and toys that will run on a little game-box which has D-pads and joysticks'. In a sense this will be even more fun than an FM-1, plus more of a fun platform to work with. You just have to be able to run on a little Linux machine. There'll be a dev kit and everything. It's kind of new :)"}, {"id": 50494747, "au": "prollings", "dom": 20, "sr": 54, "sc": 1.51, "ep": 3.05, "bs": 0.0, "d": 1, "age": 6.99, "grav": 52.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 64, "qw": 0, "k": 83, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": [], "ig": 1.231, "fa": 0.0, "gp": 0.108, "bl": 0.0, "ds": 0.0, "txt": "I find it quite an unpleasant little machine to use. Mostly because the knobs and buttons feel terrible, the firmwares I've tried were all unintuitive in their own ways, and it's really REALLY small. If you can deal with those points of friction, you might be able to enjoy it.\n\nMy only desire for it at this point is a sound source played by better hardware."}, {"id": 50488676, "au": "drbscl", "dom": 42, "sr": 55, "sc": 1.45, "ep": 2.7, "bs": 0.0, "d": 1, "age": 18.4, "grav": 227.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 466, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": [], "ig": 0.737, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I’ve tried a few, I liked Jiant’s workflow the best so far (I also tried sloop and skiff)\n\nI just wish it had proper 909 & 303 emulation"}, {"id": 50489688, "au": "InsidiousWombat", "dom": 73, "sr": 56, "sc": 1.45, "ep": 2.97, "bs": 0.0, "d": 2, "age": 16.94, "grav": 199.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 43, "qw": 0, "k": 515, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 1.192, "fa": 0.0, "gp": 0.119, "bl": 0.0, "ds": 0.0, "txt": "The ass part about jacks is that there is apparently 2 standards for midi over jack, with various gear manufacturers split over which one to use. You can make device accept either but it's pretty rare sight.\n\nConnector wise, far superior to DIN midi"}, {"id": 50492094, "au": "bluehex", "dom": 53, "sr": 57, "sc": 1.45, "ep": 2.83, "bs": 0.0, "d": 4, "age": 13.77, "grav": 143.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 947, "kpp": 5.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 1.203, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I feel like Synthstrom deserves some credit for open sourcing their deluge firmware and supporting a community version, showing us what was possible. FM-1 and vibe coding was the tipping point, granted."}, {"id": 50493371, "au": "SmirkingRevenge", "dom": 12, "sr": 58, "sc": 1.45, "ep": 2.82, "bs": 0.0, "d": 3, "age": 10.95, "grav": 100.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 1404, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": 1.201, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Throwing in an honorable mention for the Polyend Trackers - a full midi tracker in groovebox form with a big screen - and they've recently open sourced their firmware and are seeing an explosion of really cool custom firmwares"}, {"id": 50493400, "au": "uproarchat", "dom": 88, "sr": 59, "sc": 1.45, "ep": 2.82, "bs": 0.0, "d": 1, "age": 10.87, "grav": 99.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 61, "qw": 0, "k": 113, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 1.054, "fa": 0.0, "gp": 0.234, "bl": 0.0, "ds": 0.0, "txt": "I just bought one a few days ago. It's fun to have something to hack on at such a low price. The FM-1 is relatively popular too, so there's lots of stuff going on to tinker with. It's far from the most amazing piece of kit, but at the price its the cost of dinner for something I'll get more than 1 night's enjoyment from."}, {"id": 50491543, "au": "Blackthorn", "dom": 149, "sr": 60, "sc": 1.45, "ep": 6.38, "bs": 3.58, "d": 2, "age": 14.82, "grav": 160.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 1, "w": 48, "qw": 0, "k": 5658, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": ["https://cdm.link/sndstation-linux-distro-for-game-handhelds/", "https://youtu.be/0cHvzRsJg-A"], "ig": 1.309, "fa": 0.62, "gp": 1.059, "bl": 1.35, "ds": 0.0, "txt": "This exists for CLAP: https://cdm.link/sndstation-linux-distro-for-game-handhelds/; you can watch a preview of what one of the authors created for it here: https://youtu.be/0cHvzRsJg-A.\n\nA couple of these exist in guitar pedal form for lv2 (which is a dead format): Mod Audio Dwarf, and pistomp.\n\nNothing for VST3 that I'm aware of. Maybe the new Akai stuff?"}, {"id": 50491719, "au": "Marazan", "dom": 52, "sr": 61, "sc": 1.45, "ep": 2.69, "bs": 0.0, "d": 3, "age": 14.49, "grav": 155.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 3708, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 1.145, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It is not the device itself.  It is the rush of gear companies that are announcing their new gear will be open source/sdk available/1st class custom firmware writing support.\n\nThe FM1 has started a revolution."}, {"id": 50488953, "au": "mtalantikite", "dom": 25, "sr": 62, "sc": 1.45, "ep": 2.69, "bs": 0.0, "d": 1, "age": 17.96, "grav": 218.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 98, "qw": 0, "k": 3833, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": [], "ig": 0.897, "fa": 0.0, "gp": 0.401, "bl": 0.0, "ds": 0.0, "txt": "I haven't used an FM-1, so I can't speak to the specifics of it, but you absolutely do not need to understand music theory and improvisation to make music on something like this.\n\nAdditionally, understanding theory and improvisation is certainly a great thing to know if you're trying to make music, but you can understand a ton of things in the abstract and also be pretty terrible at applying it in the moment.\n\nSo if you want to get a device you can throw some hacked firmware on and have some fun, I'd say don't let your lack of theory hold you back."}, {"id": 50489563, "au": "xhevahir", "dom": 54, "sr": 63, "sc": 1.45, "ep": 2.62, "bs": 0.0, "d": 1, "age": 17.13, "grav": 202.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 1204, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 0.571, "fa": 0.34, "gp": 0.21, "bl": 0.0, "ds": 0.0, "txt": "It looks cheap because it is cheap—something like $60 US. As for understanding the market, they appear to be doing an okay job of it; lots of people are buying three or more of these."}, {"id": 50493227, "au": "jimmyjazz14", "dom": 87, "sr": 64, "sc": 1.45, "ep": 3.36, "bs": 0.8, "d": 0, "age": 11.31, "grav": 105.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 65, "qw": 0, "k": 991, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": 1.041, "fa": 0.0, "gp": 0.631, "bl": 0.3, "ds": 0.0, "txt": "I'll be honest I don't get the FM-1 hype, every custom firmware I have seen for it is just doing stuff that I have been able to do on my laptop with a midi controller for over a decade (or more) and usually with less hassle.  I do like to see that its popularity had led to some other hardware makers opening up to custom firmware out of the box though."}, {"id": 50494717, "au": "davvid", "dom": 72, "sr": 65, "sc": 1.45, "ep": 2.56, "bs": 0.0, "d": 2, "age": 7.09, "grav": 53.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 1790, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": 0.662, "fa": 0.34, "gp": 0.022, "bl": 0.0, "ds": 0.0, "txt": "To be fair, you can get a 3.5 mm type-A MIDI to MIDI DIN adapter cable pretty cheaply. The key thing to know is that it's \"type A\" so that you don't buy the wrong adapter."}, {"id": 50488832, "au": "dyzone", "dom": 112, "sr": 66, "sc": 1.45, "ep": 2.51, "bs": 0.0, "d": 0, "age": 18.13, "grav": 222.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 103, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sound_synth", "flbl": "Sound & Synth (Including)", "urls": [], "ig": 0.594, "fa": 0.0, "gp": 0.765, "bl": 0.0, "ds": 0.0, "txt": "What is the right way of thinking about frequency modulation for musicians? I know some of the maths but I can't operate the bitwig FM-4 synth. Do you just screw around with the thing until you can operate it?"}, {"id": 50494805, "au": "lossyalgo", "dom": 41, "sr": 67, "sc": 1.45, "ep": 2.5, "bs": 0.0, "d": 2, "age": 6.8, "grav": 50.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 55, "qw": 0, "k": 277, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 1.066, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Just make sure to run in Chrome, Firefox has issues. Also if it locks up during flashing, just open the firmware page directly (in Chrome of course) and flash from the source (I seem to have a lot of issues flashing on there for some reason, on multiple PCs, where it just locks up and does nothing)."}, {"id": 50492156, "au": "ghostly_s", "dom": 85, "sr": 68, "sc": 1.45, "ep": 2.36, "bs": 0.0, "d": 1, "age": 13.59, "grav": 140.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 3824, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 0.917, "fa": 0.0, "gp": 0.144, "bl": 0.0, "ds": 0.0, "txt": "It has exactly one Midi port because it is a cheap device. You're in a tiny minority who would prefer changing batteries to plugging in a charging cable. And it absolutely does not have a fan."}, {"id": 50489467, "au": "rbn3", "dom": 106, "sr": 69, "sc": 1.45, "ep": 2.34, "bs": 0.0, "d": 1, "age": 17.25, "grav": 205.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 36, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sound_synth", "flbl": "Sound & Synth (Including)", "urls": [], "ig": 0.995, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "This thing runs Linux and dexed (an open source dx7 player/emulator) - or any of the myriad vibecoded alt firmwares."}, {"id": 50493458, "au": "jimmyjazz14", "dom": 93, "sr": 70, "sc": 1.45, "ep": 3.06, "bs": 0.8, "d": 2, "age": 10.74, "grav": 97.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 991, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "sound_synth", "flbl": "Sound & Synth (Including)", "urls": [], "ig": 1.173, "fa": 0.0, "gp": 0.208, "bl": 0.3, "ds": 0.0, "txt": "Fair enough, I personally find these kinds of fiddly devices to be the worst of both worlds, lots of distracting menus and settings without the payoff you can get with working in something like Ableton, but that's just me and I certainly don't want to yuck anyone's yum as they say."}, {"id": 50489916, "au": "marpstar", "dom": 74, "sr": 71, "sc": 1.45, "ep": 2.25, "bs": 0.0, "d": 3, "age": 16.73, "grav": 195.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 25, "qw": 0, "k": 1394, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": ["https://www.disasterareadesigns.com/shop/p/midi-box-4"], "ig": 0.956, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "There are actually 4 ways manufacturers do it. Something like the Disaster Area Designs[1] MIDI Box is a necessity once you start dealing with guitar effects pedals.\n\n[1]: https://www.disasterareadesigns.com/shop/p/midi-box-4"}, {"id": 50493463, "au": "brudgers", "dom": 82, "sr": 72, "sc": 1.45, "ep": 3.08, "bs": 0.85, "d": 6, "age": 10.73, "grav": 97.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 73, "qw": 0, "k": 52656, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": 1.311, "fa": 0.0, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "I agree about the MPC...I have a Force (because it was cheaper than a used MPC One and more powerful).\n\nBut when I don't feel like that paradigm, USB MIdi is not very useful (and of course an MPC can still work with TRS/DIN).\n\nWhen I want lots of ins and outs, I use a MOTU MIDI Timepiece AV (they're not much more than a decent USB hub and can filter and route and do all sorts of clocking)."}, {"id": 50492612, "au": "flashblaze", "dom": 7, "sr": 73, "sc": 1.45, "ep": 2.23, "bs": 0.0, "d": 3, "age": 12.57, "grav": 124.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 328, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sound_synth", "flbl": "Sound & Synth (Including)", "urls": [], "ig": 0.949, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Was kinda planning the same and I feel instead of buying a synth, I would be better off buying a starter MIDI keyboard to learn music theory and then emulate the FM-1 software"}, {"id": 50493557, "au": "SmirkingRevenge", "dom": 64, "sr": 74, "sc": 1.45, "ep": 2.21, "bs": 0.0, "d": 2, "age": 10.51, "grav": 94.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 1404, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 0.941, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "M8 is really addicting and probably the most engaging little music device I've ever had. Definitely not toy-grade in build and it's one of the most capable hardware devices out there in it's price range too.  It punches way above it's weight"}, {"id": 50489438, "au": "thih9", "dom": 18, "sr": 75, "sc": 1.45, "ep": 2.19, "bs": 0.0, "d": 2, "age": 17.28, "grav": 205.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 10113, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 0.934, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "This looks great.\n\nHow long until we get that with a native support for changing firmware?\n\nAs in: preload ten firmware versions and switch between them, with persisted state?"}, {"id": 50493387, "au": "jimmyjazz14", "dom": 139, "sr": 76, "sc": 1.45, "ep": 2.99, "bs": 0.8, "d": 1, "age": 10.91, "grav": 99.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 64, "qw": 0, "k": 991, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 1.271, "fa": 0.0, "gp": 0.0, "bl": 0.3, "ds": 0.0, "txt": "Digital synthesis has been a solved problem for decades now frankly and everything this thing does has been doable in software for a long time (which is why its pretty easy to vibe code for), its just another platform for people to do it on.  Frankly open hardware is exactly the opposite of enshitification, MVave will never be able to lock it down and charge a subscription."}, {"id": 50492803, "au": "brudgers", "dom": 77, "sr": 77, "sc": 1.45, "ep": 2.13, "bs": 0.0, "d": 5, "age": 12.16, "grav": 118.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 52656, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 0.496, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I solder two TRS jacks back to back, squirt hot snot into the gap, and shrink some shrink tube around it…it’s about $0.20 of materials and five minutes work."}, {"id": 50489561, "au": "lolive", "dom": 159, "sr": 78, "sc": 1.45, "ep": 2.13, "bs": 0.0, "d": 0, "age": 17.13, "grav": 202.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 1392, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": [], "ig": 0.906, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Completely off topic, but if you are a boomer with an iOS device, there are PLENTY of electronic music apps [and emulators] on that platform too.\n\nPS: and I mean PLENTY !"}, {"id": 50494839, "au": "otabdeveloper4", "dom": 38, "sr": 79, "sc": 1.45, "ep": 2.08, "bs": 0.0, "d": 1, "age": 6.68, "grav": 48.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 3236, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sound_synth", "flbl": "Sound & Synth (Including)", "urls": [], "ig": 0.883, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It's literally AI slop.\n\nThe vast majority of these firmwares are literally just some clueless guy going \"uhh Claude make me a sick-sounding groovebox synth\" and posting the result to Github without even looking at it.\n\nIt's horrible."}, {"id": 50488748, "au": "ktzar", "dom": 95, "sr": 80, "sc": 1.45, "ep": 1.93, "bs": 0.0, "d": 0, "age": 18.28, "grav": 225.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 532, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": [], "ig": 0.7, "fa": 0.0, "gp": 0.197, "bl": 0.0, "ds": 0.0, "txt": "I got one for my kid's obsessed with music composition. What would you use this with so they can compose multitrack tunes, something like Chrome Music Lab or Beepbox? Anything in Android so they can compose on the go, such on an aeroplane?"}, {"id": 50489998, "au": "homarp", "dom": 19, "sr": 81, "sc": 1.45, "ep": 1.88, "bs": 0.0, "d": 3, "age": 16.64, "grav": 193.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 26, "qw": 0, "k": 18984, "kpp": 7.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": ["https://historyofsky.github.io/m-pyre/"], "ig": 0.8, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "not enough space on device\n\nbut hook your FM1 to your phone and flash from there (the firmware hub)... very portable.\n\ni like m-pyre a lot right now - https://historyofsky.github.io/m-pyre/"}, {"id": 50489790, "au": "diskzero", "dom": 155, "sr": 82, "sc": 1.45, "ep": 2.72, "bs": 0.85, "d": 4, "age": 16.84, "grav": 197.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 57, "qw": 0, "k": 2631, "kpp": 4.8, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": [], "ig": 1.157, "fa": 0.0, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "They are super cool! Look on Reverb. As I said, you sometimes end up with some fully licensed, expensive plugins as well. A lot of us can probably survive being a couple of versions behind.\n\nI know for a fact new devices like this are on the horizon, but it just might not be the form factor that you are looking for."}, {"id": 50490207, "au": "glimshe", "dom": 50, "sr": 83, "sc": 1.45, "ep": 1.87, "bs": 0.0, "d": 1, "age": 16.44, "grav": 189.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 8991, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 0.682, "fa": 0.0, "gp": 0.186, "bl": 0.0, "ds": 0.0, "txt": "You are criticizing a piece of equipment that created a minor revolution in the music market. Think about that. Sure it has flaws, but it brought vibe music firmware to the masses."}, {"id": 50491005, "au": "headsman771", "dom": 130, "sr": 84, "sc": 1.45, "ep": 1.86, "bs": 0.0, "d": 2, "age": 15.56, "grav": 173.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 62, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 0.794, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I think they must. The \"where to buy\" button on their product pages just goes to a \"contact us\" page."}, {"id": 50490034, "au": "varispeed", "dom": 145, "sr": 85, "sc": 1.45, "ep": 1.85, "bs": 0.0, "d": 3, "age": 16.61, "grav": 193.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 3192, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 0.789, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I was not talking about resellers. Sure you can commission product in China with your own branding. That is like buying from Temu with extra steps."}, {"id": 50494846, "au": "lossyalgo", "dom": 90, "sr": 86, "sc": 1.45, "ep": 1.82, "bs": 0.0, "d": 1, "age": 6.66, "grav": 48.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 277, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": [], "ig": 0.362, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "You can't fit your laptop in your pocket though. And $50 is a steal especially if you are on the go or just wanna plop down on the couch and jam for a couple hours."}, {"id": 50491048, "au": "consumer451", "dom": 131, "sr": 87, "sc": 1.45, "ep": 1.79, "bs": 0.0, "d": 3, "age": 15.51, "grav": 173.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 45, "qw": 0, "k": 15043, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 0.761, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I would really like to go down this rabbit hole. There are so many sellers of FM-1 on Ali. Meanwhile, there are so many USA-based companies who get their manufacturing cloned in China... For things like FM-1, are they actually respecting intellectual property over there, internally?"}, {"id": 50490948, "au": "wazoox", "dom": 146, "sr": 88, "sc": 1.45, "ep": 1.77, "bs": 0.0, "d": 0, "age": 15.63, "grav": 175.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 8954, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 0.699, "fa": 0.0, "gp": 0.091, "bl": 0.0, "ds": 0.0, "txt": "I bought two, one to try firmwares and one to stick with the one I prefer : at the time, it's the mighty OBERVAVE. Sounds huge !"}, {"id": 50494826, "au": "lossyalgo", "dom": 47, "sr": 89, "sc": 1.45, "ep": 1.76, "bs": 0.0, "d": 3, "age": 6.74, "grav": 49.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 68, "qw": 0, "k": 277, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": [], "ig": 0.749, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I got a couple of these FM-1s and they are very sturdy. I've taken them in planes, trains and automobiles, packed into various bags and suitcases and they still work fine after a couple months of abuse. I just pick a random firmware, bring wired headphones, charge the battery and then just jam for hours during my trip and it's always a great adventure. 50 euro + 10 euro shipping + unlimited easy-to-install firmware choices is unbeatable."}, {"id": 50493326, "au": "jimmyjazz14", "dom": 100, "sr": 90, "sc": 1.45, "ep": 2.48, "bs": 0.8, "d": 1, "age": 11.05, "grav": 101.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 991, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 1.057, "fa": 0.0, "gp": 0.0, "bl": 0.3, "ds": 0.0, "txt": "Honestly get a small midi-controller that comes with Ableton Lite or something like that (Akai and Arturia mini controllers both do if I recall), it will give them hundred times the functionality at almost the same price as one of these."}, {"id": 50489855, "au": "EmX_3000", "dom": 79, "sr": 91, "sc": 1.45, "ep": 3.45, "bs": 1.85, "d": 3, "age": 16.79, "grav": 196.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 193, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": 1.467, "fa": 0.0, "gp": 0.0, "bl": 0.7, "ds": 0.0, "txt": "USB MIDI seems tempting, you can send a giant virtual MIDI cable snake down one wire, but the connector issue rears its head again. It'd be cool if there was a more robust standard for USB connectors. I bet industry, the military, scientists, professional audio people etc. would all love such a thing."}, {"id": 50493199, "au": "jimmyjazz14", "dom": 27, "sr": 92, "sc": 1.45, "ep": 2.36, "bs": 0.8, "d": 1, "age": 11.38, "grav": 106.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 54, "qw": 0, "k": 991, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": [], "ig": 0.869, "fa": 0.0, "gp": 0.221, "bl": 0.3, "ds": 0.0, "txt": "Honestly, just get a midi controller and download Reaper (or Ableton Lite if it come with the controller you purchase) and you will have ten times the functionality with one percent of the hassle. That said if you want to learn how to actually play music just get a real musical instrument and take some lessons."}, {"id": 50493309, "au": "jimmyjazz14", "dom": 86, "sr": 93, "sc": 1.25, "ep": 2.05, "bs": 0.8, "d": 1, "age": 11.1, "grav": 102.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 51, "qw": 0, "k": 991, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 0.871, "fa": 0.0, "gp": 0.0, "bl": 0.3, "ds": 0.0, "txt": "I mean its basically meant to be a toy and it competition are things like the Korg Volca series, the primary factor in that market is price and mvave clearly hit it out of the park on this one when it come to price-to-value (for people that are into small toy-like synths)."}, {"id": 50494877, "au": "Lio", "dom": 49, "sr": 94, "sc": 1.1, "ep": 1.1, "bs": 0.0, "d": 2, "age": 6.57, "grav": 47.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 10451, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 0.468, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Behringer might only have factories in China but all their design work (cloning other companies’ products really) is done in other countries like the UK and Germany.\n\nA better Chinese example might be ASM and their Hydrasynth."}, {"id": 50493341, "au": "jimmyjazz14", "dom": 105, "sr": 95, "sc": 1.04, "ep": 1.84, "bs": 0.8, "d": 1, "age": 11.01, "grav": 101.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 991, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 0.782, "fa": 0.0, "gp": 0.0, "bl": 0.3, "ds": 0.0, "txt": "yeah like most digital synths of the last decade (or longer) they are just microcontrollers with buttons and most of the functionality is software driven.  You can actually build something like this with a ten/twenty dollar microcontroller and something like minidexed."}, {"id": 50489254, "au": "vegnus", "dom": 142, "sr": 96, "sc": 0.97, "ep": 0.97, "bs": 0.0, "d": 2, "age": 17.54, "grav": 210.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 147, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 0.411, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "In terms of guitars, you can actually get better guitars for substantially cheaper from China. Should I pay more for less quality? Being \"Made in USA\" used to mean quality, but it doesn't anymore"}, {"id": 50489139, "au": "varispeed", "dom": 141, "sr": 97, "sc": 0.84, "ep": 0.84, "bs": 0.0, "d": 1, "age": 17.69, "grav": 213.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 43, "qw": 0, "k": 3192, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 0.358, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "In the EU/US there are different costs of living, running a business and standards for employment. That is reflected in the price.\n\nBut as long it is cheap and you'll never visit China, then who cares that someone might be exploited there."}, {"id": 50493005, "au": "EmX_3000", "dom": 46, "sr": 98, "sc": 0.82, "ep": 2.68, "bs": 1.85, "d": 2, "age": 11.72, "grav": 111.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 76, "qw": 0, "k": 193, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 1.0, "fa": 0.0, "gp": 0.226, "bl": 0.7, "ds": 0.0, "txt": "I don't care how expensive things are, 1/8\" jacks are terrible for MIDI. They make really expensive cars with those stupid iPad dashboards too, doesn't make it OK. I'm not pleased with the build quality of the Chinese gear I've seen and none of it seems much more innovative or cheaper than anything else out these days. I still await something really great from China. I'm sure they'll figure it out sooner or later but it's not quite time yet."}, {"id": 50493076, "au": "EmX_3000", "dom": 75, "sr": 99, "sc": 0.66, "ep": 2.51, "bs": 1.85, "d": 4, "age": 11.6, "grav": 109.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 193, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 1.07, "fa": 0.0, "gp": 0.0, "bl": 0.7, "ds": 0.0, "txt": "That looks brilliant. I thought there were only 2 ways. I really think that MIDI device makers need to be actively bullied into providing DIN MIDI even if they want to stick USB or the 1/8\" jacks on too for whatever reason."}, {"id": 50490437, "au": "EmX_3000", "dom": 51, "sr": 100, "sc": 0.64, "ep": 2.5, "bs": 1.85, "d": 2, "age": 16.2, "grav": 185.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 193, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 1.063, "fa": 0.0, "gp": 0.0, "bl": 0.7, "ds": 0.0, "txt": "Korg, Behringer, they revived the cheap and cheerful modern MIDI music device market. We'll have to wait and see what kind of musical impact this has, so far Equipboard is showing one guy with a pic of it."}, {"id": 50493023, "au": "EmX_3000", "dom": 71, "sr": 101, "sc": 0.46, "ep": 2.32, "bs": 1.85, "d": 4, "age": 11.69, "grav": 111.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 193, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": 0.986, "fa": 0.0, "gp": 0.0, "bl": 0.7, "ds": 0.0, "txt": "Plenty of thinner gear has real MIDI ports. I hate the adapters and USB MIDI. Put a lump on the back, that'd protect the knobs a bit too."}, {"id": 50489151, "au": "anfractuosity", "dom": 103, "sr": 102, "sc": 0.39, "ep": 4.23, "bs": 3.84, "d": 0, "age": 17.67, "grav": 213.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 28, "qw": 0, "k": 2992, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "sound_synth", "flbl": "Sound & Synth (Including)", "urls": ["https://www.reddit.com/r/synth/comments/1vgotkd/mvave_fm1_teardown_with_photos/"], "ig": 0.703, "fa": 0.62, "gp": 0.559, "bl": 1.45, "ds": 0.0, "txt": "Was just looking at this teardown https://www.reddit.com/r/synth/comments/1vgotkd/mvave_fm1_te...\n\nI don't know anything about synthesisers, but\nwould I be right in thinking the FM modulation would be done via software on the MCU?"}, {"id": 50493515, "au": "SmirkingRevenge", "dom": 62, "sr": 103, "sc": 0.32, "ep": 1.51, "bs": 1.19, "d": 3, "age": 10.61, "grav": 95.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 1404, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": 0.642, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "That's the tracker mini I take it? I have the Tracker+ and it's build quality is quite solid w/ an aluminum front panel. I really wish it had a battery though."}, {"id": 50490885, "au": "InsidiousWombat", "dom": 76, "sr": 104, "sc": 0.29, "ep": 1.49, "bs": 1.19, "d": 4, "age": 15.71, "grav": 176.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 515, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.633, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "I've had A/B solved by just schottky rectifier and low enough current optocoupler, but damn ,didn't knew there is even more to that mess"}, {"id": 50493210, "au": "pettijohn", "dom": 21, "sr": 105, "sc": 0.22, "ep": 1.41, "bs": 1.19, "d": 1, "age": 11.35, "grav": 106.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 10, "k": 56, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.456, "fa": 0.0, "gp": 0.236, "bl": 0.45, "ds": 0.0, "txt": "> Our algorithms must all be feeding us the same things\n\nTwo days ago I watched a YouTube video about this and went to AliExpress to check prices. Tech nerd information bubble!"}, {"id": 50490269, "au": "consumer451", "dom": 129, "sr": 106, "sc": 0.17, "ep": 1.37, "bs": 1.19, "d": 1, "age": 16.39, "grav": 188.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 15043, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 0.581, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "I think that's what happened, but follow-up.. if one orders an \"FM-1\" from AliExpress, does the China-based company M-Vave make any money from the sale?"}, {"id": 50489713, "au": "InsidiousWombat", "dom": 102, "sr": 107, "sc": -0.16, "ep": 1.04, "bs": 1.19, "d": 1, "age": 16.91, "grav": 198.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 515, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 0.441, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "You're generally better off with just getting separate MIDI keyboard if you want to use other gear too."}, {"id": 50495730, "au": "nlehuen", "dom": 122, "sr": 108, "sc": -0.22, "ep": 0.97, "bs": 1.19, "d": 2, "age": 3.87, "grav": 24.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 227, "kpp": 4.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.413, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Yeah indeed too late for me!\n\nWeb installers should check for the presence of this bootloader and nudge people into installing it first."}, {"id": 50492845, "au": "brudgers", "dom": 128, "sr": 109, "sc": -0.25, "ep": 0.94, "bs": 1.19, "d": 1, "age": 12.08, "grav": 116.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 52656, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": 0.402, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "What I think happened is M-Vave decided to comply with various GNU licenses on the advice of their attorneys.\n\nThe same thing with inMusic and their MPC OS."}, {"id": 50489307, "au": "EmX_3000", "dom": 67, "sr": 110, "sc": -0.29, "ep": 1.56, "bs": 1.85, "d": 3, "age": 17.48, "grav": 209.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 193, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": 0.665, "fa": 0.0, "gp": 0.0, "bl": 0.7, "ds": 0.0, "txt": "That's a relief. The only thing I have in my studio with a fan is my ancient Roland Virtual Studio which I love and which still can not be replaced by anything newer because of the lack of full MIDI control over all features."}, {"id": 50491047, "au": "bovermyer", "dom": 132, "sr": 111, "sc": -0.35, "ep": 0.85, "bs": 1.19, "d": 0, "age": 15.52, "grav": 173.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 8486, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 0.27, "fa": 0.0, "gp": 0.146, "bl": 0.45, "ds": 0.0, "txt": "I've seen \"FM-1\" floating around lately, but didn't know what it was.\n\nWhere do I get one of these?"}, {"id": 50495596, "au": "drayfield", "dom": 13, "sr": 112, "sc": -0.39, "ep": 0.8, "bs": 1.19, "d": 4, "age": 4.29, "grav": 27.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 411, "kpp": 9.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": 0.341, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "I love my Tracker. It's great to noodle away on some ambient techno with my feet up on the sofa."}, {"id": 50488683, "au": "shimman", "dom": 43, "sr": 113, "sc": -0.42, "ep": 0.77, "bs": 1.19, "d": 1, "age": 18.38, "grav": 227.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 2041, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": 0.329, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "I've used sloop for a groove box firmware. Pretty nifty, like it more than the other groove box firmwares."}, {"id": 50494784, "au": "alfiedotwtf", "dom": 28, "sr": 114, "sc": -0.49, "ep": 0.71, "bs": 1.19, "d": 1, "age": 6.87, "grav": 50.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 4330, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": 0.285, "fa": 0.0, "gp": 0.026, "bl": 0.45, "ds": 0.0, "txt": "If you’re a groove box person, ICYMI Akai released their MPC SDK yesterday - literally you can now download or make your own plugins"}, {"id": 50489625, "au": "PUSH_AX", "dom": 123, "sr": 115, "sc": -0.51, "ep": 0.69, "bs": 1.19, "d": 0, "age": 17.02, "grav": 200.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 1476, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.183, "fa": 0.0, "gp": 0.177, "bl": 0.45, "ds": 0.0, "txt": "Wouldn’t it be wonderful if when you clicked “about” on a website, it would tell you about the website ."}, {"id": 50489835, "au": "hdb2", "dom": 83, "sr": 116, "sc": -0.62, "ep": 0.57, "bs": 1.19, "d": 2, "age": 16.8, "grav": 196.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 6, "k": 36, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 0.243, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "> but jacks for MIDI is unfair\n\nnot the person you're replying to, but -\n\nI would be ok w/ the 1/8\" jacks if there weren't TWO STANDARDS to keep up with.  madness!"}, {"id": 50493841, "au": "brudgers", "dom": 48, "sr": 117, "sc": -0.65, "ep": 0.54, "bs": 1.19, "d": 3, "age": 9.87, "grav": 85.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 52656, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 0.231, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "I don't care how expensive things are\n\nOther people do.\n\nI still await something really great from China\n\nTry the Wall."}, {"id": 50491474, "au": "ramathornn", "dom": 26, "sr": 118, "sc": -0.77, "ep": 2.28, "bs": 3.05, "d": 1, "age": 14.92, "grav": 162.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 96, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.352, "fa": 0.34, "gp": 0.331, "bl": 1.15, "ds": 0.0, "txt": "Just bought one last week of Aliexpress, totally worth the $70! Very hackable too!"}, {"id": 50489167, "au": "pwython", "dom": 15, "sr": 119, "sc": -1.06, "ep": 0.93, "bs": 1.99, "d": 1, "age": 17.65, "grav": 212.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 17, "qw": 0, "k": 800, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": ["https://thefirmwarehub.com/"], "ig": 0.123, "fa": 0.0, "gp": 0.443, "bl": 0.75, "ds": 0.0, "txt": "It's all over YouTube for me too. The firmware hacking for this thing has got people hyped.\n\nhttps://thefirmwarehub.com/"}, {"id": 50488727, "au": "chrisshroba", "dom": 40, "sr": 120, "sc": -1.38, "ep": 1.67, "bs": 3.05, "d": 1, "age": 18.31, "grav": 225.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 12, "qw": 0, "k": 1580, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": ["https://thefirmwarehub.com/"], "ig": 0.641, "fa": 0.0, "gp": 0.111, "bl": 1.15, "ds": 0.0, "txt": "I've found this to be a good resource for discovering fun custom firmwares!\n\nhttps://thefirmwarehub.com/"}, {"id": 50492821, "au": "brudgers", "dom": 80, "sr": 121, "sc": -1.54, "ep": 1.51, "bs": 3.05, "d": 4, "age": 12.13, "grav": 117.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 52656, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 0.642, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "USB Midi requires a host. So it kinda kills any Dawless vibe."}, {"id": 50489465, "au": "moron4hire", "dom": 125, "sr": 122, "sc": -1.83, "ep": 1.22, "bs": 3.05, "d": 1, "age": 17.25, "grav": 205.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 12237, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": [], "ig": 0.519, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Judging from the \"Connect Device\" button in the upper right corner, probably WebMIDI."}, {"id": 50496856, "au": "shrubby", "dom": 31, "sr": 123, "sc": -2.06, "ep": 2.18, "bs": 4.24, "d": 0, "age": 0.64, "grav": 5.7, "surf": 40.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 430, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": [], "ig": 0.926, "fa": 0.0, "gp": 0.003, "bl": 1.6, "ds": 0.0, "txt": "I have no idea what I'm asking but now with AI-crap flooding, is there a app for learning to play the piano? We have a unused electric piano (Nux something) sitting in the corner and no idea on how to play it.\n\nIs there a \"PianoCraft\" app somewhere? Preferably for Linux."}, {"id": 50488903, "au": "olerich", "dom": 114, "sr": 124, "sc": -2.24, "ep": 1.33, "bs": 3.58, "d": 1, "age": 18.04, "grav": 220.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": -1, "lu": 1, "w": 18, "qw": 0, "k": 6, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "sound_synth", "flbl": "Sound & Synth (Including)", "urls": ["https://www.youtube.com/watch?v=0S6NXIe_NyA"], "ig": 0.4, "fa": 0.0, "gp": 0.271, "bl": 1.35, "ds": 0.0, "txt": "I recommend this video from mixed signals, it shows how a few commonly used and known fm sounds are made: https://www.youtube.com/watch?v=0S6NXIe_NyA"}, {"id": 50491982, "au": "ianmarcinkowski", "dom": 135, "sr": 125, "sc": -2.67, "ep": 1.57, "bs": 4.24, "d": 0, "age": 14.0, "grav": 147.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 38, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": [], "ig": 0.584, "fa": 0.0, "gp": 0.136, "bl": 1.6, "ds": 0.0, "txt": "Mine is coming in the mail soon!  Looking forward to playing around with it :)"}, {"id": 50494318, "au": "luizfad", "dom": 16, "sr": 126, "sc": -2.84, "ep": 0.87, "bs": 3.71, "d": 2, "age": 8.54, "grav": 69.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 1, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": [], "ig": 0.372, "fa": 0.0, "gp": 0.0, "bl": 1.4, "ds": 0.0, "txt": "The hard part is to stick with a single firmware, I'm tempted to try different ones all the time haha"}, {"id": 50493362, "au": "jimmyjazz14", "dom": 118, "sr": 127, "sc": -2.94, "ep": 2.23, "bs": 5.17, "d": 1, "age": 10.97, "grav": 100.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 991, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "sound_synth", "flbl": "Sound & Synth (Including)", "urls": [], "ig": 0.949, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "Honestly the best way to think about any sound design concept as a musician is as platform for creative experimentation.  Most of my favorite patches I have come up with have been happy accidents."}, {"id": 50494785, "au": "qmmmur", "dom": 3, "sr": 128, "sc": -2.97, "ep": 1.4, "bs": 4.37, "d": 2, "age": 6.86, "grav": 50.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 823, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": 0.465, "fa": 0.0, "gp": 0.21, "bl": 1.65, "ds": 0.0, "txt": "This is an incredibly narrow opinion that is also very ignorant. Massive oversimplification to say that your can’t go deep with DJing. Look at dj sniff or Maria Chavez. It’s very much an art form in and of itself."}, {"id": 50494867, "au": "thdr", "dom": 35, "sr": 129, "sc": -3.07, "ep": 1.17, "bs": 4.24, "d": 2, "age": 6.61, "grav": 48.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 217, "kpp": 9.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.499, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Leaving out the second ‘H’ makes the name hilarious"}, {"id": 50491963, "au": "rrix2", "dom": 63, "sr": 130, "sc": -3.15, "ep": 1.09, "bs": 4.24, "d": 2, "age": 14.06, "grav": 148.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 1547, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 0.363, "fa": 0.0, "gp": 0.161, "bl": 1.6, "ds": 0.0, "txt": "I've been using my M8 and the FM-1 together, they make a good combo."}, {"id": 50490292, "au": "functionmouse", "dom": 111, "sr": 131, "sc": -3.38, "ep": 0.86, "bs": 4.24, "d": 1, "age": 16.36, "grav": 188.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 944, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": [], "ig": 0.365, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "I'd like to see velocity sensitive/aftertouch keys on this."}, {"id": 50489730, "au": "InsidiousWombat", "dom": 144, "sr": 132, "sc": -3.49, "ep": 0.75, "bs": 4.24, "d": 2, "age": 16.89, "grav": 198.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 22, "k": 515, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 0.318, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "> In the EU/US there are different costs of living, running a business and standards for employment. That is reflected in the price.\n\n...the price of made in china device that is just branded with EU/US brand ?"}, {"id": 50489424, "au": "hackingonempty", "dom": 124, "sr": 133, "sc": -3.56, "ep": 0.68, "bs": 4.24, "d": 0, "age": 17.31, "grav": 206.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 1365, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.185, "fa": 0.0, "gp": 0.172, "bl": 1.6, "ds": 0.0, "txt": "What API does this use that isn't available in Firefox?"}, {"id": 50492551, "au": "hankbond", "dom": 34, "sr": 134, "sc": -3.62, "ep": 0.62, "bs": 4.24, "d": 1, "age": 12.7, "grav": 126.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 559, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.263, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "idk whats going on here but just fooling around with NACHTFART was so relaxing"}, {"id": 50492589, "au": "cocodill", "dom": 136, "sr": 135, "sc": -3.68, "ep": 0.56, "bs": 4.24, "d": 0, "age": 12.62, "grav": 125.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 127, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 0.188, "fa": 0.0, "gp": 0.085, "bl": 1.6, "ds": 0.0, "txt": "I'll just wait until the Behringer Kick comes out."}, {"id": 50488809, "au": "anduril22", "dom": 99, "sr": 136, "sc": -3.71, "ep": 0.53, "bs": 4.24, "d": 2, "age": 18.17, "grav": 223.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 4, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": [], "ig": 0.226, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "I’ve found that hugeltons felucca is the way to go. The rest aren’t as good."}, {"id": 50494766, "au": "dyzone", "dom": 23, "sr": 137, "sc": -3.83, "ep": 0.41, "bs": 4.24, "d": 2, "age": 6.92, "grav": 51.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 103, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": [], "ig": 0.173, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Can you explain what exactly is the understanding that you gained?"}, {"id": 50491494, "au": "tartoran", "dom": 56, "sr": 138, "sc": -3.91, "ep": 0.33, "bs": 4.24, "d": 3, "age": 14.9, "grav": 162.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 11075, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "sound_synth", "flbl": "Sound & Synth (Including)", "urls": [], "ig": 0.14, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Are you in the US? How much did it come to including shipping and taxes?"}, {"id": 50493436, "au": "jimmyjazz14", "dom": 89, "sr": 139, "sc": -3.97, "ep": 1.2, "bs": 5.17, "d": 2, "age": 10.78, "grav": 98.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 991, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 1, "tier": "meme_or_snark", "facet": "sound_synth", "flbl": "Sound & Synth (Including)", "urls": [], "ig": 0.509, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "Nice I certainly get that appeal, if you ever want to go deep you should try out a raspberry pi zero with stuff like minidexed, lots of fun hacking potential with those."}, {"id": 50495914, "au": "zimpenfish", "dom": 17, "sr": 140, "sc": -4.08, "ep": 0.95, "bs": 5.04, "d": 3, "age": 3.34, "grav": 20.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 9, "qw": 0, "k": 10527, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": ["https://remotefm1.com/", "https://joakimeriksson.github.io/fm1-dock/"], "ig": 0.405, "fa": 0.0, "gp": 0.0, "bl": 1.9, "ds": 0.0, "txt": "There's RemoteFM1[0] or (kinda) FM-1 Dock[1] which help there.\n\n[0] https://remotefm1.com/\n\n[1] https://joakimeriksson.github.io/fm1-dock/"}, {"id": 50490017, "au": "varispeed", "dom": 143, "sr": 141, "sc": -4.2, "ep": 0.97, "bs": 5.17, "d": 3, "age": 16.63, "grav": 193.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 3192, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": 0.412, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "And?\n\nYou do understand that costs of making something in the West is different than in China? Some companies unfortunately have to compromise on quality to maintain price that is not outrageous when you compare to Chinese."}, {"id": 50495612, "au": "LegitShady", "dom": 4, "sr": 142, "sc": -4.4, "ep": 1.17, "bs": 5.57, "d": 2, "age": 4.25, "grav": 27.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 2986, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "sound_synth", "flbl": "Sound & Synth (Including)", "urls": [], "ig": 0.497, "fa": 0.0, "gp": 0.0, "bl": 2.1, "ds": 0.0, "txt": "thinking sound design is a distraction for the essentials of music is not understanding music or sound."}, {"id": 50488811, "au": "SamBam", "dom": 96, "sr": 143, "sc": -4.44, "ep": 0.6, "bs": 5.04, "d": 1, "age": 18.17, "grav": 223.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 11, "qw": 0, "k": 12419, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": ["https://thefirmwarehub.com/"], "ig": 0.121, "fa": 0.0, "gp": 0.214, "bl": 1.9, "ds": 0.0, "txt": "There is multitrack firmware you can download for this, like Sloop.\n\nhttps://thefirmwarehub.com/"}, {"id": 50493394, "au": "jimmyjazz14", "dom": 160, "sr": 144, "sc": -4.94, "ep": 0.09, "bs": 5.04, "d": 1, "age": 10.89, "grav": 99.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 991, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.039, "fa": 0.0, "gp": 0.0, "bl": 1.9, "ds": 0.0, "txt": "why do you have to be a boomer to use them?"}, {"id": 50488761, "au": "jareklupinski", "dom": 98, "sr": 145, "sc": -5.67, "ep": 0.96, "bs": 6.62, "d": 1, "age": 18.25, "grav": 224.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": -1, "lu": 1, "w": 14, "qw": 0, "k": 3226, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://www.youtube.com/watch?v=2puO1fV6Wi4"], "ig": 0.255, "fa": 0.0, "gp": 0.246, "bl": 2.5, "ds": 0.0, "txt": "currently watching this video, https://www.youtube.com/watch?v=2puO1fV6Wi4\n\nseems theres a few in there that make it more a DAW"}, {"id": 50490000, "au": "UncleOxidant", "dom": 55, "sr": 146, "sc": -8.15, "ep": 0.0, "bs": 6.89, "d": 2, "age": 16.64, "grav": 193.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 10, "k": 11702, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.34, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "> It looks cheap because it is cheap—something like $60 US\n\nI just got one for $48 on aliexpress."}, {"id": 50492373, "au": "UncleOxidant", "dom": 57, "sr": 147, "sc": -8.15, "ep": 0.0, "bs": 6.89, "d": 4, "age": 13.11, "grav": 132.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 11702, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "sound_synth", "flbl": "Sound & Synth (Including)", "urls": [], "ig": -0.95, "fa": 0.34, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Yes. $49.44 was the total price including shipping."}, {"id": 50491104, "au": "jordand", "dom": 134, "sr": 148, "sc": -8.15, "ep": 0.0, "bs": 6.89, "d": 1, "age": 15.44, "grav": 171.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 526, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.34, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Bought mine from AliExpress for $64"}, {"id": 50488861, "au": "urtrs", "dom": 97, "sr": 149, "sc": -8.77, "ep": 0.0, "bs": 6.89, "d": 1, "age": 18.09, "grav": 221.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 47, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.242, "bl": 2.6, "ds": 0.0, "txt": "Koala Sampler is great for that."}, {"id": 50489121, "au": "Elfener", "dom": 65, "sr": 150, "sc": -8.83, "ep": 0.0, "bs": 6.89, "d": 1, "age": 17.73, "grav": 214.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 8, "k": 575, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.204, "bl": 2.6, "ds": 0.0, "txt": "> It has a fan, that's not good at all.\n\nI think that's actually the built-in speaker?"}, {"id": 50489259, "au": "dominotw", "dom": 30, "sr": 151, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 17.53, "grav": 210.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 6912, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "hello fellow youtube addict."}, {"id": 50489264, "au": "Zetaphor", "dom": 66, "sr": 152, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 17.52, "grav": 210.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 1114, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "midi_usb", "flbl": "Midi & Usb (Mpc)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Correct, it does not have a fan"}, {"id": 50489546, "au": "lolive", "dom": 108, "sr": 153, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 17.16, "grav": 203.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 1392, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Is there Doom already ?"}, {"id": 50488922, "au": "consumer451", "dom": 115, "sr": 154, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 18.0, "grav": 219.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 15043, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "This is great! Thanks!"}, {"id": 50494882, "au": "otabdeveloper4", "dom": 126, "sr": 155, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 6.55, "grav": 47.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 0, "k": 3236, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Firefox has WebMIDI."}, {"id": 50491208, "au": "natebc", "dom": 133, "sr": 156, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 15.32, "grav": 169.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 799, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "firmware_music", "flbl": "Firmware & Music (Device)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "I got 3 on Amazon. So far no counterfeits!"}, {"id": 50494896, "au": "otabdeveloper4", "dom": 157, "sr": 157, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 6.52, "grav": 47.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 21, "k": 3236, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "> I'm surprised there isn't a sturdy generic VST-runner box with an interface to configure the MIDI in / out and which VSTs will run\n\nIt's called an iPad."}, {"id": 50489330, "au": "viklove", "dom": 161, "sr": 158, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 0, "age": 17.44, "grav": 208.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 611, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Is this an ad?"}, {"id": 50491297, "au": "hmstx", "dom": 117, "sr": 159, "sc": -10.89, "ep": 3.42, "bs": 14.31, "d": 1, "age": 15.19, "grav": 167.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": -1, "lu": 4, "w": 125, "qw": 0, "k": 41, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "sound_synth", "flbl": "Sound & Synth (Including)", "urls": ["https://www.youtube.com/watch?v=YV9vQGqoO5c", "https://www.youtube.com/watch?v=k0xGyR_lKoM", "https://www.youtube.com/watch?v=1-boGIxRZ_s"], "ig": 1.323, "fa": 0.0, "gp": 0.21, "bl": 5.4, "ds": 0.0, "txt": "I imagine you are vaguely familiar with subtractive synthesis; oscillators, filters, envelopes, modulation. It wouldn't hurt, although the building blocks are laid out differently in an FM synth.\n\nAnyway, I found these hands-on demos on the DX1 to be some of the most \"aha\" moments I've had trying to understand how FM patches are made.\n\nTLDR, an FM \"operator\" is an oscillator. A carrier is the oscillator you hear, its modulator is an oscillator that wiggles the carrier and brings out different harmonics. You can stack more modulators and you can have multiple carriers going in parallel, the various combinations of operators available in a synth being the different algorithms.\n\nhttps://www.youtube.com/watch?v=YV9vQGqoO5c\n\nhttps://www.youtube.com/watch?v=k0xGyR_lKoM\n\nhttps://www.youtube.com/watch?v=1-boGIxRZ_s\n\nThere was also one from Venus Theory about how to get musically useful stuff out of frequency/phase modulation: \nhttps://www.youtube.com/watch?v=wqc8rZnzTVI"}, {"id": 50489617, "au": "s5ma6n", "dom": 109, "sr": 160, "sc": -11.11, "ep": 0.0, "bs": 8.88, "d": 2, "age": 17.04, "grav": 201.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 2, "qw": 0, "k": 494, "kpp": 6.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "fm1_hardware", "flbl": "Fm-1 & Hardware (Vibe)", "urls": ["https://doom.deadlockinteractive.com/"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.35, "ds": 0.0, "txt": "Of course :)\n\nhttps://doom.deadlockinteractive.com/"}, {"id": 50492486, "au": "tartoran", "dom": 58, "sr": 161, "sc": -12.77, "ep": 0.0, "bs": 10.54, "d": 5, "age": 12.86, "grav": 128.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 11075, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "midi_gear", "flbl": "Midi & Gear (Cheap)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.978, "ds": 0.0, "txt": "That's really a good price. Thanks"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      const jumpBtns = isPinned
+        ? `<button type="button" class="probe-inline-btn" data-probe-jump="1">Comment &darr;</button>` +
+          `<button type="button" class="probe-inline-btn" data-probe-clear="1">Clear &times;</button>`
+        : "";
+      probeEl.innerHTML =
+        `<strong>@${escHtml(hit.au)}</strong> | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})` +
+        jumpBtns +
+        `<br>"${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 60);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 50);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 50);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 50);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `Showing ${shown.length} of ${pool.length} matching comments (mode: ${activeMode})` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear selection</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeSelect = document.getElementById("modeSelect");
+  modeSelect.addEventListener("change", () => {
+    activeMode = modeSelect.value;
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

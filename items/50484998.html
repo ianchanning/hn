@@ -1,0 +1,1354 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50484998 // Do we still have to denormalize? Have your schema and search it too — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+    }
+    .kpi-cell {
+      padding: 16px 16px 14px;
+      border-right: 1px solid rgb(205, 205, 200);
+    }
+    .kpi-cell:last-child { border-right: 0; }
+    .kpi-label {
+      font: 600 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 8px 0 4px;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      font-size: 12px;
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 6px;
+      corner-shape: bevel;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer > summary.hn-summary {
+      list-style: none;
+      cursor: pointer;
+      display: block;
+      padding: 2px 0;
+      margin: 0;
+      background: transparent;
+      border: 0;
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      user-select: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: rgb(255, 255, 253);
+      border: 1px solid rgb(13, 13, 13);
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+    }
+    table.ablation th {
+      background: rgb(236, 236, 231);
+      font: 700 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgb(60, 60, 58);
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 6px;
+      corner-shape: bevel;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-decoration: ;
+      text-transform: lowercase;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      border-top: 3px solid rgb(13, 13, 13);
+      padding-top: 14px;
+      margin-top: 36px;
+      font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpi-cell { border-bottom: 1px solid rgb(205, 205, 200); }
+      .filter-bar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in {
+        width: 100%;
+      }
+      .filter-bar input.search-in {
+        grid-column: span 2;
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; }
+      .topbar-right { font-size: 8pt; padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+      </div>
+      <div class="topbar-right">&nbsp;</div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://www.paradedb.com/blog/joins">Do we still have to denormalize? Have your schema and search it too</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=paradedb.com"><span class="sitestr">paradedb.com</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">112 points</span> by <a href="https://news.ycombinator.com/user?id=philippemnoel">philippemnoel</a> <span class="age" title="2026-11-13T15:31:50.000Z"><a href="https://news.ycombinator.com/item?id=50484998">3 days ago</a></span> | <a href="https://news.ycombinator.com/item?id=50484998">39&nbsp;comments</a> | 89.7% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">01 // EVIDENCE</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">39</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 30 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">10.3%</div>
+          <div class="kpi-sub">4 comments (2 Gold / 5.1%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">89.7%</div>
+          <div class="kpi-sub">29 chatter &bull; 6 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">2</div>
+        <div class="kpi-sub">7% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.842</div>
+        <div class="kpi-sub">4 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">17</div>
+          <div class="kpi-sub">HN POS 23..39 (43.6% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="margin-top:10px;font:600 11px/1.5 ui-monospace,Menlo,monospace;color:rgb(70,70,68)"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">02 // EXPLORE</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 39-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 39)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (2)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (2)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (29)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (6)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..39) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 25)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (jillesvangurp, 6.5h); largest subtree (@KellyCriterion) occupies 17 slots (HN POS 23..39).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="modeSelect" class="sel-in" aria-label="Ranking view">
+          <option value="hn_top40">HN Top 40</option>
+          <option value="top_signal">Epistemic Top 50</option>
+          <option value="buried_gems">Buried Gems (HN POS &gt; 25)</option>
+          <option value="bullshit_traps">High-Karma / URL Traps Caught</option>
+          <option value="mod_morgue">Mod Rebukes &amp; Downvoted Morgue</option>
+          <option value="c5a_rescues">c5A Heterodox Rescues</option>
+        </select>
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (39)</option>
+          <option value="index_search">Index &amp; Search (Logical) (14)</option>
+          <option value="query_user">Query &amp; User (Score) (10)</option>
+          <option value="mess_data">Mess &amp; Data (Consistency) (9)</option>
+          <option value="denormalization_table">Denormalization &amp; Table (Updates) (6)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, search, denormalize, indexes, join, postgres...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50484998 + PARADEDB.COM + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50484998, "story_title": "Do we still have to denormalize? Have your schema and search it too", "story_url": "https://www.paradedb.com/blog/joins", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50484998, "story_title": "Do we still have to denormalize? Have your schema and search it too", "story_url": "https://www.paradedb.com/blog/joins", "points": 112, "story_author": "philippemnoel", "article_source": "fetched_url", "t1_ref_utc": "2026-11-16T17:20:57+00:00", "t2_ref_utc": "2026-11-16T17:20:57+00:00", "delta_minutes": 0.0, "story_anchors": ["search", "denormalize", "indexes", "join", "postgres", "table", "paradedb", "users", "queries", "index", "score", "query", "separate", "single", "scoring", "writes", "schema", "columns", "order", "user", "database", "instead", "update", "etc", "fit"], "facet_labels": {"index_search": "Index & Search (Logical)", "mess_data": "Mess & Data (Consistency)", "denormalization_table": "Denormalization & Table (Updates)", "query_user": "Query & User (Score)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "index_search", "label": "Index & Search (Logical)", "count": 14, "top_terms": ["index", "search", "logical", "writes"]}, {"slug": "mess_data", "label": "Mess & Data (Consistency)", "count": 9, "top_terms": ["mess", "data", "consistency", "update"]}, {"slug": "denormalization_table", "label": "Denormalization & Table (Updates)", "count": 6, "top_terms": ["denormalization", "table", "updates", "compute"]}, {"slug": "query_user", "label": "Query & User (Score)", "count": 10, "top_terms": ["query", "user", "score", "search"]}], "counts": {"total_comments": 39, "live_t2_comments": 39, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 30, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "4dfa153df2f5cdc27c023d703fcf4d3ed186da8532e08d150966deb880bdf0fb"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 2, "grounded_analysis": 2, "crowd_chatter": 29, "bullshit_or_flamewar": 6}, "facets": {"mess_data": 9, "index_search": 14, "denormalization_table": 6, "query_user": 10}, "facet_options": [{"slug": "index_search", "label": "Index & Search (Logical)", "count": 14}, {"slug": "query_user", "label": "Query & User (Score)", "count": 10}, {"slug": "mess_data", "label": "Mess & Data (Consistency)", "count": 9}, {"slug": "denormalization_table", "label": "Denormalization & Table (Updates)", "count": 6}], "facet_diagnostics": [{"slug": "index_search", "label": "Index & Search (Logical)", "count": 14, "useful": 2, "useful_pct": 14.3, "terms": "index, search, logical, writes"}, {"slug": "query_user", "label": "Query & User (Score)", "count": 10, "useful": 0, "useful_pct": 0.0, "terms": "query, user, score, search"}, {"slug": "mess_data", "label": "Mess & Data (Consistency)", "count": 9, "useful": 1, "useful_pct": 11.1, "terms": "mess, data, consistency, update"}, {"slug": "denormalization_table", "label": "Denormalization & Table (Updates)", "count": 6, "useful": 1, "useful_pct": 16.7, "terms": "denormalization, table, updates, compute"}], "source_categories": [{"category": "general_web", "count": 2}, {"category": "arxiv_preprint", "count": 1}, {"category": "code_repository", "count": 1}], "story_anchors": ["search", "denormalize", "indexes", "join", "postgres", "table", "paradedb", "users", "queries", "index", "score", "query", "separate", "single", "scoring", "writes", "schema", "columns"], "largest_root": {"root_id": 50515626, "author": "KellyCriterion", "slots": 17, "start_dom": 23, "end_dom": 39, "share_pct": 43.6, "top_dom1_age": 6.5, "top_dom1_author": "jillesvangurp"}, "buried_cutoff": 25, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50513783, "au": "gopalv", "dom": 4, "sr": 1, "sc": 12.3, "ep": 12.3, "bs": 0.0, "d": 0, "age": 13.54, "grav": 139.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 89, "qw": 30, "k": 4284, "kpp": 5.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "mess_data", "flbl": "Mess & Data (Consistency)", "urls": ["https://arxiv.org/html/2504.11540v1\u0023S5"], "ig": 1.461, "fa": 2.77, "gp": 0.668, "bl": 0.0, "ds": 0.0, "txt": "> Instead of joining the tables completely and sorting at the end, a Rank Join streams its inputs in descending score order (sorted access, or SA), building candidate result-sets as it goes.\n\nYour algorithm feels like a variant of the WAND algorithm the Snowflake Top-K pruning paper [1] pulls from.\n\nYou can go distributed with this approach if you have a \"gossip\" protocol between workers to distribute the heap boundaries periodically.\n\nBefore the AI age, a \"papers we love\" group was a great thing within any company.\n\nNow, Claude or Codex will know the SOTA literature around a topic like this and \"uniformly distribute\" the past into every single implementation of a similar idea. The future isn't uniformly distributed, but the past is getting the treatment & that's good.\n\n[1] - https://arxiv.org/html/2504.11540v1\u0023S5"}, {"id": 50514108, "au": "anon373839", "dom": 12, "sr": 2, "sc": 9.21, "ep": 9.21, "bs": 0.0, "d": 0, "age": 12.69, "grav": 126.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 45, "qw": 0, "k": 5092, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "index_search", "flbl": "Index & Search (Logical)", "urls": ["https://github.com/paradedb/django-paradedb"], "ig": 1.033, "fa": 2.08, "gp": 0.592, "bl": 0.0, "ds": 0.0, "txt": "ParadeDB is the best! I really like the Django integration (https://github.com/paradedb/django-paradedb). You get proper BM25 scoring, fuzzy matching, hybrid search, metadata filtering while still just using  QuerySets. And you're keeping everything in Postgres, so there isn't any need to manage or sync a separate DB/search engine."}, {"id": 50516178, "au": "jillesvangurp", "dom": 1, "sr": 3, "sc": 4.41, "ep": 4.41, "bs": 0.0, "d": 0, "age": 6.5, "grav": 47.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 291, "qw": 0, "k": 21952, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "index_search", "flbl": "Index & Search (Logical)", "urls": [], "ig": 1.375, "fa": 0.28, "gp": 0.262, "bl": 0.0, "ds": 0.0, "txt": "Searching what you stored is nice. But usually, you want to put some ETL (extract, transform, and load) in between your data base and search indices that enables you to enrich, transform, and improve data. If you are using vector search, this is also where you calculate your embeddings and run your data to elaborate tokenization pipelines. And you might do things like calculate categorizations and other classifications that you might use for filtering.\n\nSearch quality tuning inevitably involves iterating on how you index your data. The value of separation of where your database and search index live is that you can try out new indexing strategies and try different strategies.\n\nI've been consulting on how to improve search quality for some time and sorting out ETL is usually the first thing I need to do for clients. A good question is \"when did you last reindex your data\". If the answer is never, that usually means the clien is probably not able to do this easily and that they probably made a lot of mistakes when they set up their system first. I've helped quite a few clients like that.\n\nETL doesn't have to mean bringing in a lot of complexity. A few simple python or whatever scripts can do the job. And many people don't actually have a lot of data which means these scripts can run quickly. I've had clients where it only took a few seconds to rebuild their search indices.\n\nParad"}, {"id": 50515626, "au": "KellyCriterion", "dom": 23, "sr": 4, "sc": 4.41, "ep": 4.41, "bs": 0.0, "d": 0, "age": 8.0, "grav": 63.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 1084, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "denormalization_table", "flbl": "Denormalization & Table (Updates)", "urls": [], "ig": 1.125, "fa": 0.34, "gp": 0.55, "bl": 0.0, "ds": 0.0, "txt": "Denormalization & Joins are mainly a thing from 80-90s when diskspace & compute was expensive; today its easy just do denormalize everything and not use joins, since diskspace & RAM today is abundant.\n\n(sure, not true for that one verylarge enterpriseDB at megacorpX, but in 95% of uses cases these topics do not matter anymore)"}, {"id": 50520081, "au": "philippemnoel", "dom": 21, "sr": 5, "sc": 3.82, "ep": 3.82, "bs": 0.0, "d": 1, "age": 0.05, "grav": 3.6, "surf": 17.2, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 1013, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "denormalization_table", "flbl": "Denormalization & Table (Updates)", "urls": [], "ig": 0.883, "fa": 0.56, "gp": 0.101, "bl": 0.0, "ds": 0.0, "txt": "ParadeDB indexes stay in sync in real-time with the underlying table's UPDATEs, INSERTs and DELETEs. No actions needed on your side. We are specifically designed for high update throughput."}, {"id": 50515982, "au": "vidarh", "dom": 29, "sr": 6, "sc": 3.71, "ep": 3.86, "bs": 0.0, "d": 1, "age": 7.07, "grav": 53.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 46972, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "denormalization_table", "flbl": "Denormalization & Table (Updates)", "urls": [], "ig": 1.086, "fa": 0.28, "gp": 0.352, "bl": 0.0, "ds": 0.0, "txt": "Denormalization brings a complexity cost when updating to ensure integrity, though. And if storage and compute is cheap then you can easily get the benefits of denormalization without the downsides by keeping data normalized for consistency and instead build indexes to let you query it dernormalized when it makes sense."}, {"id": 50515936, "au": "KellyCriterion", "dom": 36, "sr": 7, "sc": 3.5, "ep": 3.8, "bs": 0.0, "d": 2, "age": 7.18, "grav": 54.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 0, "k": 1084, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "query_user", "flbl": "Query & User (Score)", "urls": [], "ig": 0.791, "fa": 0.68, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "a) thats the reason why lot of platforms do not allow to change username after signup\n\nb) absolutely manageable with a solid tooling (and honestly, in 99% of cases this event is trivial as most systems just do not hold enough data to make it like a \"eeek this change will run for 3 days for that 1 user\")"}, {"id": 50519230, "au": "stuhood", "dom": 18, "sr": 8, "sc": 3.42, "ep": 3.42, "bs": 0.0, "d": 2, "age": 1.12, "grav": 7.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 28, "qw": 0, "k": 290, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "query_user", "flbl": "Query & User (Score)", "urls": ["https://www.paradedb.com/customers/moderntreasury"], "ig": 0.705, "fa": 0.62, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Yes, I believe that it would.\n\nIt sounds like you are in a similar boat to https://www.paradedb.com/customers/moderntreasury: no BM25 scoring, but a need to filter, sort, and aggregate by a variety of columns."}, {"id": 50514286, "au": "amluto", "dom": 6, "sr": 9, "sc": 3.13, "ep": 3.13, "bs": 0.0, "d": 0, "age": 12.19, "grav": 118.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 113, "qw": 0, "k": 25296, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "query_user", "flbl": "Query & User (Score)", "urls": [], "ig": 1.218, "fa": 0.0, "gp": 0.188, "bl": 0.0, "ds": 0.0, "txt": "This is neat, but I’m a bit confused by the query that motivates the whole article. If I search for ‘ocaml’, I want to match users’ about_me (the users.about_me ||| 'ocaml' part), but I do really want this to match on the basis of each (completely irrelevant) post and/or comment that gets picked up by the join?  I think I would rather match the user, possibly with some user scoring by the overall user score independent of my search term.\n\nI feel like I would probably execute three separate queries and merge the results myself.  And the user query wouldn’t join against posts at all.  Doing this would end up implicitly doing something like the optimization in the article."}, {"id": 50517697, "au": "cmiles74", "dom": 33, "sr": 10, "sc": 2.89, "ep": 3.34, "bs": 0.0, "d": 1, "age": 3.3, "grav": 20.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 60, "qw": 0, "k": 4854, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "denormalization_table", "flbl": "Denormalization & Table (Updates)", "urls": [], "ig": 0.985, "fa": 0.34, "gp": 0.037, "bl": 0.0, "ds": 0.0, "txt": "...And watch your updates take longer as they now update several columns over several tables instead of just one column in one table, and be sure to ensure that changes don't leave any data in an inconsistent state. I don't think this is an \"enterprise\" issue, it's about maintaining your data, and that effects 99% of applications that store data in a database."}, {"id": 50518237, "au": "lompad", "dom": 27, "sr": 11, "sc": 2.87, "ep": 3.31, "bs": 0.0, "d": 3, "age": 2.43, "grav": 14.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 102, "qw": 14, "k": 630, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "mess_data", "flbl": "Mess & Data (Consistency)", "urls": [], "ig": 0.9, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> The claim that is somehow causes data consistency issues also seems kind of unsubstantiated.\n\nLet me explain that part a bit more. If you have one application, developed by at most a handful of devs, there will not be any consistency issues. But add a few more applications and even a dozen devs (or just simply a decade of time and some staff changes), and there _will_ be misunderstandings/issues identifying the correct rows to update, with exact interpretation differing per application.\n\nCongratulations, you now own a mess. Correcting this after the fact is a major effort.\n\nIf you're in 3NF this can't really happen - the exist once and only once. It's always clear which to update and nothing can be forgotten."}, {"id": 50515972, "au": "RugnirViking", "dom": 31, "sr": 12, "sc": 2.85, "ep": 3.3, "bs": 0.0, "d": 1, "age": 7.09, "grav": 53.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 75, "qw": 0, "k": 3853, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "mess_data", "flbl": "Mess & Data (Consistency)", "urls": [], "ig": 1.203, "fa": 0.0, "gp": 0.323, "bl": 0.0, "ds": 0.0, "txt": "I do not agree, I believe normalization leads to a lot of other benefits like making you think about connections between data much more carefully, and thinking about what you need for each request. Denormalized tables have led way too many times in my experience to hapless developers fetching enormous amounts of data just to use a tiny amount far too often.\n\nAnd db performance absolutely is an issue. Agents mess it up all the time on our codebases..."}, {"id": 50516287, "au": "weego", "dom": 26, "sr": 13, "sc": 2.66, "ep": 3.1, "bs": 0.0, "d": 2, "age": 6.15, "grav": 43.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 76, "qw": 0, "k": 6119, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "mess_data", "flbl": "Mess & Data (Consistency)", "urls": [], "ig": 1.32, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Your assumption that increased resource usage is single concept with one outcome and no nuance is entirely false (where do the problems of engineering a desktop app even overlap with row level schema planning in a database?)\n\nThe claim that is somehow causes data consistency issues also seems kind of unsubstantiated.\n\nThe upside is that when you model it correctly your data conforms to your domain and business in a way that makes every aspect of its use easier."}, {"id": 50514079, "au": "stuhood", "dom": 5, "sr": 14, "sc": 2.66, "ep": 2.8, "bs": 0.0, "d": 1, "age": 12.77, "grav": 127.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 54, "qw": 0, "k": 290, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "query_user", "flbl": "Query & User (Score)", "urls": [], "ig": 1.193, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Yes! Search engines like Tantivy have long employed WAND to score across terms. The difference though is that WAND is not joining terms in descending order by score: rather, by doc-id.\n\nThis algorithm is closer to Fagin's Threshold Algorithm (also mentioned in your link): the Threshold Algorithm was the first iteration of a rank join."}, {"id": 50520060, "au": "philippemnoel", "dom": 2, "sr": 15, "sc": 2.54, "ep": 2.69, "bs": 0.0, "d": 1, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 81, "qw": 0, "k": 1013, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "index_search", "flbl": "Index & Search (Logical)", "urls": [], "ig": 1.144, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Agreed that people need to iterate on their search index. Our users do this a lot. Postgres has a clause called INDEX CONCURRENTLY, which allows you to build an index in the background while the existing index continues to serve queries.\n\nAs for embedding, etc., you can of course do this in Postgres as well. The \"T\" in ETL can still be done in a Postgres-based product like ParadeDB, but you can have it participate in transactions and avoid denormalizing (or denormalize much less), etc."}, {"id": 50519299, "au": "stuhood", "dom": 7, "sr": 16, "sc": 2.33, "ep": 2.7, "bs": 0.0, "d": 1, "age": 1.02, "grav": 7.3, "surf": 12.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 105, "qw": 0, "k": 290, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "query_user", "flbl": "Query & User (Score)", "urls": [], "ig": 1.148, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It very much depends which noun you are searching for (e.g., what the shape of your search results will be):\n\nThe central query in the blog would likely be the type of query you'd use for the default top-level search box on StackOverflow, which is searching for posts and comments (e.g. questions and answers). The reason to include users in that query is two fold: 1) posts/comments from users who are relevant to your query should get a higher score, 2) you need the users to render the search results page anyway.\n\nIf you were doing only user search, then I agree: you probably would only search the users table."}, {"id": 50515806, "au": "oulipo", "dom": 17, "sr": 17, "sc": 2.31, "ep": 2.46, "bs": 0.0, "d": 1, "age": 7.51, "grav": 57.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 72, "qw": 0, "k": 1449, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "index_search", "flbl": "Index & Search (Logical)", "urls": [], "ig": 1.047, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "In my case I'm not so much interested by the BM25 aspect (I don't really have text to search), but I have collection of objects with many columns (having a small-ish number of values, et categories/tags) and I'd like to have an easy way to facet-filter them efficiently.\n\nRight now with \"vanilla Postgres\" I have to guess which combination of facets is going to be common and try to define indexes for these. Would ParadeDB help there?"}, {"id": 50514986, "au": "bartvk", "dom": 20, "sr": 18, "sc": 2.09, "ep": 2.45, "bs": 0.0, "d": 0, "age": 9.93, "grav": 86.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 2387, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "index_search", "flbl": "Index & Search (Logical)", "urls": [], "ig": 0.728, "fa": 0.0, "gp": 0.514, "bl": 0.0, "ds": 0.0, "txt": "The article mainly talks about searching.\n\nWhat about the use case where data frequently gets updated as well? I assume you then get to update lots of duplicate data."}, {"id": 50513163, "au": "dan_thinks", "dom": 19, "sr": 19, "sc": 1.85, "ep": 2.07, "bs": 0.0, "d": 0, "age": 15.26, "grav": 168.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 17, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "denormalization_table", "flbl": "Denormalization & Table (Updates)", "urls": [], "ig": 0.713, "fa": 0.0, "gp": 0.271, "bl": 0.0, "ds": 0.0, "txt": "This looks exciting for some searches (top k), but the headline doesn't really fit. Yes - we still have to denormalize. Just not for some of the use cases paradedb targets. Impressive work."}, {"id": 50515967, "au": "load-bearing", "dom": 25, "sr": 20, "sc": 1.84, "ep": 2.51, "bs": 0.0, "d": 1, "age": 7.11, "grav": 53.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 72, "qw": 0, "k": 47, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "mess_data", "flbl": "Mess & Data (Consistency)", "urls": [], "ig": 0.867, "fa": 0.0, "gp": 0.323, "bl": 0.0, "ds": 0.0, "txt": "But why do it? You yourself are saying that it increases resource usage (which is mentality that left us with electron BTW), and creates additional difficulty with keeping data consistent. What's the upside?\n\nI've never worked on anything, and probably won't ever work, that wouldn't fit in modern machines even in heavily denormalized forms, and have zero desire to do it just for consistency sake. 3NF or up, with very rare exceptions."}, {"id": 50517548, "au": "sgarland", "dom": 37, "sr": 21, "sc": 1.8, "ep": 2.68, "bs": 0.0, "d": 3, "age": 3.6, "grav": 22.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 58, "qw": 0, "k": 5522, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "index_search", "flbl": "Index & Search (Logical)", "urls": [], "ig": 1.142, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Experience across multiple companies of varying size and maturity has proven to me that devs are incapable of doing the RDBMS’ job for it; there are always orphaned rows and referential integrity issues when FK Constraints get dropped.\n\nDatabases are hard. They’re also some of the best-tested code that exists, so maybe let them do their job."}, {"id": 50515772, "au": "lompad", "dom": 24, "sr": 22, "sc": 1.6, "ep": 2.48, "bs": 0.0, "d": 1, "age": 7.63, "grav": 58.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 630, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "mess_data", "flbl": "Mess & Data (Consistency)", "urls": [], "ig": 0.866, "fa": 0.0, "gp": 0.306, "bl": 0.0, "ds": 0.0, "txt": "That makes it rather annoying to keep data consistent though, and tons of people just won't take enough care to properly update everything. Having had to deal with that kind of half-out-of-date mess, I'd rather not, tbh."}, {"id": 50515795, "au": "oulipo", "dom": 35, "sr": 23, "sc": 1.19, "ep": 2.07, "bs": 0.0, "d": 1, "age": 7.55, "grav": 58.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 1449, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "query_user", "flbl": "Query & User (Score)", "urls": [], "ig": 0.879, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Not really, as the article mentions: if you simply denormalize everything, each time you need to eg update a user name, you suddenly have to update its whole posts and comments everywhere, making it something quite expensive"}, {"id": 50515638, "au": "nraynaud", "dom": 22, "sr": 24, "sc": 0.76, "ep": 1.72, "bs": 0.0, "d": 1, "age": 7.95, "grav": 62.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 3866, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "index_search", "flbl": "Index & Search (Logical)", "urls": [], "ig": 0.731, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The index is columnar, so the writes are less scattered on disk than in a row-style B tree even when the updated values are very scattered in logical order I think."}, {"id": 50519804, "au": "amluto", "dom": 8, "sr": 25, "sc": 0.73, "ep": 1.69, "bs": 0.0, "d": 2, "age": 0.37, "grav": 4.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 25296, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "query_user", "flbl": "Query & User (Score)", "urls": [], "ig": 0.718, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "If I’m searching for questions and answers, I don’t want an unrelated answer from a very high ranked user who happens to mention the topic in their profile."}, {"id": 50517018, "au": "KellyCriterion", "dom": 39, "sr": 26, "sc": 0.43, "ep": 1.75, "bs": 0.0, "d": 4, "age": 4.62, "grav": 30.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 1084, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "index_search", "flbl": "Index & Search (Logical)", "urls": [], "ig": 0.746, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "If I look at my youtube comment notification, Id say propably not? (Timestamp belongs to a post as well as likes etc.?)"}, {"id": 50515257, "au": "nehalem", "dom": 14, "sr": 27, "sc": 0.14, "ep": 1.54, "bs": 0.0, "d": 1, "age": 9.09, "grav": 76.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 226, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "index_search", "flbl": "Index & Search (Logical)", "urls": [], "ig": 0.577, "fa": 0.0, "gp": 0.125, "bl": 0.0, "ds": 0.0, "txt": "I would like to try out ParadeDB and potentially retire Typesense but being unable to install it in CloudSQL makes it more than difficult."}, {"id": 50519960, "au": "stuhood", "dom": 9, "sr": 28, "sc": 0.03, "ep": 2.2, "bs": 0.85, "d": 3, "age": 0.17, "grav": 4.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 290, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "query_user", "flbl": "Query & User (Score)", "urls": [], "ig": 0.938, "fa": 0.0, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "Possibly, yea: scoring can be subtle. For a query like this, you'd likely significantly \"boost\" (e.g. multiply) the scores from the questions and answers to ensure that they are prioritized. But including the user score as essentially a tiebreaker can be helpful."}, {"id": 50517535, "au": "sorenbs", "dom": 16, "sr": 29, "sc": -0.25, "ep": 1.29, "bs": 0.0, "d": 2, "age": 3.61, "grav": 22.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 1625, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "index_search", "flbl": "Index & Search (Logical)", "urls": [], "ig": 0.548, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "This might not be an option for you, but Prisma Postgres ships ParadeDB by default. We have a generous free tier."}, {"id": 50518196, "au": "isaacvando", "dom": 15, "sr": 30, "sc": -0.41, "ep": 3.12, "bs": 1.99, "d": 2, "age": 2.5, "grav": 15.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 28, "qw": 0, "k": 30, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "index_search", "flbl": "Index & Search (Logical)", "urls": ["https://app.paradedb.com"], "ig": 0.577, "fa": 0.62, "gp": 0.0, "bl": 0.75, "ds": 0.0, "txt": "If you want to stay on CloudSQL, you can always setup a ParadeDB cluster as a logical replica. Our cloud offering is in private preview if you'd like to try: https://app.paradedb.com"}, {"id": 50519343, "au": "williamdclt", "dom": 28, "sr": 31, "sc": -0.42, "ep": 1.12, "bs": 0.0, "d": 4, "age": 0.97, "grav": 7.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 166, "qw": 0, "k": 4089, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "index_search", "flbl": "Index & Search (Logical)", "urls": [], "ig": 0.475, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "while I mostly agree with you, you're opposing \"teams who made mistakes while denormalising\" with \"teams who made no mistake while normalising\". The biggest difference between these two scenarios isn't that one is using denormalisation and the other normalisation, it's that one made mistakes and the other didn't.\n\nIn real life, the teams working on a supposedly-normalised data schema will also make mistakes: they will model their domain incorrectly, have information duplication without realising it at first, different interpretation of the same data (accessing the same data doesn't mean they'll interpret it the same way... or that it even _can_ be interpreted in a consistent way if not modelled correctly).\n\nI do agree that denormalisation increases the chances of that happening. But IMO, there's much more issues on data modelling than there is in denormalisation. If you have a solid model that is shared by everyone, you'll have much fewer issues even with denormalisation than if you have a not-solid model that is not-shared by everyone even with normalisation."}, {"id": 50516129, "au": "fergie", "dom": 30, "sr": 32, "sc": -1.47, "ep": 1.26, "bs": 1.19, "d": 1, "age": 6.63, "grav": 48.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 11, "k": 4253, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "index_search", "flbl": "Index & Search (Logical)", "urls": [], "ig": 0.377, "fa": 0.0, "gp": 0.259, "bl": 0.45, "ds": 0.0, "txt": "> today its easy just do denormalize everything and not use joins\n\nYou _can_ take this approach on a read-heavy db, but depending on your usecase you are going to struggle with updates and writes."}, {"id": 50518283, "au": "Veliladon", "dom": 3, "sr": 33, "sc": -1.68, "ep": 0.46, "bs": 1.19, "d": 1, "age": 2.38, "grav": 14.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 1774, "kpp": 5.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "mess_data", "flbl": "Mess & Data (Consistency)", "urls": [], "ig": 0.197, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "You'll spend what time you save and more trying to keep all the unnormalized data consistent."}, {"id": 50516428, "au": "meindnoch", "dom": 32, "sr": 34, "sc": -2.58, "ep": 1.35, "bs": 3.05, "d": 1, "age": 5.77, "grav": 40.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 6433, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "denormalization_table", "flbl": "Denormalization & Table (Updates)", "urls": [], "ig": 0.434, "fa": 0.0, "gp": 0.23, "bl": 1.15, "ds": 0.0, "txt": "Or keep your data normalized, and maintain materialized views if and when they're needed."}, {"id": 50514969, "au": "radiospiel", "dom": 10, "sr": 35, "sc": -3.63, "ep": 0.96, "bs": 3.05, "d": 1, "age": 10.0, "grav": 87.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 369, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "query_user", "flbl": "Query & User (Score)", "urls": [], "ig": 0.409, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Indeed. The query should maybe be a UNION ALL over individual search results instead."}, {"id": 50516736, "au": "fauigerzigerk", "dom": 38, "sr": 36, "sc": -3.68, "ep": 0.69, "bs": 3.05, "d": 3, "age": 5.15, "grav": 34.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 15, "k": 16430, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "mess_data", "flbl": "Mess & Data (Consistency)", "urls": [], "ig": 0.294, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": ">a) thats the reason why lot of platforms do not allow to change username after signup\n\nNor any of the other user data that is indexed with every single post?"}, {"id": 50513732, "au": "jamesgresql", "dom": 13, "sr": 37, "sc": -4.68, "ep": 1.1, "bs": 4.24, "d": 0, "age": 13.72, "grav": 142.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 109, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "index_search", "flbl": "Index & Search (Logical)", "urls": [], "ig": 0.314, "fa": 0.0, "gp": 0.252, "bl": 1.6, "ds": 0.0, "txt": "Any questions please go for it, ParadeDB team is watching."}, {"id": 50515952, "au": "fallingbananna", "dom": 34, "sr": 38, "sc": -5.64, "ep": 0.14, "bs": 4.24, "d": 1, "age": 7.13, "grav": 53.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 270, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "mess_data", "flbl": "Mess & Data (Consistency)", "urls": [], "ig": 0.06, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "This is true only if you have *very* specific data."}, {"id": 50518879, "au": "onedognight", "dom": 11, "sr": 39, "sc": -10.66, "ep": 0.0, "bs": 6.89, "d": 2, "age": 1.55, "grav": 9.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 35, "k": 2376, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "query_user", "flbl": "Query & User (Score)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "They compare to UNION ALL in passing:\n\n> Getting that original, natural SQL query down to 100 ms on a single core (12x-50x faster than the 84-line UNION ALL rewrite, and within range of a fully denormalized dataset) required rethinking how joins and search indexes interact"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 60);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 50);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 50);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 50);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `Showing ${shown.length} of ${pool.length} matching comments (mode: ${activeMode})` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeSelect = document.getElementById("modeSelect");
+  modeSelect.addEventListener("change", () => {
+    activeMode = modeSelect.value;
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

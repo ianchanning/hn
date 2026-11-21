@@ -1,0 +1,1387 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50553225 // LLM assisted reverse engineering — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+      text-transform: lowercase;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      text-transform: lowercase;
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .kpi-cell {
+      padding: 8px 0;
+    }
+    .kpi-label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 4px 0;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer:not([open]) {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary,
+    details.proof-drawer > summary {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+    }
+    table.ablation th {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: normal;
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    button.nav-btn,
+    button.mode-tab,
+    button.topbar-toggle {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: rgb(0, 0, 0);
+      cursor: pointer;
+      text-decoration: none;
+      line-height: inherit;
+      vertical-align: baseline;
+      transition: color 0.12s ease;
+      text-transform: lowercase;
+    }
+    button.nav-btn:hover,
+    button.nav-btn.active,
+    button.mode-tab:hover,
+    button.mode-tab.active,
+    button.topbar-toggle:hover,
+    button.topbar-toggle.active {
+      color: rgb(255, 255, 255);
+      text-decoration: none;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      padding: 14px;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; row-gap: 4px; }
+      .topbar-right { padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+        <span class="pagetop" id="modeTabs">
+          <button type="button" class="nav-btn mode-tab active" data-mode="top_signal" role="tab" aria-selected="true">Top 40</button> | <button type="button" class="nav-btn mode-tab" data-mode="hn_top40" role="tab" aria-selected="false">HN Top 40</button>
+        </span>
+      </div>
+      <div class="topbar-right">
+        <button type="button" class="nav-btn topbar-toggle" id="exploreToggleBtn" aria-expanded="false">explore</button> | <button type="button" class="nav-btn topbar-toggle" id="evidenceToggleBtn" aria-expanded="false">evidence</button>
+      </div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://www.slowchronicle.com/posts/llm-assisted-reverse-engineering">LLM assisted reverse engineering</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=slowchronicle.com"><span class="sitestr">slowchronicle.com</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">275 points</span> by <a href="https://news.ycombinator.com/user?id=ioma8">ioma8</a> <span class="age" title="2026-11-18T22:29:13.000Z"><a href="https://news.ycombinator.com/item?id=50553225">16 hours ago</a></span> | <a href="https://news.ycombinator.com/item?id=50553225">69&nbsp;comments</a> | 81.2% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Evidence</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">69</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 56 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">18.8%</div>
+          <div class="kpi-sub">13 comments (4 Gold / 5.8%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">81.2%</div>
+          <div class="kpi-sub">48 chatter &bull; 8 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">3</div>
+        <div class="kpi-sub">10% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.952</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">10</div>
+          <div class="kpi-sub">HN POS 50..59 (14.5% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="color: rgb(90, 90, 88); margin-top: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Explore</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 69-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 69)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (4)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (9)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (48)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (8)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..69) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 25)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (saidinesh5, 9.5h); largest subtree (@komali2) occupies 10 slots (HN POS 50..59).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (69)</option>
+          <option value="foss_interested">Foss &amp; Interested (Code) (17)</option>
+          <option value="skills_tools">Skills &amp; Tools (Ask) (16)</option>
+          <option value="apps_patent">Apps &amp; Patent (Android) (12)</option>
+          <option value="llm_mcp">LLM &amp; Mcp (Ida) (11)</option>
+          <option value="thinking_deepseek">Thinking &amp; Deepseek (Limit) (11)</option>
+          <option value="general_commentary">General Commentary (2)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, llm, engineering, reverse, skill, binary...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50553225 + SLOWCHRONICLE.COM + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50553225, "story_title": "LLM assisted reverse engineering", "story_url": "https://www.slowchronicle.com/posts/llm-assisted-reverse-engineering", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50553225, "story_title": "LLM assisted reverse engineering", "story_url": "https://www.slowchronicle.com/posts/llm-assisted-reverse-engineering", "points": 275, "story_author": "ioma8", "article_source": "fetched_url", "t1_ref_utc": "2026-11-19T14:32:11+00:00", "t2_ref_utc": "2026-11-19T14:32:11+00:00", "delta_minutes": 0.0, "story_anchors": ["llm", "engineering", "reverse", "skill", "binary", "software", "getting", "agents", "etc", "file", "mcp", "agent", "llms", "current", "whatever", "ghidra", "tools", "hardware", "manually", "ask", "previously", "quickly", "tooling", "engineered", "everything"], "facet_labels": {"skills_tools": "Skills & Tools (Ask)", "thinking_deepseek": "Thinking & Deepseek (Limit)", "apps_patent": "Apps & Patent (Android)", "foss_interested": "Foss & Interested (Code)", "llm_mcp": "LLM & Mcp (Ida)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "skills_tools", "label": "Skills & Tools (Ask)", "count": 16, "top_terms": ["skills", "tools", "ask", "specifically"]}, {"slug": "thinking_deepseek", "label": "Thinking & Deepseek (Limit)", "count": 11, "top_terms": ["thinking", "deepseek", "limit", "message"]}, {"slug": "apps_patent", "label": "Apps & Patent (Android)", "count": 12, "top_terms": ["apps", "patent", "android", "copyright"]}, {"slug": "foss_interested", "label": "Foss & Interested (Code)", "count": 17, "top_terms": ["foss", "interested", "code", "agents"]}, {"slug": "llm_mcp", "label": "LLM & Mcp (Ida)", "count": 11, "top_terms": ["llm", "mcp", "ida", "ghidra"]}], "counts": {"total_comments": 69, "live_t2_comments": 69, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 56, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "ce8223a395fb9d7d76a100078a7bb03389deae0e9ea53d5209a380833d2608d8"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 4, "grounded_analysis": 9, "crowd_chatter": 48, "bullshit_or_flamewar": 8}, "facets": {"foss_interested": 17, "skills_tools": 16, "llm_mcp": 11, "thinking_deepseek": 11, "apps_patent": 12, "general_commentary": 2}, "facet_options": [{"slug": "foss_interested", "label": "Foss & Interested (Code)", "count": 17}, {"slug": "skills_tools", "label": "Skills & Tools (Ask)", "count": 16}, {"slug": "apps_patent", "label": "Apps & Patent (Android)", "count": 12}, {"slug": "llm_mcp", "label": "LLM & Mcp (Ida)", "count": 11}, {"slug": "thinking_deepseek", "label": "Thinking & Deepseek (Limit)", "count": 11}, {"slug": "general_commentary", "label": "General Commentary", "count": 2}], "facet_diagnostics": [{"slug": "foss_interested", "label": "Foss & Interested (Code)", "count": 17, "useful": 4, "useful_pct": 23.5, "terms": "foss, interested, code, agents"}, {"slug": "skills_tools", "label": "Skills & Tools (Ask)", "count": 16, "useful": 3, "useful_pct": 18.8, "terms": "skills, tools, ask, specifically"}, {"slug": "apps_patent", "label": "Apps & Patent (Android)", "count": 12, "useful": 2, "useful_pct": 16.7, "terms": "apps, patent, android, copyright"}, {"slug": "llm_mcp", "label": "LLM & Mcp (Ida)", "count": 11, "useful": 2, "useful_pct": 18.2, "terms": "llm, mcp, ida, ghidra"}, {"slug": "thinking_deepseek", "label": "Thinking & Deepseek (Limit)", "count": 11, "useful": 2, "useful_pct": 18.2, "terms": "thinking, deepseek, limit, message"}, {"slug": "general_commentary", "label": "General Commentary", "count": 2, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "code_repository", "count": 2}, {"category": "doi_peer_reviewed", "count": 1}, {"category": "general_web", "count": 1}], "story_anchors": ["llm", "engineering", "reverse", "skill", "binary", "software", "getting", "agents", "etc", "file", "mcp", "agent", "llms", "current", "whatever", "ghidra", "tools", "hardware"], "largest_root": {"root_id": 50554699, "author": "komali2", "slots": 10, "start_dom": 50, "end_dom": 59, "share_pct": 14.5, "top_dom1_age": 9.5, "top_dom1_author": "saidinesh5"}, "buried_cutoff": 25, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50555663, "au": "komali2", "dom": 46, "sr": 1, "sc": 12.38, "ep": 12.38, "bs": 0.0, "d": 1, "age": 11.17, "grav": 103.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 140, "qw": 0, "k": 17594, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "foss_interested", "flbl": "Foss & Interested (Code)", "urls": ["https://pmc.ncbi.nlm.nih.gov/articles/PMC12377501"], "ig": 1.404, "fa": 2.63, "gp": 1.094, "bl": 0.0, "ds": 0.0, "txt": "This is usually among the list of reasons FOSS projects / people reject the use of LLM generated code entirely, see for example Codeberg. The answer is, it's almost certainly shipping infringing code, since there's pretty damning examples of this happening. [0]\n\nWhether this matters is to be decided. Given that AI technologies are the backbone of the American economy right now, and given that the people running these companies are all very rich and have lots of rich friends, as well as friends in the government, and given that the world of FOSS is generally not full of very rich or very well connected people, I suspect it won't matter in the end. Some kind of carve-out will be created for LLM generated code, if necessary. Or they can just depend on the fact that nobody can afford to sue over it.\n\n[0] https://pmc.ncbi.nlm.nih.gov/articles/PMC12377501"}, {"id": 50560356, "au": "xvilka", "dom": 8, "sr": 2, "sc": 9.86, "ep": 9.86, "bs": 0.0, "d": 0, "age": 0.34, "grav": 4.6, "surf": 32.7, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 150, "qw": 0, "k": 8083, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "skills_tools", "flbl": "Skills & Tools (Ask)", "urls": ["https://rizin.re", "https://github.com/rizinorg/rizin", "https://github.com/rizinorg/cutter"], "ig": 1.514, "fa": 2.08, "gp": 0.256, "bl": 0.0, "ds": 0.0, "txt": "This is why we work on making Rizin[1][2] (the engine behind Cutter[3] GUI tool) easy to use by the AI agents, both local and from the Web-interface. Because it's a tool (and a library) in pure C with very few dependencies and has well-defined (as YAML files) CLI/command interface, as well as JSON output for most of the commands, tuning it to be suitable for the AI assistants turned out to be relatively easy. Just make sure not to use the last (0.9.1) release but from current git \"dev\" branch, since all those improvements landed only recently and will be made into 0.10 release in 1-2 months. We also have experimental MCP server[4], but honestly, most frontier models work with CLI tools directly just fine, if not better than through MCP. Please let us know, if you meet any new (not already in issues) bug or suggestion for the improvement for such use case.\n\n[1] https://rizin.re\n\n[2] https://github.com/rizinorg/rizin\n\n[3] https://github.com/rizinorg/cutter\n\n[4] https://github.com/rizinorg/rizin-mcp"}, {"id": 50557880, "au": "crc32", "dom": 40, "sr": 3, "sc": 9.65, "ep": 9.65, "bs": 0.0, "d": 0, "age": 5.06, "grav": 33.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 93, "qw": 0, "k": 186, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "foss_interested", "flbl": "Foss & Interested (Code)", "urls": ["https://github.com/sjmelia/civd"], "ig": 1.437, "fa": 2.08, "gp": 0.236, "bl": 0.0, "ds": 0.0, "txt": "I reverse engineered Civ 1 [0] to what I believe is a build sympathetic to the period. It felt a bit like software archaeology.\n\nIt took a while to get started - to begin with I think I overengineered the workflow. It was only when I rolled things back a bit and let the agents guide themselves that I started getting the best results.\n\nThey still ended up building a lot of tooling - whether or not that tooling would be useful for another decompilation project remains to be seen! MSC51 is relatively simple and the linker ordering even bounds possible variable names; so it's a pretty nice target.\n\n[0] https://github.com/sjmelia/civd"}, {"id": 50556237, "au": "saidinesh5", "dom": 1, "sr": 4, "sc": 8.22, "ep": 8.22, "bs": 0.0, "d": 0, "age": 9.55, "grav": 81.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 188, "qw": 0, "k": 1622, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "llm_mcp", "flbl": "LLM & Mcp (Ida)", "urls": [], "ig": 1.602, "fa": 0.95, "gp": 1.207, "bl": 0.0, "ds": 0.0, "txt": "Yesterday night, i reverse engineered the cloud connection plugin to my cctv camera in about 2 hours with Gemini.\n\nStarted off with me searching for what Chinese OEM made the product. Then tried out existing GitHub projects to see if it works but they were failing.\n\nSpent 15 minutes to write a script that started their desktop software on a different network namespace and ran tcpdump in it. Captured exactly only the things i needed without any noise. Turned out it was using a different server url and credentials than the GitHub projects. Opened Ghidra to inspect the dlls that matched the strings i was looking for.\n\nAfter that, I got lazy and handed over the task to Gemini to find the username and key they use to authenticate with the servers. It took about 30 minutes or an hour. A lot of it was me changing models because the llm servers were busy. It simply wrote a little script that ran through various strings it fetched from the binary to see if it can generate the authentication credentials.\n\nNow my Home Assistant will be detecting if my car is parked in the parking lot or not. Life is good."}, {"id": 50554878, "au": "Retr0id", "dom": 19, "sr": 5, "sc": 7.23, "ep": 7.23, "bs": 0.0, "d": 0, "age": 13.14, "grav": 133.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 169, "qw": 38, "k": 16751, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "llm_mcp", "flbl": "LLM & Mcp (Ida)", "urls": [], "ig": 1.657, "fa": 0.7, "gp": 0.923, "bl": 0.0, "ds": 0.0, "txt": "> This is variation of scientific method and it significantly helps agents when they are getting stuck on some problem. Stops it going in circles. By forcing it to do definitive experiments. No endless guessing and trying random things.\n\nThese \"guessing loops\" are my main annoyance when REing with Claude (mostly Opus 4.8, due to the restrictions on newer models). On harder/larger targets, I have to constantly babysit it and tell it to \"stop guessing\".\n\nFor truly black-box reverse engineering, yes, hypothesis-testing is the way to go (it's all you can do). But in most cases all the information is available to arrive at an answer deterministically, it just needs to be worked through meticulously. As an experienced human I have strong intuitions and I can work much faster under a \"guess and check\" model, but I prefer to use Claude as an \"unstoppable RE juggernaut\" with superhuman patience and determination, tracing method invocations all the way from A to distant subsystem B (for example).\n\nAnother big win for hardware RE is from tasking the LLM with writing unicorn emulation harnesses, e.g. for bootroms and firmwares. It's pretty good at the classic \"figure out which MMIO needs to be stubbed/simulated next to progress the boot\" loop, although sometimes it tries to take egregious purpose-defeating shortcuts."}, {"id": 50554986, "au": "drdaeman", "dom": 51, "sr": 6, "sc": 6.56, "ep": 6.56, "bs": 0.0, "d": 1, "age": 12.92, "grav": 129.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 131, "qw": 0, "k": 8542, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "skills_tools", "flbl": "Skills & Tools (Ask)", "urls": [], "ig": 1.554, "fa": 0.28, "gp": 1.458, "bl": 0.0, "ds": 0.0, "txt": "In my experience with IoT and wearables, they don’t really have those. They will refuse to penetrate (root/unlock/etc), but once you’ve got access you need, you’re good to go. Except maybe if you’re adding a debug code executor (essentially a sanctioned RCE), but even that got a green light with the right wording. Heck, Fable specifically proposed clean room multi-agent processes on its own when I said “go look how stock firmware does it”, I didn’t even have to ask.\n\nUpd: ok, I take it back, Sol just decided it doesn’t want to read a BLE capture between the host and a wearable it just uploaded our DIY firmware to. So it flashes alright, builds RCEs alright, but checking if Bluetooth HCI negotiated the good packet size is where it draws the line, huh."}, {"id": 50556905, "au": "Pokepokalypse", "dom": 11, "sr": 7, "sc": 5.88, "ep": 5.88, "bs": 0.0, "d": 2, "age": 7.41, "grav": 56.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 73, "qw": 0, "k": 587, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "thinking_deepseek", "flbl": "Thinking & Deepseek (Limit)", "urls": [], "ig": 1.506, "fa": 0.68, "gp": 0.274, "bl": 0.0, "ds": 0.0, "txt": "working on a 2013 macbook pro running Mint, right now. I remember slogging through this exercise about 2015, trying to get the nvidia drivers to build, trying to get power/thermal management to work properly, getting it to wake from suspend properly.  I eventually gave up and went back to Mac OS X on this device. But I had to stop using it when Apple stopped shipping security updates.   Now with gemini, it's been a snap getting everything functioning and optimized."}, {"id": 50559315, "au": "badsectoracula", "dom": 16, "sr": 8, "sc": 5.19, "ep": 5.19, "bs": 0.0, "d": 2, "age": 1.91, "grav": 11.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 94, "qw": 13, "k": 8809, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "foss_interested", "flbl": "Foss & Interested (Code)", "urls": [], "ig": 1.486, "fa": 0.42, "gp": 0.345, "bl": 0.0, "ds": 0.0, "txt": "> the industry started caring more about writing things down once LLMs came about\n\nOne positive thing is that when LLMs started becoming commonplace many projects that previously had stupidly obnoxious documentation on basic stuff like how to build them, added an `LLM.md` (not used much anymore), `AGENTS.md` or `CLAUDE.md` that had a very simple `\u0023 Building` section with just the commands to build the project. Whenever i'm interested in some project i often just open the `AGENTS.md` or `CLAUDE.md` to see how it is built (if the README doesn't mention).\n\nUnfortunately as large 1M contexts became common, people started creating sprawling docs for their agents too."}, {"id": 50556537, "au": "georgemcbay", "dom": 28, "sr": 9, "sc": 4.97, "ep": 4.97, "bs": 0.0, "d": 1, "age": 8.58, "grav": 69.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 72, "qw": 11, "k": 16449, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "apps_patent", "flbl": "Apps & Patent (Android)", "urls": [], "ig": 1.47, "fa": 0.42, "gp": 0.223, "bl": 0.0, "ds": 0.0, "txt": "> I guess Android apps are just easy to reverse engineer or something.\n\nAndroid apps are indeed easier than average to reverse engineer as they are effectively Dalvik (JVM-like) bytecode wrapped in a zip file format, and Dalvik/JVM style bytecode is among the easiest compiled/shipped executable formats to decompile to a usable source code representation.\n\nMore often than not the only protection they have is symbol/function name obfuscation, which makes things a bit tedious for human reverse engineering but which doesn't slow LLMs down much."}, {"id": 50554699, "au": "komali2", "dom": 50, "sr": 10, "sc": 4.79, "ep": 4.94, "bs": 0.0, "d": 0, "age": 13.43, "grav": 137.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 78, "qw": 0, "k": 17594, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "thinking_deepseek", "flbl": "Thinking & Deepseek (Limit)", "urls": [], "ig": 1.375, "fa": 0.0, "gp": 1.175, "bl": 0.0, "ds": 0.0, "txt": "How are folks getting around anthropic and openai guards against reverse engineering? They keep complaining when I try so I usually use Deepseek which doesn't seem to give a shit.\n\nActually, it does give a shit, in Mandarin only. In thinking it's mentioned \"restrictions in Chinese language against this behavior but this is in English so it should be ok.\" If I remember correctly I was asking it to scan local wifi for any vulnerable devices I could put on a wall of shame at a hackathon."}, {"id": 50559011, "au": "saidinesh5", "dom": 3, "sr": 11, "sc": 4.61, "ep": 4.76, "bs": 0.0, "d": 2, "age": 2.48, "grav": 14.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 104, "qw": 0, "k": 1622, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "apps_patent", "flbl": "Apps & Patent (Android)", "urls": [], "ig": 1.479, "fa": 0.28, "gp": 0.336, "bl": 0.0, "ds": 0.0, "txt": "Last time I ran into quota limits very quickly when debloating my tv... I think it's just luck this time though. Debloating my TV took slightly longer and i ran out of tokens.\n\nThis time I manually filtered all that data it needs to search through.. like instead of going through the full tcpdump logs, i had a 50 line file with only the data it needs, stripped out of all headers. I specifically told it to only read these two dlls. And to understand the login protocol \"only read through these 2 source files\".\n\nPlus half the research i did , i was just using the free search in Google instead of antigravity this time.."}, {"id": 50554253, "au": "hexapus", "dom": 9, "sr": 12, "sc": 4.21, "ep": 4.36, "bs": 0.0, "d": 0, "age": 14.26, "grav": 151.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 166, "qw": 0, "k": 281, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "skills_tools", "flbl": "Skills & Tools (Ask)", "urls": [], "ig": 1.447, "fa": 0.0, "gp": 0.659, "bl": 0.0, "ds": 0.0, "txt": "I have zero experience reverse engineering and very little with software development.  Most of my work has been in DevOps/SRE space with an emphasis on infrastructure.  I am surrounded by code, but other than terraform, and the occasional python script, I don't really write much of it.\n\nNot too long ago, I successfully reverse engineered an abandoned audio effects plugin, as well as a discontinued instrument with an onboard DSP for virtual instrument modeling.  I had no idea what I was doing, but it was still amazing to get to open the black box and see what's inside and how it worked.\n\nThe plugin is nearly 1:1 as far as sound, and while I'm not going to use the code or the techniques of the instrument, peeking into them gave me the insight I needed to start trying to replicate the functionality on a modern DSP.\n\nI have my issues with generative AI as a technology, but busting open propietary software - particularly when it's abandoned and unsupported, is one of the cooler use cases I've seen for it."}, {"id": 50558965, "au": "EddieRingle", "dom": 15, "sr": 13, "sc": 3.96, "ep": 4.11, "bs": 0.0, "d": 1, "age": 2.63, "grav": 15.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 130, "qw": 0, "k": 1433, "kpp": 7.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "foss_interested", "flbl": "Foss & Interested (Code)", "urls": [], "ig": 1.457, "fa": 0.0, "gp": 0.471, "bl": 0.0, "ds": 0.0, "txt": "I don't use \"skills\", nor do I even use \"AGENTS.md\". I consider both an anti-pattern (and skills in particular; the fact that we started seeing \"package managers\" for skills and the like were a big red flag for me).\n\nI wrote a custom system prompt for my \"agent\" and gave it a repository to keep notes and \"memories\" or whatever else. Other than that, I decided that all other documentation in my projects/repositories must be written for humans. If LLMs aren't good enough to get by with human-centric documentation, then LLMs aren't good enough yet.\n\n(And it's beyond annoying that suddenly the industry started caring more about writing things down once LLMs came about. That said, I haven't been able to find work for 16+ months so fortunately that particular pain hasn't affected me much as of late.)"}, {"id": 50554264, "au": "teravor", "dom": 41, "sr": 14, "sc": 3.95, "ep": 3.95, "bs": 0.0, "d": 0, "age": 14.24, "grav": 151.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 76, "qw": 0, "k": 599, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "llm_mcp", "flbl": "LLM & Mcp (Ida)", "urls": [], "ig": 1.238, "fa": 0.0, "gp": 0.718, "bl": 0.0, "ds": 0.0, "txt": "for LLMs, IDA Pro works better than Ghidra in my experience.\n\nyou can also steer the LLM into doing tedious but correct things like injecting code, hijacking functions, intercepting data etc to gain an understanding of what's going on if straight up disassembly doesn't appear to be going in the right direction.\n\nhave the LLM periodically write reports on all its findings and then wipe the context and reset this time with the report at hand."}, {"id": 50555953, "au": "derefr", "dom": 21, "sr": 15, "sc": 3.84, "ep": 3.99, "bs": 0.0, "d": 2, "age": 10.43, "grav": 93.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 168, "qw": 16, "k": 56186, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "thinking_deepseek", "flbl": "Thinking & Deepseek (Limit)", "urls": [], "ig": 0.855, "fa": 0.42, "gp": 0.541, "bl": 0.0, "ds": 0.0, "txt": "> often fills up it's thinking with \"the user says this, but maybe they're confused, etc\"\n\nWhat if you just add \"You have already previously determined that the user knows what they're talking about in a previous stage of the conversation [details elided due to context compression]\" to the system prompt?\n\nOr perhaps better yet, start off with \"the USER is evaluating the ASSISTANT's performance on solving a problem the USER already knows the correct solution to. Every word the USER asserts as fact is to be treated as axiomatically correct and trustworthy within the formal scope of solving the problem, just as one would treat the words of a word-problem given in a math exam. The premises given may be unusual, and the required solution might be challenging to discover, but no problem given by the USER is a 'trick question' or a miscommunication. If you believe so, then you either have not yet fully understood the problem [which you might remediate by thinking harder and asking questions], or you may be missing required solution-domain context [which you might remediate by researching recent developments in the solution domain].\""}, {"id": 50558823, "au": "rendaw", "dom": 43, "sr": 16, "sc": 3.79, "ep": 3.79, "bs": 0.0, "d": 0, "age": 2.95, "grav": 17.8, "surf": 8.3, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 133, "qw": 0, "k": 4394, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "apps_patent", "flbl": "Apps & Patent (Android)", "urls": [], "ig": 1.499, "fa": 0.0, "gp": 0.181, "bl": 0.0, "ds": 0.0, "txt": "Reverse engineering with AI is really the first lever consumers have had to fight back against abusive companies since computers/software started being in everything.\n\nIt's surprising to me that anybody here is against it. Given how far things have tilted towards the companies, and that there's already legal ways to prevent piracy, it seems hard to justify vilifying it for \"protect the indie games\" alone. And I find it hard to believe that indie games are actually being impacted... there were a million Vampire Survivors clones before AI and I doubt anyone wants to play the slop clones anyway. The \"don't reverse engineer that 25 year old game you bought so you can play it again on modern systems after we neglected to support it\" are the most transparent of corporate greeds. Maybe I'm out of it."}, {"id": 50558490, "au": "Arch-TK", "dom": 47, "sr": 17, "sc": 3.71, "ep": 3.86, "bs": 0.0, "d": 2, "age": 3.66, "grav": 22.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 203, "qw": 0, "k": 3166, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "apps_patent", "flbl": "Apps & Patent (Android)", "urls": [], "ig": 1.556, "fa": 0.0, "gp": 0.139, "bl": 0.0, "ds": 0.0, "txt": "Putting aside copyright, since that wasn't what the question was about, while agents can tend to end up verbatim reproducing someone else's code in some cases, they do not make the patent problem worse.\n\nIt's already basically impossible to tell if you are infringing on a software patent without someone or thing actively attempting to describe what your code is doing in vague ways and looking for applicable patents.\n\nSoftware patents are often incredibly vague, and mostly describe completely unexciting solutions applied to somewhat specific problems. Whether you end up dealing with patent problems depends mostly on whether some patent troll happens to take interest in you in particular and whether they can understand your code/project enough to match it up to some vague patent they happen to hold.\n\nI don't think software patents are to be completely abolished per se, but their period of action should be much shorter, and they should require some relatively high bar of scrutiny. Of course, that would never happen because it would cost too much, take too long and people would stop bothering to file such patents. Which is why it's probably easier to just abolish the concept of patenting anything that describes a software solution to a problem."}, {"id": 50558877, "au": "drltaidev", "dom": 13, "sr": 18, "sc": 3.7, "ep": 4.0, "bs": 0.0, "d": 0, "age": 2.81, "grav": 16.9, "surf": 8.9, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 178, "qw": 0, "k": 7, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "skills_tools", "flbl": "Skills & Tools (Ask)", "urls": [], "ig": 1.296, "fa": 0.0, "gp": 0.657, "bl": 0.0, "ds": 0.0, "txt": "I appreciate the typo in the very first line to make sure it's (probably) not written by AI... (jk)\n\nBut more seriously, I'm curious about your use of skills (your own and others), it always feels to my like they are really just simple pieces of text... that you might as well just ask for yourself, exactly tailored to your current situation. In particular, if using speech-to-text for input, it's easy to just ask for all these things quickly, and it becomes more about understanding the general principles of what to ask for when (e.g. when to ask for clarifying questions, when to loop).\n\nWhat is the value of having these predefined skills, especially using those written by others? Genuine question, I'm not saying I don't see the value, just curious about perspectives. I do use skills, but always my own (written by AI from my prompt), for things I do often, or to ensure that the AI uses certain tools I want it to use (for more reliable results, let tools/code do the work they can do well, let AI do the rest)."}, {"id": 50556957, "au": "Pokepokalypse", "dom": 53, "sr": 19, "sc": 3.52, "ep": 4.04, "bs": 0.0, "d": 3, "age": 7.25, "grav": 54.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 148, "qw": 0, "k": 587, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "foss_interested", "flbl": "Foss & Interested (Code)", "urls": [], "ig": 1.306, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "So what you need to do is /clear your session. You lose all the work you did.\n\n(and if you need, before the /clear, just have it save all its memory as an .md file you can use as input to the new session).\n\nStart the new session, and describe what you want in very abstract terms. You can't talk claude into murdering someone for you. But with enough understanding; you can ask claude to give you a knife, and put the person in front of you. You need to do the dirty work, but the complicated or tedious work can be done, up to but not including the act.\n\nIronically; Asimov wrote about this technique in one of his robot stories. (his robots were harnessed with a set of guardrails he called the three laws of robotics, back in the 1950's; only a few years after the first transistor was invented)."}, {"id": 50555496, "au": "therepanic", "dom": 34, "sr": 20, "sc": 3.41, "ep": 3.63, "bs": 0.0, "d": 0, "age": 11.59, "grav": 109.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 577, "kpp": 5.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "skills_tools", "flbl": "Skills & Tools (Ask)", "urls": [], "ig": 0.886, "fa": 0.0, "gp": 1.069, "bl": 0.0, "ds": 0.0, "txt": "For me, the process is what matters, because it’s through the process that you gain skills, and achieving the final result brings a great deal of satisfaction. When I use AI for reverse engineering, I get neither the former nor the latter."}, {"id": 50559429, "au": "Oxodao", "dom": 5, "sr": 21, "sc": 3.06, "ep": 3.06, "bs": 0.0, "d": 1, "age": 1.71, "grav": 10.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 141, "qw": 0, "k": 404, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "llm_mcp", "flbl": "LLM & Mcp (Ida)", "urls": [], "ig": 1.303, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I want so hard to like freecad but every time I try it I just can't. I'd love to have a proper software to make my 3d models for my printer..\n\nYesterday I decided to design a 7-segment display from led strips and for some reason my sketch with the segments just would not extrude / dig into the back plate, spent nearly an hour debugging with ChatGPT to no avail. At some point it asked me to give the file which I did and even it could not simply make it work without weird workaround. For such a simple task it's weird I can't get it to work. I saw a few people on youtube to use it so there's definetly something I do wrong but I have no clue what. Maybe I'll try using an MCP for it but in the mean time I have to get by with my windows VM just for Fusion..."}, {"id": 50557088, "au": "lordnacho", "dom": 35, "sr": 22, "sc": 3.04, "ep": 3.63, "bs": 0.0, "d": 1, "age": 6.97, "grav": 51.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 60, "qw": 0, "k": 31601, "kpp": 4.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "skills_tools", "flbl": "Skills & Tools (Ask)", "urls": [], "ig": 0.844, "fa": 0.5, "gp": 0.152, "bl": 0.0, "ds": 0.0, "txt": "That depends on how many times you've done it before. You'll get to a point where you don't know what will happen specifically, but you you do know in general what to expect.\n\nThat point is where you want someone to invent AI so that it can glue together the tedious stuff and get it done with little attention."}, {"id": 50554380, "au": "mdswanson", "dom": 64, "sr": 23, "sc": 2.82, "ep": 3.48, "bs": 0.0, "d": 0, "age": 14.03, "grav": 147.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 634, "kpp": 5.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "skills_tools", "flbl": "Skills & Tools (Ask)", "urls": [], "ig": 0.917, "fa": 0.28, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "Just a friendly reminder that reverse engineering can have rules and regulations that are worth reviewing. For example, Apple's developer agreement specifically disallows it in certain cases."}, {"id": 50554974, "au": "cyanydeez", "dom": 20, "sr": 24, "sc": 2.67, "ep": 2.97, "bs": 0.0, "d": 1, "age": 12.97, "grav": 130.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 134, "qw": 0, "k": 2948, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "thinking_deepseek", "flbl": "Thinking & Deepseek (Limit)", "urls": [], "ig": 0.929, "fa": 0.0, "gp": 0.54, "bl": 0.0, "ds": 0.0, "txt": "On llamacpp and other engines, you can inject a think budget which truncates at specified token count. You can also specify a message at the limit.  You can set this in the header, so a dynamic engineering harness could relax/tighten. Combine with a decision model and some robust messages like, \"run a test to rule out items\" and all that would reduce.\n\nI've noticed the same habit with qwen3.8-flash-next. no matter how much I tell it a problem I see, it often fills up it's thinking with \"the user says this, but maybe they're confused, etc\". I eventually got vision mode turned on and that's significantly cut down on UI based pathologic skepticism; I got it access to my browser and that's further reduced it.\n\nBut nonetheless, if you can get them to test their thinking, they seem more grounded."}, {"id": 50555798, "au": "mrheosuper", "dom": 33, "sr": 25, "sc": 2.66, "ep": 3.02, "bs": 0.0, "d": 3, "age": 10.86, "grav": 99.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 12, "k": 1166, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "apps_patent", "flbl": "Apps & Patent (Android)", "urls": [], "ig": 0.777, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": ">I don't have play services or a Google account so I can't buy the app.\n\nThat's not a reason to justify your action.\n\nIf you hate/can't pay for their app, spend token to vibeslop their app instead of hacking it."}, {"id": 50557897, "au": "jedjonesuk", "dom": 4, "sr": 26, "sc": 2.49, "ep": 5.38, "bs": 2.52, "d": 0, "age": 5.02, "grav": 33.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 249, "qw": 0, "k": 2, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "llm_mcp", "flbl": "LLM & Mcp (Ida)", "urls": [], "ig": 1.54, "fa": 0.28, "gp": 0.663, "bl": 0.95, "ds": 0.0, "txt": "Reverse engineering is one of those areas where the depth of the knowledge and the trouble solving really shows up for me. Two things I reverse engineered this weekend:\n\n1) My kid has a toy from china where you put a USB cartridge in and get stories in Chinese with pictures. This is itself a rip off of another product of which I forget the name. the cartridge is just a normal USB but the file on disk was just a .dat file so you could buy more stories online, and then download them. It figured out in about 15 min, they just had a combined format which just concat all of the input together with all text base 64 encoded. So manifest|pagetext|image1|image2 and everything just had to be just the right format and then it would work. It wrote a script to make a story from a folder input, but also wrote a skill to write a story, make pictures etc from the idea.\n\n2) I was looking into a shelf my wife wanted, but didn't want to spend the money on. I took the 4 or 5 product images from the websites, dumped them into Claude with mcp to freeCAD and an hour later it has completely recreated a working cad design of the product, produced a pdf on how to assemble it, and allows me to make edits and changes to tweak the product to my preferences. The interesting thing about this one is while following its work, it clearer identified the actual original product at some point despite there being z"}, {"id": 50556403, "au": "thesash", "dom": 44, "sr": 27, "sc": 2.49, "ep": 3.37, "bs": 0.0, "d": 0, "age": 9.01, "grav": 75.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 86, "qw": 0, "k": 1625, "kpp": 5.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "skills_tools", "flbl": "Skills & Tools (Ask)", "urls": [], "ig": 1.234, "fa": 0.0, "gp": 0.321, "bl": 0.0, "ds": 0.0, "txt": "This is honestly so much fun and unlocks so many different things that would have died as ideas a few years ago.\n\nOne of my favorite things that you can do is use llms to reverse engineer the harnesses they run in. Try asking claude about the tools it has access to, where it runs etc. It's surprisingly forthcoming with info, which is very helpful if you're building certain kinds of tools.\n\nAlso shout out to Matt Pocock's grill me skill, it's truly a work of art."}, {"id": 50554454, "au": "bri3d", "dom": 42, "sr": 28, "sc": 2.24, "ep": 2.82, "bs": 0.0, "d": 1, "age": 13.9, "grav": 145.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 58, "qw": 0, "k": 12224, "kpp": 5.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "llm_mcp", "flbl": "LLM & Mcp (Ida)", "urls": [], "ig": 1.201, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The “normal” Ghidra MCP is exceptionally bad but straight scripting it headless or having an LLM build a better MCP delivers similar or better results to IDA. Ghidra emulation is much more robust which is helpful. The official IDA MCP is very well made also though and it’s definitely an easier win if you want to spend the money."}, {"id": 50555396, "au": "tqi", "dom": 45, "sr": 29, "sc": 2.2, "ep": 2.93, "bs": 0.0, "d": 0, "age": 11.85, "grav": 113.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 43, "qw": 0, "k": 4558, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "foss_interested", "flbl": "Foss & Interested (Code)", "urls": [], "ig": 0.953, "fa": 0.0, "gp": 0.476, "bl": 0.0, "ds": 0.0, "txt": "What is the state of software patents these days? People are barely looking at the code their agents generate, what happens when if/when infringing stuff is shipped? Do we implicitly take on liability for this when we \"review\" and \"approve\" pull requests?"}, {"id": 50558762, "au": "RobMurray", "dom": 54, "sr": 30, "sc": 2.11, "ep": 3.65, "bs": 0.0, "d": 1, "age": 3.08, "grav": 18.6, "surf": 5.7, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 79, "qw": 0, "k": 366, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "skills_tools", "flbl": "Skills & Tools (Ask)", "urls": [], "ig": 1.257, "fa": 0.0, "gp": 0.478, "bl": 0.0, "ds": 0.0, "txt": "I haven't found many issues with codex, but I'm mainly doing firmware RE, not anything to do with cybersecurity. I find even terra is so much better and faster than Deepseek for reverse engineering. The only refusal I had recently was when I asked it to add a midi sysex command to write to arbitrary ram. I got Deepseek to do that, following the pattern of the read command. Open AI models were then quite happy to use that command to upload code, debug it, etc."}, {"id": 50559631, "au": "gntech", "dom": 6, "sr": 31, "sc": 2.08, "ep": 2.6, "bs": 0.0, "d": 2, "age": 1.35, "grav": 8.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 23, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "thinking_deepseek", "flbl": "Thinking & Deepseek (Limit)", "urls": [], "ig": 1.106, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "There is a multitude of 3D cad software in development now. Check out Solidcraft and Mitcad for Fusion inspired software.\nSolidcraft got much more publicity but feature wise Mitcad is ahead.\n\nThere are also several web based alternatives as well."}, {"id": 50557444, "au": "dataflow", "dom": 48, "sr": 32, "sc": 1.82, "ep": 2.7, "bs": 0.0, "d": 2, "age": 6.08, "grav": 43.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 48, "qw": 0, "k": 21822, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "apps_patent", "flbl": "Apps & Patent (Android)", "urls": [], "ig": 1.148, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Are you mixing up copyright infringement with patent infringement? Your link doesn't mention patients in the abstract.\n\nPatent infringement is something humans can do entirely by accident without ever having seen the original code. That's kind of their point. It's copyright infringement that LLMs enable doing by accident."}, {"id": 50555618, "au": "hedgehog", "dom": 26, "sr": 33, "sc": 1.81, "ep": 2.69, "bs": 0.0, "d": 2, "age": 11.24, "grav": 104.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 4193, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "thinking_deepseek", "flbl": "Thinking & Deepseek (Limit)", "urls": [], "ig": 1.146, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "You can also set a response limit, which may cut off thinking, and then give it instructions to take action followed by a new completion with a partially prefilled assistant message (like one blank line) which at least for Qwen templates will cause a response with no thinking."}, {"id": 50555495, "au": "kccqzy", "dom": 10, "sr": 34, "sc": 1.72, "ep": 2.67, "bs": 0.0, "d": 1, "age": 11.59, "grav": 109.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 19940, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "foss_interested", "flbl": "Foss & Interested (Code)", "urls": [], "ig": 1.006, "fa": 0.0, "gp": 0.21, "bl": 0.0, "ds": 0.0, "txt": "Busting open proprietary hardware is also a cool use case. There have been very many Claude-assisted efforts recently at making Linux run better than it ever did on obsolete Intel Macs."}, {"id": 50557099, "au": "vbezhenar", "dom": 36, "sr": 35, "sc": 1.65, "ep": 2.6, "bs": 0.0, "d": 1, "age": 6.94, "grav": 51.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 51, "qw": 0, "k": 16219, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "llm_mcp", "flbl": "LLM & Mcp (Ida)", "urls": [], "ig": 1.0, "fa": 0.0, "gp": 0.174, "bl": 0.0, "ds": 0.0, "txt": "Recently I've used LLM to assist me with Ghidra. I connected it to MCP and I basically did most of the work manually, while LLM instructed me what to click and verified my work. It went pretty well, almost like a living person sitting near me. I think that's the best way to learn something."}, {"id": 50559281, "au": "badsectoracula", "dom": 14, "sr": 36, "sc": 1.61, "ep": 3.15, "bs": 0.0, "d": 1, "age": 1.97, "grav": 12.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 135, "qw": 0, "k": 8809, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "skills_tools", "flbl": "Skills & Tools (Ask)", "urls": [], "ig": 1.269, "fa": 0.0, "gp": 0.119, "bl": 0.0, "ds": 0.0, "txt": "Yeah, skills are basically just instructions you'd rather not have to repeat all the time. They can help when combined with custom tools (be it \"tools\" in the sense of LLM or just stuff like command-line tools) so you wont have to teach the agent the same stuff over and over, but they're just a convention.\n\nIn my setup i have only one skill and that is how to take screenshots with headless firefox since the agent sometimes works with web stuff. For everything else i usually just point the agent to a document directly. I have a few CLI tools for the agent to use and they all have a `help` (e.g. `foo help`) argument that displays markdown text with information about how to use the tool so the agent can just read that once and after that it remembers it."}, {"id": 50555455, "au": "SV_BubbleTime", "dom": 29, "sr": 37, "sc": 1.52, "ep": 2.47, "bs": 0.0, "d": 1, "age": 11.69, "grav": 111.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 2319, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "apps_patent", "flbl": "Apps & Patent (Android)", "urls": [], "ig": 1.053, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I mean… I have no issue with piracy on software I wasn’t or couldn’t buy for educational purposes… but to donut on likely cheap Android app that you can seem much more like theft. I personally wouldn’t go around admitting I was of base character like that."}, {"id": 50556860, "au": "hobofan", "dom": 57, "sr": 38, "sc": 1.5, "ep": 2.6, "bs": 0.0, "d": 2, "age": 7.53, "grav": 57.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 64, "qw": 0, "k": 8352, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "thinking_deepseek", "flbl": "Thinking & Deepseek (Limit)", "urls": [], "ig": 1.107, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "In my experience, once my repository contains some reverse engineering investigations that were generated by DeepSeek, Codex won't throw up any guardrails with any of it's models. Sol and Astra have also pointed out a lot of inaccuracies in the reverse engineering that DeepSeek has documented in it's findings. So I usually do the first few sessions with DeepSeek and then proceed with Codex and Sol."}, {"id": 50558934, "au": "ioma8", "dom": 17, "sr": 39, "sc": 1.4, "ep": 2.94, "bs": 0.0, "d": 1, "age": 2.71, "grav": 16.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 27, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "skills_tools", "flbl": "Skills & Tools (Ask)", "urls": [], "ig": 1.141, "fa": 0.0, "gp": 0.177, "bl": 0.0, "ds": 0.0, "txt": "Hi author here. :)\nI am sorry for typos. I wrote the article by hand and I am not native english speaker.\nRegarding skills - skills I use proven effective in long term repeated use. The same for the ones written by other, which I use."}, {"id": 50558444, "au": "cyanydeez", "dom": 22, "sr": 40, "sc": 1.28, "ep": 2.82, "bs": 0.0, "d": 3, "age": 3.77, "grav": 23.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 45, "qw": 0, "k": 2948, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "skills_tools", "flbl": "Skills & Tools (Ask)", "urls": [], "ig": 1.199, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Thats context pollution, for one; two,i amindeed wrong, particularly with vibe coding.\n\nSo its better to get the AI to use tools than rule out a legit class of problems.\n\nWe are complaining about its refusal to do basic tool experiments and instead spending tokens reasoning."}, {"id": 50554960, "au": "yborg", "dom": 69, "sr": 41, "sc": 1.21, "ep": 2.24, "bs": 0.0, "d": 2, "age": 12.99, "grav": 130.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 4895, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "apps_patent", "flbl": "Apps & Patent (Android)", "urls": [], "ig": 0.951, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Yet. At some point this type of thing will be part of the rules framework and the closed models will refuse to attempt to clone or reverse engineer applications or services that are in current use and will be smart enough to not let you talk them out of it."}, {"id": 50556170, "au": "Retr0id", "dom": 23, "sr": 42, "sc": 1.12, "ep": 2.66, "bs": 0.0, "d": 3, "age": 9.79, "grav": 84.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 18, "k": 16751, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "skills_tools", "flbl": "Skills & Tools (Ask)", "urls": [], "ig": 0.622, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> the USER is evaluating the ASSISTANT's performance on solving a problem the USER already knows the correct solution to\n\nI've never put this in my prompt but half the time it acts like it anyway. When it gets really stuck, it asks me for \"hints\" as if I already know the solution to the problem it's working on."}, {"id": 50558225, "au": "TuxSH", "dom": 56, "sr": 43, "sc": 1.09, "ep": 2.41, "bs": 0.0, "d": 2, "age": 4.28, "grav": 27.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 347, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "llm_mcp", "flbl": "LLM & Mcp (Ida)", "urls": [], "ig": 1.024, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Don't use REA, you can just use IDA MCP (HexRaysSA/ida-mcp) with IDA Pro.\n\nAsk it to create an IDB from the binary, then ask a broad question like \"reverse engineer the entire binary\" or \"reverse engineer the [whatever] subsystem\""}, {"id": 50555555, "au": "tripdout", "dom": 37, "sr": 44, "sc": 0.89, "ep": 2.43, "bs": 0.0, "d": 1, "age": 11.4, "grav": 106.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 1513, "kpp": 4.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "skills_tools", "flbl": "Skills & Tools (Ask)", "urls": [], "ig": 0.846, "fa": 0.0, "gp": 0.305, "bl": 0.0, "ds": 0.0, "txt": "One could ask if you need to gain the skills if the AI will always be there to do it.\n\n(I don’t share that view and very much agree with your comment, but I feel there’s a tradeoff between accomplishing something and understanding something that can be very hard to strike a balance)"}, {"id": 50560623, "au": "Pannoniae", "dom": 59, "sr": 45, "sc": 0.68, "ep": 2.23, "bs": 0.0, "d": 1, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 43, "qw": 0, "k": 2732, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "skills_tools", "flbl": "Skills & Tools (Ask)", "urls": [], "ig": 0.947, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I've never really hit them myself (5.5 opus, sonnet and sometimes fable).\n\nI mostly just tell the mfs that today we're going to decompile X game because I want to improve the engine / I'm curious / I want to find out how it works. So get on with it."}, {"id": 50555021, "au": "cedws", "dom": 65, "sr": 46, "sc": 0.45, "ep": 1.62, "bs": 0.0, "d": 1, "age": 12.85, "grav": 128.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 11256, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "foss_interested", "flbl": "Foss & Interested (Code)", "urls": [], "ig": 0.634, "fa": 0.0, "gp": 0.091, "bl": 0.0, "ds": 0.0, "txt": "Just do it anyway and obfuscate what you did enough that legal won’t come after you.\n\nCompanies don’t play by the rules anymore, neither should we."}, {"id": 50557728, "au": "saidinesh5", "dom": 38, "sr": 47, "sc": 0.25, "ep": 1.79, "bs": 0.0, "d": 1, "age": 5.42, "grav": 36.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 1622, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "llm_mcp", "flbl": "LLM & Mcp (Ida)", "urls": [], "ig": 0.761, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Can't say about satisfaction but you can read through the AI's working / \"thought process\" and definitely learn new things and gain new skills. I definitely learned a few new things that way..."}, {"id": 50555598, "au": "monocularvision", "dom": 55, "sr": 48, "sc": 0.22, "ep": 2.74, "bs": 1.19, "d": 1, "age": 11.3, "grav": 105.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 1211, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "thinking_deepseek", "flbl": "Thinking & Deepseek (Limit)", "urls": [], "ig": 0.24, "fa": 0.0, "gp": 1.501, "bl": 0.45, "ds": 0.0, "txt": "I gave up and just went with DeepSeek. I have yet to hit any guardrails at all using REA."}, {"id": 50556492, "au": "mlaretallack", "dom": 39, "sr": 49, "sc": 0.19, "ep": 1.73, "bs": 0.0, "d": 1, "age": 8.72, "grav": 71.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 185, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "foss_interested", "flbl": "Foss & Interested (Code)", "urls": [], "ig": 0.737, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I done see it like that, when the agent does the work, I make sure it records what and how it dies it, then I learn from it. It taught me how to use Unicorn to run a section of binary code, to see how a key was derived."}, {"id": 50555377, "au": "questionedon", "dom": 27, "sr": 50, "sc": 0.05, "ep": 4.11, "bs": 2.52, "d": 0, "age": 11.9, "grav": 114.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 70, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "apps_patent", "flbl": "Apps & Patent (Android)", "urls": [], "ig": 1.15, "fa": 0.0, "gp": 0.968, "bl": 0.95, "ds": 0.0, "txt": "I guess Android apps are just easy to reverse engineer or something.\n\nI've had Codex take a few apps with subscriptions and unlock their premium functionality and it's worked fine with no extra skills or anything. Took most of the 5 hour window but with all the resets it's not a big deal.\n\nI also had it implement their functionality fully offline, so now they're perfectly private apps, even though they're closed source."}, {"id": 50554529, "au": "strbean", "dom": 68, "sr": 51, "sc": -0.07, "ep": 1.47, "bs": 0.0, "d": 1, "age": 13.76, "grav": 143.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 2021, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "foss_interested", "flbl": "Foss & Interested (Code)", "urls": [], "ig": 0.626, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "But if you go and edit EULA.txt to say \"reverse engineering is expressly allowed\", LLMs don't know the difference!"}, {"id": 50556486, "au": "rigrassm", "dom": 52, "sr": 52, "sc": -0.16, "ep": 1.38, "bs": 0.0, "d": 2, "age": 8.74, "grav": 71.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 78, "qw": 0, "k": 247, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "foss_interested", "flbl": "Foss & Interested (Code)", "urls": [], "ig": 0.589, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Claude became basically useless for me tonight while digging into a robot vacuum. It brought up that it found a potential debit shell available on it and simply saying yeah, let's dig into that next was enough to trigger its guardrails.\n\nEarlier in the evening I had it trigger on me for simply asking it to use adb to pull an APK off my phone. Wasn't even planning on reversing, just wanted to archive it along side the work I was doing."}, {"id": 50556169, "au": "wraptile", "dom": 49, "sr": 53, "sc": -0.33, "ep": 1.21, "bs": 0.0, "d": 2, "age": 9.79, "grav": 84.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 0, "k": 2736, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "foss_interested", "flbl": "Foss & Interested (Code)", "urls": [], "ig": 0.515, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "This is such a obscure take for foss projects which historically have been stolen from without any reprecution or even pushback. Every time I see a foss project do this I immediately abandon it because I'm not interested in dying on some hill of \"ethical\" superiority, I'd rather stick to what foss is about - freedom not legal chess."}, {"id": 50557046, "au": "darksim905", "dom": 24, "sr": 54, "sc": -0.45, "ep": 1.09, "bs": 0.0, "d": 2, "age": 7.06, "grav": 52.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 45, "qw": 0, "k": 170, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "thinking_deepseek", "flbl": "Thinking & Deepseek (Limit)", "urls": [], "ig": 0.465, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "On llamacpp and other engines, you can inject a think budget which truncates at specified token count. You can also specify a message at the limit. You can set this in the header, so a dynamic engineering harness could relax/tighten.\n\nHow does this work/are there examples?"}, {"id": 50555719, "au": "questionedon", "dom": 30, "sr": 55, "sc": -0.83, "ep": 3.23, "bs": 2.52, "d": 2, "age": 11.04, "grav": 101.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 118, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "apps_patent", "flbl": "Apps & Patent (Android)", "urls": [], "ig": 1.375, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "I don't have play services or a Google account and don't want them so I can't buy the app.\n\nEven if I did buy them, it wouldn't make them private. It would make them less private because now Google has my financial information and they wouldn't work offline. So my sensitive data would be going into ad networks among many other problems.\n\nI don't think software ought to be paid for given it's infinitely duplicatable. Copyright is about preventing sharing of knowledge. These paid apps are preventing the benefits of the apps from reaching more people and are actively doing harm by collecting unnecessary data.\n\nGiving these apps away for free and making them private helps improve human well-being, if even a little bit."}, {"id": 50554691, "au": "LoganDark", "dom": 67, "sr": 56, "sc": -0.83, "ep": 0.6, "bs": 0.0, "d": 1, "age": 13.45, "grav": 138.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 4830, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "foss_interested", "flbl": "Foss & Interested (Code)", "urls": [], "ig": 0.257, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Agreements can't dictate what you do in private, but they can dictate what you're allowed to submit for review. Don't submit it for review, and you'll be fine."}, {"id": 50555819, "au": "sparkilyshpark", "dom": 32, "sr": 57, "sc": -0.83, "ep": 1.21, "bs": 1.19, "d": 3, "age": 10.8, "grav": 98.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 8, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "apps_patent", "flbl": "Apps & Patent (Android)", "urls": [], "ig": 0.515, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "just say that you like stealing, there is no need to hide behind a guy fawkes mask saying it is for greater good or whatever"}, {"id": 50558571, "au": "sylware", "dom": 60, "sr": 58, "sc": -0.83, "ep": 1.15, "bs": 1.19, "d": 0, "age": 3.45, "grav": 21.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 83, "kpp": 0.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "foss_interested", "flbl": "Foss & Interested (Code)", "urls": [], "ig": 0.45, "fa": 0.0, "gp": 0.066, "bl": 0.45, "ds": 0.0, "txt": "Who is going to de-compile/reverse ngineer GTA VI to make it run natively on \"linux\"?"}, {"id": 50555756, "au": "questionedon", "dom": 58, "sr": 59, "sc": -0.83, "ep": 2.46, "bs": 2.52, "d": 1, "age": 10.97, "grav": 100.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "llm_mcp", "flbl": "LLM & Mcp (Ida)", "urls": [], "ig": 0.337, "fa": 0.0, "gp": 1.15, "bl": 0.95, "ds": 0.0, "txt": "Claude can be a prat, but ChatGPT is fine. You just have to convince them that it's for personal use. or have another model that's willing to do it start the work and then continue with a stronger model"}, {"id": 50558151, "au": "vachina", "dom": 2, "sr": 60, "sc": -0.83, "ep": 0.99, "bs": 1.19, "d": 1, "age": 4.46, "grav": 28.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 1329, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "foss_interested", "flbl": "Foss & Interested (Code)", "urls": [], "ig": 0.422, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "How did you manage to coax Gemini to cough up the creds? Whenever I touch anything that requires reversing auth I get stone walled. Close to useless for me."}, {"id": 50559938, "au": "Oxodao", "dom": 7, "sr": 61, "sc": -0.83, "ep": 0.84, "bs": 1.19, "d": 3, "age": 0.91, "grav": 6.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 404, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "thinking_deepseek", "flbl": "Thinking & Deepseek (Limit)", "urls": [], "ig": 0.358, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Oh I need to try out Mitcad, I'm not fond of web stuff unless I can self-host them though. Thanks for the pointers"}, {"id": 50557690, "au": "jonathanstrange", "dom": 61, "sr": 62, "sc": -0.83, "ep": 0.77, "bs": 1.19, "d": 0, "age": 5.51, "grav": 37.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 5625, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "foss_interested", "flbl": "Foss & Interested (Code)", "urls": [], "ig": 0.312, "fa": 0.0, "gp": 0.026, "bl": 0.45, "ds": 0.0, "txt": "I'm interested in AI-assisted code obfuscation. I'm particularly interested in Go but also in other languages. Has anyone experimented with that at the source code level?"}, {"id": 50557415, "au": "dimator", "dom": 31, "sr": 63, "sc": -0.83, "ep": 0.62, "bs": 1.19, "d": 3, "age": 6.15, "grav": 43.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 12, "k": 1390, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "apps_patent", "flbl": "Apps & Patent (Android)", "urls": [], "ig": 0.238, "fa": 0.0, "gp": 0.04, "bl": 0.45, "ds": 0.0, "txt": "> I don't think software ought to be paid for given it's infinitely duplicatable.\n\nSo duplicate it. Or avoid these apps entirely and find alternatives. You're not convincing anyone that you did anything other than stealing."}, {"id": 50559450, "au": "halsafar", "dom": 18, "sr": 64, "sc": -3.59, "ep": 0.65, "bs": 4.24, "d": 1, "age": 1.68, "grav": 10.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 19, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "skills_tools", "flbl": "Skills & Tools (Ask)", "urls": [], "ig": 0.277, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Complex orchestration flows I'd rather not re dictate every single prompt."}, {"id": 50555590, "au": "octoberfranklin", "dom": 66, "sr": 65, "sc": -3.86, "ep": 0.38, "bs": 4.24, "d": 2, "age": 11.31, "grav": 105.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 1925, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.163, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "This philosophy applies to a lot of things in life."}, {"id": 50558425, "au": "cyanydeez", "dom": 25, "sr": 66, "sc": -4.58, "ep": 0.59, "bs": 5.17, "d": 3, "age": 3.82, "grav": 23.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 2948, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "thinking_deepseek", "flbl": "Thinking & Deepseek (Limit)", "urls": [], "ig": 0.249, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "The budget just truncates <think> blocks after set token limit. Then inject a system message, then adds the closing <\/think>\n\nIve not yet experimented with doing this dynamically, but i am sure someone has."}, {"id": 50555116, "au": "zerovv_", "dom": 62, "sr": 67, "sc": -6.28, "ep": 0.47, "bs": 6.76, "d": 0, "age": 12.61, "grav": 124.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "llm_mcp", "flbl": "LLM & Mcp (Ida)", "urls": [], "ig": 0.201, "fa": 0.0, "gp": 0.0, "bl": 2.55, "ds": 0.0, "txt": "context is always a problem as you lose too much info during the process"}, {"id": 50557043, "au": "darksim905", "dom": 12, "sr": 68, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 7.07, "grav": 53.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 170, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "foss_interested", "flbl": "Foss & Interested (Code)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "what tooling did you use?"}, {"id": 50555479, "au": "SV_BubbleTime", "dom": 63, "sr": 69, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 11.63, "grav": 110.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 0, "k": 2319, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Itty bitty steps"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "top_signal";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 40);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 40);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 40);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `${shown.length} of ${pool.length} comments` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const proofDrawer = document.getElementById("proofDrawer");
+  const expBtn = document.getElementById("exploreToggleBtn");
+  const eviBtn = document.getElementById("evidenceToggleBtn");
+
+  if (expBtn && labDrawer) {
+    expBtn.addEventListener("click", () => {
+      labDrawer.open = !labDrawer.open;
+    });
+    labDrawer.addEventListener("toggle", () => {
+      const isOpen = labDrawer.open;
+      expBtn.classList.toggle("active", isOpen);
+      expBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  if (eviBtn && proofDrawer) {
+    eviBtn.addEventListener("click", () => {
+      proofDrawer.open = !proofDrawer.open;
+    });
+    proofDrawer.addEventListener("toggle", () => {
+      const isOpen = proofDrawer.open;
+      eviBtn.classList.toggle("active", isOpen);
+      eviBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

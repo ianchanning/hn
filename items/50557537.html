@@ -1,0 +1,1387 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50557537 // Distributed, high-performance blob storage on SQLite — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+      text-transform: lowercase;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      text-transform: lowercase;
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .kpi-cell {
+      padding: 8px 0;
+    }
+    .kpi-label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 4px 0;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer:not([open]) {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary,
+    details.proof-drawer > summary {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+    }
+    table.ablation th {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: normal;
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    button.nav-btn,
+    button.mode-tab,
+    button.topbar-toggle {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: rgb(0, 0, 0);
+      cursor: pointer;
+      text-decoration: none;
+      line-height: inherit;
+      vertical-align: baseline;
+      transition: color 0.12s ease;
+      text-transform: lowercase;
+    }
+    button.nav-btn:hover,
+    button.nav-btn.active,
+    button.mode-tab:hover,
+    button.mode-tab.active,
+    button.topbar-toggle:hover,
+    button.topbar-toggle.active {
+      color: rgb(255, 255, 255);
+      text-decoration: none;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      padding: 14px;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; row-gap: 4px; }
+      .topbar-right { padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+        <span class="pagetop" id="modeTabs">
+          <button type="button" class="nav-btn mode-tab active" data-mode="top_signal" role="tab" aria-selected="true">Top 40</button> | <button type="button" class="nav-btn mode-tab" data-mode="hn_top40" role="tab" aria-selected="false">HN Top 40</button>
+        </span>
+      </div>
+      <div class="topbar-right">
+        <button type="button" class="nav-btn topbar-toggle" id="exploreToggleBtn" aria-expanded="false">explore</button> | <button type="button" class="nav-btn topbar-toggle" id="evidenceToggleBtn" aria-expanded="false">evidence</button>
+      </div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://zerodha.tech/blog/high-performance-distributed-blob-storage/">Distributed, high-performance blob storage on SQLite</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=zerodha.tech"><span class="sitestr">zerodha.tech</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">259 points</span> by <a href="https://news.ycombinator.com/user?id=ghostfoxgod">ghostfoxgod</a> <span class="age" title="2026-11-19T08:39:45.000Z"><a href="https://news.ycombinator.com/item?id=50557537">16 hours ago</a></span> | <a href="https://news.ycombinator.com/item?id=50557537">69&nbsp;comments</a> | 78.3% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Evidence</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">69</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 51 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">21.7%</div>
+          <div class="kpi-sub">15 comments (4 Gold / 5.8%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">78.3%</div>
+          <div class="kpi-sub">27 chatter &bull; 27 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">5</div>
+        <div class="kpi-sub">17% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.973</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">11</div>
+          <div class="kpi-sub">HN POS 11..21 (15.9% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="color: rgb(90, 90, 88); margin-top: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Explore</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 69-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 69)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (4)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (11)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (27)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (27)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..69) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 25)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (anacrolix, 12.2h); largest subtree (@sgarland) occupies 11 slots (HN POS 11..21).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (69)</option>
+          <option value="sqlite_store">Sqlite &amp; Store (Json) (20)</option>
+          <option value="data_writes">Data &amp; Writes (Batch) (13)</option>
+          <option value="postgres_vacuum">Postgres &amp; Vacuum (Table) (11)</option>
+          <option value="distributed_protocol">Distributed &amp; Protocol (Support) (11)</option>
+          <option value="fsync_sqlite">Fsync &amp; Sqlite (Transaction) (10)</option>
+          <option value="general_commentary">General Commentary (4)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, blob, storage, sqlite, distributed, blobs...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50557537 + ZERODHA.TECH + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50557537, "story_title": "Distributed, high-performance blob storage on SQLite", "story_url": "https://zerodha.tech/blog/high-performance-distributed-blob-storage/", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50557537, "story_title": "Distributed, high-performance blob storage on SQLite", "story_url": "https://zerodha.tech/blog/high-performance-distributed-blob-storage/", "points": 259, "story_author": "ghostfoxgod", "article_source": "fetched_url", "t1_ref_utc": "2026-11-20T00:17:23+00:00", "t2_ref_utc": "2026-11-20T00:17:23+00:00", "delta_minutes": 0.0, "story_anchors": ["blob", "storage", "sqlite", "distributed", "blobs", "writes", "redis", "performance", "per", "wal", "protocol", "store", "json", "data", "database", "compression", "file", "node", "instead", "user", "latency", "multiple", "client", "production", "server"], "facet_labels": {"sqlite_store": "Sqlite & Store (Json)", "fsync_sqlite": "Fsync & Sqlite (Transaction)", "distributed_protocol": "Distributed & Protocol (Support)", "data_writes": "Data & Writes (Batch)", "postgres_vacuum": "Postgres & Vacuum (Table)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "sqlite_store", "label": "Sqlite & Store (Json)", "count": 20, "top_terms": ["sqlite", "store", "json", "metadata"]}, {"slug": "fsync_sqlite", "label": "Fsync & Sqlite (Transaction)", "count": 10, "top_terms": ["fsync", "sqlite", "transaction", "systems"]}, {"slug": "distributed_protocol", "label": "Distributed & Protocol (Support)", "count": 11, "top_terms": ["distributed", "protocol", "support", "redis"]}, {"slug": "data_writes", "label": "Data & Writes (Batch)", "count": 13, "top_terms": ["data", "writes", "batch", "wait"]}, {"slug": "postgres_vacuum", "label": "Postgres & Vacuum (Table)", "count": 11, "top_terms": ["postgres", "vacuum", "table", "databases"]}], "counts": {"total_comments": 69, "live_t2_comments": 69, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 51, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "86dbf7464a19eb1cb54dc1eb23ff68758b203db481bbc2afa26e71119569269c"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 4, "grounded_analysis": 11, "crowd_chatter": 27, "bullshit_or_flamewar": 27}, "facets": {"fsync_sqlite": 10, "sqlite_store": 20, "postgres_vacuum": 11, "data_writes": 13, "distributed_protocol": 11, "general_commentary": 4}, "facet_options": [{"slug": "sqlite_store", "label": "Sqlite & Store (Json)", "count": 20}, {"slug": "data_writes", "label": "Data & Writes (Batch)", "count": 13}, {"slug": "postgres_vacuum", "label": "Postgres & Vacuum (Table)", "count": 11}, {"slug": "distributed_protocol", "label": "Distributed & Protocol (Support)", "count": 11}, {"slug": "fsync_sqlite", "label": "Fsync & Sqlite (Transaction)", "count": 10}, {"slug": "general_commentary", "label": "General Commentary", "count": 4}], "facet_diagnostics": [{"slug": "sqlite_store", "label": "Sqlite & Store (Json)", "count": 20, "useful": 6, "useful_pct": 30.0, "terms": "sqlite, store, json, metadata"}, {"slug": "data_writes", "label": "Data & Writes (Batch)", "count": 13, "useful": 1, "useful_pct": 7.7, "terms": "data, writes, batch, wait"}, {"slug": "postgres_vacuum", "label": "Postgres & Vacuum (Table)", "count": 11, "useful": 3, "useful_pct": 27.3, "terms": "postgres, vacuum, table, databases"}, {"slug": "distributed_protocol", "label": "Distributed & Protocol (Support)", "count": 11, "useful": 2, "useful_pct": 18.2, "terms": "distributed, protocol, support, redis"}, {"slug": "fsync_sqlite", "label": "Fsync & Sqlite (Transaction)", "count": 10, "useful": 3, "useful_pct": 30.0, "terms": "fsync, sqlite, transaction, systems"}, {"slug": "general_commentary", "label": "General Commentary", "count": 4, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 6}, {"category": "code_repository", "count": 5}, {"category": "low_cred_or_joke", "count": 2}], "story_anchors": ["blob", "storage", "sqlite", "distributed", "blobs", "writes", "redis", "performance", "per", "wal", "protocol", "store", "json", "data", "database", "compression", "file", "node"], "largest_root": {"root_id": 50561133, "author": "sgarland", "slots": 11, "start_dom": 11, "end_dom": 21, "share_pct": 15.9, "top_dom1_age": 12.2, "top_dom1_author": "anacrolix"}, "buried_cutoff": 25, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50559043, "au": "anacrolix", "dom": 1, "sr": 1, "sc": 11.74, "ep": 11.74, "bs": 0.0, "d": 0, "age": 12.19, "grav": 118.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 82, "qw": 0, "k": 410, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "fsync_sqlite", "flbl": "Fsync & Sqlite (Transaction)", "urls": ["https://github.com/anacrolix/possum"], "ig": 1.431, "fa": 2.08, "gp": 1.69, "bl": 0.0, "ds": 0.0, "txt": "I spent years trying to squeeze this use case out of sqlite. All roads lead to tears, it is not made for this use case.\n\nI wrote https://github.com/anacrolix/possum for this exact use case. It has a few rough edges but it absolutely hauls ass for caching on disk. Incidentally it uses sqlite for transaction/TTL metadata which is more suited to sqlite but it's still the bottleneck.\n\nsqlite transaction commit overhead is too high and uncompetitive without batching but it's a design flaw specific to being multiprocess."}, {"id": 50567944, "au": "munch-o-man", "dom": 22, "sr": 2, "sc": 9.88, "ep": 9.88, "bs": 0.0, "d": 0, "age": 1.01, "grav": 7.3, "surf": 19.9, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 79, "qw": 0, "k": 18, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "sqlite_store", "flbl": "Sqlite & Store (Json)", "urls": ["https://github.com/afreidah/s3-orchestrator", "https://s3-orchestrator.munchbox.cc"], "ig": 1.54, "fa": 2.08, "gp": 0.23, "bl": 0.0, "ds": 0.0, "txt": "I wrote something similar with s3/blob storage but probably with slightly different use cases. Been working on it for like a year now:\n\nhttps://github.com/afreidah/s3-orchestrator\nhttps://s3-orchestrator.munchbox.cc\n\nself hosted service that acts as an orchestration layer between x-number of s3/blob storage backends, handles replication, failover, encryption, compression, integrity checking, and backend pressure analysis to optimize reads/writes to the most efficient available backend that meets the requirements of the request.\n\nThrew a star on yours so I can remember to look at it deeper later"}, {"id": 50561992, "au": "vmikhailov", "dom": 38, "sr": 3, "sc": 9.64, "ep": 9.64, "bs": 0.0, "d": 0, "age": 8.08, "grav": 64.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 34, "qw": 0, "k": 1, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "sqlite_store", "flbl": "Sqlite & Store (Json)", "urls": ["https://github.com/vmikhailov/cypher-sql-go"], "ig": 0.966, "fa": 2.08, "gp": 0.992, "bl": 0.0, "ds": 0.0, "txt": "Since you store blobs (json), you might benefit from having a graph on top of it at some point. I had a similar task in the past so I created a cypher-to-sql transpiler. Feel free to use it - https://github.com/vmikhailov/cypher-sql-go"}, {"id": 50566492, "au": "sgarland", "dom": 15, "sr": 4, "sc": 8.06, "ep": 8.06, "bs": 0.0, "d": 3, "age": 3.03, "grav": 18.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 115, "qw": 9, "k": 5522, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "postgres_vacuum", "flbl": "Postgres & Vacuum (Table)", "urls": ["https://zerodha.tech/blog/working-with-postgresql/"], "ig": 1.443, "fa": 1.38, "gp": 0.51, "bl": 0.0, "ds": 0.0, "txt": "> Today, that's all abstracted away for pennies an hour.\n\nUntil it isn't. \"Why is my query slow\" doesn't get solved just because you didn't have to run apt-get install postgresql.\n\nEDIT: the company also discusses working with Postgres [0], and man do they have some takes. work_mem set to 600 MB, using a temporary table for active queries while copying its rows to the main table (their pg_catalog has to be MASSIVE), generating a table per query on a \"cache DB,\" resulting in millions of tables that are then dropped at EOD...\n\nThis is my point. Even if these were running on RDS (they aren't), they would still be causing performance problems, because you need to understand how your tooling works to use it well at scale.\n\n0: https://zerodha.tech/blog/working-with-postgresql/"}, {"id": 50563760, "au": "otoolep", "dom": 54, "sr": 5, "sc": 6.88, "ep": 6.88, "bs": 0.0, "d": 3, "age": 6.06, "grav": 42.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 60, "qw": 0, "k": 5216, "kpp": 6.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "data_writes", "flbl": "Data & Writes (Batch)", "urls": ["https://rqlite.io/docs/api/bulk-api/"], "ig": 1.191, "fa": 0.9, "gp": 1.042, "bl": 0.0, "ds": 0.0, "txt": "One detail: if you batch up your writes in the client, and send that batch through a Raft-based data plane system, you can get high throughput. But then you are paying with latency, as the clients have to wait until they have a batch worth of data before making the write request to the Raft-based system. rqlite calls this approach Bulk Requests[1].\n\n[1] https://rqlite.io/docs/api/bulk-api/"}, {"id": 50561133, "au": "sgarland", "dom": 11, "sr": 6, "sc": 6.28, "ep": 6.43, "bs": 0.0, "d": 0, "age": 9.11, "grav": 76.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 51, "qw": 12, "k": 5522, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "postgres_vacuum", "flbl": "Postgres & Vacuum (Table)", "urls": [], "ig": 1.236, "fa": 0.42, "gp": 1.603, "bl": 0.0, "ds": 0.0, "txt": "> What we learned along the way… Deleting rows doesn’t shrink SQLite files\n\nThis is true of every RDBMS I am aware of. It would be horribly inefficient to constantly run page merges in order to be able to free some of them.\n\nWhenever I read things on posts that are a. discussed in documentation b. should be apparent from first principles, I immediately lose faith in the product."}, {"id": 50562074, "au": "EGreg", "dom": 69, "sr": 7, "sc": 6.01, "ep": 9.59, "bs": 3.58, "d": 0, "age": 7.98, "grav": 62.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 1, "w": 102, "qw": 0, "k": 7895, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "distributed_protocol", "flbl": "Distributed & Protocol (Support)", "urls": ["https://github.com/Safebots/Safecloud", "https://youtu.be/glWQM0BIcDQ?si=VV7YFiElGKBC82Bv", "https://safebots.ai/datasets.html"], "ig": 1.285, "fa": 2.08, "gp": 0.441, "bl": 1.35, "ds": 0.0, "txt": "If you liked that, you might like this… it’s distributed, high performance, but also encrypted and has micropayments for storage, and anyone can contribute storage by just opening a browser tab:\n\nhttps://github.com/Safebots/Safecloud\n\nIt can also stream videos to any domain, like a decentralized YouTube. Here is a demo:\n\nhttps://youtu.be/glWQM0BIcDQ?si=VV7YFiElGKBC82Bv\n\nThis is what we encourage to store in it:\n\nhttps://safebots.ai/datasets.html\n\nOh, and it is also compatible with S3 bucket protocol, IPFS, and even MySQL protocol so it can replace your S3 bucket or database with a distributed database — just like that!\n\nPS: if you’re curious, it uses a columnar store and SQLite’s query planner, to be as efficient as possible."}, {"id": 50560033, "au": "lukax", "dom": 24, "sr": 8, "sc": 5.83, "ep": 5.83, "bs": 0.0, "d": 0, "age": 10.53, "grav": 94.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 53, "qw": 0, "k": 943, "kpp": 5.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "sqlite_store", "flbl": "Sqlite & Store (Json)", "urls": [], "ig": 1.217, "fa": 0.34, "gp": 1.38, "bl": 0.0, "ds": 0.0, "txt": "OpenStack Swift uses SQLite for storing metadata. Each account has one SQLite db. Each container also initially had one SQLite db but in 2018 they added support for sharding so if a container has more than 1 million objects, the container is split into multiple SQLite databases. The performance is not ideal. Ceph scales much better."}, {"id": 50561040, "au": "articulatepang", "dom": 35, "sr": 9, "sc": 5.65, "ep": 5.65, "bs": 0.0, "d": 0, "age": 9.24, "grav": 77.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 116, "qw": 0, "k": 238, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "sqlite_store", "flbl": "Sqlite & Store (Json)", "urls": [], "ig": 1.355, "fa": 0.34, "gp": 1.031, "bl": 0.0, "ds": 0.0, "txt": "I wonder if they tried storing diffs instead, and compacting them once in a while.\n\nThese are user preferences for UI setup, and they have a lot of write traffic. But probably each user changes their preferences only by a little bit each time. Their 1MB writes would go down to just the small diffs.\n\nThey could store the diffs and transparently apply them before sending to the client. After some timeout or maybe after a certain number of diffs have accumulated, squash them all and write back.\n\nThey’d still need a server and custom code to handle this but it would probably reduce the database load and SSD writes by a lot. And let them just use something off-the-shelf for storage."}, {"id": 50559490, "au": "mightyham", "dom": 8, "sr": 10, "sc": 5.62, "ep": 5.77, "bs": 0.0, "d": 1, "age": 11.38, "grav": 106.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 79, "qw": 0, "k": 486, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "fsync_sqlite", "flbl": "Fsync & Sqlite (Transaction)", "urls": [], "ig": 1.364, "fa": 0.9, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "At the end of the day durable transaction commit in any OLTP database will always be slow because fsync is an expensive operation (~1000 IOPS on a decent SSD), so as you mentioned batching is the only way to make significant increases to throughput. That said, based on assorted benchmarks I've seen online, sqlite doesn't even get close to max fsync IOPS because it has a ton of overhead. Other embedded systems like rocksdb or lmdb are going to give better performance."}, {"id": 50558354, "au": "bob1029", "dom": 25, "sr": 11, "sc": 5.1, "ep": 5.32, "bs": 0.0, "d": 0, "age": 13.72, "grav": 142.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 68, "qw": 2, "k": 24526, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "sqlite_store", "flbl": "Sqlite & Store (Json)", "urls": [], "ig": 1.448, "fa": 0.0, "gp": 1.323, "bl": 0.0, "ds": 0.0, "txt": "> JSON blobs\n\nAn alternative to faster blob storage is to represent the blob's schema in SQL directly.\n\nIf most blob updates are incremental you can eliminate a significant amount of storage IO and garbage collection this way.\n\nOne SQLite database per blob type with a metadata SQLite db that tracks each. We could leverage powerful AI reasoning models to produce SQLite schemas and virtual table adapters for each encountered JSON schema type."}, {"id": 50562314, "au": "gkamal", "dom": 31, "sr": 12, "sc": 4.73, "ep": 4.73, "bs": 0.0, "d": 2, "age": 7.73, "grav": 60.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 66, "qw": 0, "k": 53, "kpp": 6.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "distributed_protocol", "flbl": "Distributed & Protocol (Support)", "urls": [], "ig": 1.414, "fa": 0.34, "gp": 0.301, "bl": 0.0, "ds": 0.0, "txt": "90% of it. Sharding, multi node, write buffering, redis protocol. The whole distributed and high performance part of it.\n\nProblem is that it is not really distributed (static sharding, no fault tolerance,  no consistency model).. on top of that poor operational support - backup/restore, recovery. Stateful infra pieces need lot more rigour, you can't iterate your way through such fundamental capabilities once it is in production use."}, {"id": 50565884, "au": "grep_it", "dom": 37, "sr": 13, "sc": 4.59, "ep": 4.59, "bs": 0.0, "d": 0, "age": 3.83, "grav": 23.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 1960, "kpp": 22.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "postgres_vacuum", "flbl": "Postgres & Vacuum (Table)", "urls": [], "ig": 1.028, "fa": 0.34, "gp": 0.832, "bl": 0.0, "ds": 0.0, "txt": "I find that partitioning by key range tends to be more flexible and malleable to rebalancing (merge, splits, etc). Doing things like CRC16(key) % 16384 tends to bite eventually."}, {"id": 50562165, "au": "sneilan1", "dom": 23, "sr": 14, "sc": 4.37, "ep": 4.81, "bs": 0.0, "d": 0, "age": 7.88, "grav": 61.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 25, "k": 284, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "sqlite_store", "flbl": "Sqlite & Store (Json)", "urls": [], "ig": 0.934, "fa": 0.42, "gp": 0.976, "bl": 0.0, "ds": 0.0, "txt": "Earlier in the blog post, Sarat writes about how many databases can't store multi-megabyte blobs. That makes sense to me but later on, he writes\n\n> While raw files start to beat SQLite above ~100 KiB, we compress blobs before writing them. And thankfully, 99% of our compressed values sit well below 100 KiB.\n\nMy question is, were the other databases not tried with compression on the application side?"}, {"id": 50561069, "au": "adev_", "dom": 7, "sr": 15, "sc": 4.21, "ep": 4.5, "bs": 0.0, "d": 1, "age": 9.2, "grav": 77.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 19, "k": 2319, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "fsync_sqlite", "flbl": "Fsync & Sqlite (Transaction)", "urls": [], "ig": 0.951, "fa": 0.7, "gp": 0.188, "bl": 0.0, "ds": 0.0, "txt": ">  Incidentally it uses sqlite for transaction/TTL metadata which is more suited to sqlite but it's still the bottleneck.\n\nWhy sqlite instead of RocksDB ?\n\nWhat you need at the end of the day for a blob storage is a transactional key value store.\n\nWhich RocksDB will give you with much better throughput (and latency) and solves your transaction problem."}, {"id": 50561100, "au": "otoolep", "dom": 53, "sr": 16, "sc": 3.9, "ep": 7.62, "bs": 3.58, "d": 2, "age": 9.15, "grav": 76.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 1, "w": 83, "qw": 0, "k": 5216, "kpp": 6.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "data_writes", "flbl": "Data & Writes (Batch)", "urls": ["https://youtu.be/8XbxQ1Epi5w?t=2306", "https://rqlite.io/docs/api/queued-writes/"], "ig": 1.494, "fa": 0.9, "gp": 1.068, "bl": 1.35, "ds": 0.0, "txt": "(Hi Phil!)\n\nCorrect, I read the post. Agreed, rqlite is not a great fit for high-throughput durable writes since all writes go through the Raft Leader. This is not specific to rqlite -- all systems which put Raft in the data plane[1] have the same challenge.\n\nrqlite does offer a Queued Writes mode[2], which allows you to trade durability for much greater write throughput. The post mentions something similar -- async_write -- but their post claims they also make the data queryable before it is durable, unlike rqlite.\n\n[1] https://youtu.be/8XbxQ1Epi5w?t=2306\n\n[2] https://rqlite.io/docs/api/queued-writes/"}, {"id": 50562495, "au": "mbreese", "dom": 14, "sr": 17, "sc": 3.25, "ep": 3.55, "bs": 0.0, "d": 2, "age": 7.53, "grav": 57.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 84, "qw": 0, "k": 14778, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "postgres_vacuum", "flbl": "Postgres & Vacuum (Table)", "urls": [], "ig": 1.427, "fa": 0.0, "gp": 0.134, "bl": 0.0, "ds": 0.0, "txt": "Especially if you started in an age of remote cloud databases. The further we get away from the infrastructure we use, the less we know about nuances like this. What used to be considered common knowledge gets lost when you don't have experience with running a DB server.\n\nI mean, today, why would you? It used to be that starting a new CRUD project meant at least an hour of setting up web servers, database servers, proxies, etc. Today, that's all abstracted away for pennies an hour."}, {"id": 50559004, "au": "murkt", "dom": 63, "sr": 18, "sc": 3.0, "ep": 3.0, "bs": 0.0, "d": 0, "age": 12.27, "grav": 119.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 1342, "kpp": 4.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "distributed_protocol", "flbl": "Distributed & Protocol (Support)", "urls": [], "ig": 1.163, "fa": 0.0, "gp": 0.181, "bl": 0.0, "ds": 0.0, "txt": "Sounds like it solves their particular problem, but hardly can be used by outsiders in the current state.\n\nBad fault tolerance, no words on replication or backup. Offline rebalance... meh. I am not sure how I feel about their choice of Redis protocol."}, {"id": 50563132, "au": "AtlasBarfed", "dom": 20, "sr": 19, "sc": 2.93, "ep": 3.37, "bs": 0.0, "d": 1, "age": 6.79, "grav": 50.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 76, "qw": 0, "k": 5187, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "distributed_protocol", "flbl": "Distributed & Protocol (Support)", "urls": [], "ig": 1.434, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Is there really no way to use Cassandra for this use case? A distributed and relatively battle tested database? They didn't want to use SSDB because it lacked support. Okay.\n\nI mean you're one-off vibe-coded distributed database isn't a database until aphyer puts it through it's paces, and until it encounters most CAP its edge cases over years of use.\n\nOtherwise, this isn't a database. It's a black hole of uncertainty that will almost certainly drop writes and commits silently"}, {"id": 50560707, "au": "dolmen", "dom": 42, "sr": 20, "sc": 2.78, "ep": 2.78, "bs": 0.0, "d": 1, "age": 9.64, "grav": 83.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 1368, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "data_writes", "flbl": "Data & Writes (Batch)", "urls": [], "ig": 0.772, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "As the post mentions \"trading\" and \"50% writes\", I guess that most writes are derived from live market data, and probably not user-specific but shared."}, {"id": 50561921, "au": "luke5441", "dom": 30, "sr": 21, "sc": 2.59, "ep": 2.74, "bs": 0.0, "d": 2, "age": 8.17, "grav": 65.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 391, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fsync_sqlite", "flbl": "Fsync & Sqlite (Transaction)", "urls": [], "ig": 1.165, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "My short research gives me that ScyllaDB could be tuned for this use case (e.g. disabling durable writes for the blobs). And even if not I'd look into basing the work on something like ScyllaDB instead of developing a completely new database, especially since they already run ScyllaDB and have experience running it."}, {"id": 50561398, "au": "nodesocket", "dom": 57, "sr": 22, "sc": 2.57, "ep": 2.79, "bs": 0.0, "d": 0, "age": 8.79, "grav": 72.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 6535, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "distributed_protocol", "flbl": "Distributed & Protocol (Support)", "urls": [], "ig": 0.909, "fa": 0.0, "gp": 0.452, "bl": 0.0, "ds": 0.0, "txt": "If only rethinkdb hadn’t nose dived. It supported sharding, health checks, clustering with failover. Write performance was quite good as I recall."}, {"id": 50561941, "au": "WorldMaker", "dom": 36, "sr": 23, "sc": 2.52, "ep": 3.33, "bs": 0.0, "d": 1, "age": 8.13, "grav": 64.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 113, "qw": 0, "k": 14747, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sqlite_store", "flbl": "Sqlite & Store (Json)", "urls": [], "ig": 1.417, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "A part of me wonders a similar question that they started with a blob store and assumed a blob store and might have got good results normalizing their JSON schema into an Sqlite table structure, if they were going down the road towards Sqlite anyway. Especially, because if these preferences are truly per-user you could even ship the entire Sqlite database to the user and read it with WASM and not worry about concurrent writes and use much simpler object/file storage for the backup copies of Sqlite databases at that point. (Or get fancy with it and WAL log, sure, but really, if it is user owned at that point, just stick with simple dumb backups.)"}, {"id": 50558363, "au": "tomasol", "dom": 33, "sr": 24, "sc": 2.5, "ep": 2.5, "bs": 0.0, "d": 1, "age": 13.71, "grav": 142.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 383, "kpp": 12.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "data_writes", "flbl": "Data & Writes (Batch)", "urls": [], "ig": 1.065, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I'm curious too. The only backup I found on GitHub uses cp; they may use filesystem snapshots or Litestream in production. If it’s Litestream, litestream sync -wait can force a sync after a write and wait for remote replication to complete."}, {"id": 50566406, "au": "sgarland", "dom": 13, "sr": 25, "sc": 2.3, "ep": 2.96, "bs": 0.0, "d": 2, "age": 3.13, "grav": 19.0, "surf": 3.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 83, "qw": 0, "k": 5522, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "postgres_vacuum", "flbl": "Postgres & Vacuum (Table)", "urls": [], "ig": 1.26, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "In other databases, you also don't get the space back (mostly [0]). Postgres requires VACUUM FULL (or REPACK CONCURRENTLY, as of Pg19), and MySQL requires OPTIMIZE TABLE, neither of which is commonly done.\n\nThis is my point; if you're coming from other databases, it should be obvious that you don't get space back unless you ask for it.\n\n0: Postgres can, under the specific circumstance of pages at the end of a table being completely empty, release them back to the OS with a normal VACUUM."}, {"id": 50562025, "au": "guywithahat", "dom": 19, "sr": 26, "sc": 1.95, "ep": 2.61, "bs": 0.0, "d": 1, "age": 8.04, "grav": 63.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 1074, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "data_writes", "flbl": "Data & Writes (Batch)", "urls": [], "ig": 1.023, "fa": 0.0, "gp": 0.144, "bl": 0.0, "ds": 0.0, "txt": "I once interviewed with a NYC robotics startup and, reflecting on his past job, he said they migrated away from SQLite3 because they needed a WAL database for their smart grocery cart.\n\nIt was hard to take him seriously after that"}, {"id": 50566766, "au": "ltbarcly3", "dom": 62, "sr": 27, "sc": 1.93, "ep": 2.15, "bs": 0.0, "d": 0, "age": 2.69, "grav": 16.2, "surf": 7.7, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 4250, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fsync_sqlite", "flbl": "Fsync & Sqlite (Transaction)", "urls": [], "ig": 0.902, "fa": 0.0, "gp": 0.022, "bl": 0.0, "ds": 0.0, "txt": "I remember something in operating systems class about an efficient way to store binary objects.  Let me go check the textbook..\n\nFilesystem!  I knew there was some obscure way to do this."}, {"id": 50565502, "au": "dantillberg", "dom": 5, "sr": 28, "sc": 1.62, "ep": 2.5, "bs": 0.0, "d": 4, "age": 4.25, "grav": 27.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 2315, "kpp": 5.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "distributed_protocol", "flbl": "Distributed & Protocol (Support)", "urls": [], "ig": 1.064, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Filesystems typically support mutable values, while it's beneficial in many ways to support only immutable values in distributed systems. A filesystem is a fine stand-in for object storage, though, at low scale/volume."}, {"id": 50561455, "au": "nodesocket", "dom": 58, "sr": 29, "sc": 1.4, "ep": 1.99, "bs": 0.0, "d": 1, "age": 8.72, "grav": 71.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 11, "qw": 0, "k": 6535, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "data_writes", "flbl": "Data & Writes (Batch)", "urls": ["https://github.com/rethinkdb/rethinkdb"], "ig": 0.435, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Update: I guess it’s still up, though last release was 3 years ago.\n\nhttps://github.com/rethinkdb/rethinkdb"}, {"id": 50563042, "au": "martinjc", "dom": 50, "sr": 30, "sc": 1.22, "ep": 1.95, "bs": 0.0, "d": 2, "age": 6.88, "grav": 51.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 43, "qw": 0, "k": 54, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "postgres_vacuum", "flbl": "Postgres & Vacuum (Table)", "urls": [], "ig": 0.83, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "An honor to see you here. I used rqlite for a project i want to be available globally, in a small package i can myself manage, without having to bother with clustering postgres. I appreciate the ease of implementation in code, and how easy it is to manage operationally."}, {"id": 50566467, "au": "sgarland", "dom": 17, "sr": 31, "sc": 1.07, "ep": 2.39, "bs": 0.0, "d": 2, "age": 3.05, "grav": 18.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 62, "qw": 0, "k": 5522, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "sqlite_store", "flbl": "Sqlite & Store (Json)", "urls": [], "ig": 1.017, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I want people to read documentation and try experiments, I just question whether they should be creating a product at that time. I have nothing against \"hey, look what I learned!\" posts, it's the concomitant positioning as having enough expertise in the field to sell a solution that bothers me.\n\nI felt similarly when Prisma launched and didn't implement JOINs, instead just doing full SELECTs and joining them itself."}, {"id": 50563645, "au": "otoolep", "dom": 51, "sr": 32, "sc": 1.04, "ep": 2.77, "bs": 0.85, "d": 3, "age": 6.2, "grav": 44.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 51, "qw": 0, "k": 5216, "kpp": 6.9, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "fsync_sqlite", "flbl": "Fsync & Sqlite (Transaction)", "urls": [], "ig": 1.177, "fa": 0.0, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "Great to hear, ease of operations is one of the main design goals. I've too many scars from running complicated systems. Of course that means that the rqlite feature set has remained focused (a nice way of saying \"limited\"), but in exchange, if it matches your use case, it can work well."}, {"id": 50566953, "au": "sgarland", "dom": 21, "sr": 33, "sc": 0.66, "ep": 2.2, "bs": 0.0, "d": 2, "age": 2.44, "grav": 14.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 5522, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "sqlite_store", "flbl": "Sqlite & Store (Json)", "urls": [], "ig": 0.938, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "They mentioned trying Scylla, but found it didn't do well with multi-megabyte blobs. I question why they need multiple megabytes' worth of JSON to store user preferences and metadata, personally, but that's neither here nor there."}, {"id": 50563015, "au": "UltraSane", "dom": 3, "sr": 34, "sc": 0.61, "ep": 2.15, "bs": 0.0, "d": 2, "age": 6.91, "grav": 51.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 3355, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sqlite_store", "flbl": "Sqlite & Store (Json)", "urls": [], "ig": 0.916, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Metadata in a DB or index of some kind and the actual data in a key-val object store is the most versatile configuration I have used. This lets you use as many different metadata indexes as you need."}, {"id": 50560379, "au": "luke5441", "dom": 9, "sr": 35, "sc": 0.51, "ep": 1.61, "bs": 0.0, "d": 2, "age": 10.06, "grav": 88.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 391, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "fsync_sqlite", "flbl": "Fsync & Sqlite (Transaction)", "urls": [], "ig": 0.686, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Or you can do like GP with that possum and not fsync at all. It even sets synchronous=OFF, which will corrupt SQLite databases.\nThen it is fast because it only writes to memory. YOLO!"}, {"id": 50559629, "au": "Blobtits", "dom": 40, "sr": 36, "sc": 0.45, "ep": 3.62, "bs": 2.52, "d": 0, "age": 11.1, "grav": 102.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "data_writes", "flbl": "Data & Writes (Batch)", "urls": [], "ig": 1.189, "fa": 0.0, "gp": 0.574, "bl": 0.95, "ds": 0.0, "txt": "Reads like this is be a perfect fit for ClickHouse. You should do async inserts, remove the 20 or so _log options ClickHouse enables for some insane defaults and batch them in Redis if needed (probablynot). Then you have automatic compression, free ttl, no write concurrency."}, {"id": 50558913, "au": "ncruces", "dom": 60, "sr": 37, "sc": 0.26, "ep": 1.36, "bs": 0.0, "d": 1, "age": 12.49, "grav": 123.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 2574, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sqlite_store", "flbl": "Sqlite & Store (Json)", "urls": [], "ig": 0.579, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Filesystems can be much slower than SQLite for many (think millions of) small files.\n\nThey also mention considering this in the post."}, {"id": 50562553, "au": "mbreese", "dom": 2, "sr": 38, "sc": 0.18, "ep": 1.5, "bs": 0.0, "d": 1, "age": 7.47, "grav": 57.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 14778, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "data_writes", "flbl": "Data & Writes (Batch)", "urls": [], "ig": 0.587, "fa": 0.0, "gp": 0.085, "bl": 0.0, "ds": 0.0, "txt": "Yeah, I'm not sure how well this will work. I've always dealt with data blobs with data on the filesystem (or s3), metadata in the database. Anything else starts to get a bit too much like a filesystem in a database, which has lead many smart people to tears.\n\nOr is there a better way?"}, {"id": 50563391, "au": "simonw", "dom": 16, "sr": 39, "sc": -0.23, "ep": 0.88, "bs": 0.0, "d": 1, "age": 6.49, "grav": 47.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 121922, "kpp": 7.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "postgres_vacuum", "flbl": "Postgres & Vacuum (Table)", "urls": [], "ig": 0.324, "fa": 0.0, "gp": 0.079, "bl": 0.0, "ds": 0.0, "txt": "The problem with that attitude is that you're actively encouraging people to not talk about things they've just learned that might be obvious, for fear of being judged negatively by people like you. That harms the discourse."}, {"id": 50558910, "au": "Kalanos", "dom": 45, "sr": 40, "sc": -0.31, "ep": 1.99, "bs": 1.19, "d": 0, "age": 12.49, "grav": 123.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 409, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sqlite_store", "flbl": "Sqlite & Store (Json)", "urls": [], "ig": 0.449, "fa": 0.0, "gp": 0.643, "bl": 0.45, "ds": 0.0, "txt": "A limitation that i ran into with sqlite was not being able to interact with it over the network e.g. NFS. Does this solve that problem?"}, {"id": 50558304, "au": "CyrusGrissom", "dom": 32, "sr": 41, "sc": -0.33, "ep": 3.0, "bs": 2.52, "d": 0, "age": 13.86, "grav": 144.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 2, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "distributed_protocol", "flbl": "Distributed & Protocol (Support)", "urls": [], "ig": 0.566, "fa": 0.0, "gp": 1.15, "bl": 0.95, "ds": 0.0, "txt": "I couldn't find the word \"replication\" in the post or on the GitHub page. So, what about fault tolerance?"}, {"id": 50562195, "au": "tomasol", "dom": 12, "sr": 42, "sc": -0.64, "ep": 1.87, "bs": 1.19, "d": 1, "age": 7.86, "grav": 61.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 383, "kpp": 12.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "postgres_vacuum", "flbl": "Postgres & Vacuum (Table)", "urls": [], "ig": 0.487, "fa": 0.0, "gp": 0.501, "bl": 0.45, "ds": 0.0, "txt": "Everybody learns. Coming from other databases it might not be obvious that you need to enable vacuum explicitly."}, {"id": 50559153, "au": "robinduckett", "dom": 61, "sr": 43, "sc": -0.98, "ep": 1.46, "bs": 1.19, "d": 2, "age": 11.98, "grav": 115.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 1347, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "data_writes", "flbl": "Data & Writes (Batch)", "urls": [], "ig": 0.62, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "I guess my squishy biological tokeniser and summariser missed it (i.e I read the TL;DR and skipped the post)"}, {"id": 50558861, "au": "matja", "dom": 34, "sr": 44, "sc": -1.25, "ep": 2.68, "bs": 3.05, "d": 0, "age": 12.61, "grav": 124.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 1184, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "distributed_protocol", "flbl": "Distributed & Protocol (Support)", "urls": [], "ig": 0.431, "fa": 0.0, "gp": 1.15, "bl": 1.15, "ds": 0.0, "txt": "What is the consistency model? What happens if a node is down unexpectedly?"}, {"id": 50565379, "au": "killingtime74", "dom": 27, "sr": 45, "sc": -1.5, "ep": 0.94, "bs": 1.19, "d": 2, "age": 4.38, "grav": 28.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 2703, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sqlite_store", "flbl": "Sqlite & Store (Json)", "urls": [], "ig": 0.398, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "The LLM just produces the SQL schema from your JSON one time. basically like an ORM."}, {"id": 50557940, "au": "feverzsj", "dom": 41, "sr": 46, "sc": -2.11, "ep": 1.96, "bs": 3.05, "d": 0, "age": 14.67, "grav": 158.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 1108, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "fsync_sqlite", "flbl": "Fsync & Sqlite (Transaction)", "urls": [], "ig": 0.377, "fa": 0.0, "gp": 0.743, "bl": 1.15, "ds": 0.0, "txt": "Sounds like you should use a database-per-user design."}, {"id": 50559777, "au": "gkamal", "dom": 28, "sr": 47, "sc": -2.35, "ep": 2.19, "bs": 4.24, "d": 0, "age": 10.89, "grav": 99.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 53, "kpp": 6.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.257, "fa": 0.0, "gp": 1.092, "bl": 1.6, "ds": 0.0, "txt": "This looks like a classic case of nih/reinventing wheel."}, {"id": 50560778, "au": "dolmen", "dom": 46, "sr": 48, "sc": -3.08, "ep": 1.22, "bs": 3.05, "d": 1, "age": 9.57, "grav": 82.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 1368, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "distributed_protocol", "flbl": "Distributed & Protocol (Support)", "urls": [], "ig": 0.518, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "What about reading the article?\n\nThe network interface is the Redis protocol."}, {"id": 50560537, "au": "stingraycharles", "dom": 10, "sr": 49, "sc": -3.31, "ep": 1.28, "bs": 3.05, "d": 3, "age": 9.87, "grav": 85.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 17290, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "fsync_sqlite", "flbl": "Fsync & Sqlite (Transaction)", "urls": [], "ig": 0.544, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "The usual answer here is a WAL + batching multiple transactions."}, {"id": 50560551, "au": "lmz", "dom": 44, "sr": 50, "sc": -3.46, "ep": 0.98, "bs": 3.05, "d": 2, "age": 9.85, "grav": 85.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 2389, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "sqlite_store", "flbl": "Sqlite & Store (Json)", "urls": [], "ig": 0.416, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "But now you have a file per user, which you then need to distribute somehow..."}, {"id": 50559423, "au": "ratherlongname", "dom": 67, "sr": 51, "sc": -3.48, "ep": 0.76, "bs": 4.24, "d": 0, "age": 11.47, "grav": 107.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 28, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.204, "fa": 0.0, "gp": 0.192, "bl": 1.6, "ds": 0.0, "txt": "So many comments about things already addressed in the article sigh"}, {"id": 50558809, "au": "testtestmetest", "dom": 26, "sr": 52, "sc": -3.72, "ep": 1.38, "bs": 3.71, "d": 1, "age": 12.74, "grav": 126.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": -3, "kpp": -0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "fsync_sqlite", "flbl": "Fsync & Sqlite (Transaction)", "urls": [], "ig": 0.588, "fa": 0.0, "gp": 0.0, "bl": 1.4, "ds": 0.0, "txt": "You want an LLM to be modifying your db schemas on the fly?? Seems slow and error prone."}, {"id": 50560990, "au": "redwood", "dom": 64, "sr": 53, "sc": -4.42, "ep": 0.92, "bs": 4.24, "d": 0, "age": 9.3, "grav": 78.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 3684, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "postgres_vacuum", "flbl": "Postgres & Vacuum (Table)", "urls": [], "ig": 0.303, "fa": 0.0, "gp": 0.141, "bl": 1.6, "ds": 0.0, "txt": "To confirm this is being stored on devices rather than on a server side environment?"}, {"id": 50561097, "au": "withinboredom", "dom": 47, "sr": 54, "sc": -4.45, "ep": 0.09, "bs": 4.24, "d": 2, "age": 9.16, "grav": 76.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 8714, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.037, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Then why use this at all? Why not something like SwytchDB?"}, {"id": 50560724, "au": "cuttothechase", "dom": 29, "sr": 55, "sc": -4.64, "ep": 1.14, "bs": 4.24, "d": 1, "age": 9.62, "grav": 82.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 350, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "sqlite_store", "flbl": "Sqlite & Store (Json)", "urls": [], "ig": 0.263, "fa": 0.0, "gp": 0.36, "bl": 1.6, "ds": 0.0, "txt": "explain?\n\nsqlite offers this and this is being redone or what is being reinvented here"}, {"id": 50566499, "au": "UltraSane", "dom": 6, "sr": 56, "sc": -4.64, "ep": 1.04, "bs": 4.24, "d": 5, "age": 3.01, "grav": 18.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 3355, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "sqlite_store", "flbl": "Sqlite & Store (Json)", "urls": [], "ig": 0.441, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "yes my favorite key is a blake3 hash of the object."}, {"id": 50562902, "au": "redwood", "dom": 66, "sr": 57, "sc": -4.64, "ep": 0.51, "bs": 4.24, "d": 2, "age": 7.04, "grav": 52.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 3684, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "distributed_protocol", "flbl": "Distributed & Protocol (Support)", "urls": [], "ig": 0.217, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Then why not use S3 or an S3 equivalent open source? Or even gridfs"}, {"id": 50567867, "au": "FridgeSeal", "dom": 18, "sr": 58, "sc": -4.64, "ep": 1.11, "bs": 5.17, "d": 3, "age": 1.13, "grav": 7.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 7095, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "postgres_vacuum", "flbl": "Postgres & Vacuum (Table)", "urls": [], "ig": 0.471, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "Learning things: A-ok.\n\nPublicly posting about _just_ learning stuff which should be well-and-truly table-stakes for a product you own: not the best look.\n\nIt’d be a bit like a chef posting about they’ve recently learnt that cross-contamination is bad."}, {"id": 50559034, "au": "otoolep", "dom": 49, "sr": 59, "sc": -4.64, "ep": 0.7, "bs": 5.04, "d": 1, "age": 12.2, "grav": 118.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 8, "qw": 0, "k": 5216, "kpp": 6.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "data_writes", "flbl": "Data & Writes (Batch)", "urls": ["https://rqlite.io"], "ig": 0.22, "fa": 0.0, "gp": 0.128, "bl": 1.9, "ds": 0.0, "txt": "rqlite[1] author here, happy to answer any questions.\n\n[1] https://rqlite.io"}, {"id": 50558418, "au": "zodwick", "dom": 55, "sr": 60, "sc": -8.12, "ep": 0.0, "bs": 6.89, "d": 0, "age": 13.59, "grav": 140.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 15, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "sqlite_store", "flbl": "Sqlite & Store (Json)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.694, "bl": 2.6, "ds": 0.0, "txt": "all roads lead to sqlite"}, {"id": 50558739, "au": "robinduckett", "dom": 59, "sr": 61, "sc": -8.17, "ep": 0.0, "bs": 6.89, "d": 0, "age": 12.87, "grav": 128.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 1347, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "sqlite_store", "flbl": "Sqlite & Store (Json)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.655, "bl": 2.6, "ds": 0.0, "txt": "What about using, ahem, files?"}, {"id": 50558923, "au": "Kalanos", "dom": 56, "sr": 62, "sc": -8.19, "ep": 0.0, "bs": 6.89, "d": 0, "age": 12.48, "grav": 122.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 409, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "sqlite_store", "flbl": "Sqlite & Store (Json)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.642, "bl": 2.6, "ds": 0.0, "txt": "Is the db still a single, portable file?"}, {"id": 50558952, "au": "martinjc", "dom": 48, "sr": 63, "sc": -8.2, "ep": 0.0, "bs": 6.89, "d": 0, "age": 12.41, "grav": 121.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 0, "k": 54, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "data_writes", "flbl": "Data & Writes (Batch)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.639, "bl": 2.6, "ds": 0.0, "txt": "Why not rqlite?"}, {"id": 50558860, "au": "_s_a_m_", "dom": 68, "sr": 64, "sc": -8.8, "ep": 0.0, "bs": 6.89, "d": 0, "age": 12.61, "grav": 124.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 65, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "distributed_protocol", "flbl": "Distributed & Protocol (Support)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.223, "bl": 2.6, "ds": 0.0, "txt": "so it's just sharding?"}, {"id": 50563226, "au": "senderista", "dom": 4, "sr": 65, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 3, "age": 6.69, "grav": 49.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 7, "k": 3257, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "data_writes", "flbl": "Data & Writes (Batch)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "> the actual data in a key-val object store\n\nSo, on a filesystem?"}, {"id": 50558040, "au": "mkesper", "dom": 43, "sr": 66, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 14.46, "grav": 154.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 3737, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "sqlite_store", "flbl": "Sqlite & Store (Json)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Right, then even sqlite should be enough?"}, {"id": 50560717, "au": "eatonphil", "dom": 52, "sr": 67, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 9.63, "grav": 82.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 3, "k": 24370, "kpp": 5.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "data_writes", "flbl": "Data & Writes (Batch)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "> Horizontally scalable, distributed.\n\nThis doesn't describe rqlite, at least."}, {"id": 50562340, "au": "gkamal", "dom": 65, "sr": 68, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 7.7, "grav": 59.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 53, "kpp": 6.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "postgres_vacuum", "flbl": "Postgres & Vacuum (Table)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "No, this is on the server."}, {"id": 50568465, "au": "adsharma", "dom": 39, "sr": 69, "sc": -13.34, "ep": 0.0, "bs": 11.13, "d": 0, "age": 0.05, "grav": 3.6, "surf": 43.5, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 0, "k": 562, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.019, "bl": 4.2, "ds": 0.0, "txt": "Why not rivet?"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "top_signal";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 40);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 40);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 40);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `${shown.length} of ${pool.length} comments` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const proofDrawer = document.getElementById("proofDrawer");
+  const expBtn = document.getElementById("exploreToggleBtn");
+  const eviBtn = document.getElementById("evidenceToggleBtn");
+
+  if (expBtn && labDrawer) {
+    expBtn.addEventListener("click", () => {
+      labDrawer.open = !labDrawer.open;
+    });
+    labDrawer.addEventListener("toggle", () => {
+      const isOpen = labDrawer.open;
+      expBtn.classList.toggle("active", isOpen);
+      expBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  if (eviBtn && proofDrawer) {
+    eviBtn.addEventListener("click", () => {
+      proofDrawer.open = !proofDrawer.open;
+    });
+    proofDrawer.addEventListener("toggle", () => {
+      const isOpen = proofDrawer.open;
+      eviBtn.classList.toggle("active", isOpen);
+      eviBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

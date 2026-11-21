@@ -1,0 +1,1356 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50509837 // Protomaps: Self-hosting map tiles has gotten cheap and easy — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+    }
+    .kpi-cell {
+      padding: 16px 16px 14px;
+      border-right: 1px solid rgb(205, 205, 200);
+    }
+    .kpi-cell:last-child { border-right: 0; }
+    .kpi-label {
+      font: 600 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 8px 0 4px;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      font-size: 12px;
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 6px;
+      corner-shape: bevel;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer > summary.hn-summary {
+      list-style: none;
+      cursor: pointer;
+      display: block;
+      padding: 2px 0;
+      margin: 0;
+      background: transparent;
+      border: 0;
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      user-select: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: rgb(255, 255, 253);
+      border: 1px solid rgb(13, 13, 13);
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+    }
+    table.ablation th {
+      background: rgb(236, 236, 231);
+      font: 700 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgb(60, 60, 58);
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 6px;
+      corner-shape: bevel;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-decoration: ;
+      text-transform: lowercase;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      border-top: 3px solid rgb(13, 13, 13);
+      padding-top: 14px;
+      margin-top: 36px;
+      font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpi-cell { border-bottom: 1px solid rgb(205, 205, 200); }
+      .filter-bar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in {
+        width: 100%;
+      }
+      .filter-bar input.search-in {
+        grid-column: span 2;
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; }
+      .topbar-right { font-size: 8pt; padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+      </div>
+      <div class="topbar-right">&nbsp;</div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://bruceroettgers.eu/blog/protomaps/">Protomaps: Self-hosting map tiles has gotten cheap and easy</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=bruceroettgers.eu"><span class="sitestr">bruceroettgers.eu</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">438 points</span> by <a href="https://news.ycombinator.com/user?id=bcye">bcye</a> <span class="age" title="2026-11-15T19:26:22.000Z"><a href="https://news.ycombinator.com/item?id=50509837">21 hours ago</a></span> | <a href="https://news.ycombinator.com/item?id=50509837">77&nbsp;comments</a> | 66.2% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">01 // EVIDENCE</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">77</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 56 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">33.8%</div>
+          <div class="kpi-sub">26 comments (10 Gold / 13.0%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">66.2%</div>
+          <div class="kpi-sub">26 chatter &bull; 25 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">7</div>
+        <div class="kpi-sub">17% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.954</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">16</div>
+          <div class="kpi-sub">HN POS 9..24 (20.8% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="margin-top:10px;font:600 11px/1.5 ui-monospace,Menlo,monospace;color:rgb(70,70,68)"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">02 // EXPLORE</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 77-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 77)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (10)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (16)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (26)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (25)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..77) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 25)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (boramalper, 17.2h); largest subtree (@neomantra) occupies 16 slots (HN POS 9..24).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="modeSelect" class="sel-in" aria-label="Ranking view">
+          <option value="hn_top40">HN Top 40</option>
+          <option value="top_signal">Epistemic Top 50</option>
+          <option value="buried_gems">Buried Gems (HN POS &gt; 25)</option>
+          <option value="bullshit_traps">High-Karma / URL Traps Caught</option>
+          <option value="mod_morgue">Mod Rebukes &amp; Downvoted Morgue</option>
+          <option value="c5a_rescues">c5A Heterodox Rescues</option>
+        </select>
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (77)</option>
+          <option value="bunny_file">Bunny &amp; File (Cloudflare) (18)</option>
+          <option value="maps_google">Maps &amp; Google (Mapbox) (18)</option>
+          <option value="satellite_source">Satellite &amp; Source (App) (15)</option>
+          <option value="range_requests">Range &amp; Requests (Latency) (13)</option>
+          <option value="data_map">Data &amp; Map (Library) (12)</option>
+          <option value="general_commentary">General Commentary (1)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, protomaps, map, cheap, tiles, easy...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50509837 + BRUCEROETTGERS.EU + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50509837, "story_title": "Protomaps: Self-hosting map tiles has gotten cheap and easy", "story_url": "https://bruceroettgers.eu/blog/protomaps/", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50509837, "story_title": "Protomaps: Self-hosting map tiles has gotten cheap and easy", "story_url": "https://bruceroettgers.eu/blog/protomaps/", "points": 438, "story_author": "bcye", "article_source": "fetched_url", "t1_ref_utc": "2026-11-16T16:41:59+00:00", "t2_ref_utc": "2026-11-16T16:41:59+00:00", "delta_minutes": 0.0, "story_anchors": ["protomaps", "map", "cheap", "tiles", "easy", "via", "requests", "file", "storage", "range", "cdn", "self-hosting", "tile", "data", "mapbox", "works", "pmtiles", "bucket", "limit", "usage", "maplibre", "maps", "format", "download", "per"], "facet_labels": {"satellite_source": "Satellite & Source (App)", "bunny_file": "Bunny & File (Cloudflare)", "data_map": "Data & Map (Library)", "range_requests": "Range & Requests (Latency)", "maps_google": "Maps & Google (Mapbox)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "satellite_source", "label": "Satellite & Source (App)", "count": 15, "top_terms": ["satellite", "source", "app", "open"]}, {"slug": "bunny_file", "label": "Bunny & File (Cloudflare)", "count": 18, "top_terms": ["bunny", "file", "cloudflare", "request"]}, {"slug": "data_map", "label": "Data & Map (Library)", "count": 12, "top_terms": ["data", "map", "library", "load"]}, {"slug": "range_requests", "label": "Range & Requests (Latency)", "count": 13, "top_terms": ["range", "requests", "latency", "cloudflare"]}, {"slug": "maps_google", "label": "Maps & Google (Mapbox)", "count": 18, "top_terms": ["maps", "google", "mapbox", "hosted"]}], "counts": {"total_comments": 77, "live_t2_comments": 77, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 56, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "527a7d0ba6f08b55c882b0042a1ebf98a05122409ec566792d6ca37a2c964b6f"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 10, "grounded_analysis": 16, "crowd_chatter": 26, "bullshit_or_flamewar": 25}, "facets": {"range_requests": 13, "satellite_source": 15, "bunny_file": 18, "data_map": 12, "maps_google": 18, "general_commentary": 1}, "facet_options": [{"slug": "bunny_file", "label": "Bunny & File (Cloudflare)", "count": 18}, {"slug": "maps_google", "label": "Maps & Google (Mapbox)", "count": 18}, {"slug": "satellite_source", "label": "Satellite & Source (App)", "count": 15}, {"slug": "range_requests", "label": "Range & Requests (Latency)", "count": 13}, {"slug": "data_map", "label": "Data & Map (Library)", "count": 12}, {"slug": "general_commentary", "label": "General Commentary", "count": 1}], "facet_diagnostics": [{"slug": "bunny_file", "label": "Bunny & File (Cloudflare)", "count": 18, "useful": 7, "useful_pct": 38.9, "terms": "bunny, file, cloudflare, request"}, {"slug": "maps_google", "label": "Maps & Google (Mapbox)", "count": 18, "useful": 3, "useful_pct": 16.7, "terms": "maps, google, mapbox, hosted"}, {"slug": "satellite_source", "label": "Satellite & Source (App)", "count": 15, "useful": 5, "useful_pct": 33.3, "terms": "satellite, source, app, open"}, {"slug": "range_requests", "label": "Range & Requests (Latency)", "count": 13, "useful": 7, "useful_pct": 53.8, "terms": "range, requests, latency, cloudflare"}, {"slug": "data_map", "label": "Data & Map (Library)", "count": 12, "useful": 4, "useful_pct": 33.3, "terms": "data, map, library, load"}, {"slug": "general_commentary", "label": "General Commentary", "count": 1, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 16}, {"category": "code_repository", "count": 3}, {"category": "github_artifact", "count": 3}, {"category": "investigative_or_tech_press", "count": 1}], "story_anchors": ["protomaps", "map", "cheap", "tiles", "easy", "via", "requests", "file", "storage", "range", "cdn", "self-hosting", "tile", "data", "mapbox", "works", "pmtiles", "bucket"], "largest_root": {"root_id": 50511304, "author": "neomantra", "slots": 16, "start_dom": 9, "end_dom": 24, "share_pct": 20.8, "top_dom1_age": 17.2, "top_dom1_author": "boramalper"}, "buried_cutoff": 25, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50514118, "au": "starkparker", "dom": 44, "sr": 1, "sc": 11.03, "ep": 11.03, "bs": 0.0, "d": 0, "age": 12.01, "grav": 115.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 42, "qw": 0, "k": 4820, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "range_requests", "flbl": "Range & Requests (Latency)", "urls": ["https://github.com/pf-wikis/mapping", "https://github.com/pf-wikis/mapping-data"], "ig": 1.231, "fa": 2.08, "gp": 1.524, "bl": 0.0, "ds": 0.0, "txt": "map.pathfinderwiki.com runs a fictional setting's world map on PMTiles, with both the mapping data and the website stack open-source:\n\nhttps://github.com/pf-wikis/mapping (using maplibre-gl-js and some custom Java code to manage layers, tile generation, and PoI collation from the associated MediaWiki)\n\nhttps://github.com/pf-wikis/mapping-data (using kart)"}, {"id": 50517039, "au": "jo-m", "dom": 40, "sr": 2, "sc": 10.81, "ep": 10.81, "bs": 0.0, "d": 0, "age": 3.92, "grav": 24.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 49, "qw": 0, "k": 999, "kpp": 12.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "satellite_source", "flbl": "Satellite & Source (App)", "urls": ["https://github.com/jo-m/cartomancer/tree/a02f042173b5ba1a7d9730344b300f1202d02099/internal/pkg/maps", "https://github.com/jo-m/cartomancer/blob/a02f042173b5ba1a7d9730344b300f1202d02099/internal/pkg/api/api.go\u0023L117"], "ig": 1.169, "fa": 2.35, "gp": 0.943, "bl": 0.0, "ds": 0.0, "txt": "I love protomaps, I have added it to my own hobby project to have a self-hosted fallback for regions (or times) where there are no SwissTopo maps available.\n\nThe app will periodically download the configured map regions and store the pmap files [1]. The Go backend then directly serves them to the frontend [2].\n\n[1]: https://github.com/jo-m/cartomancer/tree/a02f042173b5ba1a7d9...\n[2]: https://github.com/jo-m/cartomancer/blob/a02f042173b5ba1a7d9..."}, {"id": 50512892, "au": "blueblazin", "dom": 54, "sr": 3, "sc": 10.73, "ep": 10.73, "bs": 0.0, "d": 0, "age": 15.33, "grav": 169.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 26, "qw": 0, "k": 81, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "bunny_file", "flbl": "Bunny & File (Cloudflare)", "urls": ["https://github.com/BlueBlazin/lowpolyearth"], "ig": 0.768, "fa": 2.42, "gp": 1.397, "bl": 0.0, "ds": 0.0, "txt": "I self-host protomaps on CloudFlare for my side project: https://github.com/BlueBlazin/lowpolyearth\n\nIt costs me something like $2/month iirc, and it made tile querying faster over protomaps' free hosted endpoint."}, {"id": 50511637, "au": "jamessb", "dom": 10, "sr": 4, "sc": 10.51, "ep": 10.51, "bs": 0.0, "d": 1, "age": 18.02, "grav": 220.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 8, "qw": 24, "k": 1840, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "bunny_file", "flbl": "Bunny & File (Cloudflare)", "urls": ["https://pmtiles.io/", "https://github.com/protomaps/PMTiles/tree/main/app", "https://protomaps.com/blog/new-pmtiles-io/"], "ig": 1.435, "fa": 2.35, "gp": 0.306, "bl": 0.0, "ds": 0.0, "txt": "> If you are into this stuff, you can view PMTiles from the CLI with \"gloss\", or try to drag-and-drop on its web interface\n\nThe official PMTiles viewer [1, 2, 3] is also pretty good.\n\n[1]: https://pmtiles.io/\n\n[2]: https://github.com/protomaps/PMTiles/tree/main/app\n\n[3]: https://protomaps.com/blog/new-pmtiles-io/"}, {"id": 50518771, "au": "bcye", "dom": 23, "sr": 5, "sc": 9.29, "ep": 10.55, "bs": 1.11, "d": 5, "age": 1.03, "grav": 7.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 78, "qw": 0, "k": 896, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "epistemic_gold", "facet": "range_requests", "flbl": "Range & Requests (Latency)", "urls": ["https://bruceroettgers.eu/blog/benchmarking-r2-head-requests-from-workers/"], "ig": 1.313, "fa": 2.13, "gp": 0.96, "bl": 0.42, "ds": 0.0, "txt": "When you have a CDN in front of object storage it's not so easy to compare as the origin requests go out in chunks. For caching in front of R2, you need the worker, as Cloudflare only permits file sizes of up to 512MB regardless of the range requested. And then there's the latency difference of working directly with R2 (Protomaps calls out latency up to 500ms and on a previous blog post I measured 300-600ms on HEAD requests against R2[0])\n\n[0]: https://bruceroettgers.eu/blog/benchmarking-r2-head-requests..."}, {"id": 50513336, "au": "cldellow", "dom": 52, "sr": 6, "sc": 8.84, "ep": 8.84, "bs": 0.0, "d": 2, "age": 14.09, "grav": 148.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 15, "qw": 0, "k": 2763, "kpp": 5.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "data_map", "flbl": "Data & Map (Library)", "urls": ["https://github.com/systemed/tilemaker/discussions/977", "https://github.com/dktue/tilemaker/tree/perf/planet-3min"], "ig": 0.273, "fa": 2.35, "gp": 1.037, "bl": 0.0, "ds": 0.0, "txt": "https://github.com/systemed/tilemaker/discussions/977 has running discussion of it.\n\ndktue's branch has all the perf PRs applied to it: https://github.com/dktue/tilemaker/tree/perf/planet-3min"}, {"id": 50510948, "au": "perrygeo", "dom": 64, "sr": 7, "sc": 8.16, "ep": 8.16, "bs": 0.0, "d": 1, "age": 19.27, "grav": 245.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 112, "qw": 0, "k": 3190, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "range_requests", "flbl": "Range & Requests (Latency)", "urls": ["https://docs.protomaps.com/pmtiles/maplibre"], "ig": 1.567, "fa": 0.9, "gp": 1.319, "bl": 0.0, "ds": 0.0, "txt": "You can use the pmtiles:// protocol in Maplibre GL, requires protomaps.js and a few lines of setup [1]\n\nMy experience with it is ... ok. It works. But going directly to cloud storage (s3 in my case) is unpredictable latency and neither the browser nor most servers really cache HTTP range requests granularly, so every tile is another high-latency round trip. Not worth it - I ended up putting Martin tile server in front of it.\n\nI assume someone could write a protomaps adapter in WASM with some smart caching? Until then, Standard GET requests are just easier to cache and perform much better in practice. The downside being you have to run a server or statically generate files.\n\n[1]- https://docs.protomaps.com/pmtiles/maplibre"}, {"id": 50514080, "au": "sarkarghya", "dom": 37, "sr": 8, "sc": 7.82, "ep": 7.82, "bs": 0.0, "d": 0, "age": 12.12, "grav": 117.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 66, "qw": 21, "k": 20, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "maps_google", "flbl": "Maps & Google (Mapbox)", "urls": ["https://versatiles.org/"], "ig": 1.499, "fa": 1.04, "gp": 0.918, "bl": 0.0, "ds": 0.0, "txt": "if you are looking into self hosting, i highly recommend checking out \nhttps://versatiles.org/\nthe maintainer seems pretty passionate\n\n> VersaTiles is a completely FLOSS stack for generating, distributing, and using map tiles based on OpenStreetMap data, free of any commercial interests.\nVersaTiles is a free and open alternative to commercial map services like Google Maps or Mapbox. It is designed for newsrooms, NGOs, developers, and public institutions who need reliable maps without vendor lock-in. VersaTiles is fully self-hostable, requires no API keys, charges no usage fees, and does not track your users."}, {"id": 50511304, "au": "neomantra", "dom": 9, "sr": 9, "sc": 7.49, "ep": 7.78, "bs": 0.0, "d": 0, "age": 18.68, "grav": 233.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 110, "qw": 0, "k": 887, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "data_map", "flbl": "Data & Map (Library)", "urls": ["https://nimbleterminal.com/gloss/app.html", "https://nimbleterminal.com/ntmaps", "https://nimbleterminal.com/ntplaygrounds"], "ig": 1.545, "fa": 0.62, "gp": 1.643, "bl": 0.0, "ds": 0.0, "txt": "We're doing something like this behind Cloudflare R2, same concept of owning the map infra (for privacy and access-control) and reducing load on public infrastructure.\n\nIf you are into this stuff, you can view PMTiles from the CLI with \"gloss\", or try to drag-and-drop on its web interface [1].   It seems large tiles (>128M) and some raster formats are failing; plus it would be nice to load from URL there.  Will fix that...\n\n(AI warning).  ntmaps [2] is a Golang library that lets you use different tile providers, deployable in terminal or browser.  ntplaygrounds [3] uses that and nt3d and ntactor to make a city simulation.  Data is pulled from OpenStreetMap in those.\n\n[1] https://nimbleterminal.com/gloss/app.html\n[2] https://nimbleterminal.com/ntmaps\n[3] https://nimbleterminal.com/ntplaygrounds"}, {"id": 50515646, "au": "jillesvangurp", "dom": 32, "sr": 10, "sc": 7.32, "ep": 7.32, "bs": 0.0, "d": 2, "age": 7.28, "grav": 55.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 395, "qw": 0, "k": 21952, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "satellite_source", "flbl": "Satellite & Source (App)", "urls": [], "ig": 1.839, "fa": 0.68, "gp": 0.729, "bl": 0.0, "ds": 0.0, "txt": "I was playing with their elevation data last week. Maptiler provides elevation data as well but it gets expensive quickly with them. We managed to blow through our 50$ limit in two days with them just testing this out. So, we tried out Mapterhorn.\n\nI really like their data set. For self hosting, vector map tiles are  small enough that storing it in a bucket won't break the bank. I think you need somewhere around 100-150GB or so for protomaps. A few dollars per month goes a long way. However Mapterhorn's elevation data set is something like 11 TB or so. That's going to cost some money to store somewhere. Satellite imagery is similarly expensive to host. And you typically want both.\n\nThere is of course an asymmetric relation with what you store and what you serve. Ideally, you store data for the whole planet. But you probably are only going to serve a tiny portion of it. This favors hosted setups where you pay for what you use via a CDN and share the storage with others. A shared service also relieves you from the burden of having to keep that data up to date. The main issue with that is commercial map services tend to overcharge for more intensive usage to the point where self hosting actually becomes attractive despite this.\n\nThe main issue is that the number of requests really goes through the roof if you start getting tiles beyond certain zoom levels, which pushes you into th"}, {"id": 50518641, "au": "Nnnes", "dom": 22, "sr": 11, "sc": 7.01, "ep": 7.45, "bs": 0.0, "d": 4, "age": 1.19, "grav": 8.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 175, "qw": 0, "k": 54, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "epistemic_gold", "facet": "bunny_file", "flbl": "Bunny & File (Cloudflare)", "urls": [], "ig": 1.619, "fa": 0.95, "gp": 0.645, "bl": 0.0, "ds": 0.0, "txt": "Huh yeah you're right, I was off by about 100 orders of magnitude. pmtiles.io shows tile sizes with \"Show tile bounds\" checked and they're mostly in the 30-100 kB range.\n\nBunny's volume tier costs $5/TB served, i.e. $1 gets you 2~6.7 million tiles served, probably closer to 3.\n\nBut Cloudflare also allows public R2 buckets so we could potentially ignore the Workers cost, i.e. $1 gets you 2.8 million tiles served. I think caching just works in front of R2? So you get significant gains if your visitors are mostly looking at the same areas and not zooming in all the way to their house every time.\n\nSo they come out pretty evenly or with Cloudflare a bit on top depending on the scenario. Bunny does has the advantage of easy data replication across regions (I don't know of a good way to achieve this with R2, although D1 has some kind of replication feature in beta).\n\nBoth are still far, far cheaper than almost any vector tile subscription I've come across. And, of course, more expensive than self-hosting (at least at the hobbyist level)."}, {"id": 50511852, "au": "motoroco", "dom": 28, "sr": 12, "sc": 6.26, "ep": 6.41, "bs": 0.0, "d": 0, "age": 17.6, "grav": 211.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 234, "qw": 0, "k": 629, "kpp": 18.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "satellite_source", "flbl": "Satellite & Source (App)", "urls": [], "ig": 1.791, "fa": 0.0, "gp": 1.517, "bl": 0.0, "ds": 0.0, "txt": "yeah, basemaps are small enough to store and host cost effectively, but high res satellite imagery gets big and expensive fast as you go up in zoom level. I built my own satellite mosaic of North America for my app so I can offer users offline access to the tiles and had to stop at z17 because of projected storage requirements. high res global coverage can get you into the hundreds of TB range which is no longer in the \"stick it on r2 and serve it with a worker\" or \"download and upload the entire dataset sequentially over your residential internet\" territory\n\nthe fun/hard parts of the project weren't really scale dependent, although downloading source imagery and building the tile pyramids did take literally weeks to run. actually, the hardest part was getting demosaicing right, e.g. making the quilt seamless. filtering out cloudy and smokey/hazy tiles while picking alternatives from the same time of year so groundcover & crops are in a consistent growth stage so you don't end up with checkerboard patterns or cloud silhouettes randomly across your map. and there were other problems that came up more or less just because of how & when the satellite took the images that require exposure correction and more filtering\n\nI also have a pelias index with 170M records for search and self-host valhalla for routing. the open source mapping ecosystem has really impressed me the more I lear"}, {"id": 50516595, "au": "dromtrund", "dom": 43, "sr": 13, "sc": 6.23, "ep": 6.23, "bs": 0.0, "d": 0, "age": 4.78, "grav": 31.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 77, "qw": 0, "k": 67, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "bunny_file", "flbl": "Bunny & File (Cloudflare)", "urls": [], "ig": 1.519, "fa": 0.62, "gp": 0.614, "bl": 0.0, "ds": 0.0, "txt": "The svg tiles are decent for reverse geocoding too. I've had great success splitting gps routes into segments by pulling location data out of relevant tiles. A lot of the reverse geocoding APIs have pretty restrictive per-second limits and response times in the order of 1-2 seconds. Hosting this in an s3 bucket costs an order of magnitude less than any of the APIs I tried at my scale, with millisecond latency, no request limits and near-flat volume scaling."}, {"id": 50517970, "au": "bcye", "dom": 21, "sr": 14, "sc": 5.98, "ep": 6.91, "bs": 0.27, "d": 3, "age": 2.2, "grav": 13.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 74, "qw": 0, "k": 896, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "bunny_file", "flbl": "Bunny & File (Cloudflare)", "urls": [], "ig": 1.396, "fa": 0.95, "gp": 0.635, "bl": 0.1, "ds": 0.0, "txt": "I think PM tiles are quite a bit larger. Just loading at a low zoom level a view of the world triggers requests of ca. 500kB on my site, though that might also overscan a bit or include the file header. From my calculations, for Bunny to be cheaper the avg request should be at most 660kB at $0.01/GB which should probably hold true (I think just the worker invocations alone are already equivalent to 300kB of traffic on Bunny)"}, {"id": 50517591, "au": "boramalper", "dom": 6, "sr": 15, "sc": 5.95, "ep": 5.95, "bs": 0.0, "d": 2, "age": 2.86, "grav": 17.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 64, "qw": 0, "k": 4589, "kpp": 8.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "range_requests", "flbl": "Range & Requests (Latency)", "urls": [], "ig": 1.4, "fa": 0.56, "gp": 0.731, "bl": 0.0, "ds": 0.0, "txt": "I think OpenFreeMap and Protomaps shift the complexity from serving tiles to building tiles: the former approach requires a Postgres + PostGIS + Martin + a reverse proxy whereas the latter approach requires nothing but a web server (arguably OpenFreeMap requires a bit more than that, since it uses BTRFS images).\n\nIf you are optimising for cost and read-traffic, such as OpenFreeMap, shifting that complexity to a preparation step makes a lot of sense."}, {"id": 50517846, "au": "Nnnes", "dom": 20, "sr": 16, "sc": 5.68, "ep": 6.56, "bs": 0.0, "d": 2, "age": 2.38, "grav": 14.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 85, "qw": 0, "k": 54, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "bunny_file", "flbl": "Bunny & File (Cloudflare)", "urls": [], "ig": 1.425, "fa": 0.95, "gp": 0.348, "bl": 0.0, "ds": 0.0, "txt": "Once you get outside Cloudflare's free tier, the Bunny setup in the original post beats it pretty quickly. Cloudflare costs $0.30 (Workers invocations) + $0.36 (R2 class B operations) per million requests. Bunny charges for bandwidth but not per request (!!), so assuming an average of 1kB/request (map vector tiles should be a bit less than this in my experience) that's $0.005-$0.06 per million depending on which region and tier you're serving from.\n\nThe real \"too good to be true\" might be GitHub Actions building a 100GB+ PMTiles file for free"}, {"id": 50511863, "au": "maelito", "dom": 25, "sr": 17, "sc": 5.4, "ep": 5.4, "bs": 0.0, "d": 0, "age": 17.58, "grav": 211.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 70, "qw": 0, "k": 3787, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "satellite_source", "flbl": "Satellite & Source (App)", "urls": [], "ig": 1.491, "fa": 0.0, "gp": 1.305, "bl": 0.0, "ds": 0.0, "txt": "For Cartes.app we used to pay Maptiler. While great, recommanded to start, without client revenue it was impossible to scale, we've hit 150 €/month bills way too fast.\n\nHence Protomaps. Hosting costs almost nothing.\n\nThe main problem though is that once you host your tiles, why not put what you want inside ?\n\nTune Tilemaker's processing.lua to your envy. Spend hours designing maps and building a Typescrpt dynamic Maplibre style."}, {"id": 50511892, "au": "cldellow", "dom": 19, "sr": 18, "sc": 5.18, "ep": 5.84, "bs": 0.0, "d": 3, "age": 17.5, "grav": 209.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 113, "qw": 0, "k": 2763, "kpp": 5.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "satellite_source", "flbl": "Satellite & Source (App)", "urls": [], "ig": 1.686, "fa": 0.28, "gp": 0.742, "bl": 0.0, "ds": 0.0, "txt": "Two small uses:\n\n1. The app is a remix app, workers do server-side rendering, so that a vanilla `curl` shows the actual payload, not just a script tag that loads the app.\n\n2. I'm a great big nerd, so I recently added the ability to post reviews/photos/GPX traces to your AT protocol PDS. The app has a Worker cron job that subscribes to Bluesky's Jetstream for events in its namespace, and indexes these into D1 in order to answer certain API calls like \"get traces in this area\" or \"get reviews for this hike\". So the app itself isn't the primary source of truth, a person's PDS (which they control) is. The app just maintains a cache/index that can be rebuilt."}, {"id": 50513203, "au": "thatslast", "dom": 39, "sr": 19, "sc": 5.1, "ep": 5.1, "bs": 0.0, "d": 0, "age": 14.48, "grav": 155.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 56, "qw": 0, "k": 407, "kpp": 13.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "maps_google", "flbl": "Maps & Google (Mapbox)", "urls": [], "ig": 1.38, "fa": 0.0, "gp": 1.283, "bl": 0.0, "ds": 0.0, "txt": "I'm making a Wikipedia walking game where each card comes in a sealed pack printed with the real streets around where you found it, rendered live.\n\nWith Mapbox or Google Maps I wouldn't even have considered building this game. Protomaps made it a no-brainer\n\nThanks to Brandon and the OSM contributors. This is what made the idea affordable for a side project."}, {"id": 50512117, "au": "nchmy", "dom": 41, "sr": 20, "sc": 5.01, "ep": 5.01, "bs": 0.0, "d": 0, "age": 17.0, "grav": 200.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 62, "qw": 0, "k": 2101, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "data_map", "flbl": "Data & Map (Library)", "urls": [], "ig": 1.422, "fa": 0.0, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "I was very grateful to find protomaps recently for a project where I want to allow people to download custom regional subsections of the global map for offline usage.\n\nAfter evaluating maplibre vs the somewhat-abandonned protomaps-leaflet library, I decided to go with the latter as I don't really need the fancy 3d gpu and custom layers functionality of maplibre. Plus leaflet is releasing a long-awaited v2 right now."}, {"id": 50516210, "au": "globular-toast", "dom": 62, "sr": 21, "sc": 4.96, "ep": 4.96, "bs": 0.0, "d": 0, "age": 5.75, "grav": 39.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 74, "qw": 0, "k": 6292, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "data_map", "flbl": "Data & Map (Library)", "urls": ["https://blog.gpkb.org/posts/hugo-static-site-maps/"], "ig": 1.154, "fa": 0.62, "gp": 0.33, "bl": 0.0, "ds": 0.0, "txt": "I use this on my blog with MapLibreGL. I wrote up how I do it: https://blog.gpkb.org/posts/hugo-static-site-maps/\n\nOne thing I really like is that the data is static. This isn't useful for some applications, but for my use, namely blogging about my travels, it's perfect. I wouldn't come back and edit the text or pictures to reflect subsequent events, so why would I edit the map? Being able to take ad hoc snapshots of the map at a point in time is perfect."}, {"id": 50511042, "au": "bcye", "dom": 66, "sr": 22, "sc": 4.68, "ep": 5.31, "bs": 0.27, "d": 2, "age": 19.12, "grav": 242.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 45, "qw": 0, "k": 896, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "range_requests", "flbl": "Range & Requests (Latency)", "urls": [], "ig": 1.079, "fa": 0.62, "gp": 0.693, "bl": 0.1, "ds": 0.0, "txt": "For what it's worth I think latency/reliability varies a lot with provider. Bunny Storage has quite good latency in my experience (100-300ms) and their CDN supports Range caching (from my understanding Cloudflare does too they just limit the size of the file regardless of the Range)"}, {"id": 50514377, "au": "bitbuilder", "dom": 4, "sr": 23, "sc": 4.61, "ep": 5.42, "bs": 0.0, "d": 1, "age": 11.18, "grav": 103.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 61, "qw": 0, "k": 335, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "bunny_file", "flbl": "Bunny & File (Cloudflare)", "urls": ["https://streeter.city/"], "ig": 1.21, "fa": 0.62, "gp": 0.559, "bl": 0.0, "ds": 0.0, "txt": "Seconding the praise for OpenFreeMap. I've been using it for Streeter [0] for the last month or so and it's worked out great.\n\nSelf-hosting ended up being relatively cheap and easy too. They publish the whole planet as a single PMTiles file every week, and I just copy that to R2 and serve it through a small Worker, basically the Cloudflare route the article mentions.\n\n[0] https://streeter.city/"}, {"id": 50511971, "au": "joshstrange", "dom": 42, "sr": 24, "sc": 4.25, "ep": 4.25, "bs": 0.0, "d": 0, "age": 17.31, "grav": 206.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 23804, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "maps_google", "flbl": "Maps & Google (Mapbox)", "urls": [], "ig": 1.126, "fa": 0.0, "gp": 1.103, "bl": 0.0, "ds": 0.0, "txt": "I use Protomaps and absolutely love it. After getting hit with a Google Maps bill that was larger than I ever would have expected, I swapped it out for Protomaps instead and I’ve loved it ever since.\n\nDirt cheap to run, theme-able, easy to use."}, {"id": 50517230, "au": "wcedmisten", "dom": 36, "sr": 25, "sc": 4.18, "ep": 4.62, "bs": 0.0, "d": 1, "age": 3.54, "grav": 21.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 37, "qw": 0, "k": 884, "kpp": 6.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "range_requests", "flbl": "Range & Requests (Latency)", "urls": ["https://docs.protomaps.com/deploy/cloudflare"], "ig": 1.011, "fa": 0.62, "gp": 0.328, "bl": 0.0, "ds": 0.0, "txt": "A common approach that's recommended is to use cloudflare workers as a translation layer from the classic /z/x/y request format to the HTTP range headers. That's what I do on my sites, rather than using the pmtiles protocol directly in MapLibre\n\nhttps://docs.protomaps.com/deploy/cloudflare"}, {"id": 50511835, "au": "maelito", "dom": 49, "sr": 26, "sc": 3.64, "ep": 4.01, "bs": 0.0, "d": 0, "age": 17.64, "grav": 212.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 3787, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "data_map", "flbl": "Data & Map (Library)", "urls": [], "ig": 0.604, "fa": 0.34, "gp": 1.12, "bl": 0.0, "ds": 0.0, "txt": "Checkout the new PRs submitted to Tilemaker. It appears building the planet could soon take less than 5 minutes."}, {"id": 50512110, "au": "perks_12", "dom": 53, "sr": 27, "sc": 3.59, "ep": 3.59, "bs": 0.0, "d": 0, "age": 17.01, "grav": 200.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 237, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "maps_google", "flbl": "Maps & Google (Mapbox)", "urls": [], "ig": 0.827, "fa": 0.0, "gp": 1.132, "bl": 0.0, "ds": 0.0, "txt": "Deploying this as I am typing this. The problem I have with Mapbox is that there is no way to limit spending. When the public key gets abused, it's a potentially enormous bill."}, {"id": 50513033, "au": "cjlm", "dom": 47, "sr": 28, "sc": 3.36, "ep": 3.8, "bs": 0.0, "d": 0, "age": 14.94, "grav": 162.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 1828, "kpp": 7.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "data_map", "flbl": "Data & Map (Library)", "urls": [], "ig": 1.023, "fa": 0.0, "gp": 0.963, "bl": 0.0, "ds": 0.0, "txt": "I’m using (and donating to) OpenFreeMap and using Cloudflare to host custom tiles for my travel time map for Canada, à portée [0] - it’s been so effortless and the tiles are quick to load. No clunky tile server required!\n\n[0] aportee.ca"}, {"id": 50516341, "au": "twelvechairs", "dom": 5, "sr": 29, "sc": 3.18, "ep": 4.13, "bs": 0.0, "d": 1, "age": 5.35, "grav": 36.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 76, "qw": 0, "k": 4569, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "range_requests", "flbl": "Range & Requests (Latency)", "urls": [], "ig": 1.485, "fa": 0.0, "gp": 0.443, "bl": 0.0, "ds": 0.0, "txt": "The mature best practice in the geospatial industry is a postgis server with R-tree based indexing of every item in space. Its pretty trivial to serve this as dynamic vector tiles (e.g. 'martin') including at different scales/zooms.\n\nFew people store data on a server as tiles though it might be served as tiles. Aside from the added storage size, you dont want to have to update 20 levels tiles every time one piece of data is added or removed."}, {"id": 50512011, "au": "motoroco", "dom": 33, "sr": 30, "sc": 2.81, "ep": 3.77, "bs": 0.0, "d": 2, "age": 17.21, "grav": 204.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 54, "qw": 0, "k": 629, "kpp": 18.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "data_map", "flbl": "Data & Map (Library)", "urls": [], "ig": 1.372, "fa": 0.0, "gp": 0.373, "bl": 0.0, "ds": 0.0, "txt": "yeah, I heard about them for the first time a few weeks ago. they have a fantastic data set just judging with my bare eyes. I built my topo map from terrain tiles on aws + gebco et al for the bathymetry data which is just personal preference (I love me an old globe with the tactile mountains and seafloor)"}, {"id": 50511502, "au": "cldellow", "dom": 11, "sr": 31, "sc": 2.68, "ep": 4.0, "bs": 0.0, "d": 1, "age": 18.27, "grav": 225.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 47, "qw": 0, "k": 2763, "kpp": 5.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bunny_file", "flbl": "Bunny & File (Cloudflare)", "urls": [], "ig": 0.718, "fa": 0.68, "gp": 0.257, "bl": 0.0, "ds": 0.0, "txt": "R2 is amazing for this.\n\nCloudflare, generally, is amazing for this, actually. It serves my personal hiking map for about $2/mo, using R2, D1 and Workers.\n\nBuilding the map itself is free via GitHub Actions.\n\nIt's bonkers how the map world has changed over the last 20 years."}, {"id": 50512777, "au": "notatoad", "dom": 67, "sr": 32, "sc": 2.46, "ep": 2.98, "bs": 0.0, "d": 2, "age": 15.62, "grav": 174.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 26056, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "maps_google", "flbl": "Maps & Google (Mapbox)", "urls": [], "ig": 0.854, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "we use pmtiles on s3 behind cloudfront, and it seems to work pretty well.  maybe not a 100% solution compared to what you'd get from google maps, but good enough that i've got no reason to be looking for another solution."}, {"id": 50512146, "au": "eruci", "dom": 58, "sr": 33, "sc": 2.07, "ep": 2.51, "bs": 0.0, "d": 0, "age": 16.93, "grav": 199.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 18, "qw": 0, "k": 530, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "satellite_source", "flbl": "Satellite & Source (App)", "urls": ["https://geocode.xyz/415%20C'WEALTH%20AVE%20WEST%20Singapore"], "ig": 0.768, "fa": 0.0, "gp": 0.488, "bl": 0.0, "ds": 0.0, "txt": "I deployed self-hosted protomaps on geocode.xyz and it works like a charm. I wish it had more customization options though ( https://geocode.xyz/415%20C'WEALTH%20AVE%20WEST%20Singapore )"}, {"id": 50511176, "au": "doodlebugging", "dom": 73, "sr": 34, "sc": 1.77, "ep": 2.87, "bs": 0.0, "d": 0, "age": 18.9, "grav": 237.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 2995, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bunny_file", "flbl": "Bunny & File (Cloudflare)", "urls": [], "ig": 1.0, "fa": 0.0, "gp": 0.357, "bl": 0.0, "ds": 0.0, "txt": "I visited the link and Malwarebytes warned of a potentially malicious site:\n\np - proxy - tp8ez dot bunny dot run\n\nso I closed that window.\n\nWhat else you got?"}, {"id": 50513482, "au": "cube00", "dom": 2, "sr": 35, "sc": 1.69, "ep": 4.78, "bs": 1.99, "d": 1, "age": 13.75, "grav": 142.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 34, "qw": 0, "k": 7469, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "satellite_source", "flbl": "Satellite & Source (App)", "urls": ["https://openmaptiles.org/docs/host/maptiler-cloud/"], "ig": 0.742, "fa": 0.62, "gp": 0.874, "bl": 0.75, "ds": 0.0, "txt": "Just be aware unlike Protomaps, OpenFreeMap uses OpenMapTiles which has stricter attribution requirements.\n\nYou'll also see upselling from MapTiler on the pages you're required to attribute along with upselling in the docs https://openmaptiles.org/docs/host/maptiler-cloud/"}, {"id": 50512989, "au": "h4kunamata", "dom": 77, "sr": 36, "sc": 1.67, "ep": 2.11, "bs": 0.0, "d": 0, "age": 15.07, "grav": 165.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 447, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "maps_google", "flbl": "Maps & Google (Mapbox)", "urls": [], "ig": 0.897, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "CoMaps said hi and uses OpenStreet maps.\n\nIt works amazingly on GrapheneOS, Android Auto, and Desktop app via Flatpak."}, {"id": 50511312, "au": "doodlebugging", "dom": 75, "sr": 37, "sc": 1.49, "ep": 2.52, "bs": 0.0, "d": 2, "age": 18.66, "grav": 233.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 61, "qw": 0, "k": 2995, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "data_map", "flbl": "Data & Map (Library)", "urls": [], "ig": 1.071, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Yeah, me neither. I opened the link along with several other article links from the front page so it sat idle in a separate private tab waiting for me to get to it and just as I clicked on it MWB popped the warning. I'm using LibreOffice with container tabs and MWB Pro under Win10 Pro. Probably nothing.\n\nThanks for the explanation.\n\nProtomaps sounds interesting."}, {"id": 50513080, "au": "X-Cubed", "dom": 45, "sr": 38, "sc": 1.47, "ep": 2.35, "bs": 0.0, "d": 0, "age": 14.81, "grav": 160.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 8, "qw": 0, "k": 404, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "range_requests", "flbl": "Range & Requests (Latency)", "urls": ["https://blog.cloudflare.com/origin-range-requests/"], "ig": 0.368, "fa": 0.0, "gp": 1.023, "bl": 0.0, "ds": 0.0, "txt": "Cloudflare recently improved their support for Range requests: https://blog.cloudflare.com/origin-range-requests/"}, {"id": 50515066, "au": "rw2", "dom": 59, "sr": 39, "sc": 1.39, "ep": 2.05, "bs": 0.0, "d": 0, "age": 9.04, "grav": 75.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 232, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "maps_google", "flbl": "Maps & Google (Mapbox)", "urls": [], "ig": 0.736, "fa": 0.0, "gp": 0.219, "bl": 0.0, "ds": 0.0, "txt": "agree with this totally, use it on a project I am working on and it now takes like 3-4 hour to have a self hosted map of the world on your computer."}, {"id": 50511302, "au": "wkrp", "dom": 65, "sr": 40, "sc": 0.97, "ep": 2.51, "bs": 0.0, "d": 2, "age": 18.68, "grav": 233.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 43, "qw": 0, "k": 28, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "range_requests", "flbl": "Range & Requests (Latency)", "urls": [], "ig": 0.976, "fa": 0.0, "gp": 0.152, "bl": 0.0, "ds": 0.0, "txt": "I've had success with using a cache in front of my buckets for great performance. In my case I have raster tiles so they get turned into z/x/y tile filenames and a cloudflare worker pulls that from the full file and caches the result in the region."}, {"id": 50515934, "au": "omnimus", "dom": 26, "sr": 41, "sc": 0.78, "ep": 1.8, "bs": 0.0, "d": 1, "age": 6.54, "grav": 47.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 3042, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "maps_google", "flbl": "Maps & Google (Mapbox)", "urls": [], "ig": 0.768, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I think main issue hosting services solve is keeping up the tiles up to date.\n\nMaptiler is pretty good company, maybe they would support the project."}, {"id": 50512890, "au": "fhk", "dom": 15, "sr": 42, "sc": 0.7, "ep": 2.25, "bs": 0.0, "d": 2, "age": 15.33, "grav": 169.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 110, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bunny_file", "flbl": "Bunny & File (Cloudflare)", "urls": [], "ig": 0.46, "fa": 0.0, "gp": 0.803, "bl": 0.0, "ds": 0.0, "txt": "Nice ! Yeah I just built bowmaps.com with this approach of cloudflare for tiles and workers for on the fly vector tiling"}, {"id": 50512027, "au": "tjwebbnorfolk", "dom": 24, "sr": 43, "sc": 0.57, "ep": 1.89, "bs": 0.0, "d": 1, "age": 17.17, "grav": 203.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 818, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "satellite_source", "flbl": "Satellite & Source (App)", "urls": [], "ig": 0.803, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "same, we use pmtiles on R2 for landstats.com parcel map. it's very easy to set up and cheap to serve\n\nand we have a CF worker than turns them into rasters on the fly if that's how people want to get them"}, {"id": 50519612, "au": "maelito", "dom": 27, "sr": 44, "sc": 0.3, "ep": 1.7, "bs": 0.0, "d": 2, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 3787, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "satellite_source", "flbl": "Satellite & Source (App)", "urls": [], "ig": 0.722, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "They did not follow our question about pricing for open source :/\n\nWe now generate our tiles every week for 2 €, and could soon generate them daily for .5 €"}, {"id": 50511212, "au": "bcye", "dom": 74, "sr": 45, "sc": 0.3, "ep": 1.96, "bs": 0.27, "d": 1, "age": 18.84, "grav": 236.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 896, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bunny_file", "flbl": "Bunny & File (Cloudflare)", "urls": [], "ig": 0.568, "fa": 0.22, "gp": 0.0, "bl": 0.1, "ds": 0.0, "txt": "It's my API endpoint for Plausible (private website analytics), not sure why it would get flagged"}, {"id": 50513878, "au": "mips_avatar", "dom": 29, "sr": 46, "sc": 0.12, "ep": 1.66, "bs": 0.0, "d": 1, "age": 12.63, "grav": 125.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 2866, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "satellite_source", "flbl": "Satellite & Source (App)", "urls": [], "ig": 0.709, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Would be nice if cloudflare/someone would host a multi tb r2 satellite mosaic.  Once it's cached it's pretty cheap to serve and everyone could use it."}, {"id": 50516263, "au": "Doctor_Fegg", "dom": 51, "sr": 47, "sc": 0.08, "ep": 1.47, "bs": 0.0, "d": 2, "age": 5.58, "grav": 38.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 67, "qw": 0, "k": 8832, "kpp": 4.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "data_map", "flbl": "Data & Map (Library)", "urls": [], "ig": 0.627, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Worth noting too that there's been a fair amount of effort to fix generated geometry issues in tilemaker, which was historically the pain point (essentially because tilemaker's geometry operations are based on Boost.Geometry rather than JTS/GEOS, and BG is a bit less developed in this sphere). It's a lot better now than it used to be and there's a few PRs being merged soon which will improve things further."}, {"id": 50517830, "au": "oshawaconnectio", "dom": 7, "sr": 48, "sc": 0.02, "ep": 1.56, "bs": 0.0, "d": 1, "age": 2.42, "grav": 14.5, "surf": 13.9, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 6, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "data_map", "flbl": "Data & Map (Library)", "urls": [], "ig": 0.323, "fa": 0.28, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "They are not the same; protomaps is for any map dataset whereas OpenFreeMap is just for openstreetmap."}, {"id": 50517502, "au": "vladsanchez", "dom": 55, "sr": 49, "sc": -0.1, "ep": 1.15, "bs": 0.0, "d": 1, "age": 3.02, "grav": 18.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 10, "qw": 0, "k": 178, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "maps_google", "flbl": "Maps & Google (Mapbox)", "urls": ["https://github.com/BlueBlazin/blockviz"], "ig": 0.489, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "This is amazing! I also love your BlockViz https://github.com/BlueBlazin/blockviz project. Keep Blazin!"}, {"id": 50512174, "au": "rafram", "dom": 50, "sr": 50, "sc": -0.18, "ep": 1.36, "bs": 0.0, "d": 1, "age": 16.88, "grav": 198.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 6079, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "maps_google", "flbl": "Maps & Google (Mapbox)", "urls": [], "ig": 0.577, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Any in particular? That’s pretty cool. I switched my own workflow to Planetiler because Tilemaker had too many bugs and quirks for my liking, but I might be tempted to switch back if it’s that much faster."}, {"id": 50510895, "au": "bcye", "dom": 69, "sr": 51, "sc": -0.29, "ep": 1.51, "bs": 0.27, "d": 1, "age": 19.34, "grav": 247.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 896, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "data_map", "flbl": "Data & Map (Library)", "urls": [], "ig": 0.644, "fa": 0.0, "gp": 0.0, "bl": 0.1, "ds": 0.0, "txt": "There is an npm library that integrates the format into MapLibre (fork of Mapbox) and Leaflet."}, {"id": 50517009, "au": "gorayobi", "dom": 35, "sr": 52, "sc": -0.49, "ep": 3.27, "bs": 2.52, "d": 0, "age": 3.98, "grav": 25.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 48, "qw": 0, "k": 4, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "bunny_file", "flbl": "Bunny & File (Cloudflare)", "urls": [], "ig": 1.179, "fa": 0.0, "gp": 0.345, "bl": 0.95, "ds": 0.0, "txt": "Word of warning. I had a client that was behind some corporate anti malware proxy. Turned out it stripped the range header from the request and simply did a request for the entire file. Had to implement a proxy endpoint just for them so they could do classic WMTS style requests insetad."}, {"id": 50512335, "au": "tracerbulletx", "dom": 12, "sr": 53, "sc": -1.05, "ep": 1.68, "bs": 1.19, "d": 2, "age": 16.57, "grav": 192.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 4469, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bunny_file", "flbl": "Bunny & File (Cloudflare)", "urls": [], "ig": 0.223, "fa": 0.0, "gp": 0.798, "bl": 0.45, "ds": 0.0, "txt": "R2 is kind of too good, it makes me nervous about how long such a good thing can last."}, {"id": 50514000, "au": "devadattas", "dom": 48, "sr": 54, "sc": -1.36, "ep": 2.79, "bs": 3.05, "d": 0, "age": 12.33, "grav": 120.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 4, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "bunny_file", "flbl": "Bunny & File (Cloudflare)", "urls": [], "ig": 0.612, "fa": 0.0, "gp": 0.93, "bl": 1.15, "ds": 0.0, "txt": "A PMTiles file on a bucket is the only map provider whose worst case is a rounding error."}, {"id": 50517977, "au": "bcye", "dom": 30, "sr": 55, "sc": -1.66, "ep": 1.34, "bs": 1.46, "d": 2, "age": 2.19, "grav": 13.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 896, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "satellite_source", "flbl": "Satellite & Source (App)", "urls": [], "ig": 0.57, "fa": 0.0, "gp": 0.0, "bl": 0.55, "ds": 0.0, "txt": "Not sure satellite data is as freely available as OpenStreetMaps, I thought the imagery is mostly copyrighted/propietary."}, {"id": 50512895, "au": "simonw", "dom": 3, "sr": 56, "sc": -1.66, "ep": 2.83, "bs": 3.05, "d": 1, "age": 15.32, "grav": 169.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 15, "qw": 0, "k": 121922, "kpp": 7.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "satellite_source", "flbl": "Satellite & Source (App)", "urls": ["https://lite.datasette.io/?install=datasette-maplibre&url=https://gist.githubusercontent.com/simonw/39fa5d399465766039549912e2b3d291/raw/f6dfba99a75cbb8b5d9386223220eb52272767ee/demo.db&metadata=https://gist.githubusercontent.com/simonw/39fa5d399465766039549912e2b3d291/raw/f6dfba99a75cbb8b5d9386223220eb52272767ee/metadata.yml\u0023/demo/capitals_and_countries%23map=0/4.2/180&color=continent"], "ig": 0.758, "fa": 0.0, "gp": 0.721, "bl": 1.15, "ds": 0.0, "txt": "OpenFreeMap is amazing. Coincidentally I released a new open source tool that uses that today - demo here: https://lite.datasette.io/?install=datasette-maplibre&url=ht..."}, {"id": 50512768, "au": "SafemapTecnolgs", "dom": 57, "sr": 57, "sc": -1.66, "ep": 1.81, "bs": 3.05, "d": 0, "age": 15.64, "grav": 175.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 76, "kpp": 5.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "maps_google", "flbl": "Maps & Google (Mapbox)", "urls": [], "ig": 0.53, "fa": 0.0, "gp": 0.388, "bl": 1.15, "ds": 0.0, "txt": "My product safemap.io is hosted on Protomaps. Highly recommend."}, {"id": 50511750, "au": "is_true", "dom": 13, "sr": 58, "sc": -1.66, "ep": 1.65, "bs": 3.05, "d": 2, "age": 17.83, "grav": 216.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 996, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "satellite_source", "flbl": "Satellite & Source (App)", "urls": [], "ig": 0.138, "fa": 0.0, "gp": 0.914, "bl": 1.15, "ds": 0.0, "txt": "That's mostly for the storage not the bandwidth right?"}, {"id": 50513139, "au": "bcye", "dom": 46, "sr": 59, "sc": -1.66, "ep": 0.73, "bs": 2.25, "d": 1, "age": 14.67, "grav": 158.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 18, "qw": 0, "k": 896, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "bunny_file", "flbl": "Bunny & File (Cloudflare)", "urls": ["https://developers.cloudflare.com/cache/reference/range-requests/\u0023caching-limitations"], "ig": 0.311, "fa": 0.0, "gp": 0.0, "bl": 0.85, "ds": 0.0, "txt": "From my understanding it is still limited by the overall file size though or has this changed too?\n\nhttps://developers.cloudflare.com/cache/reference/range-requ..."}, {"id": 50510950, "au": "pstuart", "dom": 70, "sr": 60, "sc": -1.81, "ep": 1.24, "bs": 3.05, "d": 1, "age": 19.27, "grav": 245.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 11, "qw": 0, "k": 6841, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "range_requests", "flbl": "Range & Requests (Latency)", "urls": ["https://maplibre.org/"], "ig": 0.528, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "A quick search showed that this should work with HTTP range requests: https://maplibre.org/"}, {"id": 50510960, "au": "cr125rider", "dom": 68, "sr": 61, "sc": -2.09, "ep": 0.96, "bs": 3.05, "d": 1, "age": 19.25, "grav": 245.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 10, "qw": 0, "k": 696, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "maps_google", "flbl": "Maps & Google (Mapbox)", "urls": ["https://gdal.org/en/stable/drivers/vector/pmtiles.html"], "ig": 0.33, "fa": 0.0, "gp": 0.125, "bl": 1.15, "ds": 0.0, "txt": "Protomaps, pmtiles, are actually pretty ubiquitous. Even has a GDAL driver https://gdal.org/en/stable/drivers/vector/pmtiles.html"}, {"id": 50511762, "au": "kellpossible2", "dom": 18, "sr": 62, "sc": -2.76, "ep": 1.48, "bs": 4.24, "d": 2, "age": 17.8, "grav": 215.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 21, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "bunny_file", "flbl": "Bunny & File (Cloudflare)", "urls": [], "ig": 0.064, "fa": 0.0, "gp": 0.914, "bl": 1.6, "ds": 0.0, "txt": "how are you using D1 and Workers with this?"}, {"id": 50511872, "au": "maelito", "dom": 31, "sr": 63, "sc": -2.78, "ep": 1.46, "bs": 4.24, "d": 1, "age": 17.56, "grav": 211.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 3787, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "maps_google", "flbl": "Maps & Google (Mapbox)", "urls": [], "ig": 0.4, "fa": 0.0, "gp": 0.36, "bl": 1.6, "ds": 0.0, "txt": "Have you check Mapterhorn's next project ? Funded by Nlnet."}, {"id": 50519602, "au": "maelito", "dom": 34, "sr": 64, "sc": -2.83, "ep": 1.06, "bs": 3.9, "d": 3, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 3787, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "satellite_source", "flbl": "Satellite & Source (App)", "urls": [], "ig": 0.451, "fa": 0.0, "gp": 0.0, "bl": 1.47, "ds": 0.0, "txt": "I'm talking about their global satellite dataset project, in works now."}, {"id": 50510849, "au": "pluto_modadic", "dom": 63, "sr": 65, "sc": -2.88, "ep": 1.36, "bs": 4.24, "d": 0, "age": 19.43, "grav": 248.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 765, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "range_requests", "flbl": "Range & Requests (Latency)", "urls": [], "ig": 0.309, "fa": 0.0, "gp": 0.437, "bl": 1.6, "ds": 0.0, "txt": "okay, but what clients work with this approach?"}, {"id": 50513390, "au": "fhk", "dom": 17, "sr": 66, "sc": -3.11, "ep": 1.13, "bs": 4.24, "d": 4, "age": 13.96, "grav": 146.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 110, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "maps_google", "flbl": "Maps & Google (Mapbox)", "urls": [], "ig": 0.482, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Company has a product called Arrow so figure it works together."}, {"id": 50516570, "au": "nchmy", "dom": 38, "sr": 67, "sc": -3.42, "ep": 0.82, "bs": 4.24, "d": 1, "age": 4.84, "grav": 31.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 2101, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "data_map", "flbl": "Data & Map (Library)", "urls": [], "ig": 0.349, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Thanks for sharing this. I'll dig into how it differs from protomaps today."}, {"id": 50513084, "au": "BubbleRings", "dom": 16, "sr": 68, "sc": -3.86, "ep": 0.38, "bs": 4.24, "d": 3, "age": 14.8, "grav": 160.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 353, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "bunny_file", "flbl": "Bunny & File (Cloudflare)", "urls": [], "ig": 0.162, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Looks good. What does the Bow in bowmaps.com mean?"}, {"id": 50514762, "au": "emersion", "dom": 76, "sr": 69, "sc": -3.98, "ep": 1.05, "bs": 5.04, "d": 0, "age": 9.91, "grav": 86.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 9, "qw": 0, "k": 1402, "kpp": 5.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "range_requests", "flbl": "Range & Requests (Latency)", "urls": ["https://tuiles.enliberte.fr/"], "ig": 0.448, "fa": 0.0, "gp": 0.0, "bl": 1.9, "ds": 0.0, "txt": "Another open-for-everyone tile server is Tuiles en Libertés : https://tuiles.enliberte.fr/"}, {"id": 50512075, "au": "bcye", "dom": 8, "sr": 70, "sc": -4.13, "ep": 0.37, "bs": 4.5, "d": 1, "age": 17.08, "grav": 201.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 896, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "maps_google", "flbl": "Maps & Google (Mapbox)", "urls": [], "ig": 0.157, "fa": 0.0, "gp": 0.0, "bl": 1.7, "ds": 0.0, "txt": "I didn't know they just served it straight from disk, that's pretty cool!"}, {"id": 50512020, "au": "boramalper", "dom": 1, "sr": 71, "sc": -6.82, "ep": 0.07, "bs": 6.89, "d": 0, "age": 17.19, "grav": 204.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 4, "qw": 98, "k": 4589, "kpp": 8.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "satellite_source", "flbl": "Satellite & Source (App)", "urls": ["https://openfreemap.org/"], "ig": -0.95, "fa": 0.0, "gp": 1.59, "bl": 2.6, "ds": 0.0, "txt": "OpenFreeMap is a similar project:\n\nhttps://openfreemap.org/\n\n> What is OpenFreeMap?\n\n> OpenFreeMap lets you display custom maps on your website and apps for free.\n\n> Using our public instance is completely free: there are no limits on the number of map views or requests. There’s no registration, no user database, no API keys, and no cookies. We aim to cover the running costs of our public instance through donations.\n\n> What is the tech stack?\n\n> There is no tile server running; only nginx serving a Btrfs image with 300 million hard-linked files. This was my idea; I haven’t read about anyone else doing this in production, but it works really well."}, {"id": 50511616, "au": "edumucelli", "dom": 72, "sr": 72, "sc": -8.66, "ep": 0.0, "bs": 6.89, "d": 0, "age": 18.07, "grav": 221.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 350, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "maps_google", "flbl": "Maps & Google (Mapbox)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.321, "bl": 2.6, "ds": 0.0, "txt": "Really cool, did not know about it!"}, {"id": 50511847, "au": "cldellow", "dom": 14, "sr": 73, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 3, "age": 17.61, "grav": 212.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 2763, "kpp": 5.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "range_requests", "flbl": "Range & Requests (Latency)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "It's pretty much all storage."}, {"id": 50517986, "au": "bcye", "dom": 61, "sr": 74, "sc": -9.39, "ep": 0.0, "bs": 7.16, "d": 1, "age": 2.18, "grav": 13.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 896, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.7, "ds": 0.0, "txt": "Thank you :)"}, {"id": 50514856, "au": "SeifHeakal", "dom": 60, "sr": 75, "sc": -11.3, "ep": 0.0, "bs": 9.41, "d": 0, "age": 9.65, "grav": 83.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 1, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "maps_google", "flbl": "Maps & Google (Mapbox)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.238, "bl": 3.55, "ds": 0.0, "txt": "I really loved this post keep going"}, {"id": 50515571, "au": "mokto", "dom": 71, "sr": 76, "sc": -11.51, "ep": 0.0, "bs": 9.41, "d": 0, "age": 7.5, "grav": 57.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 1, "kpp": 0.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "bunny_file", "flbl": "Bunny & File (Cloudflare)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.091, "bl": 3.55, "ds": 0.0, "txt": "Super nice!"}, {"id": 50518677, "au": "YuriyChobotok", "dom": 56, "sr": 77, "sc": -11.61, "ep": 0.0, "bs": 9.41, "d": 0, "age": 1.15, "grav": 7.9, "surf": 31.5, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 1, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "maps_google", "flbl": "Maps & Google (Mapbox)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.019, "bl": 3.55, "ds": 0.0, "txt": "Pretty cool option and easy to reuse."}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 60);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 50);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 50);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 50);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `Showing ${shown.length} of ${pool.length} matching comments (mode: ${activeMode})` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeSelect = document.getElementById("modeSelect");
+  modeSelect.addEventListener("change", () => {
+    activeMode = modeSelect.value;
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

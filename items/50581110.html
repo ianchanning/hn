@@ -1,0 +1,1026 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>50581110 // DreamCoder: Coding harness and IDE from the author of Mastering Emacs - Better Signal News</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+      text-transform: lowercase;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      text-transform: lowercase;
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .kpi-cell {
+      padding: 8px 0;
+    }
+    .kpi-label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 4px 0;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer:not([open]) {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary,
+    details.proof-drawer > summary {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+    }
+    table.ablation th {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: normal;
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    button.nav-btn,
+    button.mode-tab,
+    button.topbar-toggle {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: rgb(0, 0, 0);
+      cursor: pointer;
+      text-decoration: none;
+      line-height: inherit;
+      vertical-align: baseline;
+      transition: color 0.12s ease;
+      text-transform: lowercase;
+    }
+    button.nav-btn:hover,
+    button.nav-btn.active,
+    button.mode-tab:hover,
+    button.mode-tab.active,
+    button.topbar-toggle:hover,
+    button.topbar-toggle.active {
+      color: rgb(255, 255, 255);
+      text-decoration: none;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      padding: 14px;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; row-gap: 4px; }
+      .topbar-right { padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+</head>
+<body>
+<div id="elm-root">
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">BS</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Better Signal News</a>
+        <span class="pagetop" id="modeTabs">
+          <button type="button" class="nav-btn mode-tab active" data-mode="top_signal" role="tab" aria-selected="true">Top 40</button> | <button type="button" class="nav-btn mode-tab" data-mode="hn_top40" role="tab" aria-selected="false">HN Top 40</button>
+        </span>
+      </div>
+      <div class="topbar-right">
+        <button type="button" class="nav-btn topbar-toggle" id="exploreToggleBtn" aria-expanded="false">explore</button> | <button type="button" class="nav-btn topbar-toggle" id="evidenceToggleBtn" aria-expanded="false">evidence</button>
+      </div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://www.masteringemacs.org/article/announcing-dreamcoder">DreamCoder: Coding harness and IDE from the author of Mastering Emacs</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=masteringemacs.org"><span class="sitestr">masteringemacs.org</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">247 points</span> by <a href="https://news.ycombinator.com/user?id=facundo_olano">facundo_olano</a> <span class="age" title="2026-11-20T20:03:59.000Z"><a href="https://news.ycombinator.com/item?id=50581110">19 hours ago</a></span> | <a href="https://news.ycombinator.com/item?id=50581110">100&nbsp;comments</a> | 82.0% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Evidence</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">100</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 58 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">18.0%</div>
+          <div class="kpi-sub">18 comments (3 Gold / 3.0%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">82.0%</div>
+          <div class="kpi-sub">43 chatter &bull; 39 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">2</div>
+        <div class="kpi-sub">7% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.995</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">15</div>
+          <div class="kpi-sub">HN POS 56..70 (15.0% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="color: rgb(90, 90, 88); margin-top: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Explore</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">CALIBRATE</div>
+              <h2>Signal Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 100-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Bullshit (Y) // Signal (X) </span>
+                <span class="sig">TAP POINT (N = 100)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (3)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (15)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (43)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (39)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>HN POS (1..100) (Y) // Age (Hours) (X)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 30)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (mjdiloreto, 2.3h); largest subtree (@chilicuil) occupies 15 slots (HN POS 56..70).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (100)</option>
+          <option value="claude_harness">Claude &amp; Harness (Code) (27)</option>
+          <option value="shell_control">Shell &amp; Control (Commands) (19)</option>
+          <option value="agent_code">Agent &amp; Code (Website) (16)</option>
+          <option value="emacs_coding">Emacs &amp; Coding (Features) (16)</option>
+          <option value="codex_opencode">Codex &amp; Opencode (Import) (12)</option>
+          <option value="general_commentary">General Commentary (10)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, emacs, coding, harness, dreamcoder, lisp...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT</span>
+    <span>SOURCE: HN 50581110 + MASTERINGEMACS.ORG + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50581110, "story_title": "DreamCoder: Coding harness and IDE from the author of Mastering Emacs", "story_url": "https://www.masteringemacs.org/article/announcing-dreamcoder", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50581110, "story_title": "DreamCoder: Coding harness and IDE from the author of Mastering Emacs", "story_url": "https://www.masteringemacs.org/article/announcing-dreamcoder", "points": 247, "story_author": "facundo_olano", "article_source": "fetched_url", "t1_ref_utc": "2026-11-21T15:09:29+00:00", "t2_ref_utc": "2026-11-21T15:09:29+00:00", "delta_minutes": 0.0, "story_anchors": ["emacs", "coding", "harness", "dreamcoder", "lisp", "software", "ide", "harnesses", "mastering", "code", "tool", "done", "system", "tools", "model", "help", "project", "course", "author", "terminal", "instead", "text", "feel", "agents", "user"], "facet_labels": {"claude_harness": "Claude & Harness (Code)", "agent_code": "Agent & Code (Website)", "codex_opencode": "Codex & Opencode (Import)", "shell_control": "Shell & Control (Commands)", "emacs_coding": "Emacs & Coding (Features)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "claude_harness", "label": "Claude & Harness (Code)", "count": 27, "top_terms": ["claude", "harness", "code", "app"]}, {"slug": "agent_code", "label": "Agent & Code (Website)", "count": 16, "top_terms": ["agent", "code", "website", "diff"]}, {"slug": "codex_opencode", "label": "Codex & Opencode (Import)", "count": 12, "top_terms": ["codex", "opencode", "import", "copilot"]}, {"slug": "shell_control", "label": "Shell & Control (Commands)", "count": 19, "top_terms": ["shell", "control", "commands", "support"]}, {"slug": "emacs_coding", "label": "Emacs & Coding (Features)", "count": 16, "top_terms": ["emacs", "coding", "features", "fix"]}], "counts": {"total_comments": 100, "live_t2_comments": 100, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 58, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "05d9e1221aeeb8e9b930a353f902453833c82e7535df596d3a197cc33b722d4f"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 3, "grounded_analysis": 15, "crowd_chatter": 43, "bullshit_or_flamewar": 39}, "facets": {"agent_code": 16, "claude_harness": 27, "codex_opencode": 12, "emacs_coding": 16, "shell_control": 19, "general_commentary": 10}, "facet_options": [{"slug": "claude_harness", "label": "Claude & Harness (Code)", "count": 27}, {"slug": "shell_control", "label": "Shell & Control (Commands)", "count": 19}, {"slug": "agent_code", "label": "Agent & Code (Website)", "count": 16}, {"slug": "emacs_coding", "label": "Emacs & Coding (Features)", "count": 16}, {"slug": "codex_opencode", "label": "Codex & Opencode (Import)", "count": 12}, {"slug": "general_commentary", "label": "General Commentary", "count": 10}], "facet_diagnostics": [{"slug": "claude_harness", "label": "Claude & Harness (Code)", "count": 27, "useful": 5, "useful_pct": 18.5, "terms": "claude, harness, code, app"}, {"slug": "shell_control", "label": "Shell & Control (Commands)", "count": 19, "useful": 2, "useful_pct": 10.5, "terms": "shell, control, commands, support"}, {"slug": "agent_code", "label": "Agent & Code (Website)", "count": 16, "useful": 4, "useful_pct": 25.0, "terms": "agent, code, website, diff"}, {"slug": "emacs_coding", "label": "Emacs & Coding (Features)", "count": 16, "useful": 3, "useful_pct": 18.8, "terms": "emacs, coding, features, fix"}, {"slug": "codex_opencode", "label": "Codex & Opencode (Import)", "count": 12, "useful": 4, "useful_pct": 33.3, "terms": "codex, opencode, import, copilot"}, {"slug": "general_commentary", "label": "General Commentary", "count": 10, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 6}, {"category": "code_repository", "count": 1}, {"category": "github_artifact", "count": 1}], "story_anchors": ["emacs", "coding", "harness", "dreamcoder", "lisp", "software", "ide", "harnesses", "mastering", "code", "tool", "done", "system", "tools", "model", "help", "project", "course"], "largest_root": {"root_id": 50584496, "author": "chilicuil", "slots": 15, "start_dom": 56, "end_dom": 70, "share_pct": 15.0, "top_dom1_age": 2.3, "top_dom1_author": "mjdiloreto"}, "buried_cutoff": 30, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50586654, "au": "FailMore", "dom": 14, "sr": 1, "sc": 11.19, "ep": 11.19, "bs": 0.0, "d": 0, "age": 8.41, "grav": 67.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 167, "qw": 0, "k": 1827, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "agent_code", "flbl": "Agent & Code (Website)", "urls": ["https://smalldocs.org", "https://github.com/espressoplease/smalldocs", "https://smalldocs.org/s/bLV9Fe2RemM7ipvCy01NXo\u0023k=U9yFaCKp1onQJRoEbAictn2PIi_M_K1fpcQ3Ug7v84k"], "ig": 1.71, "fa": 2.08, "gp": 0.859, "bl": 0.0, "ds": 0.0, "txt": "I built https://smalldocs.org / https://github.com/espressoplease/smalldocs to handle some of the problems Mickey is trying to solve. It's a cli your agent can call to open up a markdown file in the browser with richer-than-normal formatting options.\n\nHere's an example SmallDoc that has a few formatting examples (mermaid diagrams, charts, etc.): https://smalldocs.org/s/bLV9Fe2RemM7ipvCy01NXo\u0023k=U9yFaCKp1on...\n\nI'm a so-so programmer, and often the agent can come up with ideas which I need to be broken down to fully grasp. I ask my agent \"produce a sdoc on this [architecture/bug/flow]\", or \"walk me through every db interaction with sample tables as we save this record given our approach to permissions in a sdoc\", etc. And then the agent can pop me open a document in the browser for me to understand in a richer visual space.\n\nThe current version on my site is cloud based (I've been experimenting with turning it into a business), but there is also a local first verion where the document lives in the url fragment. If you want that, point your agent at my codebase and they will sort that out for you."}, {"id": 50588151, "au": "tijl", "dom": 63, "sr": 2, "sc": 9.47, "ep": 9.47, "bs": 0.0, "d": 4, "age": 3.67, "grav": 22.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 24, "qw": 0, "k": 20, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": ["https://github.com/anomalyco/opencode/tree/dev/packages/core/src/plugin/provider/claude-agent"], "ig": 0.591, "fa": 2.35, "gp": 0.954, "bl": 0.0, "ds": 0.0, "txt": "Opencode can start a claude process with --output-format stream-json and reads the stdout. That way, you can use your claude code subscription. It's implemented here:\nhttps://github.com/anomalyco/opencode/tree/dev/packages/core..."}, {"id": 50584713, "au": "komali2", "dom": 82, "sr": 3, "sc": 9.15, "ep": 9.15, "bs": 0.0, "d": 1, "age": 14.01, "grav": 147.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 210, "qw": 0, "k": 17659, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": ["https://www.dreamcoder.ai/pricing/"], "ig": 1.615, "fa": 1.3, "gp": 1.137, "bl": 0.0, "ds": 0.0, "txt": "Genuinely gobsmacked by your comment, I just assumed it was FOSS. https://www.dreamcoder.ai/pricing/ Nope!\n\nI remember ten years ago someone was showing me their cool jetbrains setup, my coworker came around the corner, looked over our shoulders, and said \"imagine paying for an IDE.\" He was the local vimlord and later inspired me to get into building my own config for my own coding environment.\n\nThat's all I can think now, about something like this. Imagine paying for an IDE... in 2026. Imagine running non FOSS code when you can just point Claude at a featureset and say \"build this for me as GPL3. Don't make any mistakes.\"\n\nIt also is strange to me that The Emacs Guy decided to keep this proprietary. Like, Emacs, as in GNU EMACS, as in made by that old wizard that won't even use a laptop with nonfree wifi drivers, as one of the ultimate expressions of his libre philosophy, that's where you cut your teeth, and you go and release a nonfree IDE?\n\nEdit: I mean just to show how futile it is to release non FOSS code these days: the \"system prompt\" (a collection of jinja templates, not one thing) instructs to adopt the tone of Benson Dubious but not tell anyone that's who you are. DeepSeek pulled it apart in about 10 minutes."}, {"id": 50589960, "au": "spapas82", "dom": 10, "sr": 4, "sc": 6.58, "ep": 6.58, "bs": 0.0, "d": 2, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 106, "qw": 170, "k": 2104, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "codex_opencode", "flbl": "Codex & Opencode (Import)", "urls": [], "ig": 1.706, "fa": 0.7, "gp": 0.394, "bl": 0.0, "ds": 0.0, "txt": "Hey mickeyp, that's great! Α have to confess that it feels faster than other python harnesses (ie hermes).\n\nUnfortunately, right now, it's difficult for me to write or do serious debugging cause I've got a broken right arm. So it’s better for me to wait until other people have experienced the same problems as me and they’re fixed.\n\nHowever a quick heads up:\n\n1. tryimg to import from opencode settibgs: \n>  Nothing was imported from OpenCode. DreamCoder is already signed in to OpenAI, so it kept that sign-in rather than the one from OpenCode. github-copilot is a sign-in rather than an API key, so it stayed behind. Set this provider up here instead. Choose one to set up its models.\n\n2. creating a new connectiom with gh copilot:\n\n> tries to connect but receives the following msg: GitHub token validation failed against GitHub Copilot models API: GitHub Copilot credential is not authorized to list Copilot models; reconnect or check Copilot entitlement.\n\n3. Using codex:\n\n> getting this error \"LLMTokenRefreshError: Token refresh failed for 'openai'. Details: 'Re-authenticate via the OAuth login flow.'\" but no way to re-auth\n\n4. using opencode go api key:\n\n> error OpenAI API error: Error code: 400 - {'model': 'muse-spark-1.3-contributor', 'error': {'code': None, 'message': 'only `\"auto\"` is supported for `tool_choice`. `\"none\"`, `\"required\"`, and named function choices are not currently"}, {"id": 50589354, "au": "spapas82", "dom": 8, "sr": 5, "sc": 5.66, "ep": 5.81, "bs": 0.0, "d": 0, "age": 1.02, "grav": 7.3, "surf": 27.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 125, "qw": 0, "k": 2104, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "codex_opencode", "flbl": "Codex & Opencode (Import)", "urls": [], "ig": 1.588, "fa": 0.62, "gp": 0.212, "bl": 0.0, "ds": 0.0, "txt": "I just tried this. I like the UI and UX. I don't like very much that it's written in Python instead of a compiled language like Rust or Golang, resulting in higher memory consumption (~350 mb without  doin anything).\n\nHowever, I was not able to integrate it with any of my three different subscriptions (I also use DSH but didn’t bother to try it):\n\n- openCodeGo with api key and Import settings\n\n- OpenAI codex\n\n- GitHub Copilot\n\nI got a different error for each one of them. I consider myself an experienced user have many harnesses in the past (hermes paseo opencode pi and of course chatgpt and dsh).\n\nSo, I would recommend to try to polish and test more thoroughly the integration with the various providers. I'd be very happy to give it another go when this happens!"}, {"id": 50588539, "au": "bloopernova", "dom": 15, "sr": 6, "sc": 5.66, "ep": 5.66, "bs": 0.0, "d": 0, "age": 2.69, "grav": 16.1, "surf": 11.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 113, "qw": 0, "k": 8338, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": ["https://albedo.sh/"], "ig": 1.376, "fa": 0.62, "gp": 0.455, "bl": 0.0, "ds": 0.0, "txt": "It kinda reminds me of https://albedo.sh/ in that it's a browser based canvas type UI.\n\nI think we're going to continue to get thousands of agent harnesses as people test out their ideas. I don't know if there's One True Paradigm for agentic coding, or even if agentic coding is the right thing to pursue. Maybe we stop trying to make software for others and just have an LLM \"companion\" that creates apps dynamically for ourselves.\n\nPersonally I freaking love Miller Columns, so I think a harness should have those.\n\nI loathe the term harness though. Shouldn't it be called something more like a workshop? An artisan's bench?\n\nI was fully expecting this to be Emacs based, definitely surprised that it isn't."}, {"id": 50583104, "au": "julienchastang", "dom": 13, "sr": 7, "sc": 5.59, "ep": 5.59, "bs": 0.0, "d": 0, "age": 16.88, "grav": 198.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 80, "qw": 0, "k": 2747, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "emacs_coding", "flbl": "Emacs & Coding (Features)", "urls": [], "ig": 1.556, "fa": 0.0, "gp": 1.33, "bl": 0.0, "ds": 0.0, "txt": "Relatedly, I have installed my customized emacs inside a container that also has codex and a bunch of other niceties. In short, having Codex and emacs side-by-side super-charges the concept of emacs. Why? Because you can ask AI to write emacs lisp quickly molding the coding environment you want for whatever task you are trying to achieve. And the container aspect makes the whole development environment portable. Despite its age, in the AI era, emacs is the gift that keeps on giving."}, {"id": 50583494, "au": "everforward", "dom": 6, "sr": 8, "sc": 5.38, "ep": 5.38, "bs": 0.0, "d": 0, "age": 16.29, "grav": 187.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 295, "qw": 0, "k": 3033, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "agent_code", "flbl": "Agent & Code (Website)", "urls": [], "ig": 1.578, "fa": 0.0, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "It's interesting (and probably correct) how much this focuses on the UI.\n\nI also looked (/am looking) at Lisp and AI, but I went with Clojure and zero-ed in on the REPL driven development.  The high level idea is that a session maps to a namespace in Clojure.  When you create a new session, it makes a new namespace, injects tools that are bound to that session into it, and then swaps you into that namespace.  So I can do something like:\n\n    (new!)\n    (prompt! \"Write me a script that does ....\")\n\nThe agent configuration, tools it has, etc, etc are all bound to the namespace so you can drop a tool or change the model just for the session.\n\nThe agent also has a tool (that I've tried to encourage it to use almost exclusively) to execute code in the session's namespace (via nREPL, so same JVM as yours is connected to), so you have full access to any variables it declares, functions it makes, etc.\n\nThe idea was to be able to work collaboratively with the agent.  I can e.g. load API data into a variable, point the agent at the variable, and it does stuff.  It's also capable of modifying its own code.  I semi-routinely poke it by asking it to add features to the harness and then use them (\"add support for subagents in this workspace, and then invoke a separate agent to handle each of these tasks\").  I've also had it add support for a new inference provider, swap the session to that p"}, {"id": 50588880, "au": "unj", "dom": 21, "sr": 9, "sc": 5.1, "ep": 5.1, "bs": 0.0, "d": 2, "age": 1.95, "grav": 11.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 390, "qw": 0, "k": 24, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "codex_opencode", "flbl": "Codex & Opencode (Import)", "urls": [], "ig": 1.654, "fa": 0.28, "gp": 0.288, "bl": 0.0, "ds": 0.0, "txt": "So first of all -- no need to pin on who that's it. I try to ride the AI wave, but I also fully accept there are many modern ways and trends I am too old to learn or will never be natural for me. Also, truly appreciate trying to do something novel rather than copying TUI, even if I personally don't get it :)\n\nHaving said that:\n\nUnfortunately I do not use bare Pi anymore. And have very minimal Codex installation. Most of my plugins are in Omp, which is a fork of Pi, and does not share anything with .pi folder.\n\nHow can I find those manuals? I tried C-h, I tried clicking through moon-icon, and other. Tried the webpage, read the blog post. Didn't find any.\n\nModel setup wizard imports the model, sure, but AFAICT that's it. Does it import skills?\n\nInteractive tutorials to me are kind of trying to explain what you had in mind for the flow, but do not explain how do I map my flow, that I am used to, to DreamCoder. I need documentation to understand how to navigate the tool, but also how to map and configure it to my flow.\n\ngsd-core is get-shit-done, one of many spec-driven development frameworks. That's kind of irrelevant I guess, the point would be to have marketplace support, so I can install any set of skills using plugin system (not sure if that got anyhow \"standardised\" but claude, codex, pi, omp and probably others support it ootb).\n\nYes, marketplace would be kind of essential.\n"}, {"id": 50585221, "au": "Uptrenda", "dom": 100, "sr": 10, "sc": 4.93, "ep": 4.93, "bs": 0.0, "d": 0, "age": 12.87, "grav": 128.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 107, "qw": 0, "k": 3979, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": [], "ig": 1.373, "fa": 0.34, "gp": 0.51, "bl": 0.0, "ds": 0.0, "txt": "The aspergian obsession of making 1000 different versions of the same thing. \"Bruhh this wheel is going to be more of a good wheel than all the other wheels bruhh. I consider it a good use of my time compared to working on original problems.\" Almost as heart warming as the people porting every code base between languages because of their strange religious / cult beliefs. I am angry.\n\nBefore anyone says I'm hating for no reason: does anyone here have an issue with the existing tools? Does it not already do  more than enough? Can the most basic interface that exists already do what you need? Did author ask anyone before building it?"}, {"id": 50587384, "au": "pimeys", "dom": 23, "sr": 11, "sc": 4.87, "ep": 4.87, "bs": 0.0, "d": 0, "age": 6.1, "grav": 43.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 284, "qw": 0, "k": 7172, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "agent_code", "flbl": "Agent & Code (Website)", "urls": [], "ig": 1.606, "fa": 0.0, "gp": 0.753, "bl": 0.0, "ds": 0.0, "txt": "Very interesting. I'll give it a go. I found out that just running a multiplexer with agents in separate workspaces is not enough to do my work, and I very often need to start a separate editor to read and investigate changes. I like to use Gram to read and navigate the code. Now if you have multiple things going on, switching the editor to a different project is a mental context switch that takes too much time and is not very easy to do anymore with more than three projects.\n\nSo I've been using just Gram, with a remote session to our development server, and keep multiple windows open.\n\nDreamCoder could really be the best harness for me, if it keeps the whole context easy to navigate, but also provides me excellent code navigation and diffing tools. My way of working is to read and iterate on code with the agent, I'm never only vibecoding. So if I can open the code and the diff in the workspace that would simplify my work a lot.\n\nAnother important part would be to forward local ports. If I start the system I'm implementing in DreamCoder, and I could then access the page I'm developing from the harness or if the harness could forward a port or path for me, this would remove the step of remembering to open ssh port forwards in another terminal. Now split the workspaces to separate paths maybe and you can open the different projects in your browser without needing to turn off and "}, {"id": 50586216, "au": "jeffybefffy519", "dom": 93, "sr": 12, "sc": 4.84, "ep": 4.84, "bs": 0.0, "d": 2, "age": 9.75, "grav": 84.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 94, "qw": 0, "k": 295, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "agent_code", "flbl": "Agent & Code (Website)", "urls": [], "ig": 1.347, "fa": 0.34, "gp": 0.485, "bl": 0.0, "ds": 0.0, "txt": "Hey,\n\nThanks for replying! The thing I struggle with agentic coding is that code review has always been the worst part of the job - and now its basically 70% of the job. So to me, figuring out how to change that with agents helping build is a key area for improvement. So much of code understanding comes from the loop of running->watching->running->watching over and over, and thats kind of gone... I just dont know what replaces that so I can stay in the loop.\n\nAnyway, I applaud you for doing something different - I will definitely give it a try."}, {"id": 50587996, "au": "metroholografix", "dom": 49, "sr": 13, "sc": 4.84, "ep": 4.84, "bs": 0.0, "d": 0, "age": 4.15, "grav": 26.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 159, "qw": 0, "k": 862, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "emacs_coding", "flbl": "Emacs & Coding (Features)", "urls": [], "ig": 1.731, "fa": 0.0, "gp": 0.529, "bl": 0.0, "ds": 0.0, "txt": "I don't see how this survives, it's not open-source and is much too limited compared to a custom harness that one can ask an LLM to iterate on. The barrier-to-entry for such work keeps getting lower and it won't be long now that bespoke software tailored to each individual's preferences will be the order of the day. We're FINALLY moving away from a {person's, corporation's} imposed, rigid view on how one should interact with information towards adaptable and fluid information processing paradigms that put each individual at the center.\n\nThe power users that live in Emacs will -of course- embrace this by building on top of Emacs (which is really close to an optimal substrate for agent coordination work).\n\nIronically, it seems \"the author of Mastering Emacs\" (which overpromises and underdelivers, if you really want to master Emacs, go read the more-than-excellent official documentation and save your money) did not internalize the most important lesson Emacs teaches: end-user empowerment."}, {"id": 50586790, "au": "weavermarquez", "dom": 75, "sr": 14, "sc": 4.8, "ep": 4.8, "bs": 0.0, "d": 2, "age": 7.98, "grav": 62.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 82, "qw": 0, "k": 8, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "emacs_coding", "flbl": "Emacs & Coding (Features)", "urls": [], "ig": 1.747, "fa": 0.0, "gp": 0.478, "bl": 0.0, "ds": 0.0, "txt": "I had problems with agent-shell because background processes blocked user input, and a bunch of other papercuts e.g. AskUserQuestionTool; lack of multimedia inputs and outputs or other niceties like tool/skill search/attachments/image-copy-paste in user inputs; inconvenient buffer switching behaviour when handling tabs + windows + project views.\n\nAlternatively, claude-code.el had other issues like flickering on libvterm and EAT with evil mode; and edge cases with properly integrating libghostty with all keybindings in doom evil keybinds. I suppose I could fix those with coding agents now."}, {"id": 50587629, "au": "f2hex", "dom": 45, "sr": 15, "sc": 4.61, "ep": 4.61, "bs": 0.0, "d": 0, "age": 5.32, "grav": 36.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": -2, "kpp": -0.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "shell_control", "flbl": "Shell & Control (Commands)", "urls": [], "ig": 1.313, "fa": 0.28, "gp": 0.501, "bl": 0.0, "ds": 0.0, "txt": "There is no enough clarity about the telemetry. Which data is collected? Can telemetry be disabled?\nThe harness sees everything I write so I want full control about what would be collected (and implicitly shared)\n\nOverall it seems innovative, however on my Mac M3 Max has some problems, sometimes hangs up..."}, {"id": 50586251, "au": "mickeyp", "dom": 94, "sr": 16, "sc": 4.45, "ep": 5.45, "bs": 0.85, "d": 3, "age": 9.63, "grav": 82.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 94, "qw": 0, "k": 2307, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "grounded_analysis", "facet": "shell_control", "flbl": "Shell & Control (Commands)", "urls": [], "ig": 1.398, "fa": 0.34, "gp": 0.822, "bl": 0.32, "ds": 0.0, "txt": "Yes we are still at the foot of the mountain, here.\n\nThe Review feature works well enough, but it does not replace the fact the AI (especially the GPT models) wrote 20,000 LOC that you have to sift through.\n\nI think the longer term is a \"local-only\" CI-like system that has a million-mile long checklist it goes through; like tests and linting, of course, but more specific and tailored to what a human would flag. I've been playing around with that internally but it's a tricky way of solving the problem because coding has so many exceptions to the rule."}, {"id": 50587531, "au": "brabel", "dom": 38, "sr": 17, "sc": 4.42, "ep": 4.64, "bs": 0.0, "d": 1, "age": 5.61, "grav": 38.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 162, "qw": 0, "k": 8713, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": [], "ig": 1.557, "fa": 0.34, "gp": 0.005, "bl": 0.0, "ds": 0.0, "txt": "I have been using ThinkRail from JetBrains and it also does that. It is based on the Pi harness but it is a GUI (built on ElectronBun which seems lightweight enough compared to Electron itself). It is moving fast! So download the Canary version which you can easily update daily.\n\nThough there is also IntelliJ latest release which can embed any harness into the IDE seamlessly. And the harness is given tools that the IDE provides which are very useful for agents! No more grepping for types like it’s 1986.\n\nI have been using ThinkRail and the harness in IntelliJ lately, but my main driver is still the Claude Desktop app just because it’s good at keeping agents working in git worktrees (a mandatory feature) and lets me use Claude via the subscription plan, rather than API billing the other harnesses require.\n\nAnyway, DreamCoder seems similar to ThinkRail so I will give it a try as well, the author seems to have put a lot of thought to the design."}, {"id": 50588021, "au": "Kon5ole", "dom": 46, "sr": 18, "sc": 4.22, "ep": 4.22, "bs": 0.0, "d": 0, "age": 4.04, "grav": 25.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 152, "qw": 0, "k": 1341, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "codex_opencode", "flbl": "Codex & Opencode (Import)", "urls": [], "ig": 1.559, "fa": 0.0, "gp": 0.384, "bl": 0.0, "ds": 0.0, "txt": "Very inspirational!\n\nMy optimistic hope for the AI revolution is that people with good ideas can realize them into spectacular products in ways that were impossible before, and this seems like a good example of that.\n\nConsider the classic old scope-effort-time triangle. I think \"Slop\" is the result of locking the scope and reducing the time and effort. \"I made this in a weekend!\"\n\nA much more interesting approach is to lock the time and effort, and see what happens to the scope! \"I spent a year working with AI on my idea, here's the result.\"\n\nI think us pre-ai devs are limited by experience, in a way. Our minds already eliminates ideas before we really consider them because we have a instinctive feel for what is even meaningful to consider. \"Yah, I'm gonna make my own IDE, solo? Go to bed, brain you're drunk!\"\n\nWe'll need time to learn where we can go in a year now. Great post, OP!"}, {"id": 50582529, "au": "weavermarquez", "dom": 73, "sr": 19, "sc": 3.83, "ep": 3.98, "bs": 0.0, "d": 0, "age": 17.57, "grav": 211.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 74, "qw": 0, "k": 8, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "emacs_coding", "flbl": "Emacs & Coding (Features)", "urls": [], "ig": 1.461, "fa": 0.0, "gp": 0.377, "bl": 0.0, "ds": 0.0, "txt": "Oh, that's exciting! I have been disappointed by Steve Yegge's attempts at emacs-inspired coding harnesses, and options like ECA using ACP have always felt a little too behind for me, so I honestly felt like an insistence on sticking with Emacs for coding / AI interfacing was actually holding me back. But I'm certainly excited to see what Mr. Mastering Emacs has to say about it.\n\nOne request, which I'm emailing in for: arm64 builds for Linux, since I use Asahi."}, {"id": 50587613, "au": "mickeyp", "dom": 12, "sr": 20, "sc": 3.82, "ep": 3.82, "bs": 0.0, "d": 1, "age": 5.36, "grav": 36.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 91, "qw": 0, "k": 2307, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "shell_control", "flbl": "Shell & Control (Commands)", "urls": [], "ig": 1.5, "fa": 0.0, "gp": 0.203, "bl": 0.0, "ds": 0.0, "txt": "Thank you for your feedback. It took me weeks to write this; dozens of hours. Yes it is a bit long: my achilles' heel.\n\nIt can sandbox if you run it in docker; you can hook shell commands and `bwrap` them but there is no built-in sandboxing. It works great with a codex sub.\n\nAntigravity's TOS prohibit third-party harnesses, and the last thing I want is to get people's google accounts banned, so that sadly does not work. (But I hear scuttlebutt on Twitter from the Gemini team they're trying to loosen that restriction.)"}, {"id": 50586875, "au": "spockz", "dom": 11, "sr": 21, "sc": 3.66, "ep": 4.03, "bs": 0.0, "d": 0, "age": 7.75, "grav": 60.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 59, "qw": 0, "k": 2608, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agent_code", "flbl": "Agent & Code (Website)", "urls": [], "ig": 1.267, "fa": 0.0, "gp": 0.726, "bl": 0.0, "ds": 0.0, "txt": "I just read the whole announcement and boy I wish more text was written like this. Full of history, facts, and reasoning. Beautifully written. (I recognise it is a tad long of you just want to get cracking with it.) A very nice refresher in this age.\n\nI’ll be trying it out soon. Hopefully it does sandboxing and dealing with antigravity and codex well."}, {"id": 50588003, "au": "unj", "dom": 19, "sr": 22, "sc": 3.59, "ep": 3.95, "bs": 0.0, "d": 0, "age": 4.13, "grav": 26.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 143, "qw": 0, "k": 24, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "codex_opencode", "flbl": "Codex & Opencode (Import)", "urls": [], "ig": 1.428, "fa": 0.0, "gp": 0.412, "bl": 0.0, "ds": 0.0, "txt": "I really wanted to love this. I had so high hopes...\n\nFor context, I am a long time emacs user. I am pi (eventually ohmypi) user. I feel like with each of these, you can start fast, on a very entry level, gradually extend it to your needs while you learn. They feel similar to what you're used to, until you customize the heck out of them, and they no longer do...\n\nDreamCoder unfortunately made me feel dumb from the get go. Like I landed on another planet. Maybe I am old and too used to the terminal, filesystem, etc to learn new tricks, but honestly I do not even where to start with something I would know, like gsd-core, or any other established plugin from a marketplace, to hit the ground running... (not even mentioning to transfer anything I have customized in omp so far).\n\nOr maybe it's just a complete lack of docs. Dunno."}, {"id": 50588299, "au": "wtarreau", "dom": 16, "sr": 23, "sc": 3.37, "ep": 3.81, "bs": 0.0, "d": 0, "age": 3.23, "grav": 19.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 110, "qw": 0, "k": 256, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": [], "ig": 1.414, "fa": 0.0, "gp": 0.334, "bl": 0.0, "ds": 0.0, "txt": "Strange to see that the guy is having issues with terminals. The terminal is actually what gives all the power to these harnesses. I run them over SSH, I permanently have between 30 and 50 xterms on my machines, each more or less dedicated to some tasks in progress or just with some history where I can instantly press up-arrow enter and try something again. Why on earth would I lose all this convenience, remove one hand from the keyboard to grab a mouse that drags more energy and requires the arm and the shoulder to move, and have to deal with much more complicated UIs when terminals solved all that in the first place decades ago ?"}, {"id": 50589403, "au": "wasting_time", "dom": 42, "sr": 24, "sc": 3.36, "ep": 3.8, "bs": 0.0, "d": 0, "age": 0.92, "grav": 6.9, "surf": 29.9, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 73, "qw": 0, "k": 293, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "codex_opencode", "flbl": "Codex & Opencode (Import)", "urls": [], "ig": 1.552, "fa": 0.0, "gp": 0.106, "bl": 0.0, "ds": 0.0, "txt": "I tried to run this with podman; however after authenticating with OpenAI/Codex, the OpenAI sign-in window gives a Firefox error:\n\n  Error Code: NS_ERROR_NET_EMPTY_RESPONSE\n\n...on http://localhost:1455.\n\nPresumably this response should be forwarded to the container.  I don't know why podman fails to do this; I copied the Docker example exactly.\n\nI really don't want to give a model unrestricted access to my user account, so I'm wary of trying the .deb.  Perhaps I can containerize the server manually?"}, {"id": 50588706, "au": "mjdiloreto", "dom": 1, "sr": 25, "sc": 3.35, "ep": 6.62, "bs": 3.05, "d": 0, "age": 2.32, "grav": 13.9, "surf": 14.2, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 167, "qw": 24, "k": 137, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "emacs_coding", "flbl": "Emacs & Coding (Features)", "urls": ["https://codeberg.org/emacswasm/", "https://emacswasm.org"], "ig": 1.7, "fa": 0.62, "gp": 0.592, "bl": 1.15, "ds": 0.0, "txt": "> DreamCoder is not an Emacs-related application. The reason is unfortunately one of economics and access: I want to build an AI coding harness for everyone.\n\nI think this is an enormous mistake, and it will completely stop me from using this project. Being emacs compatible software would give this project a shared base of decades of composable interoperable software, and he ditched it. Now DreamCoder is completely indistinguishable from any other vibe coded bullshit IDE.\n\nIf the author is lurking, I implore you to re-port DreamCoder back to emacs. I share a similar vision, but I took another approach.\n\nThe problem is not emacs itself (one could simply customize emacs to be more palatable), but distribution. If emacs was web software, then it _would_ be \"for everyone\". That's why I built emacswasm (https://codeberg.org/emacswasm/, https://emacswasm.org) - it's also vibe coded bullshit, but it does port the emacs lisp interpreter and PTY interface to Web assembly, and lets Emacs lisp call JavaScript synchronously, and lets JavaScript call emacs lisp asynchronously.\n\nI will take a more thorough look at DreamCoder, and see if I can port a sufficient amount of features myself, because \"an emacs that edits itself with AI better than I ever could manually\" is my absolute dream."}, {"id": 50587765, "au": "pimeys", "dom": 25, "sr": 26, "sc": 3.25, "ep": 3.84, "bs": 0.0, "d": 2, "age": 4.87, "grav": 32.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 148, "qw": 0, "k": 7172, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "agent_code", "flbl": "Agent & Code (Website)", "urls": [], "ig": 1.511, "fa": 0.0, "gp": 0.199, "bl": 0.0, "ds": 0.0, "txt": "So basically I always want to monitor the changes the agent does, so git/jj changed files and diff view is really important. Refer the agent the parts you don't like and ask it to change. Sometimes you also want to jump in to the code, jump to definition and understand why it calls some APIs like it does in the diff.\n\nSo this is kind of like three tricky components already: VCS, LSP, and code navigation.\n\nThen sharing the stack. At work we have a shared development server. So what we do is we use process-compose and split the network space with netns. Do a pipe to the right stack and load the website in your local browser. Now, if DreamCode could juggle multiple workspaces as it does already, but each workspace could have a view to the website it's working on. Very powerful.\n\nIn general I love the DX. Nice work."}, {"id": 50585611, "au": "intrasight", "dom": 67, "sr": 27, "sc": 3.02, "ep": 3.61, "bs": 0.0, "d": 1, "age": 11.72, "grav": 111.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 11, "k": 6126, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "emacs_coding", "flbl": "Emacs & Coding (Features)", "urls": [], "ig": 1.026, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Really? That is problematic. And why?\n\nAnd while I'm here:\n\n> Browsers lock you out of some rather important Emacs button combinations.\n\nWhich ones? I use emacs in the browser all day. I just had to disable all the keyboard shortcuts in the browser settings.\n\nThis long article about lisp and emacs and then this lame and incorrect excuse for not supporting emacs keybindings? WTAF!"}, {"id": 50589666, "au": "mickeyp", "dom": 33, "sr": 28, "sc": 2.99, "ep": 3.84, "bs": 0.85, "d": 3, "age": 0.47, "grav": 5.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 121, "qw": 0, "k": 2307, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "shell_control", "flbl": "Shell & Control (Commands)", "urls": [], "ig": 1.506, "fa": 0.0, "gp": 0.204, "bl": 0.32, "ds": 0.0, "txt": "That's not a bad idea for a blog post, actually. The answer, in brief, is it took a very long time with a lot of iteration.\n\nYes the moon was one of those... happenstance ideas. I'd been noodling around (as I like to do when I'm feeling creative) with MidJourney which is hard to steer but does generate beautiful art. And the rest just fell out of that primary hero image on dreamcoder.ai over time.\n\nThe irony of course is without AI most of these ideas would just remain that. Before I'd design all manner of creative stuff and then immediately scrap them because they never lived up to the design aesthetic I wanted. Now that still happens, but it takes seconds instead of hours or days to redo."}, {"id": 50588282, "au": "Kon5ole", "dom": 37, "sr": 29, "sc": 2.68, "ep": 3.49, "bs": 0.0, "d": 1, "age": 3.28, "grav": 20.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 98, "qw": 0, "k": 1341, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": [], "ig": 1.447, "fa": 0.0, "gp": 0.058, "bl": 0.0, "ds": 0.0, "txt": "The market for such tools is really crowded, but a solo dev doesn't need to find that many other users who \"click\" with the idea they have realized to make a living from it. I think this tool stands out and like the author's chances.\n\nPersonally I try to avoid additional layers of abstraction when possible. Building muscle memory around the shortcuts in the actual OS and a good terminal app with tabs and panes has so far been enough. Even things like tmux feel like a level too deep for what I do. I run out of ideas long before I lose track of the agents!"}, {"id": 50585517, "au": "mattbis", "dom": 80, "sr": 30, "sc": 2.54, "ep": 3.34, "bs": 0.0, "d": 1, "age": 12.01, "grav": 115.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 125, "qw": 0, "k": 18, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agent_code", "flbl": "Agent & Code (Website)", "urls": [], "ig": 1.423, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "No link to create_account or a link to website, I go to website I dont see how to make account... it also auto opens a new tab which is really annoying. \nThings I would make easily toggle via the tray - and fix UI.\n\nI will try it - since it looks decent. I am always weary of web ide since they used to have lags when typing... really like the look of it for sure.\n\nYou have to make stuff - super easy to use and try... nobody has time!\n\nwhy not a try_it_out mode with guest login or equiv? A login has put me off also since now I wonder, what is it collecting. Hint: another thing to make very easy to see - \" we don't collect anything except X, Y, Z \"\n\nGreat work all the same."}, {"id": 50587899, "au": "mickeyp", "dom": 28, "sr": 31, "sc": 2.53, "ep": 5.59, "bs": 2.54, "d": 5, "age": 4.44, "grav": 28.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 121, "qw": 0, "k": 2307, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 6, "meme": 0, "tier": "crowd_chatter", "facet": "shell_control", "flbl": "Shell & Control (Commands)", "urls": [], "ig": 1.624, "fa": 0.22, "gp": 0.792, "bl": 0.96, "ds": 0.0, "txt": "Right now if you click \"Review\" (on an assistant message, so in effect a reply to an email almost) or after it's stopped and click the purple review button, you can edit inline like MS Word track changes. \"Commit\" then sends the hunks back to the AI on your next turn to review. Works quite well. Caveat is it uses DC's own tools to track changes to files (because I want the system to be source control agnostic) - so YMMV if your AI goes blundering around making big changes in shell commands.\n\nThe next step I need to do is to let users (or the AI help you) set up version control command to do that work instead of DreamCoder if you prefer that."}, {"id": 50585245, "au": "keyle", "dom": 99, "sr": 32, "sc": 2.48, "ep": 3.14, "bs": 0.0, "d": 0, "age": 12.82, "grav": 128.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 60, "qw": 0, "k": 17279, "kpp": 4.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "codex_opencode", "flbl": "Codex & Opencode (Import)", "urls": [], "ig": 1.068, "fa": 0.22, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I read the whole thing and the argument is long to come as to why this is superior to other harnesses; and it appears to come down to \"I have taste\" therefor  \"this is better\" because I said so.\n\nNo actual metrics and something very much in the feels of Omarchy.\n\nThank you for your closed contribution to humanity, I guess. Release the source."}, {"id": 50587603, "au": "mickeyp", "dom": 24, "sr": 33, "sc": 2.17, "ep": 3.49, "bs": 0.0, "d": 1, "age": 5.39, "grav": 36.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 93, "qw": 0, "k": 2307, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agent_code", "flbl": "Agent & Code (Website)", "urls": [], "ig": 1.37, "fa": 0.0, "gp": 0.186, "bl": 0.0, "ds": 0.0, "txt": "I have a Browser pane in Dreamcoder but I disabled it behind a flag because 'forwarding' things not localhost'ed is... very very challenging due to security risks. But maybe I can bring it back for localhost only? It works reasonably well.\n\nDreamCoder does not have code navigation tools per se. I would spread myself a bit too thin to do that right now also, but if you tell me more about your user story maybe I can build something reasonably helpful? Maybe AI-directed navigation where it builds up charts and slides? That is very doable.\n\nKeen to hear your thoughts!"}, {"id": 50585274, "au": "aquariusDue", "dom": 86, "sr": 34, "sc": 2.16, "ep": 3.33, "bs": 0.0, "d": 2, "age": 12.74, "grav": 126.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 119, "qw": 0, "k": 560, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": [], "ig": 1.35, "fa": 0.0, "gp": 0.108, "bl": 0.0, "ds": 0.0, "txt": "Eh, I think it's reasonable. From what I gather you'd only need to pay beyond 5 people using the application in the same business otherwise it's free for commercial and personal use.\n\nAlso weirdly I believe the app will have more success with people who have picked up vibe coding rather than developers (the kind who'll reach for something like pi at least) though the marketing copy is all over the place and the blog post posits that the harness is aimed at everyone.\n\nWhat's really damning for me in the general sense is that regardless of harness used most people get pretty much the same result (visually at least). Which harness you use is pretty much up to preference or \"taste\"."}, {"id": 50589626, "au": "mickeyp", "dom": 22, "sr": 35, "sc": 2.08, "ep": 3.67, "bs": 0.85, "d": 3, "age": 0.52, "grav": 5.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 167, "qw": 0, "k": 2307, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "shell_control", "flbl": "Shell & Control (Commands)", "urls": [], "ig": 1.44, "fa": 0.0, "gp": 0.195, "bl": 0.32, "ds": 0.0, "txt": "DreamCoder reads skills. I'll improve the help to make it clearer where it looks for them, but it is documented in \"How to use and create Agent skills.\" It looks inside `.skills` in a project root or your home directory. Importing them is not a bad idea either. I hadn't thought of that. I have never used 'omp' before; but if it has its own settings, I will try to get that running also.\n\nAs for hooks. There are two: shell command and new chat. Former triggers when a shell command is about to be executed; the latter when there is a new chat. If you need more, drop me an email and I can try to support it.\n\nAs for supporting people's pet workflows: DreamCoder is its own thing. I will endeavour to support a wide range of things, but it has its own rhythm, and that means adjusting to it.\n\n\"Open in studio\" opens the designated primary agent. You can create another if you wish to control tool and prompts for your main chat agent."}, {"id": 50585479, "au": "wangguode", "dom": 97, "sr": 36, "sc": 1.9, "ep": 5.52, "bs": 2.52, "d": 0, "age": 12.14, "grav": 117.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 81, "qw": 0, "k": 0, "kpp": 0.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": [], "ig": 1.705, "fa": 0.28, "gp": 0.494, "bl": 0.95, "ds": 0.0, "txt": "Owning the harness rather than treating the model as a magic black box is where all the real reliability gains come from. Two primitives that made the biggest difference in our own agent harness:\n\n1. Pre-tool AST/command boundary checks before execution rather than relying on system-prompt warnings.\n2. Aggressive stdout/stderr truncation (capping tool output tokens before context bloat triggers silent instruction drift).\n\nCurious how DreamCoder handles long-running test output or background server logs inside the Emacs buffer loop without blowing up context."}, {"id": 50589322, "au": "frou_dh", "dom": 47, "sr": 37, "sc": 1.84, "ep": 2.72, "bs": 0.0, "d": 0, "age": 1.08, "grav": 7.6, "surf": 27.9, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 8968, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "codex_opencode", "flbl": "Codex & Opencode (Import)", "urls": [], "ig": 1.139, "fa": 0.0, "gp": 0.032, "bl": 0.0, "ds": 0.0, "txt": "The design looks like it is suffering from the programmer affliction of using monospaced text in many GUI elements that have no reason to be monospaced :( For a serious GUI application we need to step up from mindless monospace worship, and think about what actually makes sense for each element."}, {"id": 50587434, "au": "globular-toast", "dom": 55, "sr": 38, "sc": 1.81, "ep": 2.47, "bs": 0.0, "d": 1, "age": 5.94, "grav": 41.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 6350, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "emacs_coding", "flbl": "Emacs & Coding (Features)", "urls": [], "ig": 1.049, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "You should be in control of the font and video size. Blame your browser. Surely we could fix all this with vibe coding.\n\n\"<Anthropomorphised LLM harness>, sometimes the text is too big on websites I read, fix it.\""}, {"id": 50587358, "au": "hobo123", "dom": 89, "sr": 39, "sc": 1.71, "ep": 2.81, "bs": 0.0, "d": 4, "age": 6.17, "grav": 43.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 68, "qw": 0, "k": 325, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "shell_control", "flbl": "Shell & Control (Commands)", "urls": [], "ig": 1.194, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Same. For Java coding I much prefer eclipse, it's ugly but very powerful and more convenient (and I've regularly tried Idea for a few weeks full time once per year in the past, so it's not like I haven't tried; stopped a few years back). For non Java VSCode does the job for me (edit: and I don't have to pay for the pro version to get JS support or something like that)."}, {"id": 50586423, "au": "mitjam", "dom": 58, "sr": 40, "sc": 1.54, "ep": 2.94, "bs": 0.0, "d": 2, "age": 9.11, "grav": 76.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 413, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": [], "ig": 1.166, "fa": 0.0, "gp": 0.136, "bl": 0.0, "ds": 0.0, "txt": "Thank you for your beautiful project and article. Thery’re very close to me, haven’t felt that excited about programming since my early days on the Amiga.\n\nI was already on the fence of halfing my Claude ultra to put some coins into OpenAI’s subscription. DreamCoder might pull me over."}, {"id": 50585542, "au": "jeffybefffy519", "dom": 91, "sr": 41, "sc": 1.41, "ep": 2.8, "bs": 0.0, "d": 0, "age": 11.92, "grav": 114.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 295, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agent_code", "flbl": "Agent & Code (Website)", "urls": [], "ig": 1.057, "fa": 0.0, "gp": 0.221, "bl": 0.0, "ds": 0.0, "txt": "Mehhh i dunno, this seems like it missing a key point of actually make agent outputs reviewable.... thats whats missing.... and chatting to an agent to do tasks isnt the right input is what i feel."}, {"id": 50583464, "au": "atrus", "dom": 51, "sr": 42, "sc": 1.36, "ep": 2.24, "bs": 0.0, "d": 1, "age": 16.34, "grav": 188.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 1236, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "shell_control", "flbl": "Shell & Control (Commands)", "urls": [], "ig": 0.543, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I liked the article, it provided contest to everything, as opposed to a rather bland homepage. I won't even call it a AI generated since it looks like...every other bland tool homepage from the past 15 years lol."}, {"id": 50587762, "au": "noir_lord", "dom": 48, "sr": 43, "sc": 1.27, "ep": 2.47, "bs": 1.19, "d": 0, "age": 4.87, "grav": 32.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 31, "k": 18124, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.442, "fa": 0.42, "gp": 0.159, "bl": 0.45, "ds": 0.0, "txt": "> So in May 2025 I decreed that I would build a better harness, and surely now that I have AI this should not take more than 2 or 3 months to build.\n\n> And so, after 15 months of work\n\nThat got a genuine chuckle, so many times in my career I've done the \"shouldn't take more than X, it's not that <whatever\" and it's been 2-8 * X in the end."}, {"id": 50586283, "au": "esFran", "dom": 41, "sr": 44, "sc": 1.25, "ep": 2.35, "bs": 0.0, "d": 0, "age": 9.57, "grav": 82.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 92, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": [], "ig": 0.5, "fa": 0.0, "gp": 0.808, "bl": 0.0, "ds": 0.0, "txt": "Very interesting, in deed.\n\nI think it is one of the correct ways to harness all the power of AI. A set of workers doing your job in a very clear way."}, {"id": 50588853, "au": "doginasuit", "dom": 39, "sr": 45, "sc": 1.21, "ep": 2.61, "bs": 0.0, "d": 2, "age": 2.02, "grav": 12.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 1217, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": [], "ig": 1.109, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Thank you for mentioning the feature in the latest IntelliJ release, I was starting to feel the limits of Claude Code in the terminal.\n\nI have an Anthropic subscription or I'd try out DreamCoder in a heartbeat. Hopefully they see the value of letting people use other tools, I'm weighing alternatives."}, {"id": 50589284, "au": "doginasuit", "dom": 32, "sr": 46, "sc": 1.18, "ep": 2.43, "bs": 0.0, "d": 2, "age": 1.17, "grav": 8.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 1217, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": [], "ig": 1.033, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I'd love to hear about the design, have you written about it? What stands out to me is the really thoughtful use of color, generally restrained, occasionally exuberant. The moon also seems to be a recurring idea, an unexpected touch for an IDE."}, {"id": 50586445, "au": "rramon", "dom": 60, "sr": 47, "sc": 1.02, "ep": 2.56, "bs": 0.0, "d": 2, "age": 9.03, "grav": 75.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 87, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agent_code", "flbl": "Agent & Code (Website)", "urls": [], "ig": 0.785, "fa": 0.0, "gp": 0.493, "bl": 0.0, "ds": 0.0, "txt": "They must have changed this because you can bring your CC sub into other ADEs like T3 or Amp and use the CC agent together with other agents."}, {"id": 50588702, "au": "mjdiloreto", "dom": 18, "sr": 48, "sc": 0.8, "ep": 1.83, "bs": 0.0, "d": 1, "age": 2.33, "grav": 14.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 137, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "emacs_coding", "flbl": "Emacs & Coding (Features)", "urls": [], "ig": 0.778, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Emacs gives more power than the terminal, especially in your remote case. The author of Mastering Emacs certainly knows this."}, {"id": 50586704, "au": "mickeyp", "dom": 59, "sr": 49, "sc": 0.74, "ep": 3.7, "bs": 2.52, "d": 3, "age": 8.28, "grav": 66.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 2307, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 1.046, "fa": 0.34, "gp": 0.188, "bl": 0.95, "ds": 0.0, "txt": "Glad to hear it. It was hard writing the post. I have programmed since I was a kid, and my identity is locked up in programming. But I also know that our industry keeps reinventing itself, and after 30 years most of the work I do is stuff I have seen before, and done many times."}, {"id": 50586770, "au": "punchmesan", "dom": 65, "sr": 50, "sc": 0.63, "ep": 2.17, "bs": 0.0, "d": 2, "age": 8.03, "grav": 63.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 109, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": [], "ig": 0.925, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "They do, it just dips into \"extra usage\". And some of us on Claude Enterprise can trivially authenticate a harness via OAuth but are not empowered to create API keys."}, {"id": 50583789, "au": "2001zhaozhao", "dom": 36, "sr": 51, "sc": 0.6, "ep": 3.33, "bs": 1.19, "d": 0, "age": 15.79, "grav": 178.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 1008, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": [], "ig": 0.487, "fa": 0.0, "gp": 1.51, "bl": 0.45, "ds": 0.0, "txt": "FINALLY someone else made an orchestrator with a built-in desktop. This is the right direction for managing agents for sure."}, {"id": 50589380, "au": "fock", "dom": 3, "sr": 52, "sc": 0.58, "ep": 1.82, "bs": 0.0, "d": 1, "age": 0.96, "grav": 7.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 53, "qw": 0, "k": 1365, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "emacs_coding", "flbl": "Emacs & Coding (Features)", "urls": [], "ig": 0.776, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "emacs is fundamentally broken for todays world, evene before \"AI\" (look at the CVEs they have). Maybe once this all burned down, we can create something better. (Linux is burning already and all the people renting us computers have very much decided to stoke the fire to support their case of monopolizing compute)"}, {"id": 50587686, "au": "xenodium", "dom": 76, "sr": 53, "sc": 0.34, "ep": 1.74, "bs": 0.0, "d": 3, "age": 5.16, "grav": 34.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 1525, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "emacs_coding", "flbl": "Emacs & Coding (Features)", "urls": [], "ig": 0.739, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "agent-shell author here. Curious, how long since you last took it for a spin? Many of the features mentioned have been supported for a while now."}, {"id": 50585948, "au": "Uhhrrr", "dom": 68, "sr": 54, "sc": 0.25, "ep": 1.79, "bs": 0.0, "d": 2, "age": 10.69, "grav": 96.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 3581, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": [], "ig": 0.763, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "C-n gives you a new browser window instead of moving to the next line, that's a pretty big one."}, {"id": 50589769, "au": "mickeyp", "dom": 2, "sr": 55, "sc": 0.18, "ep": 4.09, "bs": 2.52, "d": 1, "age": 0.3, "grav": 4.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 60, "qw": 0, "k": 2307, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "emacs_coding", "flbl": "Emacs & Coding (Features)", "urls": [], "ig": 1.272, "fa": 0.28, "gp": 0.21, "bl": 0.95, "ds": 0.0, "txt": "It will not run in Emacs. Emacs is great, but it's fundamentally unsuited, today, in its current shape -- and by Emacs I mean GNU Emacs specifically -- to a high-fidelity, asynchronous and highly parallel agent workflow engine.\n\nI wish it did fit the mould --- it does not. Not for what I want.\n\nBy all means avail yourself of DreamCoder's features and port them yourself though."}, {"id": 50586714, "au": "disgruntledphd2", "dom": 53, "sr": 56, "sc": 0.18, "ep": 1.42, "bs": 0.0, "d": 3, "age": 8.24, "grav": 65.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 8526, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "emacs_coding", "flbl": "Emacs & Coding (Features)", "urls": [], "ig": 0.606, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Yeah, the article is almost entirely context. I think for most of his readers, that was the right approach but it's not ideal for HN (unless you're already an Emacs nerd)."}, {"id": 50587873, "au": "pimeys", "dom": 27, "sr": 57, "sc": 0.18, "ep": 3.0, "bs": 1.7, "d": 4, "age": 4.55, "grav": 29.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 86, "qw": 0, "k": 7172, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 5, "meme": 0, "tier": "crowd_chatter", "facet": "agent_code", "flbl": "Agent & Code (Website)", "urls": [], "ig": 1.275, "fa": 0.0, "gp": 0.0, "bl": 0.64, "ds": 0.0, "txt": "Terminal of course would do. But the graphical diff of Gram editor is so good, and if you combine it with tighter integration with the agent this might be a great feature. Right click a part of the diff, ask the agent a question or ask it to make changes...\n\nThere are people who say that reading code is not needed anymore. After a year in a company who kind of stopped that at some point, we all learned it's a horrible idea and now we carefully review and craft every change."}, {"id": 50588468, "au": "bloopernova", "dom": 72, "sr": 58, "sc": 0.18, "ep": 1.1, "bs": 0.0, "d": 1, "age": 2.85, "grav": 17.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 16, "qw": 0, "k": 8338, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "shell_control", "flbl": "Shell & Control (Commands)", "urls": ["https://albedo.sh/"], "ig": 0.469, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Similar ideas in https://albedo.sh/ (not affiliated with it, I just like it)\n\nI too wish DreamCoder was open source."}, {"id": 50584183, "au": "cmrdporcupine", "dom": 79, "sr": 59, "sc": 0.18, "ep": 1.9, "bs": 1.19, "d": 0, "age": 15.11, "grav": 166.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 23667, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agent_code", "flbl": "Agent & Code (Website)", "urls": [], "ig": 0.409, "fa": 0.0, "gp": 0.649, "bl": 0.45, "ds": 0.0, "txt": "Runs locally... but requires account registration to get  a license and requires signing a EULA?\n\nEh. This is a saturated market."}, {"id": 50587636, "au": "mickeyp", "dom": 85, "sr": 60, "sc": 0.18, "ep": 3.14, "bs": 2.52, "d": 4, "age": 5.31, "grav": 35.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 76, "qw": 0, "k": 2307, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "shell_control", "flbl": "Shell & Control (Commands)", "urls": [], "ig": 1.335, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "That will come. I want AI-driven extension and plugin support. The backend can do it; the frontend can do it. It just needs to be built properly, which I am slowly ideating and architecting.\n\nWhat would you like to build?\n\nMy vision is that you go \"I'm trying to optimise a megakernel for my system, I'll need a dashboard that updates when you meet new goals\" combined with the power of Jupyter/Mathematica's \"notebook\" design. That is what I am working towards."}, {"id": 50588167, "au": "mickeyp", "dom": 20, "sr": 61, "sc": 0.18, "ep": 2.97, "bs": 2.52, "d": 1, "age": 3.65, "grav": 22.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 84, "qw": 0, "k": 2307, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": [], "ig": 1.262, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "Sorry to hear about the onboarding experience. That's on me. It has manuals, interactive tutorials, popup context help, and a model setup wizard.\n\nIf you use Pi, click \"Import from Pi\" in the model setup wizard. The next version will have an interactive butler you can use that can call DreamCoder itself. I wanted it in this version, but... then that's also why it took me 15 months to ship this because I keep adding more :-)\n\nI don't know what \"gsd-core\" is --- is it an essential feature to you?"}, {"id": 50589729, "au": "mickeyp", "dom": 17, "sr": 62, "sc": 0.18, "ep": 2.93, "bs": 2.52, "d": 1, "age": 0.36, "grav": 4.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 64, "qw": 0, "k": 2307, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "agent_code", "flbl": "Agent & Code (Website)", "urls": [], "ig": 1.246, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "It has a keyboard-driven UI with avy-embark style combos for the chat panes, and general keyboard-friendly driving for many other things.\n\nI don't have issues with terminals; but they are a terrible fit for the future of coding. If people prefer terminals, great! We have many wonderful tools that fill that role, so everybody can have their cake and eat it.\n\nI do not share that view though!"}, {"id": 50586171, "au": "mickeyp", "dom": 83, "sr": 63, "sc": 0.18, "ep": 2.76, "bs": 2.52, "d": 2, "age": 9.9, "grav": 86.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 63, "qw": 0, "k": 2307, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": [], "ig": 1.134, "fa": 0.0, "gp": 0.063, "bl": 0.95, "ds": 0.0, "txt": "I am the author.\n\nYou can literally see the system prompt in the app itself. You can configure it in the UI (Moon menu -> Agents -> PRIMARY).\n\nThere are very few if any secrets from the user.\n\nAs for pricing: I am not VC funded, nor a trillion-dollar AI company, so I cannot afford to give away the tool to businesses. It is, however, free for personal use."}, {"id": 50584496, "au": "chilicuil", "dom": 56, "sr": 64, "sc": -0.03, "ep": 3.01, "bs": 3.05, "d": 0, "age": 14.42, "grav": 154.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 183, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "agent_code", "flbl": "Agent & Code (Website)", "urls": [], "ig": 0.692, "fa": 0.0, "gp": 0.957, "bl": 1.15, "ds": 0.0, "txt": "it seems it doesnt work with the antrophic suscription model, nice project to try later"}, {"id": 50586082, "au": "mickeyp", "dom": 57, "sr": 65, "sc": -0.06, "ep": 2.46, "bs": 2.52, "d": 1, "age": 10.16, "grav": 89.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 2307, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": [], "ig": 0.711, "fa": 0.0, "gp": 0.54, "bl": 0.95, "ds": 0.0, "txt": "Anthropic won't allow  harnesses other than Claude Code for their subscribers. That is why. You can still use their free monthly credits or API keys with DreamCoder."}, {"id": 50589700, "au": "mickeyp", "dom": 9, "sr": 66, "sc": -0.27, "ep": 2.24, "bs": 2.52, "d": 1, "age": 0.41, "grav": 4.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 47, "qw": 0, "k": 2307, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "codex_opencode", "flbl": "Codex & Opencode (Import)", "urls": [], "ig": 0.955, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "It is compiled. It's compiled with nuitka. So you're technically not right about that.\n\nI tested all the importers and I have subscriptions for all 3: Copilot Enterprise, Codex, OpenCode + a Go Sub. And they import just fine.\n\nI would like to try and help you -- can you email me please?"}, {"id": 50587808, "au": "mickeyp", "dom": 26, "sr": 67, "sc": -0.42, "ep": 2.94, "bs": 3.37, "d": 3, "age": 4.72, "grav": 30.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 80, "qw": 0, "k": 2307, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "agent_code", "flbl": "Agent & Code (Website)", "urls": [], "ig": 1.253, "fa": 0.0, "gp": 0.0, "bl": 1.27, "ds": 0.0, "txt": "I think a lot of this can be done in a Terminal pane for terminal-shaped things, but it won't do for UI stuff. The other approach is to 'adopt' a site through a proxy which is kind-of what the browser pane does. I've resisted it because it's a serious attack vector for baddies.\n\nAs for the website: yeah I'll re-enable the panel, but add some disclaimers so people don't try to do their online banking through it where random things won't load due to iframe sandboxing."}, {"id": 50586534, "au": "ctippett", "dom": 30, "sr": 68, "sc": -0.43, "ep": 0.76, "bs": 1.19, "d": 1, "age": 8.77, "grav": 72.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 1313, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "codex_opencode", "flbl": "Codex & Opencode (Import)", "urls": [], "ig": 0.247, "fa": 0.0, "gp": 0.125, "bl": 0.45, "ds": 0.0, "txt": "The visuals really stand out. It's actually the main reason why I decided to download it and give it a go."}, {"id": 50583572, "au": "hasbot", "dom": 52, "sr": 69, "sc": -0.5, "ep": 0.69, "bs": 1.19, "d": 2, "age": 16.17, "grav": 184.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 853, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": [], "ig": 0.294, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "On the article I kept scrolling and scrolling to see a description of the harness and what it does.  The \"bland\" homepage does exactly that."}, {"id": 50586953, "au": "philip-b", "dom": 34, "sr": 70, "sc": -0.51, "ep": 0.69, "bs": 1.19, "d": 1, "age": 7.44, "grav": 56.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 90, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "shell_control", "flbl": "Shell & Control (Commands)", "urls": [], "ig": 0.292, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "I actually hate the design because it looks like Claude-slop, even though I understand that that doesn't actually make the design bad. I just dislike it by association."}, {"id": 50586613, "au": "mickeyp", "dom": 62, "sr": 71, "sc": -0.56, "ep": 1.95, "bs": 2.52, "d": 3, "age": 8.56, "grav": 69.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 2307, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "codex_opencode", "flbl": "Codex & Opencode (Import)", "urls": [], "ig": 0.831, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "I will check their TOS, but I am fairly certain they are using the Claude Agent SDK or just support API key only. (Which DreamCoder also does; you can use pay as you go with Ants' endpoints.)"}, {"id": 50584178, "au": "doginasuit", "dom": 29, "sr": 72, "sc": -0.58, "ep": 2.46, "bs": 3.05, "d": 0, "age": 15.13, "grav": 166.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 1217, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": [], "ig": 0.362, "fa": 0.0, "gp": 1.112, "bl": 1.15, "ds": 0.0, "txt": "How is this so beautiful? Both the article and the IDE. Really refreshing design."}, {"id": 50586181, "au": "mickeyp", "dom": 98, "sr": 73, "sc": -0.63, "ep": 1.88, "bs": 2.52, "d": 1, "age": 9.86, "grav": 85.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 2307, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "shell_control", "flbl": "Shell & Control (Commands)", "urls": [], "ig": 0.802, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "I am the creator. It handles all that trivially. You can hook pre shell commands and decide waht to do with them with a shell script you write. It does not run in Emacs though. It is its own thing."}, {"id": 50587365, "au": "rthimian", "dom": 61, "sr": 74, "sc": -0.7, "ep": 1.82, "bs": 2.52, "d": 3, "age": 6.16, "grav": 43.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 6, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": [], "ig": 0.775, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "No, they didn't change it. All the requests you mentioned and also Opencode send them to Anthropics' own Claude Code via the Claude Agent SDK. So you have a harness in a harness.\n\nThat's how I understand it at least."}, {"id": 50586807, "au": "mickeyp", "dom": 66, "sr": 75, "sc": -0.73, "ep": 1.78, "bs": 2.52, "d": 3, "age": 7.95, "grav": 62.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 2307, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": [], "ig": 0.76, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "Okay, I can add OAuth for Claude support for sure. I just have to be careful it does not violate the TOS. I would hate for someone to get into trouble because of DreamCoder.\n\nThanks for clarifying."}, {"id": 50582773, "au": "rthimian", "dom": 44, "sr": 76, "sc": -0.85, "ep": 2.86, "bs": 3.71, "d": 0, "age": 17.29, "grav": 205.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 6, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "shell_control", "flbl": "Shell & Control (Commands)", "urls": [], "ig": 0.509, "fa": 0.0, "gp": 1.15, "bl": 1.4, "ds": 0.0, "txt": "That really looks interesting. Both in terms of functionality and in terms of the visual design. Refreshingly different."}, {"id": 50586157, "au": "mickeyp", "dom": 92, "sr": 77, "sc": -0.9, "ep": 1.62, "bs": 2.52, "d": 1, "age": 9.94, "grav": 86.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 2307, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": [], "ig": 0.689, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "I am the author. It has a review feature so you can see what the agent has done, provided it did it through the internal tools. In fact very little in the app is hidden."}, {"id": 50589801, "au": "mickeyp", "dom": 43, "sr": 78, "sc": -1.0, "ep": 1.52, "bs": 2.52, "d": 1, "age": 0.26, "grav": 4.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 2307, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "shell_control", "flbl": "Shell & Control (Commands)", "urls": [], "ig": 0.646, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "The default copy-pasta on the site has the callback port forwarded back in using the localhost trick like so: `...   -p 127.0.0.1:1455:1455 ...`.\n\nIf that does not work (and an AI can't figure it out for you either) -- do email me and I'll try and help."}, {"id": 50584944, "au": "gmmachine", "dom": 88, "sr": 79, "sc": -1.59, "ep": 1.46, "bs": 3.05, "d": 3, "age": 13.53, "grav": 139.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 22, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "codex_opencode", "flbl": "Codex & Opencode (Import)", "urls": [], "ig": 0.62, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "I found JetBrains clunky, it feels like Macromedia only for today."}, {"id": 50587648, "au": "mickeyp", "dom": 81, "sr": 80, "sc": -2.57, "ep": 1.14, "bs": 3.71, "d": 2, "age": 5.27, "grav": 35.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 2307, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "agent_code", "flbl": "Agent & Code (Website)", "urls": [], "ig": 0.484, "fa": 0.0, "gp": 0.0, "bl": 1.4, "ds": 0.0, "txt": "Auto tab: sorry about that. I got lots of feedback saying it should open a tab. You can't win :-)"}, {"id": 50587310, "au": "hobo123", "dom": 54, "sr": 81, "sc": -3.02, "ep": 1.22, "bs": 4.24, "d": 0, "age": 6.3, "grav": 45.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 325, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.37, "fa": 0.0, "gp": 0.244, "bl": 1.6, "ds": 0.0, "txt": "minor nitpick: Huge font, tiny videos on mobile Firefox, but the content is great."}, {"id": 50585895, "au": "weavermarquez", "dom": 78, "sr": 82, "sc": -3.1, "ep": 1.14, "bs": 4.24, "d": 2, "age": 10.86, "grav": 99.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 8, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "shell_control", "flbl": "Shell & Control (Commands)", "urls": [], "ig": 0.484, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "I would normally fork it and submit a PR to support it if I had a github link!"}, {"id": 50583376, "au": "hasbot", "dom": 50, "sr": 83, "sc": -3.23, "ep": 1.81, "bs": 5.04, "d": 0, "age": 16.46, "grav": 190.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 13, "qw": 0, "k": 853, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": ["https://www.dreamcoder.ai/"], "ig": 0.332, "fa": 0.0, "gp": 0.708, "bl": 1.9, "ds": 0.0, "txt": "Should have linked to the actual harness and not some incredibly long article: https://www.dreamcoder.ai/"}, {"id": 50588153, "au": "croes", "dom": 71, "sr": 84, "sc": -3.49, "ep": 0.75, "bs": 4.24, "d": 0, "age": 3.67, "grav": 22.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 25736, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "shell_control", "flbl": "Shell & Control (Commands)", "urls": [], "ig": 0.296, "fa": 0.0, "gp": 0.037, "bl": 1.6, "ds": 0.0, "txt": "I‘ll wait for the open source clean room clone"}, {"id": 50584358, "au": "ngai_aku", "dom": 74, "sr": 85, "sc": -3.62, "ep": 0.62, "bs": 4.24, "d": 1, "age": 14.75, "grav": 159.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 156, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "emacs_coding", "flbl": "Emacs & Coding (Features)", "urls": [], "ig": 0.263, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "You mention ECA, but did you ever try agent-shell (which also uses ACP)?"}, {"id": 50587580, "au": "nolist_policy", "dom": 84, "sr": 86, "sc": -3.66, "ep": 0.58, "bs": 4.24, "d": 3, "age": 5.47, "grav": 37.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 1747, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.247, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Quick question: are there docs for extensions/plugins?"}, {"id": 50584796, "au": "cmrdporcupine", "dom": 87, "sr": 87, "sc": -3.73, "ep": 0.51, "bs": 4.24, "d": 2, "age": 13.83, "grav": 144.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 23667, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "shell_control", "flbl": "Shell & Control (Commands)", "urls": [], "ig": 0.217, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "I actually pay for JetBrains. Or did until recently.\n\nThis? I'd need a compelling argument."}, {"id": 50586716, "au": "disgruntledphd2", "dom": 70, "sr": 88, "sc": -4.08, "ep": 0.16, "bs": 4.24, "d": 3, "age": 8.22, "grav": 65.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 8526, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.069, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "C-w is the one that kills me (he he he)."}, {"id": 50589028, "au": "doginasuit", "dom": 35, "sr": 89, "sc": -4.09, "ep": 0.15, "bs": 4.24, "d": 2, "age": 1.67, "grav": 10.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 1217, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.064, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Would you mind saying more about why this looks like Claude-slop?"}, {"id": 50582781, "au": "rootnod3", "dom": 77, "sr": 90, "sc": -4.13, "ep": 0.11, "bs": 4.24, "d": 1, "age": 17.28, "grav": 205.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 763, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "shell_control", "flbl": "Shell & Control (Commands)", "urls": [], "ig": 0.048, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Can’t you just add it yourself with AI?"}, {"id": 50586889, "au": "moneybunny", "dom": 95, "sr": 91, "sc": -4.57, "ep": 1.0, "bs": 5.57, "d": 0, "age": 7.7, "grav": 59.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 0, "kpp": 0.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "shell_control", "flbl": "Shell & Control (Commands)", "urls": [], "ig": 0.389, "fa": 0.0, "gp": 0.057, "bl": 2.1, "ds": 0.0, "txt": "your computer comes with mouse support, why not use it"}, {"id": 50588316, "au": "intrasight", "dom": 69, "sr": 92, "sc": -4.99, "ep": 0.75, "bs": 5.74, "d": 3, "age": 3.17, "grav": 19.2, "surf": 3.4, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 6126, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "emacs_coding", "flbl": "Emacs & Coding (Features)", "urls": [], "ig": 0.317, "fa": 0.0, "gp": 0.0, "bl": 2.165, "ds": 0.0, "txt": "Was a big one - until I turned off keyboard shortcuts"}, {"id": 50589707, "au": "fock", "dom": 5, "sr": 93, "sc": -5.15, "ep": 1.21, "bs": 6.36, "d": 3, "age": 0.4, "grav": 4.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 1365, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.513, "fa": 0.0, "gp": 0.0, "bl": 2.4, "ds": 0.0, "txt": "ebpf, user-namespaces, high-performance-protocols. All added into the monolith for improving the bottomline for people renting out the cloud. All requiring a steady-stream of patches to keep barely safe..."}, {"id": 50586636, "au": "DehuWang", "dom": 64, "sr": 94, "sc": -6.41, "ep": 0.34, "bs": 6.76, "d": 4, "age": 8.47, "grav": 68.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 3, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": [], "ig": 0.146, "fa": 0.0, "gp": 0.0, "bl": 2.55, "ds": 0.0, "txt": "can't use it unless it supports claude subscription"}, {"id": 50589538, "au": "croes", "dom": 4, "sr": 95, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 0.72, "grav": 6.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 25736, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "emacs_coding", "flbl": "Emacs & Coding (Features)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Where is Linux burning?"}, {"id": 50585837, "au": "maxwelljoslyn", "dom": 7, "sr": 96, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 11.02, "grav": 101.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 38, "k": 833, "kpp": 5.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "> The high level idea is that a session maps to a namespace in Clojure. When you create a new session, it makes a new namespace, injects tools that are bound to that session into it, and then swaps you into that namespace.\n\nOh, that's a fascinating idea. Well done."}, {"id": 50584929, "au": "gmmachine", "dom": 40, "sr": 97, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 13.55, "grav": 139.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 1, "qw": 0, "k": 22, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Agreed."}, {"id": 50585240, "au": "newsclues", "dom": 90, "sr": 98, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 12.83, "grav": 128.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 2875, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "emacs_coding", "flbl": "Emacs & Coding (Features)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Imagine paying for software"}, {"id": 50586911, "au": "defrost", "dom": 96, "sr": 99, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 7.61, "grav": 58.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 26384, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "not everyone's got time to waste"}, {"id": 50586276, "au": "mickeyp", "dom": 31, "sr": 100, "sc": -11.44, "ep": 0.0, "bs": 9.41, "d": 1, "age": 9.58, "grav": 82.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 2307, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "claude_harness", "flbl": "Claude & Harness (Code)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.141, "bl": 3.55, "ds": 0.0, "txt": "Thank you for your kind words :)"}]}</script>
+
+<script>
+/* HN Epistemic Observatory — Elm Display Layer */
+!function(r){"use strict";function n(r,n,t){return t.a=r,t.f=n,t}function t(r){return n(2,r,function(n){return function(t){return r(n,t)}})}function e(r){return n(3,r,function(n){return function(t){return function(e){return r(n,t,e)}}})}function a(r){return n(4,r,function(n){return function(t){return function(e){return function(a){return r(n,t,e,a)}}}})}function u(r){return n(5,r,function(n){return function(t){return function(e){return function(a){return function(u){return r(n,t,e,a,u)}}}}})}function o(r){return n(6,r,function(n){return function(t){return function(e){return function(a){return function(u){return function(o){return r(n,t,e,a,u,o)}}}}}})}function i(r){return n(7,r,function(n){return function(t){return function(e){return function(a){return function(u){return function(o){return function(i){return r(n,t,e,a,u,o,i)}}}}}}})}function c(r){return n(8,r,function(n){return function(t){return function(e){return function(a){return function(u){return function(o){return function(i){return function(c){return r(n,t,e,a,u,o,i,c)}}}}}}}})}function f(r){return n(9,r,function(n){return function(t){return function(e){return function(a){return function(u){return function(o){return function(i){return function(c){return function(f){return r(n,t,e,a,u,o,i,c,f)}}}}}}}}})}function s(r,n,t){return 2===r.a?r.f(n,t):r(n)(t)}function b(r,n,t,e){return 3===r.a?r.f(n,t,e):r(n)(t)(e)}function d(r,n,t,e,a){return 4===r.a?r.f(n,t,e,a):r(n)(t)(e)(a)}function l(r,n,t,e,a,u){return 5===r.a?r.f(n,t,e,a,u):r(n)(t)(e)(a)(u)}function v(r,n,t,e,a,u,o,i){return 7===r.a?r.f(n,t,e,a,u,o,i):r(n)(t)(e)(a)(u)(o)(i)}function p(r,n,t,e,a,u,o,i,c,f){return 9===r.a?r.f(n,t,e,a,u,o,i,c,f):r(n)(t)(e)(a)(u)(o)(i)(c)(f)}var h={$:0};function g(r,n){return{$:1,a:r,b:n}}var m=t(g);function y(r){for(var n=h,t=r.length;t--;)n=g(r[t],n);return n}function w(r){for(var n=[];r.b;r=r.b)n.push(r.a);return n}var _=e(function(r,n,t){for(var e=[];n.b&&t.b;n=n.b,t=t.b)e.push(s(r,n.a,t.a));return y(e)}),$=t(function(r,n){return y(w(n).sort(function(n,t){return T(r(n),r(t))}))}),k=e(function(r,n,t){for(var e=new Array(r),a=0;a<r;a++)e[a]=t(n+a);return e}),A=t(function(r,n){for(var t=new Array(r),e=0;e<r&&n.b;e++)t[e]=n.a,n=n.b;return t.length=e,x(t,n)});function S(r){throw new Error("https://github.com/elm/core/blob/1.0.0/hints/"+r+".md")}function N(r,n){for(var t,e=[],a=C(r,n,0,e);a&&(t=e.pop());a=C(t.a,t.b,0,e));return a}function C(r,n,t,e){if(r===n)return!0;if("object"!=typeof r||null===r||null===n)return"function"==typeof r&&S(5),!1;if(t>100)return e.push(x(r,n)),!0;for(var a in r.$<0&&(r=Bn(r),n=Bn(n)),r)if(!C(r[a],n[a],t+1,e))return!1;return!0}function T(r,n,t){if("object"!=typeof r)return r===n?0:r<n?-1:1;if(void 0===r.$)return(t=T(r.a,n.a))||(t=T(r.b,n.b))?t:T(r.c,n.c);for(;r.b&&n.b&&!(t=T(r.a,n.a));r=r.b,n=n.b);return t||(r.b?1:n.b?-1:0)}var I=t(function(r,n){var t=T(r,n);return t<0?Dn:t?Mn:Pn});function x(r,n){return{a:r,b:n}}function E(r){return r}function O(r,n){var t={};for(var e in r)t[e]=r[e];for(var e in n)t[e]=n[e];return t}function R(r,n){if("string"==typeof r)return r+n;if(!r.b)return n;var t=g(r.a,n);r=r.b;for(var e=t;r.b;r=r.b)e=e.b=g(r.a,n);return t}Math;var P=t(function(r,n){var t=n%r;return 0===r?S(11):t>0&&r<0||t<0&&r>0?t+r:t});Math,Math,Math,Math,Math,Math,Math,Math,Math;var D=Math.ceil,L=Math.floor,F=Math.round,B=(Math,Math.log);isNaN;var M=t(function(r,n){return r+n}),H=t(function(r,n){return n.split(r)}),j=t(function(r,n){return n.join(r)}),U=e(function(r,n,t){return t.slice(r,n)}),G=t(function(r,n){for(var t=n.length;t--;){var e=n[t],a=n.charCodeAt(t);if(56320<=a&&a<=57343&&(e=n[--t]+e),!r(E(e)))return!1}return!0}),z=t(function(r,n){return n.indexOf(r)>-1}),Y=t(function(r,n){return 0===n.indexOf(r)});function J(r){return r+""}function W(r){return{$:2,b:r}}var q=W(function(r){return"number"!=typeof r?lr("an INT",r):-2147483647<r&&r<2147483647&&(0|r)===r?Hn(r):!isFinite(r)||r%1?lr("an INT",r):Hn(r)}),X=W(function(r){return"boolean"==typeof r?Hn(r):lr("a BOOL",r)}),Q=W(function(r){return"number"==typeof r?Hn(r):lr("a FLOAT",r)}),V=W(function(r){return Hn(r)}),K=W(function(r){return"string"==typeof r?Hn(r):r instanceof String?Hn(r+""):lr("a STRING",r)}),Z=t(function(r,n){return{$:6,d:r,b:n}});function rr(r,n){return{$:9,f:r,g:n}}var nr=t(function(r,n){return{$:10,b:n,h:r}}),tr=t(function(r,n){return rr(r,[n])}),er=e(function(r,n,t){return rr(r,[n,t])}),ar=a(function(r,n,t,e){return rr(r,[n,t,e])}),ur=u(function(r,n,t,e,a){return rr(r,[n,t,e,a])}),or=i(function(r,n,t,e,a,u,o){return rr(r,[n,t,e,a,u,o])}),ir=f(function(r,n,t,e,a,u,o,i,c){return rr(r,[n,t,e,a,u,o,i,c])}),cr=t(function(r,n){return fr(r,n)});function fr(r,n){switch(r.$){case 2:return r.b(n);case 5:return null===n?Hn(r.c):lr("null",n);case 3:return br(n)?sr(r.b,n,y):lr("a LIST",n);case 4:return br(n)?sr(r.b,n,dr):lr("an ARRAY",n);case 6:var t=r.d;if("object"!=typeof n||null===n||!(t in n))return lr("an OBJECT with a field named `"+t+"`",n);var e=fr(r.b,n[t]);return Un(e)?e:jn(s(Gn,t,e.a));case 7:var a=r.e;return br(n)?a>=n.length?lr("a LONGER array. Need index "+a+" but only see "+n.length+" entries",n):(e=fr(r.b,n[a]),Un(e)?e:jn(s(zn,a,e.a))):lr("an ARRAY",n);case 8:if("object"!=typeof n||null===n||br(n))return lr("an OBJECT",n);var u=h;for(var o in n)if(n.hasOwnProperty(o)){if(e=fr(r.b,n[o]),!Un(e))return jn(s(Gn,o,e.a));u=g(x(o,e.a),u)}return Hn(qn(u));case 9:for(var i=r.f,c=r.g,f=0;f<c.length;f++){if(e=fr(c[f],n),!Un(e))return e;i=i(e.a)}return Hn(i);case 10:return e=fr(r.b,n),Un(e)?fr(r.h(e.a),n):e;case 11:for(var b=h,d=r.g;d.b;d=d.b){if(e=fr(d.a,n),Un(e))return e;b=g(e.a,b)}return jn(Yn(qn(b)));case 1:return jn(s(Jn,r.a,n));case 0:return Hn(r.a)}}function sr(r,n,t){for(var e=n.length,a=new Array(e),u=0;u<e;u++){var o=fr(r,n[u]);if(!Un(o))return jn(s(zn,u,o.a));a[u]=o.a}return Hn(t(a))}function br(r){return Array.isArray(r)||"undefined"!=typeof FileList&&r instanceof FileList}function dr(r){return s(vt,r.length,function(n){return r[n]})}function lr(r,n){return jn(s(Jn,"Expecting "+r,n))}function vr(r,n){if(r===n)return!0;if(r.$!==n.$)return!1;switch(r.$){case 0:case 1:return r.a===n.a;case 2:return r.b===n.b;case 5:return r.c===n.c;case 3:case 4:case 8:return vr(r.b,n.b);case 6:return r.d===n.d&&vr(r.b,n.b);case 7:return r.e===n.e&&vr(r.b,n.b);case 9:return r.f===n.f&&pr(r.g,n.g);case 10:return r.h===n.h&&vr(r.b,n.b);case 11:return pr(r.g,n.g)}}function pr(r,n){var t=r.length;if(t!==n.length)return!1;for(var e=0;e<t;e++)if(!vr(r[e],n[e]))return!1;return!0}var hr=t(function(r,n){return JSON.stringify(n,null,r)+""});function gr(r){return r}function mr(r){return r}var yr=e(function(r,n,t){return t[r]=n,t});function wr(r){return{$:0,a:r}}function _r(r){return{$:2,b:r,c:null}}var $r=t(function(r,n){return{$:3,b:r,d:n}}),kr=0;function Ar(r){var n={$:0,e:kr++,f:r,g:null,h:[]};return Tr(n),n}function Sr(r,n){r.h.push(n),Tr(r)}var Nr=!1,Cr=[];function Tr(r){if(Cr.push(r),!Nr){for(Nr=!0;r=Cr.shift();)Ir(r);Nr=!1}}function Ir(r){for(;r.f;){var n=r.f.$;if(0===n||1===n){for(;r.g&&r.g.$!==n;)r.g=r.g.i;if(!r.g)return;r.f=r.g.b(r.f.a),r.g=r.g.i}else{if(2===n)return void(r.f.c=r.f.b(function(n){r.f=n,Tr(r)}));if(5===n){if(0===r.h.length)return;r.f=r.f.b(r.h.shift())}else r.g={$:3===n?0:1,b:r.f.b,i:r.g},r.f=r.f.d}}}var xr={};function Er(r,n){var t={g:n,h:void 0},e=r.c,a=r.d,u=r.e,o=r.f;function i(r){return s($r,i,{$:5,b:function(n){var i=n.a;return 0===n.$?b(a,t,i,r):u&&o?d(e,t,i.i,i.j,r):b(e,t,u?i.i:i.j,r)}})}return t.h=Ar(s($r,i,r.b))}var Or=t(function(r,n){return _r(function(t){r.g(n),t(wr(0))})});function Rr(r){return function(n){return{$:1,k:r,l:n}}}function Pr(r){return{$:2,m:r}}var Dr=t(function(r,n){return{$:3,n:r,o:n}}),Lr=[],Fr=!1;function Br(r,n,t){if(Lr.push({p:r,q:n,r:t}),!Fr){Fr=!0;for(var e;e=Lr.shift();)Mr(e.p,e.q,e.r);Fr=!1}}function Mr(r,n,t){var e={};for(var a in Hr(!0,n,e,null),Hr(!1,t,e,null),r)Sr(r[a],{$:"fx",a:e[a]||{i:h,j:h}})}function Hr(r,n,t,e){switch(n.$){case 1:var a=n.k,u=function(r,n,t,e){function a(r){for(var n=t;n;n=n.t)r=n.s(r);return r}return s(r?xr[n].e:xr[n].f,a,e)}(r,a,e,n.l);return void(t[a]=function(r,n,t){return t=t||{i:h,j:h},r?t.i=g(n,t.i):t.j=g(n,t.j),t}(r,u,t[a]));case 2:for(var o=n.m;o.b;o=o.b)Hr(r,o.a,t,e);return;case 3:return void Hr(r,n.o,t,{s:n.n,t:e})}}function jr(r){xr[r]&&S(3)}var Ur=t(function(r,n){return n});var Gr=t(function(r,n){return function(t){return r(n(t))}});function zr(r,n){var t=h,a=xr[r].u,u=wr(null);return xr[r].b=u,xr[r].c=e(function(r,n,e){return t=n,u}),{send:function(r){var e=s(cr,a,r);Un(e)||S(4);for(var u=e.a,o=t;o.b;o=o.b)n(o.a(u))}}}var Yr="undefined"!=typeof document?document:{};function Jr(r,n){r.appendChild(n)}function Wr(r){return{$:0,a:r}}var qr=t(function(r,n){return t(function(t,e){for(var a=[],u=0;e.b;e=e.b){var o=e.a;u+=o.b||0,a.push(o)}return u+=a.length,{$:1,c:n,d:an(t),e:a,f:r,b:u}})})(void 0);t(function(r,n){return t(function(t,e){for(var a=[],u=0;e.b;e=e.b){var o=e.a;u+=o.b.b||0,a.push(o)}return u+=a.length,{$:2,c:n,d:an(t),e:a,f:r,b:u}})})(void 0);var Xr,Qr=t(function(r,n){return{$:4,j:r,k:n,b:1+(n.b||0)}}),Vr=t(function(r,n){return{$:"a0",n:r,o:n}}),Kr=t(function(r,n){return{$:"a1",n:r,o:n}}),Zr=t(function(r,n){return{$:"a2",n:r,o:n}}),rn=t(function(r,n){return{$:"a3",n:r,o:n}}),nn=/^(on|formAction$)/i,tn=/^\s*j\s*a\s*v\s*a\s*s\s*c\s*r\s*i\s*p\s*t\s*:/i,en=/^\s*(j\s*a\s*v\s*a\s*s\s*c\s*r\s*i\s*p\s*t\s*:|d\s*a\s*t\s*a\s*:\s*t\s*e\s*x\s*t\s*\/\s*h\s*t\s*m\s*l\s*(,|;))/i;function an(r){for(var n={};r.b;r=r.b){var t=r.a,e=t.$,a=t.n,u=t.o;if("a2"!==e){var o=n[e]||(n[e]={});"a3"===e&&"class"===a?un(o,a,u):o[a]=u}else"className"===a?un(n,a,mr(u)):n[a]=mr(u)}return n}function un(r,n,t){var e=r[n];r[n]=e?e+" "+t:t}function on(r,n){var t=r.$;if(5===t)return on(r.k||(r.k=r.m()),n);if(0===t)return Yr.createTextNode(r.a);if(4===t){for(var e=r.k,a=r.j;4===e.$;)"object"!=typeof a?a=[a,e.j]:a.push(e.j),e=e.k;var u={j:a,p:n};return(o=on(e,u)).elm_event_node_ref=u,o}if(3===t)return cn(o=r.h(r.g),n,r.d),o;var o=r.f?Yr.createElementNS(r.f,r.c):Yr.createElement(r.c);cn(o,n,r.d);for(var i=r.e,c=0;c<i.length;c++)Jr(o,on(1===t?i[c]:i[c].b,n));return o}function cn(r,n,t){for(var e in t){var a=t[e];"a1"===e?fn(r,a):"a0"===e?dn(r,n,a):"a3"===e?sn(r,a):"a4"===e?bn(r,a):("value"!==e&&"checked"!==e||r[e]!==a)&&(r[e]=a)}}function fn(r,n){var t=r.style;for(var e in n)t[e]=n[e]}function sn(r,n){for(var t in n){var e=n[t];void 0!==e?r.setAttribute(t,e):r.removeAttribute(t)}}function bn(r,n){for(var t in n){var e=n[t],a=e.f,u=e.o;void 0!==u?r.setAttributeNS(a,t,u):r.removeAttributeNS(a,t)}}function dn(r,n,t){var e=r.elmFs||(r.elmFs={});for(var a in t){var u=t[a],o=e[a];if(u){if(o){if(o.q.$===u.$){o.q=u;continue}r.removeEventListener(a,o)}o=ln(n,u),r.addEventListener(a,o,Xr&&{passive:la(u)<2}),e[a]=o}else r.removeEventListener(a,o),e[a]=void 0}}try{window.addEventListener("t",null,Object.defineProperty({},"passive",{get:function(){Xr=!0}}))}catch(r){}function ln(r,n){function t(n){var e=t.q,a=fr(e.a,n);if(Un(a)){for(var u,o=la(e),i=a.a,c=o?o<3?i.a:i.dF:i,f=1==o?i.b:3==o&&i.a8,s=(f&&n.stopPropagation(),(2==o?i.b:3==o&&i.a6)&&n.preventDefault(),r);u=s.j;){if("function"==typeof u)c=u(c);else for(var b=u.length;b--;)c=u[b](c);s=s.p}s(c,f)}}return t.q=n,t}function vn(r,n){return r.$==n.$&&vr(r.a,n.a)}function pn(r,n,t,e){var a={$:n,r:t,s:e,t:void 0,u:void 0};return r.push(a),a}function hn(r,n,t,e){if(r!==n){var a=r.$,u=n.$;if(a!==u){if(1!==a||2!==u)return void pn(t,0,e,n);n=function(r){for(var n=r.e,t=n.length,e=new Array(t),a=0;a<t;a++)e[a]=n[a].b;return{$:1,c:r.c,d:r.d,e:e,f:r.f,b:r.b}}(n),u=1}switch(u){case 5:for(var o=r.l,i=n.l,c=o.length,f=c===i.length;f&&c--;)f=o[c]===i[c];if(f)return void(n.k=r.k);n.k=n.m();var s=[];return hn(r.k,n.k,s,0),void(s.length>0&&pn(t,1,e,s));case 4:for(var b=r.j,d=n.j,l=!1,v=r.k;4===v.$;)l=!0,"object"!=typeof b?b=[b,v.j]:b.push(v.j),v=v.k;for(var p=n.k;4===p.$;)l=!0,"object"!=typeof d?d=[d,p.j]:d.push(p.j),p=p.k;return l&&b.length!==d.length?void pn(t,0,e,n):((l?function(r,n){for(var t=0;t<r.length;t++)if(r[t]!==n[t])return!1;return!0}(b,d):b===d)||pn(t,2,e,d),void hn(v,p,t,e+1));case 0:return void(r.a!==n.a&&pn(t,3,e,n.a));case 1:return void gn(r,n,t,e,yn);case 2:return void gn(r,n,t,e,wn);case 3:if(r.h!==n.h)return void pn(t,0,e,n);var h=mn(r.d,n.d);h&&pn(t,4,e,h);var g=n.i(r.g,n.g);return void(g&&pn(t,5,e,g))}}}function gn(r,n,t,e,a){if(r.c===n.c&&r.f===n.f){var u=mn(r.d,n.d);u&&pn(t,4,e,u),a(r,n,t,e)}else pn(t,0,e,n)}function mn(r,n,t){var e;for(var a in r)if("a1"!==a&&"a0"!==a&&"a3"!==a&&"a4"!==a)if(a in n){var u=r[a],o=n[a];u===o&&"value"!==a&&"checked"!==a||"a0"===t&&vn(u,o)||((e=e||{})[a]=o)}else(e=e||{})[a]=t?"a1"===t?"":"a0"===t||"a3"===t?void 0:{f:r[a].f,o:void 0}:"string"==typeof r[a]?"":null;else{var i=mn(r[a],n[a]||{},a);i&&((e=e||{})[a]=i)}for(var c in n)c in r||((e=e||{})[c]=n[c]);return e}function yn(r,n,t,e){var a=r.e,u=n.e,o=a.length,i=u.length;o>i?pn(t,6,e,{v:i,i:o-i}):o<i&&pn(t,7,e,{v:o,e:u});for(var c=o<i?o:i,f=0;f<c;f++){var s=a[f];hn(s,u[f],t,++e),e+=s.b||0}}function wn(r,n,t,e){for(var a=[],u={},o=[],i=r.e,c=n.e,f=i.length,s=c.length,b=0,d=0,l=e;b<f&&d<s;){var v=(N=i[b]).a,p=(C=c[d]).a,h=N.b,g=C.b,m=void 0,y=void 0;if(v!==p){var w=i[b+1],_=c[d+1];if(w){var $=w.a,k=w.b;y=p===$}if(_){var A=_.a,S=_.b;m=v===A}if(m&&y)hn(h,S,a,++l),$n(u,a,v,g,d,o),l+=h.b||0,kn(u,a,v,k,++l),l+=k.b||0,b+=2,d+=2;else if(m)l++,$n(u,a,p,g,d,o),hn(h,S,a,l),l+=h.b||0,b+=1,d+=2;else if(y)kn(u,a,v,h,++l),l+=h.b||0,hn(k,g,a,++l),l+=k.b||0,b+=2,d+=1;else{if(!w||$!==A)break;kn(u,a,v,h,++l),$n(u,a,p,g,d,o),l+=h.b||0,hn(k,S,a,++l),l+=k.b||0,b+=2,d+=2}}else hn(h,g,a,++l),l+=h.b||0,b++,d++}for(;b<f;){var N;l++,kn(u,a,(N=i[b]).a,h=N.b,l),l+=h.b||0,b++}for(;d<s;){var C,T=T||[];$n(u,a,(C=c[d]).a,C.b,void 0,T),d++}(a.length>0||o.length>0||T)&&pn(t,8,e,{w:a,x:o,y:T})}var _n="_elmW6BL";function $n(r,n,t,e,a,u){var o=r[t];if(!o)return u.push({r:a,A:o={c:0,z:e,r:a,s:void 0}}),void(r[t]=o);if(1===o.c){u.push({r:a,A:o}),o.c=2;var i=[];return hn(o.z,e,i,o.r),o.r=a,void(o.s.s={w:i,A:o})}$n(r,n,t+_n,e,a,u)}function kn(r,n,t,e,a){var u=r[t];if(u){if(0===u.c){u.c=2;var o=[];return hn(e,u.z,o,a),void pn(n,9,a,{w:o,A:u})}kn(r,n,t+_n,e,a)}else{var i=pn(n,9,a,void 0);r[t]={c:1,z:e,r:a,s:i}}}function An(r,n,t,e){Sn(r,n,t,0,0,n.b,e)}function Sn(r,n,t,e,a,u,o){for(var i=t[e],c=i.r;c===a;){var f=i.$;if(1===f)An(r,n.k,i.s,o);else if(8===f)i.t=r,i.u=o,(s=i.s.w).length>0&&Sn(r,n,s,0,a,u,o);else if(9===f){i.t=r,i.u=o;var s,b=i.s;b&&(b.A.s=r,(s=b.w).length>0&&Sn(r,n,s,0,a,u,o))}else i.t=r,i.u=o;if(!(i=t[++e])||(c=i.r)>u)return e}var d=n.$;if(4===d){for(var l=n.k;4===l.$;)l=l.k;return Sn(r,l,t,e,a+1,u,r.elm_event_node_ref)}for(var v=n.e,p=r.childNodes,h=0;h<v.length;h++){a++;var g=1===d?v[h]:v[h].b,m=a+(g.b||0);if(a<=c&&c<=m&&(!(i=t[e=Sn(p[h],g,t,e,a,m,o)])||(c=i.r)>u))return e;a=m}return e}function Nn(r,n){for(var t=0;t<n.length;t++){var e=n[t],a=e.t,u=Cn(a,e);a===r&&(r=u)}return r}function Cn(r,n){switch(n.$){case 0:return function(r,n,t){var e=r.parentNode,a=on(n,t);return a.elm_event_node_ref||(a.elm_event_node_ref=r.elm_event_node_ref),e&&a!==r&&e.replaceChild(a,r),a}(r,n.s,n.u);case 4:return cn(r,n.u,n.s),r;case 3:return r.replaceData(0,r.length,n.s),r;case 1:return Nn(r,n.s);case 2:return r.elm_event_node_ref?r.elm_event_node_ref.j=n.s:r.elm_event_node_ref={j:n.s,p:n.u},r;case 6:for(var t=n.s,e=0;e<t.i;e++)r.removeChild(r.childNodes[t.v]);return r;case 7:for(var a=(t=n.s).e,u=r.childNodes[e=t.v];e<a.length;e++)r.insertBefore(on(a[e],n.u),u);return r;case 9:if(!(t=n.s))return r.parentNode.removeChild(r),r;var o=t.A;return void 0!==o.r&&r.parentNode.removeChild(r),o.s=Nn(r,t.w),r;case 8:return function(r,n){var t=n.s,e=function(r,n){if(r){for(var t=Yr.createDocumentFragment(),e=0;e<r.length;e++){var a=r[e].A;Jr(t,2===a.c?a.s:on(a.z,n.u))}return t}}(t.y,n);r=Nn(r,t.w);for(var a=t.x,u=0;u<a.length;u++){var o=a[u],i=o.A,c=2===i.c?i.s:on(i.z,n.u);r.insertBefore(c,r.childNodes[o.r])}return e&&Jr(r,e),r}(r,n);case 5:return n.s(r);default:S(10)}}function Tn(r){if(3===r.nodeType)return Wr(r.textContent);if(1!==r.nodeType)return Wr("");for(var n=h,t=r.attributes,e=t.length;e--;){var a=t[e];n=g(s(rn,a.name,a.value),n)}var u=r.tagName.toLowerCase(),o=h,i=r.childNodes;for(e=i.length;e--;)o=g(Tn(i[e]),o);return b(qr,u,n,o)}var In=a(function(r,n,t,e){return function(r,n,t,e,a,u){var o=s(cr,r,n?n.flags:void 0);Un(o)||S(2);var i={},c=t(o.a),f=c.a,b=u(l,f),d=function(r,n){var t;for(var e in xr){var a=xr[e];a.a&&((t=t||{})[e]=a.a(e,n)),r[e]=Er(a,n)}return t}(i,l);function l(r,n){var t=s(e,r,f);b(f=t.a,n),Br(i,t.b,a(f))}return Br(i,c.b,a(f)),d?{ports:d}:{}}(n,e,r.cU,r.dA,r.ey,function(n,t){var a=r.c4,u=e.node,o=Tn(u);return function(r,n){n(r);var t=0;function e(){t=1===t?0:(xn(e),n(r),1)}return function(a,u){r=a,u?(n(r),2===t&&(t=1)):(0===t&&xn(e),t=2)}}(t,function(r){var t=a(r),e=function(r,n){var t=[];return hn(r,n,t,0),t}(o,t);u=function(r,n,t,e){return 0===t.length?r:(An(r,n,t,e),Nn(r,t))}(u,o,e,n),o=t})})}),xn=("undefined"!=typeof cancelAnimationFrame&&cancelAnimationFrame,"undefined"!=typeof requestAnimationFrame?requestAnimationFrame:function(r){return setTimeout(r,1e3/60)});"undefined"!=typeof document&&document,"undefined"!=typeof window&&window;var En,On,Rn,Pn=1,Dn=0,Ln=m,Fn=e(function(r,n,t){for(;;){if(-2===t.$)return n;var e=t.d,a=r,u=b(r,t.b,t.c,b(Fn,r,n,t.e));r=a,n=u,t=e}}),Bn=function(r){return b(Fn,e(function(r,n,t){return s(Ln,x(r,n),t)}),h,r)},Mn=2,Hn=function(r){return{$:0,a:r}},jn=function(r){return{$:1,a:r}},Un=function(r){return!r.$},Gn=t(function(r,n){return{$:0,a:r,b:n}}),zn=t(function(r,n){return{$:1,a:r,b:n}}),Yn=function(r){return{$:2,a:r}},Jn=t(function(r,n){return{$:3,a:r,b:n}}),Wn=e(function(r,n,t){for(;;){if(!t.b)return n;var e=t.b,a=r,u=s(r,t.a,n);r=a,n=u,t=e}}),qn=function(r){return b(Wn,Ln,h,r)},Xn=[],Qn=D,Vn=t(function(r,n){return B(n)/B(r)}),Kn=32,Zn=Qn(s(Vn,2,Kn)),rt=a(function(r,n,t,e){return{$:0,a:r,b:n,c:t,d:e}}),nt=d(rt,0,Zn,Xn,Xn),tt=k,et=function(r){return{$:1,a:r}},at=t(function(r,n){return n(r)}),ut=t(function(r,n){return T(r,n)>0?r:n}),ot=L,it=function(r){return r.length},ct=function(r){return{$:0,a:r}},ft=A,st=t(function(r,n){for(;;){var t=s(ft,Kn,r),e=t.b,a=s(Ln,ct(t.a),n);if(!e.b)return qn(a);r=e,n=a}}),bt=t(function(r,n){for(;;){var t=Qn(n/Kn);if(1===t)return s(ft,Kn,r).a;r=s(st,r,h),n=t}}),dt=t(function(r,n){if(n.f){var t=r?qn(n.i):n.i,e=n.f*Kn,a=ot(s(Vn,Kn,e-1)),u=s(bt,t,n.f);return d(rt,it(n.g)+e,s(ut,5,a*Zn),u,n.g)}return d(rt,it(n.g),Zn,Xn,n.g)}),lt=u(function(r,n,t,e,a){for(;;){if(n<0)return s(dt,!1,{g:a,i:e,f:t/Kn|0});var u=et(b(tt,Kn,n,r));n-=Kn,e=s(Ln,u,e)}}),vt=t(function(r,n){if(r<=0)return nt;var t=r%Kn;return l(lt,n,r-t-Kn,r,h,b(tt,t,r-t,n))}),pt=function(r){return{$:0,a:r}},ht={$:1},gt=G,mt=t(function(r,n){return s(j,r,w(n))}),yt=hr,wt=t(function(r,n){return y(s(H,r,n))}),_t=function(r){return s(mt,"\n    ",s(wt,"\n",r))},$t=function(r){return b(Wn,t(function(r,n){return n+1}),0,r)},kt=J,At=function(r){var n=r.charCodeAt(0);return 55296<=n&&n<=56319?1024*(n-55296)+r.charCodeAt(1)-56320+65536:n},St=function(r){var n=At(r);return 97<=n&&n<=122},Nt=function(r){var n=At(r);return n<=90&&65<=n},Ct=_,Tt=e(function(r,n,t){for(;;){if(!(T(r,n)<1))return t;var e=r,a=n-1,u=s(Ln,n,t);r=e,n=a,t=u}}),It=t(function(r,n){return b(Tt,r,n,h)}),xt=t(function(r,n){return b(Ct,r,s(It,0,$t(n)-1),n)}),Et=function(r){return St(r)||Nt(r)||function(r){var n=At(r);return n<=57&&48<=n}(r)},Ot=t(function(r,n){return"\n\n("+kt(r+1)+") "+_t(Rt(n))}),Rt=function(r){return s(Pt,r,h)},Pt=t(function(r,n){r:for(;;)switch(r.$){case 0:var t=r.a,e=r.b,a=function(){var r,n,e=(n=(r=t).charCodeAt(0),isNaN(n)?ht:pt(55296<=n&&n<=56319?x(r[0]+r[1],r.slice(2)):x(r[0],r.slice(1))));if(1===e.$)return!1;var a,u=e.a,o=u.b;return(St(a=u.a)||Nt(a))&&s(gt,Et,o)}();r=e,n=s(Ln,a?"."+t:"['"+t+"']",n);continue r;case 1:e=r.b;var u="["+kt(r.a)+"]";r=e,n=s(Ln,u,n);continue r;case 2:var o=r.a;if(o.b){if(o.b.b){var i=function(){return n.b?"The Json.Decode.oneOf at json"+s(mt,"",qn(n)):"Json.Decode.oneOf"}()+" failed in the following "+kt($t(o))+" ways:";return s(mt,"\n\n",s(Ln,i,s(xt,Ot,o)))}r=e=o.a;continue r}return"Ran into a Json.Decode.oneOf with no possibilities"+function(){return n.b?" at json"+s(mt,"",qn(n)):"!"}();default:var c=r.a,f=r.b;return(i=function(){return n.b?"Problem with the value at json"+s(mt,"",qn(n))+":\n\n    ":"Problem with the given value:\n\n"}())+(_t(s(yt,4,f))+"\n\n")+c}}),Dt=Dr,Lt=Pr,Ft=Lt(h),Bt=function(r){return{$:3,a:r}},Mt=cr,Ht=t(function(r,n){return{$:2,a:r,b:n}}),jt=function(r){return{$:0,a:r}},Ut=function(r){return r},Gt=(En="drawPlot",On=Ut,jr(En),xr[En]={e:Ur,u:On,a:function(r){var n=[],t=xr[r].u,a=_r(function(r){var n=setTimeout(function(){r(wr(0))},0);return function(){clearTimeout(n)}});return xr[r].b=a,xr[r].c=e(function(r,e,u){for(;e.b;e=e.b)for(var o=n,i=mr(t(e.a)),c=0;c<o.length;c++)o[c](i);return a}),{subscribe:function(r){n.push(r)},unsubscribe:function(r){var t=(n=n.slice()).indexOf(r);t>=0&&n.splice(t,1)}}}},Rr(En)),zt=gr,Yt=t(function(r,n){return b(Wn,function(r){return t(function(n,t){return t.push(r(n)),t})}(r),[],n)}),Jt=function(r){return b(Wn,t(function(r,n){return b(yr,r.a,r.b,n)}),{},r)},Wt=gr,qt=gr,Xt=function(r){return Jt(y([x("x",qt(r.au)),x("y",qt(r.av)),x("radius",qt(r.aK)),x("colour",(n=r.aI,Jt(y([x("r",zt(n.ct)),x("g",zt(n.cr)),x("b",zt(n.cp)),x("a",qt(n.co))])))),x("commentId",zt(r.aU))]));var n},Qt=function(r){return Gt(function(r){return Jt(y([x("canvasId",Wt(r.aP)),x("points",s(Yt,Xt,r.bF)),x("selectedId",(a=r.a_,a.$?null:zt(a.a))),x("axisConfig",(e=r.aX,Jt(y([x("maxX",qt(e.az)),x("maxY",qt(e.aA)),x("xLabel",Wt(e.aL)),x("yLabel",Wt(e.aM))])))),x("largestRoot",(t=r.ah,t.$?null:(n=t.a,Jt(y([x("rootId",zt(n.dv)),x("author",Wt(n.di)),x("slots",zt(n.bz)),x("startDom",zt(n.dU)),x("endDom",zt(n.dm)),x("sharePct",qt(n.dT)),x("topDom1Age",qt(n.d3)),x("topDom1Author",Wt(n.ez))])))))]));var n,t,e,a}(r))},Vt=a(function(r,n,t,e){if(e.b){var a=e.a,u=e.b;if(u.b){var o=u.a,i=u.b;if(i.b){var c=i.a,f=i.b;if(f.b){var l=f.b;return s(r,a,s(r,o,s(r,c,s(r,f.a,t>500?b(Wn,r,n,qn(l)):d(Vt,r,n,t+1,l)))))}return s(r,a,s(r,o,s(r,c,n)))}return s(r,a,s(r,o,n))}return s(r,a,n)}return n}),Kt=e(function(r,n,t){return d(Vt,r,n,0,t)}),Zt=t(function(r,n){return b(Kt,t(function(n,t){return s(Ln,r(n),t)}),h,n)}),re=t(function(r,n){return T(r,n)<0?r:n}),ne=a(function(r,n,t,e){return{co:e,cp:t,cr:n,ct:r}}),te=t(function(r,n){return{bF:s(Zt,function(r){var n=274-254*s(re,1,r.dr/16.5),t=32+488*s(re,1,r.ds/16.5),e=r.dC,a=function(){switch(e.aD){case 0:return 4.2;case 1:return 2.8;default:return 2}}();return{au:t,av:n,aI:function(r){switch(r){case 0:return d(ne,0,230,118,1);case 1:return d(ne,56,189,248,1);case 2:return d(ne,148,163,184,.45);case 3:return d(ne,255,179,0,1);case 4:return d(ne,255,68,0,.72);default:return d(ne,110,118,128,.45)}}(e.aD),aK:a,aU:e.bd}},r.aQ),aP:"phaseCanvas",aX:{az:16.5,aA:16.5,aL:"SIGNAL (INFO + FALSIFIABILITY) →",aM:"↑ BULLSHIT"},a_:r.ba,ah:ht}}),ee=t(function(r,n){for(;;){if(r<=0)return n;if(!n.b)return n;r-=1,n=n.b}}),ae=function(r){return r.b?pt(r.a):ht},ue=$,oe=J,ie=t(function(r,n){return n.$?r:n.a}),ce=t(function(r,n){var t=s(ut,1,$t(n.dN)),e=s(ue,Ut,s(Zt,function(r){return r.be},n.dN)),a=ot(.98*s(ut,0,$t(e)-1)),u=s(ie,12,ae(s(ee,a,e))),o=s(ut,4,Qn(u));return{bF:s(Zt,function(r){var n=r.dC,e=32+488*s(re,1,n.be/o),a=20+256*s(re,1,n.cJ/t),u=n.aD?n.c1>=4?x(d(ne,255,179,0,1),3.2):n.cA>=2||1===n.cL?x(d(ne,255,68,0,.7),2.4):x(d(ne,148,163,184,.3),2):x(d(ne,0,230,118,1),4.2);return{au:e,av:a,aI:u.a,aK:u.b,aU:n.bd}},r.aQ),aP:"gravityCanvas",aX:{az:o,aA:t,aL:"COMMENT AGE (0..."+oe(o)+"h) →",aM:"↑ HN POS 1"},a_:r.ba,ah:n.ah.bz>1?pt(n.ah):ht}}),fe=function(r){var n=r.dI;if(n.$)return Ft;var t=n.a;return Lt(y([Qt(s(te,r,t)),Qt(s(ce,r,t))]))},se=t(function(r,n){return s(xt,t(function(r,n){return O(n,{bP:r+1})}),s(ue,function(r){return-r.bZ},s(Zt,function(n){var t=r.ay*n.ay+r.aw*n.aw+r.ax*n.ax,e=r.bb*n.cw+r.bc*n.cz,a=t-e;return{dr:s(ut,0,e),ds:s(ut,0,t),dC:n,bP:0,bZ:a}},n)))}),be=function(r){return{bb:r.cg,bc:r.ch,aw:r.cb,ax:r.ce,ay:r.bO}},de=function(r){var n=be(r.dJ),t=s(se,n,r.dN),e={c6:ht,dI:pt(r),aQ:t,aT:0,aW:0,a1:"",a2:!1,a3:"all",a5:n,a7:!1,a9:!0,ba:ht};return x(e,fe(e))},le=ur,ve=Z,pe=tr,he=function(r){return{$:11,g:r}},ge=function(r){return{$:0,a:r}},me=function(r){return he(y([s(pe,pt,r),ge(ht)]))},ye=K,we=a(function(r,n,t,e){return{bj:e,bG:t,bH:n,b3:r}}),_e=q,$e=function(r){return{$:3,b:r}},ke=Q,Ae=er,Se=Ae(at),Ne=i(function(r,n,t,e,a,u,o){return{an:o,ar:r,ee:t,ef:u,at:a,eE:n,eN:e}}),Ce=t(function(r,n){return he(y([n,ge(r)]))}),Te=s(Se,s(Ce,0,s(ve,"size_kb",ke)),s(Se,s(Ce,"",s(ve,"t2_ref_utc",ye)),s(Se,s(Ce,0,s(ve,"grounded_analysis",_e)),s(Se,s(Ce,0,s(ve,"epistemic_gold",_e)),s(Se,s(Ce,0,s(ve,"total_comments",_e)),s(Se,s(Ce,"",s(ve,"story_author",ye)),s(Se,s(Ce,0,s(ve,"points",_e)),s(Se,s(Ce,"",s(ve,"story_url",ye)),s(Se,s(ve,"story_title",ye),s(Se,s(ve,"story_id",_e),ge(function(r){return function(n){return function(t){return function(e){return function(a){return function(u){return function(o){return function(i){return function(c){return function(f){return{bF:e,dw:f,aO:r,aS:t,bV:c,b1:n,ed:a,b9:o,a4:u,eH:i}}}}}}}}}}}))))))))))),Ie=s(Se,s(ve,"items",$e(Te)),s(Se,s(Ce,"",s(ve,"uri_template",ye)),s(Se,s(Ce,h,s(ve,"frontpage_ids",$e(_e))),s(Se,s(Ce,"",s(ve,"frontpage_synced_utc",ye)),s(Se,s(Ce,0,s(ve,"total_size_mb",ke)),s(Se,s(Ce,0,s(ve,"total_published",_e)),s(Se,s(Ce,"",s(ve,"updated_utc",ye)),ge(Ne)))))))),xe=X,Ee={$:-2},Oe=Ee,Re=u(function(r,n,t,e,a){return{$:-1,a:r,b:n,c:t,d:e,e:a}}),Pe=u(function(r,n,t,e,a){if(-1!==a.$||a.a){if(-1!==e.$||e.a||-1!==e.d.$||e.d.a)return l(Re,r,n,t,e,a);var u=e.d;return o=e.e,l(Re,0,e.b,e.c,l(Re,1,u.b,u.c,u.d,u.e),l(Re,1,n,t,o,a))}var o,i=a.b,c=a.c,f=a.d,s=a.e;return-1!==e.$||e.a?l(Re,r,i,c,l(Re,0,n,t,e,f),s):l(Re,0,n,t,l(Re,1,e.b,e.c,e.d,o=e.e),l(Re,1,i,c,f,s))}),De=I,Le=e(function(r,n,t){if(-2===t.$)return l(Re,0,r,n,Ee,Ee);var e=t.a,a=t.b,u=t.c,o=t.d,i=t.e;switch(s(De,r,a)){case 0:return l(Pe,e,a,u,b(Le,r,n,o),i);case 1:return l(Re,e,a,n,o,i);default:return l(Pe,e,a,u,o,b(Le,r,n,i))}}),Fe=e(function(r,n,t){var e=b(Le,r,n,t);return-1!==e.$||e.a?e:l(Re,1,e.b,e.c,e.d,e.e)}),Be=function(r){return b(Wn,t(function(r,n){return b(Fe,r.a,r.b,n)}),Oe,r)},Me=function(r){return s(pe,Be,function(r){return{$:8,b:r}}(r))},He=i(function(r,n,t,e,a,u,o){return{aF:n,bM:t,dX:a,d8:o,b6:e,ek:r,eO:u}}),je=or,Ue=s(Se,s(ve,"full_metrics",v(je,o(function(r,n,t,e,a,u){return{bD:r,ca:t,cf:u,cl:n,cm:e,cn:a}}),s(Ce,0,s(ve,"ndcg20",ke)),s(Ce,0,s(ve,"pairwise_concordance",ke)),s(Ce,0,s(ve,"adversarial_acc",ke)),s(Ce,0,s(ve,"buried_gold_recall_top45",ke)),s(Ce,0,s(ve,"bullshit_sink_percentile",ke)),s(Ce,0,s(ve,"top20_diversity",ke)))),s(Se,s(ve,"hn_live_baseline_score",ke),s(Se,s(ve,"delta_vs_hn",ke),s(Se,s(ve,"holdout_score",ke),s(Se,s(ve,"dev_score",ke),s(Se,s(ve,"score",ke),s(Se,s(ve,"judge_version",ye),ge(He)))))))),Ge=s(nr,function(r){switch(r){case"epistemic_gold":return ge(0);case"grounded_analysis":return ge(1);case"crowd_chatter":return ge(2);case"meme_or_snark":return ge(3);case"bullshit_or_flamewar":return ge(4);case"downvoted_sink":return ge(5);default:return{$:1,a:"Unknown tier: "+r}}},ye),ze=s(Se,s(ve,"txt",ye),s(Se,s(ve,"ds",ke),s(Se,s(ve,"bl",ke),s(Se,s(ve,"gp",ke),s(Se,s(ve,"fa",ke),s(Se,s(ve,"ig",ke),s(Se,s(ve,"urls",$e(ye)),s(Se,s(ve,"flbl",ye),s(Se,s(ve,"facet",ye),s(Se,s(ve,"tier",Ge),s(Se,s(ve,"meme",_e),s(Se,s(ve,"pp",_e),s(Se,s(ve,"mod",_e),s(Se,s(ve,"td",ke),s(Se,s(ve,"kpp",ke),s(Se,s(ve,"k",_e),s(Se,s(ve,"qw",_e),s(Se,s(ve,"w",_e),s(Se,s(ve,"lu",_e),s(Se,s(ve,"ut",_e),s(Se,s(ve,"dt",_e),s(Se,s(ve,"fade",ye),s(Se,s(ve,"surf",ke),s(Se,s(ve,"grav",ke),s(Se,s(ve,"age",ke),s(Se,s(ve,"d",_e),s(Se,s(ve,"bs",ke),s(Se,s(ve,"ep",ke),s(Se,s(ve,"sc",ke),s(Se,s(ve,"sr",_e),s(Se,s(ve,"dom",_e),s(Se,s(ve,"au",ye),s(Se,s(ve,"id",_e),ge(function(r){return function(n){return function(t){return function(e){return function(a){return function(u){return function(o){return function(i){return function(c){return function(f){return function(s){return function(b){return function(d){return function(l){return function(v){return function(p){return function(h){return function(g){return function(m){return function(y){return function(w){return function(_){return function($){return function(k){return function(A){return function(S){return function(N){return function(C){return function(T){return function(I){return function(x){return function(E){return function(O){return{cq:i,cs:g,cu:p,cv:n,cw:x,cx:o,cz:E,cA:d,cB:u,aw:T,ax:I,bd:r,ay:C,cC:v,cD:_,cE:h,cF:a,cG:e,cH:y,cI:l,be:c,cJ:t,cK:m,cL:w,cO:O,cR:b,cS:S,cT:f,cX:$,c1:s,aD:k,c3:N,c8:A}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}})))))))))))))))))))))))))))))))))),Ye=ir,Je=p(Ye,c(function(r,n,t,e,a,u,o,i){return{bO:r,el:u,ev:o,cb:n,ce:t,eB:i,cg:e,ch:a}}),s(ve,"info_gain",ke),s(ve,"falsifiability",ke),s(ve,"gravity_progeny",ke),s(ve,"bullshit_penalty",ke),s(ve,"downvote_penalty",ke),s(ve,"mmr_sim_lambda",ke),s(ve,"mmr_root_lambda",ke),s(ve,"mmr_facet_lambda",ke)),We=c(function(r,n,t,e,a,u,o,i){return{cY:r,aF:n,bD:t,ca:a,cf:i,cl:e,cm:u,cn:o}}),qe=p(Ye,We,s(ve,"name",ye),s(ve,"score",ke),s(ve,"ndcg20",ke),s(ve,"pairwise_concordance",ke),s(ve,"adversarial_acc",ke),s(ve,"buried_gold_recall_top45",ke),s(ve,"bullshit_sink_percentile",ke),s(ve,"top20_diversity",ke)),Xe=b(Ae,t(function(r,n){return{aC:r,dV:n}}),s(ve,"slug",ye),s(Ce,h,s(ve,"top_terms",$e(ye)))),Qe=ar,Ve=d(Qe,e(function(r,n,t){return{eq:t,a4:r,eP:n}}),s(Ce,0,s(ve,"total_comments",_e)),s(Ce,0,s(ve,"unique_authors_profiled",_e)),s(Ce,1,s(ve,"pages_fetched",_e))),Ke=s(Se,s(Ce,h,s(ve,"story_anchors",$e(ye))),s(Se,s(Ce,h,s(ve,"facet_clusters",$e(Xe))),s(Se,s(Ce,Oe,s(ve,"facet_labels",Me(ye))),s(Se,s(Ce,{eq:1,a4:0,eP:0},s(ve,"counts",Ve)),s(Se,s(Ce,0,s(ve,"delta_minutes",ke)),s(Se,s(Ce,"",s(ve,"t2_ref_utc",ye)),s(Se,s(Ce,"",s(ve,"story_author",ye)),s(Se,s(Ce,0,s(ve,"points",_e)),s(Se,s(Ce,"",s(ve,"story_url",ye)),s(Se,s(Ce,"",s(ve,"story_title",ye)),ge(function(r){return function(n){return function(t){return function(e){return function(a){return function(u){return function(o){return function(i){return function(c){return function(f){return{dl:o,bF:t,aS:n,bV:a,b1:r,d7:i,ed:e,ei:u,b7:f,et:c}}}}}}}}}}}))))))))))),Ze=v(je,o(function(r,n,t,e,a,u){return{ea:e,eh:t,er:u,b9:r,eH:n,eL:a}}),s(Ce,0,s(ve,"epistemic_gold",_e)),s(Ce,0,s(ve,"grounded_analysis",_e)),s(Ce,0,s(ve,"crowd_chatter",_e)),s(Ce,0,s(ve,"meme_or_snark",_e)),s(Ce,0,s(ve,"bullshit_or_flamewar",_e)),s(Ce,0,s(ve,"downvoted_sink",_e))),ra=o(function(r,n,t,e,a,u){return{cM:n,aF:t,dc:r,bM:e,d6:u,b6:a}}),na=s(Se,s(Ce,"",s(ve,"disposition",ye)),s(Se,s(ve,"holdout_score",ke),s(Se,s(ve,"dev_score",ke),s(Se,s(ve,"score",ke),s(Se,s(ve,"sha",ye),s(Se,s(ve,"stage",ye),ge(ra))))))),ta=d(Qe,e(function(r,n,t){return{aC:r,aE:t,bu:n}}),s(ve,"slug",ye),s(ve,"label",ye),s(ve,"count",_e)),ea=p(Ye,c(function(r,n,t,e,a,u,o,i){return{bz:t,di:n,dm:a,dv:r,dT:u,dU:e,d3:o,ez:i}}),s(ve,"root_id",_e),s(ve,"author",ye),s(ve,"slots",_e),s(ve,"start_dom",_e),s(ve,"end_dom",_e),s(ve,"share_pct",ke),s(ve,"top_dom1_age",ke),s(ve,"top_dom1_author",ye)),aa=b(Ae,t(function(r,n){return{aE:n,dL:r}}),s(ve,"category",ye),s(ve,"count",_e)),ua=o(function(r,n,t,e,a,u){return{aC:r,aE:t,bu:n,dd:u,dB:e,d$:a}}),oa=s(Se,s(ve,"terms",ye),s(Se,s(ve,"useful_pct",ke),s(Se,s(ve,"useful",_e),s(Se,s(ve,"count",_e),s(Se,s(ve,"label",ye),s(Se,s(ve,"slug",ye),ge(ua))))))),ia=s(Se,s(ve,"comments",$e(ze)),s(Se,s(ve,"tournament",$e(na)),s(Se,s(ve,"ablations",$e(qe)),s(Se,s(ve,"rescue_top_k",_e),s(Se,s(ve,"buried_cutoff",_e),s(Se,s(ve,"largest_root",ea),s(Se,s(ve,"story_anchors",$e(ye)),s(Se,s(ve,"source_categories",$e(aa)),s(Se,s(ve,"facet_diagnostics",$e(oa)),s(Se,s(ve,"facet_options",$e(ta)),s(Se,s(ve,"facets",Me(_e)),s(Se,s(ve,"tiers",Ze),s(Se,s(ve,"weights",Je),s(Se,s(ve,"judge",he(y([(Rn=ht,{$:5,c:Rn}),s(pe,pt,Ue)]))),s(Se,s(ve,"manifest",Ke),s(Se,s(ve,"is_benchmark",xe),s(Se,s(ve,"story_url",ye),s(Se,s(ve,"story_title",ye),s(Se,s(ve,"story_id",_e),ge(function(r){return function(n){return function(t){return function(e){return function(a){return function(u){return function(o){return function(i){return function(c){return function(f){return function(s){return function(b){return function(d){return function(l){return function(v){return function(p){return function(h){return function(g){return function(m){return{db:u,de:i,$7:c,aO:r,dJ:o,dN:m,dP:a,aS:t,dW:h,d0:p,b1:n,d4:g,d9:e,ah:l,eg:v,ej:f,b7:d,eG:s,eI:b}}}}}}}}}}}}}}}}}}}})))))))))))))))))))),ca=e(function(r,n,t){return{bm:r,b$:n,b8:t}}),fa=s(Se,s(ve,"workflow_file",ye),s(Se,s(ve,"actions_url",ye),s(Se,s(ve,"repo",ye),ge(ca)))),sa=l(le,we,me(s(ve,"observatory",ia)),me(s(ve,"catalog",Ie)),me(s(ve,"router",fa)),he(y([s(ve,"page",ye),ge("observatory")]))),ba=function(r){return{$:0,a:r}},da=function(r){var n=s(Mt,ia,r);if(n.$){var t=n.a,e=s(Mt,Ie,r);if(e.$){var a=s(Mt,fa,r);return x(a.$?{$:4,a:Rt(t)}:function(r){return{$:2,a:r}}(s(Ht,50467087,a.a)),Ft)}var u=e.a;return x({$:1,a:{bm:"ian/hn",an:u.an,b$:"",ar:u.ar,at:u.at,b8:"hn-observatory-pages.yml"}},Ft)}var o=function(r){var n=s(Mt,ia,r);return n.$?x({c6:pt(Rt(n.a)),dI:ht,aQ:h,aT:0,aW:0,a1:"",a2:!1,a3:"all",a5:{bb:2.65,bc:3.1,aw:2.85,ax:1.45,ay:2.35},a7:!1,a9:!0,ba:ht},Ft):de(n.a)}(r),i=o.b;return x(ba(o.a),s(Dt,jt,i))},la=function(r){switch(r.$){case 0:return 0;case 1:return 1;case 2:return 2;default:return 3}},va=t(function(r,n){return s(Zr,r,Wt(n))}),pa=va("id"),ha=qr("div"),ga=Qr,ma=Wr,ya=qr("a"),wa=qr("td"),_a=qr("tr"),$a=va("htmlFor"),ka=qr("form"),Aa=function(r){return s(va,"href",tn.test(n=r)?"":n);var n},Sa=va("className"),Na=qr("input"),Ca=qr("label"),Ta=qr("table"),Ia=qr("tbody"),xa=va("type"),Ea=t(function(r,n){return n.b?b(Kt,Ln,n,r):r}),Oa=function(r){return b(Kt,Ea,h,r)},Ra=t(function(r,n){return b(Kt,t(function(n,t){return r(n)?s(Ln,n,t):t}),h,n)}),Pa=function(r){return s(rn,"colspan",kt(r))},Da=function(r){return!r.b},La=function(r){return""===r},Fa=t(function(r,n){return s(rn,function(r){return nn.test(r)?"data-"+r:r}(r),function(r){return en.test(r)?"":r}(n))}),Ba=e(function(r,n,t){var e=r(n);return e.$?t:s(Ln,e.a,t)}),Ma=t(function(r,n){return b(Kt,Ba(r),h,n)}),Ha=Y,ja=va("placeholder"),Ua=qr("span"),Ga=F,za=U,Ya=function(r){return r.length},Ja=t(function(r,n){return r<1?n:b(za,r,Ya(n),n)}),Wa=function(r){var n,t,e=s(Ha,"https://",r)?s(Ja,8,r):s(Ha,"http://",r)?s(Ja,7,r):r,a=(n=s(wt,"/",e)).b?n.a:e,u=(t=s(wt,":",a)).b?t.a:a;return s(Ha,"www.",u)?s(Ja,4,u):u},qa=function(r){return r<0?-r:r},Xa=P,Qa=e(function(r,n,t){return r<=0?t:b(Qa,r>>1,R(n,n),1&r?R(t,n):t)}),Va=t(function(r,n){return b(Qa,r,n,"")}),Ka=M,Za=function(r){return s(Ka,r,"")},ru=e(function(r,n,t){return R(s(Va,r-Ya(t),Za(n)),t)}),nu=function(r){if(r<0)return"-"+nu(qa(r));if(r<1e3)return kt(r);var n=r/1e3|0,t=b(ru,3,"0",kt(s(Xa,1e3,r)));return nu(n)+","+t},tu=t(function(r,n){var t=!La(n.aS),e=Wa(n.aS),a="./item?id="+kt(n.aO),u=n.aS,o=t?x(s(ya,y([Sa("storylink"),Aa(u)]),y([ma(n.b1)])),s(Ua,y([Sa("sitebit comhead")]),y([ma(" ("),s(ya,y([Aa(u)]),y([ma(e)])),ma(")")]))):x(s(ya,y([Sa("storylink"),Aa(a)]),y([ma(n.b1)])),ma("")),i=o.a,c=o.b,f=n.a4>0?s(ut,0,100-100*(n.b9+n.eH)/s(ut,1,n.a4)):0,b=y([s(Ua,h,y([ma(R(kt(n.bF),R(1===n.bF?" point by ":" points by ",n.ed)))])),ma(" | "),s(ya,y([Aa(a)]),y([ma(nu(n.a4)+" comments")])),ma(" | "),s(ya,y([Aa(a)]),y([ma(kt(n.b9)+" gold · "+kt(Ga(f))+"% bullshit")])),ma(" | "),s(ya,y([Aa("https://news.ycombinator.com/item?id="+kt(n.aO))]),y([ma("hn")]))]);return y([s(_a,y([Sa("athing")]),y([s(wa,y([Sa("title rank")]),y([ma(kt(r)+".")])),s(wa,y([Sa("title")]),y([s(Ua,y([Sa("titleline")]),y([i,c]))]))])),s(_a,h,y([s(wa,h,h),s(wa,y([Sa("subtext")]),b)])),s(_a,y([Sa("spacer")]),y([s(wa,y([Pa(2)]),h)]))])}),eu=function(r){var n=$t(r.an),e=function(n){return ae(s(Ra,function(r){return N(r.aO,n)},r.an))},a=function(){if(Da(r.at))return r.an;var n=s(Ma,e,r.at);return Da(n)?r.an:n}(),u=Da(a)?y([s(_a,h,y([s(wa,y([Pa(2),Sa("empty-msg")]),y([ma("No stories built yet. Run the GitHub Actions frontpage workflow or paste an item ID.")]))]))]):Oa(s(xt,t(function(r,n){return s(tu,r+1,n)}),a));return s(ha,y([Sa("hnmain")]),y([s(ha,y([Sa("topbar")]),y([s(ha,y([Sa("topbar-left")]),y([s(ya,y([Sa("hn-logo"),Aa("./")]),y([ma("BS")])),s(ya,y([Sa("hnname"),Aa("./")]),y([ma("Better Signal News")]))])),s(ha,y([Sa("topbar-right")]),y([ma(La(r.ar)?"hourly updates":s(Ha,"Updated ",r.ar)?r.ar:"Updated "+r.ar)]))])),s(ha,y([Sa("list-pad")]),y([s(Ta,y([Sa("itemlist"),pa("frontpageList")]),y([s(Ia,h,u)]))])),s(ha,y([Sa("hn-footer")]),y([s(ha,y([Sa("yclinks")]),y([ma("Hourly updates | "),ma(kt(n)+" published | "),s(ya,y([Aa("https://news.ycombinator.com/")]),y([ma("news.ycombinator.com")]))])),s(ka,y([Sa("hn-search"),pa("jumpForm")]),y([s(Ca,y([$a("hnInput")]),y([ma("Open item:")])),ma(" "),s(Na,y([xa("text"),pa("hnInput"),s(Fa,"size","28"),ja("ID or news.ycombinator.com/item?id=..."),s(Fa,"required","")]),h)]))]))]))},au=qr("p"),uu=qr("h1"),ou=qr("pre"),iu=qr("code"),cu=function(r){switch(r.$){case 0:var n=r.a;return s(ha,h,y([s(uu,y([pa("statusTitle")]),y([ma("Loading Better Signal News...")])),s(au,y([pa("statusBody")]),y([ma("Resolving "),s(iu,h,y([ma("/item?id="+kt(n))])),ma(" from static observatory archive.")]))]));case 1:return s(ha,h,y([s(uu,y([pa("statusTitle")]),y([ma("Observatory Loaded")]))]));case 2:var t=r.b,e="gh workflow run "+t.b8+" -f target="+kt(n=r.a)+"\nuv run --no-project python hn-comments/cli.py "+kt(n)+" --open",a="https://news.ycombinator.com/item?id="+kt(n),u=R(La(t.b$)?h:y([s(ya,y([Sa("btn"),Aa(t.b$)]),y([ma("Run GitHub Workflow")]))]),y([s(ya,y([Sa("btn alt"),Aa(a)]),y([ma("View Original HN Thread")])),s(ya,y([Sa("btn alt"),Aa("./")]),y([ma("Published Index")]))]));return s(ha,h,y([s(uu,y([pa("statusTitle")]),y([ma("HN Item "+kt(n)+" Not Yet Built")])),s(au,y([pa("statusBody")]),y([ma("No pre-built observatory was found at "),s(iu,h,y([ma("/items/"+kt(n)+".html")])),ma(". Trigger the GitHub Actions workflow with item ID "),s(iu,h,y([ma(kt(n))])),ma(" to publish "),s(iu,h,y([ma("/item?id="+kt(n))])),ma(":")])),s(ou,h,y([ma(e)])),s(ha,y([Sa("actions")]),u)]));default:return s(ha,h,y([s(uu,y([pa("statusTitle")]),y([ma("Missing or Invalid Hacker News Item ID")])),s(au,y([pa("statusBody")]),y([ma("Append "),s(iu,h,y([ma("?id=50472038")])),ma(" just like Hacker News ("),s(iu,h,y([ma("/item?id=50472038")])),ma("), or browse the published index.")])),s(ha,y([Sa("actions")]),y([s(ya,y([Sa("btn"),Aa("./")]),y([ma("Open Published Index")]))]))]))}},fu=function(r){return s(ha,y([Sa("hnmain")]),y([s(ha,y([Sa("topbar")]),y([s(ha,y([Sa("topbar-left")]),y([s(ya,y([Sa("hn-logo"),Aa("./")]),y([ma("BS")])),s(ya,y([Sa("hnname"),Aa("./")]),y([ma("Better Signal News")]))]))])),s(ha,y([Sa("shell"),pa("routerStatus")]),y([s(ha,y([Sa("eyebrow")]),y([ma("NYX OBSERVATORY // HN URI MIRROR")])),cu(r)]))]))},su=e(function(r,n,t){for(;;){if(r<=0)return t;if(!n.b)return t;var e=n.a;r-=1,n=n.b,t=s(Ln,e,t)}}),bu=t(function(r,n){return qn(b(su,r,n,h))}),du=e(function(r,n,t){if(n<=0)return h;var e=x(n,t);r:for(;;){n:for(;;){if(!e.b.b)return t;if(!e.b.b.b){if(1===e.a)break r;break n}switch(e.a){case 1:break r;case 2:var a=e.b;return y([a.a,a.b.a]);case 3:if(e.b.b.b.b){var u=e.b,o=u.b;return y([u.a,o.a,o.b.a])}break n;default:if(e.b.b.b.b&&e.b.b.b.b.b){var i=e.b,c=i.b,f=c.b,d=f.b,l=d.b;return s(Ln,i.a,s(Ln,c.a,s(Ln,f.a,s(Ln,d.a,r>1e3?s(bu,n-4,l):b(du,r+1,n-4,l)))))}break n}}return t}return y([e.b.a])}),lu=t(function(r,n){return b(du,0,r,n)}),vu=Kr,pu=va("value"),hu=qr("button"),gu=qr("option"),mu=qr("select"),yu=Vr,wu=t(function(r,n){return s(yu,r,{$:0,a:n})}),_u=function(r){return s(wu,"click",ge(r))},$u=function(r){return x(r,!0)},ku=t(function(r,n){return b(Kt,ve,n,r)}),Au=s(ku,y(["target","value"]),ye),Su=t(function(r,n){return s(yu,r,{$:1,a:n})}),Nu=function(r){return s(Su,"input",s(pe,$u,s(pe,r,Au)))},Cu=qr("section"),Tu=function(r){return r.toLowerCase()},Iu=z,xu=gr,Eu=t(function(r,n){return s(Zr,r,xu(n))})("selected"),Ou={$:4},Ru=function(r){return{$:2,a:r}},Pu=function(r){return{$:3,a:r}},Du=qr("strong"),Lu=qr("article"),Fu=e(function(r,n,t){return s(mt,n,s(wt,r,t))}),Bu=function(r){switch(r){case 0:return"epistemic_gold";case 1:return"grounded_analysis";case 2:return"crowd_chatter";case 3:return"meme_or_snark";case 4:return"bullshit_or_flamewar";default:return"downvoted_sink"}},Mu=t(function(r,n){return r<1?"":b(za,0,r,n)}),Hu=function(r){var n=Ga(10*r)/10,t=s(wt,".",oe(n));r:for(;;){if(t.b){if(t.b.b){if(t.b.b.b)break r;return t.a+"."+s(Mu,1,t.b.a)}return t.a+".0"}break r}return oe(r)},ju=function(r){var n=Ga(100*r)/100,t=s(wt,".",oe(n));r:for(;;){if(t.b){if(t.b.b){if(t.b.b.b)break r;a=t.a;var e=t.b.a;return 1===Ya(e)?a+"."+e+"0":a+"."+s(Mu,2,e)}var a;return(a=t.a)+".00"}break r}return oe(r)},Uu=function(r){var n=Wa(r);return s(ya,y([Sa("ext-link"),Aa(r),s(Fa,"target","_blank"),s(Fa,"rel","noopener noreferrer"),s(vu,"margin-right","6px")]),y([ma("["+n+"]")]))},Gu=a(function(r,n,e,a){var u,o,i,c=r.a5,f=a.dC,l=f.cJ-a.bP,v=T(l,n)>-1?s(Ua,y([Sa("badge rescue")]),y([ma("RESCUED +"+kt(l)+" SPOTS")])):T(l,e)<1?s(Ua,y([Sa("badge drop")]),y([ma("DEMOTED "+kt(l)+" SPOTS")])):ma(""),p=1===f.cL?s(Ua,y([Sa("badge drop")]),y([ma("MOD REBUKED (dang/tomhow)")])):ma(""),g=1===f.cA?s(Ua,y([Sa("badge c5a")]),y([ma("HN FADE: "+f.cR+" (RESCUED)")])):f.cA>=2?s(Ua,y([Sa("badge drop")]),y([ma("HN FADE: "+f.cR+" (TIER "+kt(f.cA)+")")])):ma(""),m="comm-"+(La(f.cR)?"c00":Tu(f.cR)),w=f.c1>=4?s(Ua,y([Sa("badge c5a")]),y([ma("SURF MIRAGE "+Hu(f.c1)+"x")])):ma(""),_=La(f.cS)?b(Fu,"_"," ",f.c8):f.cS,$=s(vu,"border-left","4px solid "+function(r){return r.co>=1?"rgb("+kt(r.ct)+", "+kt(r.cr)+", "+kt(r.cp)+")":"rgba("+kt(r.ct)+", "+kt(r.cr)+", "+kt(r.cp)+", "+oe(r.co)+")"}(function(r){switch(r){case 0:return d(ne,0,158,96,1);case 1:return d(ne,16,98,188,1);case 3:return d(ne,230,145,0,1);case 4:return d(ne,255,51,0,1);case 5:return d(ne,156,156,156,1);default:return d(ne,255,102,0,1)}}(f.aD)));return s(Lu,y([Sa("c-card tier-"+Bu(f.aD)),$]),y([s(ha,y([Sa("hn-comhead")]),y([s(ya,y([Aa("https://news.ycombinator.com/user?id="+f.cv)]),y([ma(f.cv)])),s(Ua,h,y([ma(" "+Hu(f.be)+" hours ago")])),s(Ua,h,y([ma(" | ")])),s(Ua,h,y([ma("depth "+kt(f.cq))])),s(Ua,h,y([ma(" | ")])),s(Ua,h,y([ma("karma "+nu(f.cs)+" ("+Hu(f.cK)+"/post)")])),s(Ua,h,y([ma(" | ")])),s(ya,y([Aa("https://news.ycombinator.com/item?id="+kt(f.bd))]),y([ma("link")]))])),s(ha,y([Sa("c-meta")]),y([s(Ua,y([Sa("badge rank-sig")]),y([ma("SIGNAL "+kt(a.bP))])),s(Ua,y([Sa("badge")]),y([ma("HN POS "+kt(f.cJ))])),v,g,p,w,s(Ua,y([Sa("badge")]),y([ma(_)]))])),s(ha,y([Sa("c-body "+m)]),(u=f.cO,o=t(function(r,n){var t=s(Ha,">",r.replace(/^\s+/,""))?s(Ua,y([Sa("hn-quote")]),y([ma(r)])):ma(r);return y(n?[t]:[t,ma("\n")])}),i=s(wt,"\n",u),Oa(s(xt,t(function(r,n){return s(o,n,N(r,$t(i)-1))}),i)))),s(ha,y([Sa("vec-bars")]),y([s(Ua,h,y([ma("SCORE: "),s(Du,h,y([ma(ju(a.bZ))]))])),s(Ua,h,y([ma("INFO: +"+ju(c.ay*f.ay))])),s(Ua,h,y([ma("FALSIFIABILITY: +"+ju(c.aw*f.aw))])),s(Ua,h,y([ma("GRAVITY/PRECISION: +"+ju(c.ax*f.ax))])),s(Ua,h,y([ma("BULLSHIT LOAD: -"+ju(c.bb*f.cw))])),s(Ua,h,y([ma("DOWNVOTE SINK: -"+ju(c.bc*f.cz))])),Da(f.c3)?ma(""):s(Ua,h,s(Ln,ma("LINKS: "),s(Zt,Uu,f.c3)))]))]))}),zu=t(function(r,n){var t=$t(n.dN),e=s(Ln,s(gu,y([pu("all"),Eu("all"===r.a3)]),y([ma("All Facets ("+nu(t)+")")])),s(Zt,function(n){return s(gu,y([pu(n.aC),Eu(N(r.a3,n.aC))]),y([ma(n.bu+" ("+kt(n.aE)+")")]))},n.ej)),a=s(ut,25,s(re,150,Ga(.15*t))),u=-s(ut,40,s(re,300,Ga(.25*t))),o=!La(r.a1)||!N(r.ba,ht),i=Tu(r.a1.trim()),c=function(){if(!La(i)){var e=s(Ha,"@",i)?s(Ja,1,i):i;return s(Ra,function(r){var n=r.dC;return N(kt(n.bd),i)||s(Iu,e,Tu(n.cv))||s(Iu,i,Tu(n.cO))},r.aQ)}switch(r.aW){case 0:return s(lu,40,r.aQ);case 1:return s(lu,40,s(ue,function(r){return r.dC.cJ},r.aQ));case 2:return s(Ra,function(r){return T(r.dC.cJ,n.eg)>0&&T(r.bP,n.d0)<1},r.aQ);case 3:return s(Ra,function(r){return 1===r.dC.cA&&r.dC.cI>=2},r.aQ);case 4:var a=s(ut,40,Ga(.4*t)),u=s(ut,20,Ga(.15*t));return s(lu,40,s(Ra,function(r){var n=r.dC;return n.cX>0&&(n.cs>=5e3||$t(n.c3)>0)||n.cC>0&&$t(n.c3)>0||T(n.cJ,u)<1&&T(r.bP,a)>0},r.aQ));default:return s(lu,40,s(Ra,function(r){return 1===r.dC.cL||r.dC.cA>=2||r.dC.cD>=4},r.aQ))}}(),f="all"===r.a3?c:s(Ra,function(n){return N(n.dC.c8,r.a3)},c),d=s(lu,40,f);return s(Cu,y([Sa("band grid-12"),pa("explorerSection"),s(vu,"padding-top","16px")]),y([s(ha,y([Sa("col-12")]),y([s(ha,y([Sa("filter-bar")]),y([s(mu,y([pa("facetSelect"),Sa("sel-in"),s(Fa,"aria-label","Topic facet"),Nu(Pu)]),e),s(Na,y([xa("search"),pa("searchInput"),Sa("search-in"),ja("Search "+nu(t)+" comments by text, author, or id..."),pu(r.a1),Nu(Ru)]),h)])),s(ha,y([pa("resultMeta"),s(vu,"color","rgb(90, 90, 88)"),s(vu,"margin-bottom","10px"),s(vu,"padding","0 8px")]),y([ma(kt($t(d))+" of "+kt($t(f))+" comments"),o?s(hu,y([xa("button"),pa("clearFilterBtn"),Sa("tab-btn"),s(vu,"padding","2px 8px"),s(vu,"box-shadow","none"),s(vu,"margin-left","8px"),_u(Ou)]),y([ma("Clear")])):ma("")])),s(ha,y([pa("cardContainer"),Sa("card-list")]),s(Zt,b(Gu,r,a,u),d))]))]))}),Yu=qr("footer"),Ju=function(r){var n=La(r.aS)?"NEWS.YCOMBINATOR.COM":Wa(r.aS).toUpperCase();return s(Yu,y([Sa("sheet-foot")]),y([s(Ua,h,y([ma("SILICON PIRATE × CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT")])),s(Ua,h,y([ma("SOURCE: HN "+kt(r.aO)+" + "+n+" + ALGOLIA + AUTHOR CACHE")]))]))},Wu=qr("header"),qu={$:12},Xu={$:11},Qu=t(function(r,n){var e=$t(n.dN),a="https://news.ycombinator.com/item?id="+kt(n.aO),u=n.de.b9+n.de.eH,o=La(n.aS)?a:n.aS,i=t(function(n,t){var e,a=n.a,u=n.b,o=N(r.aW,a),i=s(hu,y([xa("button"),Sa("nav-btn mode-tab"+(o?" active":"")),s(Fa,"role","tab"),s(Fa,"aria-selected",o?"true":"false"),_u((e=a,{$:1,a:e}))]),y([ma(u)]));return y(t?[i]:[i,ma(" | ")])}),c=Wa(n.aS),f=La(n.aS)?ma(""):s(Ua,y([Sa("sitebit comhead")]),y([ma(" ("),s(ya,y([Aa("https://news.ycombinator.com/from?site="+c)]),y([s(Ua,y([Sa("sitestr")]),y([ma(c)]))])),ma(")")])),b=e>0?s(ut,0,100-100*u/s(ut,1,e)):0,d=n.dP.ei>0?n.dP.ei<60?kt(Ga(n.dP.ei))+"m ago":Hu(n.dP.ei/60)+"h ago":"recently",l=y([x(0,"Top 40"),x(1,"HN Top 40")]),v=Oa(s(xt,t(function(r,n){return s(i,n,N(r,$t(l)-1))}),l));return s(Wu,y([Sa("hn-header")]),y([s(ha,y([Sa("topbar")]),y([s(ha,y([Sa("topbar-left")]),y([s(ya,y([Aa("https://news.ycombinator.com"),Sa("hn-logo")]),y([ma("BS")])),s(ya,y([Aa("https://ianchanning.com/hn"),Sa("hnname")]),y([ma("Better Signal News")])),s(Ua,y([Sa("pagetop"),pa("modeTabs")]),v)])),s(ha,y([Sa("topbar-right")]),y([s(hu,y([xa("button"),Sa("nav-btn topbar-toggle"+(r.a2?" active":"")),pa("exploreToggleBtn"),s(Fa,"aria-expanded",r.a2?"true":"false"),_u(qu)]),y([ma("explore")])),ma(" | "),s(hu,y([xa("button"),Sa("nav-btn topbar-toggle"+(r.a7?" active":"")),pa("evidenceToggleBtn"),s(Fa,"aria-expanded",r.a7?"true":"false"),_u(Xu)]),y([ma("evidence")]))]))])),s(ha,y([Sa("fatitem-box")]),y([s(ha,y([Sa("story-titleline")]),y([s(ya,y([Sa("story-title"),Aa(o)]),y([ma(n.b1)])),f])),s(ha,y([Sa("subtext")]),y([s(Ua,y([Sa("subline")]),y([s(Ua,y([Sa("score")]),y([ma(kt(n.dP.bF)+" points")])),ma(" by "),s(ya,y([Aa("https://news.ycombinator.com/user?id="+n.dP.ed)]),y([ma(n.dP.ed)])),ma(" "),s(Ua,y([Sa("age")]),y([s(ya,y([Aa(a)]),y([ma(d)]))])),ma(" | "),s(ya,y([Aa(a)]),y([ma(nu(e)+" comments")])),ma(" | "),ma(Hu(b)+"% bullshit")]))]))]))]))}),Vu=t(function(r,n){return n.$?ht:r(n.a)}),Ku=qr("details"),Zu=qr("summary"),ro=qr("i"),no=qr("h2"),to=function(r){return s(rn,"width",kt(r))},eo=qr("canvas"),ao=function(r){return s(rn,"height",kt(r))},uo={$:10},oo=function(r){var n=r.dC,t=n.cJ-r.bP,e=t>=0?"+"+kt(t):kt(t),a=b(Fu,"\n"," ",s(Mu,88,n.cO));return s(ha,h,y([s(ha,y([Sa("hn-comhead")]),y([ma(n.cv+" | Signal "+kt(r.bP)+" vs HN "+kt(n.cJ)+" ("+e+") "),s(hu,y([Sa("tab-btn"),s(vu,"padding","0 6px"),s(vu,"margin-left","6px"),_u(uo)]),y([ma("Clear")]))])),ma(a+"...")]))},io=e(function(r,n,t){return s(Ku,y([Sa("graph-drawer"),pa("phaseDrawer"),s(Fa,"open","")]),y([s(Zu,y([Sa("graph-summary")]),y([s(ha,y([Sa("graph-title-group")]),y([s(ha,y([Sa("sec-tag")]),y([ma("EPISTEMIC PHASE PLANE")])),s(no,h,y([ma("Crowd Chatter vs. Grounded Signal")]))])),s(Ua,y([Sa("mob-graph-pill")]),h)])),s(ha,y([Sa("oled-bay")]),y([s(ha,y([Sa("oled-head")]),y([s(Ua,h,y([ma("Bullshit (Y) // Signal (X) ")])),s(Ua,y([Sa("sig")]),y([ma("TAP POINT (N = "+nu(n)+")")]))])),s(eo,y([pa("phaseCanvas"),Sa("plot"),to(540),ao(300)]),h),s(ha,y([Sa("legend-row")]),y([s(Ua,h,y([s(ro,y([Sa("dot"),s(vu,"background","rgb(0, 230, 118)")]),h),ma("Gold ("+kt(r.de.b9)+")")])),s(Ua,h,y([s(ro,y([Sa("dot"),s(vu,"background","rgb(56, 189, 248)")]),h),ma("Grounded ("+kt(r.de.eH)+")")])),s(Ua,h,y([s(ro,y([Sa("dot"),s(vu,"background","rgb(148, 163, 184)")]),h),ma("Chatter ("+kt(r.de.eh)+")")])),s(Ua,h,y([s(ro,y([Sa("dot"),s(vu,"background","rgb(255, 179, 0)")]),h),ma("Meme ("+kt(r.de.ea)+")")])),s(Ua,h,y([s(ro,y([Sa("dot"),s(vu,"background","rgb(255, 68, 0)")]),h),ma("BS ("+kt(r.de.eL)+")")]))])),s(ha,y([Sa("probe-box")]),y([s(ha,y([pa("phaseProbe"),Sa("probe-clamp")]),y([t.$?ma("Tap or hover any point to inspect its coordinates and filter the comment below."):oo(t.a)]))]))]))]))}),co=qr("br"),fo=va("max"),so=va("min"),bo={$:15},lo=function(r){return s(va,"step",r)},vo={$:6},po=t(function(r,n){return{$:5,a:r,b:n}}),ho={$:13},go=a(function(r,n,e,a){var u=t(function(r,n){var t=function(r){if(0===r.length||/[\sxbo]/.test(r))return ht;var n=+r;return n==n?pt(n):ht}(n);return t.$?bo:s(po,r,t.a)}),o=r.a9?y([s(Fa,"open","")]):h;return s(Ku,s(Ln,Sa("graph-drawer"),s(Ln,pa("tunerDrawer"),o)),y([s(Zu,y([Sa("graph-summary"),_u(ho)]),y([s(ha,y([Sa("graph-title-group")]),y([s(ha,y([Sa("sec-tag")]),y([ma("CALIBRATE")])),s(no,h,y([ma("Signal Tuner")]))])),s(Ua,y([Sa("mob-graph-pill")]),h)])),s(ha,y([Sa("control-panel")]),y([s(ha,y([Sa("slider-row")]),y([s(ha,y([Sa("slider-lbl")]),y([s(Ua,h,y([ma("1. Info Gain (IDF)")])),s(Ua,y([pa("val_ig")]),y([ma(ju(a.ay))]))])),s(Na,y([xa("range"),pa("sl_ig"),so("0"),fo("5"),lo("0.05"),pu(oe(a.ay)),Nu(u(0))]),h)])),s(ha,y([Sa("slider-row")]),y([s(ha,y([Sa("slider-lbl")]),y([s(Ua,h,y([ma("2. Falsifiability")])),s(Ua,y([pa("val_fa")]),y([ma(ju(a.aw))]))])),s(Na,y([xa("range"),pa("sl_fa"),so("0"),fo("5"),lo("0.05"),pu(oe(a.aw)),Nu(u(1))]),h)])),s(ha,y([Sa("slider-row")]),y([s(ha,y([Sa("slider-lbl")]),y([s(Ua,h,y([ma("3. Gravity & Precision")])),s(Ua,y([pa("val_gp")]),y([ma(ju(a.ax))]))])),s(Na,y([xa("range"),pa("sl_gp"),so("0"),fo("4"),lo("0.05"),pu(oe(a.ax)),Nu(u(2))]),h)])),s(ha,y([Sa("slider-row")]),y([s(ha,y([Sa("slider-lbl")]),y([s(Ua,h,y([ma("4. Bullshit Penalty")])),s(Ua,y([pa("val_bp")]),y([ma(ju(a.bb))]))])),s(Na,y([xa("range"),pa("sl_bp"),so("0"),fo("5"),lo("0.05"),pu(oe(a.bb)),Nu(u(3))]),h)])),s(ha,y([Sa("slider-row")]),y([s(ha,y([Sa("slider-lbl")]),y([s(Ua,h,y([ma("5. Downvote Sink")])),s(Ua,y([pa("val_dp")]),y([ma(ju(a.bc))]))])),s(Na,y([xa("range"),pa("sl_dp"),so("0"),fo("5"),lo("0.05"),pu(oe(a.bc)),Nu(u(4))]),h)])),s(hu,y([Sa("tab-btn"),pa("resetWeightsBtn"),s(vu,"width","100%"),s(vu,"margin-top","6px"),_u(vo)]),y([ma("Reset Calibrated Weights")])),s(au,h,y([ma("Drag any weight to watch the "+nu(e)+"-point phase plane and comment ranking re-solve instantaneously."),s(co,h,h),ma("• "),s(Du,h,y([ma("c5A Rescue: ")])),ma("Sourced "),s(iu,h,y([ma("c5A")])),ma(" rebuttals survive partisan downvotes."),s(co,h,h),ma("• "),s(Du,h,y([ma("Context Gate: ")])),ma("Meme links & bare drops get zero citation boost.")]))]))]))}),mo=e(function(r,n,t){var e=r.ah,a="Top slot ("+e.ez+", "+Hu(e.d3)+"h); largest subtree (@"+e.di+") occupies "+kt(e.bz)+" slots (HN POS "+kt(e.dU)+".."+kt(e.dm)+").";return s(Ku,y([Sa("graph-drawer"),pa("gravityDrawer"),s(Fa,"open","")]),y([s(Zu,y([Sa("graph-summary")]),y([s(ha,y([Sa("graph-title-group")]),y([s(ha,y([Sa("sec-tag")]),y([ma("NEWS.ARC GRAVITY & TREE-LOCK")])),s(no,h,y([ma("Why Live HN Buried Primary Evidence")]))])),s(Ua,y([Sa("mob-graph-pill")]),h)])),s(ha,y([Sa("oled-bay")]),y([s(ha,y([Sa("oled-head")]),y([s(Ua,h,y([ma("HN POS (1.."+nu(n)+") (Y) // Age (Hours) (X)")])),s(Ua,y([Sa("sig")]),y([ma("(T + 2)^1.8")]))])),s(eo,y([pa("gravityCanvas"),Sa("plot"),to(540),ao(300)]),h),s(ha,y([Sa("legend-row")]),y([s(Ua,h,y([s(ro,y([Sa("dot"),s(vu,"background","rgb(0, 230, 118)")]),h),ma("Buried Gold (HN POS > "+kt(r.eg)+")")])),s(Ua,h,y([s(ro,y([Sa("dot"),s(vu,"background","rgb(255, 179, 0)")]),h),ma("Surf Mirage (<3.2h)")])),s(Ua,h,y([s(ro,y([Sa("dot"),s(vu,"background","rgb(255, 68, 0)")]),h),ma("Downvoted / Mod-Rebuked")]))])),s(ha,y([Sa("probe-box")]),y([s(ha,y([pa("gravProbe"),Sa("probe-clamp")]),y([t.$?ma(a):oo(t.a)]))]))]))]))}),yo=t(function(r,n){var t=s(Vu,function(n){return ae(s(Ra,function(r){return N(r.dC.bd,n)},r.aQ))},r.ba),e=$t(n.dN),a=r.a2?y([s(Fa,"open","")]):h,u=r.a5;return s(Ku,s(Ln,Sa("proof-drawer"),s(Ln,pa("labDrawer"),a)),y([s(Zu,y([Sa("hn-summary"),s(vu,"display","none")]),h),s(ha,y([Sa("proof-body grid-12")]),y([s(ha,y([Sa("col-3")]),y([d(go,r,n,e,u)])),s(ha,y([Sa("col-9")]),y([s(ha,y([Sa("dual-oled")]),y([b(io,n,e,t),b(mo,n,e,t)]))]))]))]))}),wo=qr("th"),_o=qr("thead"),$o=e(function(r,n,t){return R(t,s(Va,r-Ya(t),Za(n)))}),ko=function(r){var n=Ga(1e3*r)/1e3,t=s(wt,".",oe(n));r:for(;;){if(t.b){if(t.b.b){if(t.b.b.b)break r;return t.a+"."+b($o,3,"0",s(Mu,3,t.b.a))}return t.a+".000"}break r}return oe(r)},Ao=t(function(r,n){var e,a=t(function(r,n){var t="promoted_champion"===n.d6?" ★":"";return s(_a,y([Sa(r?"promoted_champion"===n.d6||"promoted_best"===n.d6?"winner":"":"hn-row")]),y([s(wa,h,y([ma(R(n.dc,t))])),s(wa,h,y([ma(n.cM)])),s(wa,h,y([s(Du,h,y([ma(ju(n.aF))]))])),s(wa,h,y([ma(ju(n.bM))])),s(wa,h,y([ma(ju(n.b6))]))]))}),u=s(ie,0,(e=s(Zt,function(r){return r.aF},n.dW)).b?pt(b(Wn,ut,e.a,e.b)):ht),o=t(function(r,n){var t=r?qa(n.aF-u)<.02?"winner":"":"hn-row";return s(_a,y([Sa(t)]),y([s(wa,h,y([ma(n.cY)])),s(wa,h,y([s(Du,h,y([ma(ju(n.aF))]))])),s(wa,h,y([ma(ko(n.bD))])),s(wa,h,y([ma(ko(n.cl))])),s(wa,h,y([ma(Hu(100*n.ca)+"%")])),s(wa,h,y([ma(Hu(100*n.cm)+"%")])),s(wa,h,y([ma(Hu(100*n.cn)+"%")])),s(wa,h,y([ma(ko(n.cf))]))]))});return s(ha,y([Sa("proof-body grid-12")]),y([s(ha,y([Sa("col-7")]),y([s(ha,y([Sa("sec-tag")]),y([ma("CONTROLLED ABLATION MATRIX")])),s(no,h,y([ma("Marginal Gain of Each Epistemic Pillar")])),s(ha,y([s(vu,"overflow-x","auto")]),y([s(Ta,y([Sa("ablation"),pa("ablationTable")]),y([s(_o,h,y([s(_a,h,y([s(wo,h,y([ma("Model / Controlled Ablation Stage")])),s(wo,h,y([ma("Score")])),s(wo,h,y([ma("NDCG@20")])),s(wo,h,y([ma("Concord")])),s(wo,h,y([ma("Adv Traps")])),s(wo,h,y([ma("Rescue")])),s(wo,h,y([ma("Sink")])),s(wo,h,y([ma("Div")]))]))])),s(Ia,y([pa("ablationBody")]),s(xt,o,n.dW))]))]))])),s(ha,y([Sa("col-5")]),y([s(ha,y([Sa("sec-tag")]),y([ma("FORGET-TEAM 4-AGENT HERDR TOURNAMENT")])),s(no,h,y([ma("Amnesia Reset & Holdout Generalization")])),s(ha,y([s(vu,"overflow-x","auto"),s(vu,"max-height","365px"),s(vu,"overflow-y","auto")]),y([s(Ta,y([Sa("ablation"),pa("tourneyTable")]),y([s(_o,h,y([s(_a,h,y([s(wo,h,y([ma("Stage / Worker")])),s(wo,h,y([ma("SHA")])),s(wo,h,y([ma("Full")])),s(wo,h,y([ma("Dev")])),s(wo,h,y([ma("Holdout")]))]))])),s(Ia,y([pa("tourneyBody")]),s(xt,a,n.d4))]))]))]))]))}),So=t(function(r,n){var e,a=r.a7?y([s(Fa,"open","")]):h,u=(e=n.db).$?function(r){var n=function(r){return s(_a,h,y([s(wa,h,y([ma(r.dL)])),s(wa,h,y([s(Du,h,y([ma(kt(r.aE))]))]))]))},e=t(function(r,n){return s(_a,y([Sa(r?"":"winner")]),y([s(wa,h,y([ma(n.bu)])),s(wa,h,y([ma(kt(n.aE))])),s(wa,h,y([s(Du,h,y([ma(kt(n.dB))]))])),s(wa,h,y([ma(Hu(n.d$)+"%")])),s(wa,y([s(vu,"text-align","left")]),y([ma(n.dd)]))]))}),a=$t(s(Ra,function(r){return r.cI>=2},r.dN)),u=Da(r.eI)?y([s(_a,h,y([s(wa,h,y([ma("No external links")])),s(wa,h,y([ma("0")]))]))]):s(Zt,n,r.eI),o=r.de.b9+r.de.eH,i=Da(r.b7)?ma(""):s(ha,y([pa("anchorListBox"),s(vu,"color","rgb(90, 90, 88)"),s(vu,"margin-top","16px")]),y([ma("UNSUPERVISED STORY ANCHORS: "+s(mt,", ",r.b7))])),c=$t(r.dN),f=c>0?100*o/c:0,b=s(ut,0,100-f),d=c>0?100*r.de.b9/c:0,l=r.ah;return s(ha,h,y([s(ha,y([Sa("proof-body")]),y([s(au,y([s(vu,"margin","0 0 12px"),s(vu,"color","rgb(70, 70, 68)")]),y([ma("Replacing surface crowd prediction and "),s(iu,h,y([ma("(T + 2)^1.8")])),ma(" recency decay with Shannon/IDF surprisal, Popperian falsifiability, Frankfurtian bullshit suppression, inverse "),s(iu,h,y([ma("news.arc")])),ma(" physics, and submodular portfolio selection.")])),s(ha,y([Sa("kpi-strip")]),y([s(ha,y([Sa("kpi-cell")]),y([s(ha,y([Sa("kpi-label")]),y([ma("Corpus Audited")])),s(ha,y([Sa("kpi-val")]),y([ma(nu(c))])),s(ha,y([Sa("kpi-sub")]),y([ma(kt(r.dP.dl.eq)+" HTML page(s) • "+nu(r.dP.dl.eP)+" authors")]))])),s(ha,y([Sa("kpi-cell")]),y([s(ha,y([Sa("kpi-label")]),y([ma("Actual Useful Signal")])),s(ha,y([Sa("kpi-val ok")]),y([ma(Hu(f)+"%")])),s(ha,y([Sa("kpi-sub")]),y([ma(kt(o)+" comments ("+kt(r.de.b9)+" Gold / "+Hu(d)+"%)")]))])),s(ha,y([Sa("kpi-cell")]),y([s(ha,y([Sa("kpi-label")]),y([ma("Chatter & Bullshit")])),s(ha,y([Sa("kpi-val hi")]),y([ma(Hu(b)+"%")])),s(ha,y([Sa("kpi-sub")]),y([ma(kt(r.de.eh)+" chatter • "+kt(r.de.eL)+" BS • "+kt(r.de.er)+" faded")]))])),s(ha,y([Sa("kpi-cell")]),y([s(ha,y([Sa("kpi-label")]),y([ma("Primary Citations")])),s(ha,y([Sa("kpi-val ok")]),y([ma(kt(a))])),s(ha,y([Sa("kpi-sub")]),y([ma("Tier 2/3 verified citations")]))])),s(ha,y([Sa("kpi-cell")]),y([s(ha,y([Sa("kpi-label")]),y([ma("Facet Sub-Themes")])),s(ha,y([Sa("kpi-val")]),y([ma(kt($t(r.ej)))])),s(ha,y([Sa("kpi-sub")]),y([ma("Auto-discovered TF-IDF clusters")]))])),s(ha,y([Sa("kpi-cell")]),y([s(ha,y([Sa("kpi-label")]),y([ma("Largest Root Monopoly")])),s(ha,y([Sa("kpi-val hi")]),y([ma(kt(l.bz))])),s(ha,y([Sa("kpi-sub")]),y([ma("HN POS "+kt(l.dU)+".."+kt(l.dm)+" ("+Hu(l.dT)+"% of thread)")]))]))]))])),s(ha,y([Sa("proof-body grid-12")]),y([s(ha,y([Sa("col-7")]),y([s(ha,y([Sa("sec-tag")]),y([ma("UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)")])),s(no,h,y([ma("Auto-Discovered Sub-Themes & Signal Yield")])),s(ha,y([s(vu,"overflow-x","auto")]),y([s(Ta,y([Sa("ablation"),pa("facetDiagTable")]),y([s(_o,h,y([s(_a,h,y([s(wo,h,y([ma("Discovered Facet Cluster")])),s(wo,h,y([ma("Comments")])),s(wo,h,y([ma("Useful Signal")])),s(wo,h,y([ma("Signal %")])),s(wo,h,y([ma("Centroid Salient Terms")]))]))])),s(Ia,y([pa("facetDiagBody")]),s(xt,e,r.eG))]))]))])),s(ha,y([Sa("col-5")]),y([s(ha,y([Sa("sec-tag")]),y([ma("SOURCE REGISTRY & STORY ANCHORS")])),s(no,h,y([ma("Cross-Domain Citations & TF-IDF Anchors")])),s(ha,y([s(vu,"overflow-x","auto"),s(vu,"max-height","365px"),s(vu,"overflow-y","auto")]),y([s(Ta,y([Sa("ablation"),pa("sourceCatTable")]),y([s(_o,h,y([s(_a,h,y([s(wo,h,y([ma("Source Registry Category")])),s(wo,h,y([ma("Cited Comments")]))]))])),s(Ia,y([pa("sourceCatBody")]),u)])),i]))]))]))]))}(n):s(Ao,e.a,n);return s(Ku,s(Ln,Sa("proof-drawer"),s(Ln,pa("proofDrawer"),a)),y([s(Zu,y([Sa("hn-summary"),s(vu,"display","none")]),h),u]))}),No=function(r){var n=r.c6;if(n.$){var t=r.dI;if(t.$)return s(ha,y([Sa("wrap")]),y([ma("Waiting for observatory payload...")]));var e=t.a;return s(ha,y([Sa("wrap")]),y([s(Qu,r,e),s(So,r,e),s(yo,r,e),s(zu,r,e),Ju(e)]))}var a=n.a;return s(ha,y([Sa("wrap")]),y([s(ha,y([Sa("topbar")]),y([ma("HN Epistemic Observatory — Elm")])),s(ha,y([pa("error")]),y([ma("Payload decode error: "+a)]))]))},Co=V,To=t(function(r,n){switch(r.$){case 1:return x(c=O(n,{aW:r.a,a1:"",ba:ht}),fe(c));case 2:return x(O(n,{a1:r.a}),Ft);case 3:return x(O(n,{a3:r.a}),Ft);case 4:case 10:return x(c=O(n,{a1:"",ba:ht}),fe(c));case 5:var t=r.a,e=r.b,a=n.a5,u=function(){switch(t){case 0:return O(a,{ay:e});case 1:return O(a,{aw:e});case 2:return O(a,{ax:e});case 3:return O(a,{bb:e});default:return O(a,{bc:e})}}();return x(c=O(n,{aQ:(b=n.dI).$?n.aQ:s(se,u,b.a.dN),a5:u}),fe(c));case 6:var o=n.dI;if(o.$)return x(n,Ft);var i=o.a;return a=be(i.dJ),x(c=O(n,{aQ:s(se,a,i.dN),a5:a}),fe(c));case 9:var c,f=r.a;return x(c=O(n,{a1:kt(f.aU),ba:pt(f.aU)}),fe(c));case 11:return x(O(n,{a7:!n.a7}),Ft);case 12:return x(O(n,{a2:!n.a2}),Ft);case 13:return x(O(n,{a9:!n.a9}),Ft);case 14:return x(O(n,{aT:r.a}),Ft);default:return x(n,Ft)}var b}),Io=t(function(r,n){var t=x(r,n);r:for(;;){if(t.a.$){if(3===t.b.$){var e=t.a.a,a=(i=t.b.a,function(){if(e)return Ft;var r=i.R;return r.$?Ft:s(Dt,jt,fe(r.a))}());return x(Bt(O(i,{X:e})),a)}break r}switch(t.b.$){case 0:var u=s(To,c=t.a.a,t.b.a),o=u.b;return x(ba(u.a),s(Dt,jt,o));case 3:var i,c=t.a.a,f=(i=t.b.a).R;if(f.$)return x(n,Ft);var b=s(To,c,f.a);return o=b.b,x(Bt(O(i,{R:pt(b.a)})),s(Dt,jt,o));default:break r}}return x(n,Ft)}),xo=$r,Eo=wr,Oo=t(function(r,n){return s(xo,function(n){return Eo(r(n))},n)}),Ro=Eo(0),Po=e(function(r,n,t){return s(xo,function(n){return s(xo,function(t){return Eo(s(r,n,t))},t)},n)}),Do=Or,Lo=t(function(r,n){var t=n;return function(r){return _r(function(n){n(wr(Ar(r)))})}(s(xo,Do(r),t))});xr.Task={b:Ro,c:e(function(r,n,t){return s(Oo,function(r){return 0},(e=s(Zt,Lo(r),n),b(Kt,Po(Ln),Eo(h),e)));var e}),d:e(function(r,n,t){return Eo(0)}),e:t(function(r,n){return s(Oo,r,n)}),f:void 0},Rr("Task");var Fo,Bo=In,Mo=Dr,Ho=Pr(h),jo=b(Ae,t(function(r,n){return{aP:r,aU:n}}),s(ve,"canvasId",ye),s(ve,"commentId",_e)),Uo=function(r){var n=s(Mt,jo,r);return n.$?bo:{$:9,a:n.a}},Go=function(r,n){return jr(r),xr[r]={f:Gr,u:n,a:zr},Rr(r)}("onCanvasProbe",Co),zo=function(r){return Go(Uo)};Fo={Main:{init:Bo({cU:function(r){var n=s(Mt,sa,r);if(n.$)return da(r);var t=n.a,e=t.b3;if(e.$)return da(r);var a,u=de(e.a),o=u.a,i=u.b,c=function(){switch(t.bj){case"catalog":case"index":return 1;case"router":return 2;default:return 0}}(),f=c?Ft:s(Dt,jt,i),b=(a=t.bG).$?ht:pt(s(Ht,50467087,a.a)),d=function(){var r=t.bH;if(r.$)return ht;var n=r.a;return pt({bm:"ian/hn",an:n.an,b$:"",ar:n.ar,at:n.at,b8:"hn-observatory-pages.yml"})}(),l={R:pt(o),X:c,aY:d,a0:b};return x(Bt(l),f)},c4:function(r){switch(r.$){case 0:return s(ga,jt,No(r.a));case 1:return eu(r.a);case 2:return fu(r.a);case 3:var n=r.a;return s(ha,h,y([(a=n.X,u=t(function(r,n){var t,e=N(a,r),u=e?"rgb(255, 255, 255)":"rgb(34, 34, 34)",o=e?"rgb(255, 102, 0)":"transparent";return s(Ua,y([_u((t=r,{$:1,a:t})),s(vu,"background",o),s(vu,"color",u),s(vu,"padding","3px 8px"),s(vu,"cursor","pointer"),s(vu,"font-weight","bold"),s(vu,"border-radius","3px"),s(vu,"user-select","none")]),y([ma(n)]))}),s(ha,y([s(vu,"background","rgb(246, 246, 239)"),s(vu,"border-bottom","1px solid rgb(255, 102, 0)"),s(vu,"padding","6px 12px"),s(vu,"font-family","monospace"),s(vu,"font-size","12px"),s(vu,"display","flex"),s(vu,"gap","10px"),s(vu,"align-items","center")]),y([s(Ua,y([s(vu,"font-weight","bold"),s(vu,"color","rgb(255, 102, 0)")]),y([ma("ELM DEV:")])),s(u,0,"1. Comments Observatory"),s(u,1,"2. Frontpage Index"),s(u,2,"3. SPA Router (/item?id=)")]))),function(){switch(n.X){case 0:var r=n.R;return r.$?s(ha,y([Sa("wrap")]),y([ma("No observatory payload loaded in dev bundle.")])):s(ga,jt,No(r.a));case 1:var t=n.aY;return t.$?s(ha,y([Sa("wrap")]),y([ma("No catalog payload loaded in dev bundle.")])):eu(t.a);default:var e=n.a0;return e.$?s(ha,y([Sa("wrap")]),y([ma("No router config loaded in dev bundle.")])):fu(e.a)}}()]));default:var e=r.a;return s(ha,y([Sa("wrap")]),y([s(ha,y([Sa("topbar")]),y([ma("Better Signal News — Elm")])),s(ha,y([pa("error")]),y([ma("Payload decode error: "+e)]))]))}var a,u},dA:Io,ey:function(r){switch(r.$){case 0:return s(Mo,jt,zo());case 3:var n=r.a,t=x(n.X,n.R);return t.a||t.b.$?Ho:s(Mo,jt,zo());default:return Ho}}})(Co)(0)}},r.Elm?function r(n,t){for(var e in t)e in n?"init"==e?S(6):r(n[e],t[e]):n[e]=t[e]}(r.Elm,Fo):r.Elm=Fo}(this);
+/**
+ * Canvas 2D scatter-plot renderer — port bridge between Elm and <canvas>.
+ *
+ * Elm sends PlotCommand via `drawPlot` port.
+ * User interactions fire back via `onCanvasProbe` port.
+ *
+ * IIFE version: no ES module imports/exports — works as a plain <script>
+ * in both dev (static/index.html) and production (inlined by Python).
+ */
+
+// eslint-disable-next-line no-unused-vars
+function mountCanvasRenderer(app) {
+  if (!app.ports) return;
+
+  // Outgoing port: Elm -> JS canvas draw
+  if (app.ports.drawPlot) {
+    app.ports.drawPlot.subscribe(renderPlot);
+  }
+
+  // Incoming port: JS canvas events -> Elm
+  function emitProbe(canvasId, commentId) {
+    if (app.ports.onCanvasProbe) {
+      app.ports.onCanvasProbe.send({ canvasId: canvasId, commentId: commentId });
+    }
+  }
+
+  /**
+   * Render a scatter plot onto a <canvas> element.
+   * @param {Object} cmd - PlotCommand from Elm
+   */
+  function renderPlot(cmd) {
+    var canvas = document.getElementById(cmd.canvasId);
+    if (!canvas || !canvas.getContext) return;
+
+    var ctx = canvas.getContext("2d");
+    var W = canvas.width;
+    var H = canvas.height;
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Grid lines
+    ctx.strokeStyle = "rgb(30, 36, 44)";
+    ctx.lineWidth = 1;
+    for (var i = 1; i < 6; i++) {
+      ctx.beginPath(); ctx.moveTo((W * i) / 6, 0); ctx.lineTo((W * i) / 6, H); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, (H * i) / 6); ctx.lineTo(W, (H * i) / 6); ctx.stroke();
+    }
+
+    // Largest root subtree highlight (gravity canvas only)
+    if (cmd.largestRoot && cmd.largestRoot.slots > 1) {
+      var lr = cmd.largestRoot;
+      var totalN = cmd.points.length || 1;
+      var yStart = 20 + (lr.startDom / totalN) * (H - 44);
+      var yEnd = 20 + (lr.endDom / totalN) * (H - 44);
+      ctx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      ctx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      ctx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      ctx.font = "10px ui-monospace, Menlo, monospace";
+      ctx.fillText(
+        "LARGEST SUBTREE (@" + lr.author + ": " + lr.slots + " SLOTS, HN POS " + lr.startDom + ".." + lr.endDom + ")",
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    // Plot points (draw back-to-front so gold renders on top)
+    var pts = [];
+    var drawOrder = cmd.points.slice().reverse();
+    for (var j = 0; j < drawOrder.length; j++) {
+      var p = drawOrder[j];
+      var col = "rgba(" + p.colour.r + ", " + p.colour.g + ", " + p.colour.b + ", " + p.colour.a + ")";
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Selection ring
+      if (cmd.selectedId === p.commentId) {
+        ctx.strokeStyle = "rgb(255, 255, 255)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius + 4, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      pts.push({ x: p.x, y: p.y, id: p.commentId });
+    }
+
+    // Axis labels
+    ctx.fillStyle = "rgb(140, 150, 162)";
+    ctx.font = "10px ui-monospace, Menlo, monospace";
+    if (cmd.axisConfig) {
+      ctx.fillText(cmd.axisConfig.xLabel, W - 295, H - 7);
+      ctx.fillText(cmd.axisConfig.yLabel, 8, 14);
+    }
+
+    // Attach interaction listeners (replace previous)
+    var handler = makeCanvasHandler(canvas, pts, cmd.canvasId, emitProbe);
+    if (canvas._hnCleanup) canvas._hnCleanup();
+    canvas.addEventListener("click", handler.onClick);
+    canvas.addEventListener("mousemove", handler.onMove);
+    canvas._hnCleanup = function() {
+      canvas.removeEventListener("click", handler.onClick);
+      canvas.removeEventListener("mousemove", handler.onMove);
+    };
+  }
+
+  function makeCanvasHandler(canvas, pts, canvasId, emit) {
+    function findNearest(ev, maxDistSq) {
+      var rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      var sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      var sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      var best = null;
+      var bestD = maxDistSq;
+      for (var k = 0; k < pts.length; k++) {
+        var pt = pts[k];
+        var d = (pt.x - sx) * (pt.x - sx) + (pt.y - sy) * (pt.y - sy);
+        if (d < bestD) { bestD = d; best = pt; }
+      }
+      return best;
+    }
+
+    return {
+      onClick: function(ev) {
+        var hit = findNearest(ev, 576);
+        if (hit) emit(canvasId, hit.id);
+      },
+      onMove: function(ev) {
+        var hit = findNearest(ev, 169);
+        if (hit) emit(canvasId, hit.id);
+      }
+    };
+  }
+}
+
+(function() {
+  var dataEl = document.getElementById("observatoryData") ||
+               document.getElementById("catalogData") ||
+               document.getElementById("routerConfig");
+  var flags = null;
+  if (dataEl) {
+    try { flags = JSON.parse(dataEl.textContent); } catch(e) {}
+  }
+  var root = document.getElementById("elm-root");
+  var app = Elm.Main.init({ node: root, flags: flags });
+  if (typeof mountCanvasRenderer === "function") {
+    mountCanvasRenderer(app);
+  }
+})();
+</script>
+</body>
+</html>

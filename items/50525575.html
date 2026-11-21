@@ -1,0 +1,1364 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50525575 // Why 3dfx 1 cards had such a washed out color output? — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .kpi-cell {
+      padding: 8px 0;
+    }
+    .kpi-label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 4px 0;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer > summary.hn-summary {
+      list-style: none;
+      cursor: pointer;
+      display: block;
+      padding: 2px 0;
+      margin: 0;
+      background: transparent;
+      border: 0;
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      user-select: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+    }
+    table.ablation th {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: normal;
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    .mode-tabs {
+      gap: 6px;
+      padding: 0 8px;
+      margin-bottom: 8px;
+    }
+    button.mode-tab {
+      appearance: none;
+      border-width: 0px;
+      border-radius: 4px;
+      background: rgb(246, 246, 239);
+      color: rgb(130, 130, 130);
+      cursor: pointer;
+      padding: 6px 14px;
+      transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+    }
+    button.mode-tab:hover {
+      background: rgb(240, 240, 235);
+      color: rgb(13, 13, 13);
+    }
+    button.mode-tab.active {
+      background: rgb(246, 246, 239);
+      color: rgb(13, 13, 13);
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      padding: 14px;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .mode-tabs button.mode-tab {
+        flex: 1;
+        text-align: center;
+        padding: 7px 8px;
+      }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; }
+      .topbar-right { font-size: 8pt; padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+      </div>
+      <div class="topbar-right">&nbsp;</div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://twitter.com/id_aa_carmack/status/2122478083319992513">Why 3dfx 1 cards had such a washed out color output?</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=twitter.com"><span class="sitestr">twitter.com</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">234 points</span> by <a href="https://news.ycombinator.com/user?id=mfiguiere">mfiguiere</a> <span class="age" title="2026-11-17T00:16:24.000Z"><a href="https://news.ycombinator.com/item?id=50525575">16 hours ago</a></span> | <a href="https://news.ycombinator.com/item?id=50525575">82&nbsp;comments</a> | 85.4% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">Evidence</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">82</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 66 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">14.6%</div>
+          <div class="kpi-sub">12 comments (4 Gold / 4.9%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">85.4%</div>
+          <div class="kpi-sub">33 chatter &bull; 37 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">2</div>
+        <div class="kpi-sub">7% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.944</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">12</div>
+          <div class="kpi-sub">HN POS 13..24 (14.6% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="color: rgb(90, 90, 88); margin-top: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">Explore</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 82-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 82)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (4)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (8)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (33)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (37)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..82) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 25)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (AkBKukU, 2.4h); largest subtree (@tannhaeuser) occupies 12 slots (HN POS 13..24).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="mode-tabs" id="modeTabs" role="tablist" aria-label="Ranking view">
+        <button type="button" class="mode-tab active" data-mode="hn_top40" role="tab" aria-selected="true">HN Top 40</button>
+        <button type="button" class="mode-tab" data-mode="top_signal" role="tab" aria-selected="false">Epistemic Top 40</button>
+      </div>
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (82)</option>
+          <option value="cards_3dfx">Cards &amp; 3dfx (Gamma) (16)</option>
+          <option value="getting_hl2">Getting &amp; Hl2 (Interesting) (15)</option>
+          <option value="linear_srgb">Linear &amp; Srgb (Space) (12)</option>
+          <option value="hdr_dark">Hdr &amp; Dark (Gamut) (10)</option>
+          <option value="software_renderer">Software &amp; Renderer (Lighting) (9)</option>
+          <option value="general_commentary">General Commentary (20)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, color, 3dfx, cards, linear, colors...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50525575 + TWITTER.COM + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50525575, "story_title": "Why 3dfx 1 cards had such a washed out color output?", "story_url": "https://twitter.com/id_aa_carmack/status/2122478083319992513", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50525575, "story_title": "Why 3dfx 1 cards had such a washed out color output?", "story_url": "https://twitter.com/id_aa_carmack/status/2122478083319992513", "points": 234, "story_author": "mfiguiere", "article_source": "fetched_url", "t1_ref_utc": "2026-11-17T15:54:30+00:00", "t2_ref_utc": "2026-11-17T15:54:30+00:00", "delta_minutes": 0.0, "story_anchors": ["color", "3dfx", "cards", "linear", "colors", "gamma", "textures", "washed", "output", "blending", "correct", "john", "carmack", "value", "worse", "display", "dark", "getting", "srgb", "interesting", "everything", "accurate", "closer", "contrast", "difference"], "facet_labels": {"linear_srgb": "Linear & Srgb (Space)", "cards_3dfx": "Cards & 3dfx (Gamma)", "software_renderer": "Software & Renderer (Lighting)", "getting_hl2": "Getting & Hl2 (Interesting)", "hdr_dark": "Hdr & Dark (Gamut)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "linear_srgb", "label": "Linear & Srgb (Space)", "count": 12, "top_terms": ["linear", "srgb", "space", "function"]}, {"slug": "cards_3dfx", "label": "Cards & 3dfx (Gamma)", "count": 16, "top_terms": ["cards", "3dfx", "gamma", "voodoo"]}, {"slug": "software_renderer", "label": "Software & Renderer (Lighting)", "count": 9, "top_terms": ["software", "renderer", "lighting", "quake"]}, {"slug": "getting_hl2", "label": "Getting & Hl2 (Interesting)", "count": 15, "top_terms": ["getting", "hl2", "interesting", "card"]}, {"slug": "hdr_dark", "label": "Hdr & Dark (Gamut)", "count": 10, "top_terms": ["hdr", "dark", "gamut", "display"]}], "counts": {"total_comments": 82, "live_t2_comments": 82, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 66, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "1e7debd208e1543a84961b0d9e4b75bf142ec403cca20ecdf1d12e916aa5c7cb"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 4, "grounded_analysis": 8, "crowd_chatter": 33, "bullshit_or_flamewar": 37}, "facets": {"cards_3dfx": 16, "linear_srgb": 12, "general_commentary": 20, "software_renderer": 9, "hdr_dark": 10, "getting_hl2": 15}, "facet_options": [{"slug": "cards_3dfx", "label": "Cards & 3dfx (Gamma)", "count": 16}, {"slug": "getting_hl2", "label": "Getting & Hl2 (Interesting)", "count": 15}, {"slug": "linear_srgb", "label": "Linear & Srgb (Space)", "count": 12}, {"slug": "hdr_dark", "label": "Hdr & Dark (Gamut)", "count": 10}, {"slug": "software_renderer", "label": "Software & Renderer (Lighting)", "count": 9}, {"slug": "general_commentary", "label": "General Commentary", "count": 20}], "facet_diagnostics": [{"slug": "cards_3dfx", "label": "Cards & 3dfx (Gamma)", "count": 16, "useful": 3, "useful_pct": 18.8, "terms": "cards, 3dfx, gamma, voodoo"}, {"slug": "getting_hl2", "label": "Getting & Hl2 (Interesting)", "count": 15, "useful": 2, "useful_pct": 13.3, "terms": "getting, hl2, interesting, card"}, {"slug": "linear_srgb", "label": "Linear & Srgb (Space)", "count": 12, "useful": 3, "useful_pct": 25.0, "terms": "linear, srgb, space, function"}, {"slug": "hdr_dark", "label": "Hdr & Dark (Gamut)", "count": 10, "useful": 2, "useful_pct": 20.0, "terms": "hdr, dark, gamut, display"}, {"slug": "software_renderer", "label": "Software & Renderer (Lighting)", "count": 9, "useful": 1, "useful_pct": 11.1, "terms": "software, renderer, lighting, quake"}, {"slug": "general_commentary", "label": "General Commentary", "count": 20, "useful": 1, "useful_pct": 5.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 10}, {"category": "investigative_or_tech_press", "count": 1}, {"category": "primary_technical_doc", "count": 1}], "story_anchors": ["color", "3dfx", "cards", "linear", "colors", "gamma", "textures", "washed", "output", "blending", "correct", "john", "carmack", "value", "worse", "display", "dark", "getting"], "largest_root": {"root_id": 50528313, "author": "tannhaeuser", "slots": 12, "start_dom": 13, "end_dom": 24, "share_pct": 14.6, "top_dom1_age": 2.4, "top_dom1_author": "AkBKukU"}, "buried_cutoff": 25, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50531103, "au": "AkBKukU", "dom": 1, "sr": 1, "sc": 9.38, "ep": 9.38, "bs": 0.0, "d": 0, "age": 2.38, "grav": 14.3, "surf": 6.6, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 270, "qw": 23, "k": 440, "kpp": 7.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "cards_3dfx", "flbl": "Cards & 3dfx (Gamma)", "urls": [], "ig": 1.755, "fa": 1.38, "gp": 0.91, "bl": 0.0, "ds": 0.0, "txt": "I have two alternate observations, because VGA is an analog signal there are standards for what the voltages should be. But they were not always followed. Keep in mind that the first two Voodoo cards were also video switchers with a chip to output either the 2D passthrough or the internally generated 3D chip signal created by its own GENDAC.\n\n1. I have a Voodoo 2 paired with an S3 Virge/DX, the Voodoo 2 output level is lower. On a CRT I always have to make the image brighter when running a 3DFX game. Additionally, the V-Sync pulse is not the same as the Virge/DX and the Voodoo 2 image is shifted up.\n\n2. I have a Voodoo Rush which is the maligned hybrid model of 2D and 3D chipsets on a single card. It still uses the internal switching though. On this card the voltage issues are the opposite, the 2D output is significantly dimmer than the 3D which makes the 3D game clip badly when running something until the image is adjusted again.\n\nThese problems are voltage level issues with the signal, not gamma. Adjusting gamma will not change the black or white voltage level of the signal. But a lower voltage signal may seem brighter as gamma is raised and the dynamic range is compressed.\n\n> we were so enthralled by the absolute performance of 3DFX that the color fidelity didn’t get as much attention as it should have.\n\nI would say it's more likely that they just didn't notice and the varyi"}, {"id": 50529397, "au": "cccbbbaaa", "dom": 58, "sr": 2, "sc": 8.42, "ep": 8.42, "bs": 0.0, "d": 1, "age": 6.08, "grav": 43.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 121, "qw": 0, "k": 262, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "linear_srgb", "flbl": "Linear & Srgb (Space)", "urls": ["https://eng.aurelienpierre.com/2022/02/color-saturation-control-for-the-21th-century/", "https://ansel.photos/en/news/color-controls-finally-correct/\u0023color-equalizer", "https://en.wikipedia.org/wiki/Helmholtz%E2%80%93Kohlrausch_effect"], "ig": 1.629, "fa": 1.3, "gp": 0.611, "bl": 0.0, "ds": 0.0, "txt": "When it comes to colour spaces, there is no “one size fits all”.  Perceptual colour spaces are good for, well, perceptual transformations, but many transformations ought to be done in a linear colour space, eg. exposure, color calibration and white balance adjustment, etc.  This is how darktable operates (everything before the tonemapper is done in a linear colour space, everything after is done in a perceptual colour space such as JzAzBz or DT UCS 2022 [0], the latter being based on OKLab).  Experience has shown that choices made when designing a perceptual colour space can lead to subtle issues [1].  (JzAzBz has its own issues for such transformations, such as not modelling the Helmholtz-Kohlrausch effect [2].)\n\n[0] https://eng.aurelienpierre.com/2022/02/color-saturation-cont...\n\n[1] https://ansel.photos/en/news/color-controls-finally-correct/... (Issue caused by the DT UCS 2022 colour space, which is based on OKLab.)\n\n[2] https://en.wikipedia.org/wiki/Helmholtz%E2%80%93Kohlrausch_e..."}, {"id": 50530056, "au": "justsomehnguy", "dom": 46, "sr": 3, "sc": 7.81, "ep": 7.81, "bs": 0.0, "d": 3, "age": 4.39, "grav": 28.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 38, "qw": 0, "k": 2746, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "cards_3dfx", "flbl": "Cards & 3dfx (Gamma)", "urls": ["https://www.tomshardware.com/reviews/nvidia,87-15.html"], "ig": 0.762, "fa": 1.78, "gp": 0.652, "bl": 0.0, "ds": 0.0, "txt": "That  was because you had a dogshit CPU. Voodoo was famously 'processor independent' which means what you could get a decent framerate on a cheap CPU.. at the expense of having only 640x480 and 800x600 at best and the picture quality.\n\nhttps://www.tomshardware.com/reviews/nvidia,87-15.html"}, {"id": 50529882, "au": "stateoff", "dom": 34, "sr": 4, "sc": 7.45, "ep": 7.45, "bs": 0.0, "d": 0, "age": 4.86, "grav": 32.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 11, "qw": 0, "k": 214, "kpp": 6.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://www.poynton.ca/pdf/GammaFAQ.pdf"], "ig": 0.281, "fa": 2.35, "gp": 0.066, "bl": 0.0, "ds": 0.0, "txt": "Good read on the topic is Charles Poynton site and books, e.g.\nhttps://www.poynton.ca/pdf/GammaFAQ.pdf"}, {"id": 50527785, "au": "Dwedit", "dom": 9, "sr": 5, "sc": 7.25, "ep": 7.25, "bs": 0.0, "d": 0, "age": 10.48, "grav": 94.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 63, "qw": 0, "k": 4828, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "linear_srgb", "flbl": "Linear & Srgb (Space)", "urls": [], "ig": 1.186, "fa": 0.95, "gp": 1.21, "bl": 0.0, "ds": 0.0, "txt": "You might have heard about sRGB (the commonly used colorspace) not being linear, and that to get halfway between black and white (linear RGB of 50%), you get an sRGB value of around 74%.\n\nBut there is one place where sRGB is truly linear, and that is signal voltage for a CRT display.  50% of sRGB truly means 50% of signal voltage (between the minimum and maximum voltages)."}, {"id": 50529463, "au": "magicalhippo", "dom": 74, "sr": 6, "sc": 6.82, "ep": 6.82, "bs": 0.0, "d": 1, "age": 5.93, "grav": 41.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 154, "qw": 0, "k": 18464, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "software_renderer", "flbl": "Software & Renderer (Lighting)", "urls": ["https://imglink.cc/cdn/fv5Z3WB_aS.jpg", "https://imglink.cc/cdn/fx8prYfGs6.jpg", "https://quake.fandom.com/wiki/Colored_lightning"], "ig": 1.746, "fa": 0.62, "gp": 0.657, "bl": 0.0, "ds": 0.0, "txt": "From what I can gather it's mainly a holdover from Quake[1] and the limited colors afforded by an 8-bit palette.\n\nThe lightmaps and such support colored lighting, but by default the software renderer just used the max IIRC of the color channels as a monochrome light value.\n\nJust for giggles I recently had Claude rewrite the software renderer for Quake 2 to support true-color output and so could enable `sw_colorlight 1` when using the software renderer. Doing so results in the same reddish tint as the GL renderer, but with the software renderer aesthetics.\n\nI think you can set `sw_colorlight` to `1` even in the classic renderer, but it'll look quite bad due to the limited colors afforded by the 8-bit palette.\n\nMakes sense I guess, the plot takes place on Mars, so perhaps that's why they went heavy on the red-orange.\n\nedit: uploaded some screenshots to show the difference:\n\nClassic SW with `sw_colorlight 1`: https://imglink.cc/cdn/fv5Z3WB_aS.jpg\n\nTrue-color SW with `sw_colorlight 1`: https://imglink.cc/cdn/fx8prYfGs6.jpg\n\n[1]: https://quake.fandom.com/wiki/Colored_lightning"}, {"id": 50532189, "au": "kllrnohj", "dom": 62, "sr": 7, "sc": 6.55, "ep": 6.69, "bs": 0.0, "d": 3, "age": 1.02, "grav": 7.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 113, "qw": 0, "k": 12957, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "hdr_dark", "flbl": "Hdr & Dark (Gamut)", "urls": [], "ig": 1.505, "fa": 0.68, "gp": 0.84, "bl": 0.0, "ds": 0.0, "txt": "A full gamut isn't unreasonable because of that. A full gamut is unreasonable because you'd need a larger number of subpixels to make that work. If you look at a CIE 1931 chromaticity diagram, no matter where you place your 3 points for 3 subpixels you will be unable to cover the full gamut. BT 2020 is basically an attempt at covering as much as possible and you can still see it misses huge amounts of visible colors. A wider gamut at that point requires additional color subpixels so it's no longer a triangle.\n\nAnd at least with current technology we are not at a point where sacrificing resolution or brightness for more coverage of the green end of the gamut is a wortwhile tradeoff."}, {"id": 50531127, "au": "reverheart", "dom": 69, "sr": 8, "sc": 6.45, "ep": 8.97, "bs": 2.52, "d": 1, "age": 2.35, "grav": 14.1, "surf": 3.6, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 232, "qw": 0, "k": 2, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "hdr_dark", "flbl": "Hdr & Dark (Gamut)", "urls": [], "ig": 1.95, "fa": 1.23, "gp": 0.608, "bl": 0.95, "ds": 0.0, "txt": "Dynamic range is luminance range. Standard dynamic range (SDR) was ~[0, 200nits]. High dynamic range (HDR) is higher, e.g. [0, 1000nits]. As John Carmack pointed out, human perception is non-linear. SDR uses color volumes that relies on Stevens' power law, which gamma correction approximates. For example, the SRGB and rec.709 TFs are pretty much piecewise gamma 2.2. This curve is only accurate at low nit levels. Thus, at high nit levels, a new curve known as the \"perceptual quanitizer\" or PQ TF is used instead. This curve is ostensibly fine up to 10000nits.\n\nBecause luminance ranges can differ drastically, converting media intended to be viewed on, say, a 3000nits display to a 1000nits display require other global transformations. HDR metadata standards are different parameterizations of different global transforms.\n\nIf you've ever experienced problems with HDR media it is because human perception is not actually global nor is it rooted in physics. We know from Retinex theory, the spatial dampening of the lateral geniculate nucleus, the Barten CSF, the Gelb effect, the 2022 Los Alamos paper on the non-Riemannian nature of color, etc. that the human visual system (HVS) cares about local spatio-temporal relationships more than it cares about global luminance. Because HDR pipelines are built on global transforms, they can actually have the effect of crushing the local differential"}, {"id": 50528313, "au": "tannhaeuser", "dom": 13, "sr": 9, "sc": 5.89, "ep": 5.89, "bs": 0.0, "d": 0, "age": 8.94, "grav": 74.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 11786, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "cards_3dfx", "flbl": "Cards & 3dfx (Gamma)", "urls": [], "ig": 1.111, "fa": 0.34, "gp": 1.59, "bl": 0.0, "ds": 0.0, "txt": "Hard to believe, but Nvidia, founded by former SGI engineers, was considered an entrepreneur and challenger of 3dfx, the dominant pioneer in PC 3D hardware 30 years ago.\n\nEdit: see comments re founders"}, {"id": 50528502, "au": "ack_complete", "dom": 67, "sr": 10, "sc": 5.52, "ep": 5.52, "bs": 0.0, "d": 2, "age": 8.47, "grav": 68.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 835, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "linear_srgb", "flbl": "Linear & Srgb (Space)", "urls": [], "ig": 1.168, "fa": 0.68, "gp": 0.574, "bl": 0.0, "ds": 0.0, "txt": "grGammaCorrectionValue() sounds like the DAC -- so during scanout.\n\nWhich by itself isn't the worst, if you have a 24-bit framebuffer and sRGB read conversion. Without read conversion and going from 565 textures to 565 framebuffer with a 1.5 gamma... blecch. Checking the curves, the banding on the low end is worse than an Atari 2600!"}, {"id": 50531005, "au": "whizzter", "dom": 19, "sr": 11, "sc": 5.01, "ep": 5.15, "bs": 0.0, "d": 4, "age": 2.54, "grav": 15.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 192, "qw": 0, "k": 3073, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "getting_hl2", "flbl": "Getting & Hl2 (Interesting)", "urls": [], "ig": 1.894, "fa": 0.0, "gp": 0.485, "bl": 0.0, "ds": 0.0, "txt": "Huh? 3DFX \"won\" initially because the Glide API was simple, lightweight and fast, but the open market pressures of gaming hardware, consumers and developers made OGL (that was \"bloated\" initially) and D3D (that was improved) win.\n\nLike Glide, CUDA took off because getting started is so much easier than getting started with OpenCL,etc, so a ton of researches could do stupid prototypes without getting bogged down in implementation details and once those prototypes took off a ton of code was tied to Cuda (seriously, look at OpenCL vs Cuda hello world or simple 1d kernel examples).\n\nNow with higher level Python bindings being popular and US export restrictions, people has put effort into stuff like PyTorch supporting other API's, because there is enough industry pressure to have alternatives, the question is how long the CUDA moat can keep giving NVidia a hardware premium.\n\nSo, CUDA really wasn't anything they embraced or extended (even if they did so with GL,etc), it's their own API thus GP's parallell to 3dfx/Glide and the question is how long they can keep milking that moat (especially, since iroincally,  AI's probably makes porting to other frameworks far easier)."}, {"id": 50528902, "au": "fps-hero", "dom": 60, "sr": 12, "sc": 3.87, "ep": 4.16, "bs": 0.0, "d": 1, "age": 7.39, "grav": 56.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 70, "qw": 0, "k": 402, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "getting_hl2", "flbl": "Getting & Hl2 (Interesting)", "urls": [], "ig": 1.407, "fa": 0.22, "gp": 0.157, "bl": 0.0, "ds": 0.0, "txt": "Humans are too flawed with colour perception. I wish color were 2D, but much like music, it depends on what notes you play.\n\nIt’s bad enough that monitors do not produce colour accuracy, or to the full gamut.\n\nHonestly, it’s the one thing Apple got right. Everyone in the creative industry runs Apple, and Apple had a consistency with color. Good luck getting your stuff approved if you produced it on Windows."}, {"id": 50531442, "au": "zbendefy", "dom": 44, "sr": 13, "sc": 3.59, "ep": 3.74, "bs": 0.0, "d": 2, "age": 1.95, "grav": 11.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 63, "qw": 0, "k": 263, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "getting_hl2", "flbl": "Getting & Hl2 (Interesting)", "urls": [], "ig": 1.159, "fa": 0.34, "gp": 0.032, "bl": 0.0, "ds": 0.0, "txt": "hl2's 2004 version could even run on directx 6.0 mode, but that was removed later on, but my intel integrated graphics at the time ran using that (mat_dxlevel 60 i think). It also had dx 7.0 for a while (which brought multitexturing compared to dx6), but I think thats also no longer there.\n\nso its possible that it runs hl2, it would be interesting to see if it does."}, {"id": 50528659, "au": "Luke2642", "dom": 57, "sr": 14, "sc": 3.43, "ep": 3.88, "bs": 0.0, "d": 0, "age": 7.99, "grav": 63.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 22, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "linear_srgb", "flbl": "Linear & Srgb (Space)", "urls": [], "ig": 0.828, "fa": 0.34, "gp": 0.662, "bl": 0.0, "ds": 0.0, "txt": "I dream of a parallel timeline when OKLAB became the standard colourspace in 1980! It's a very colourful dream, the lightness stays consistent as the hues change, and colour interpolation just works!"}, {"id": 50532555, "au": "neckro23", "dom": 77, "sr": 15, "sc": 3.3, "ep": 3.44, "bs": 0.0, "d": 3, "age": 0.58, "grav": 5.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 54, "qw": 0, "k": 445, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "software_renderer", "flbl": "Software & Renderer (Lighting)", "urls": [], "ig": 1.389, "fa": 0.0, "gp": 0.123, "bl": 0.0, "ds": 0.0, "txt": "Pretty sure it could, the original Unreal engine was quite impressive for its time. In fact if I'm recalling correctly, it had some omissions when accelerated (detail textures?) that worked fine in software mode.\n\nHalf-Life 1 could also do colored lighting in software, the software-rendered and accelerated versions looked almost identical aside from the texture filtering."}, {"id": 50529883, "au": "papua_is_being_", "dom": 23, "sr": 16, "sc": 3.22, "ep": 3.52, "bs": 0.0, "d": 1, "age": 4.86, "grav": 32.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 6, "k": 35, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "cards_3dfx", "flbl": "Cards & 3dfx (Gamma)", "urls": [], "ig": 0.986, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> Nvidia, founded by former SGI engineers\n\nIs that accurate? I saw some content about how Microsoft, Rick Beluzo and Jensen engineered the internal implosion of SGI and transfer of IP to Nvidia."}, {"id": 50532067, "au": "kllrnohj", "dom": 29, "sr": 17, "sc": 3.18, "ep": 3.4, "bs": 0.0, "d": 1, "age": 1.18, "grav": 8.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 12957, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "linear_srgb", "flbl": "Linear & Srgb (Space)", "urls": [], "ig": 0.946, "fa": 0.34, "gp": 0.144, "bl": 0.0, "ds": 0.0, "txt": "It's not. Videos are never in linear. SDR videos almost always means Rec 709 which is approximately gamma 2.4, and HDR videos are HLG or PQ. Both of which are very far from linear."}, {"id": 50529457, "au": "bni", "dom": 41, "sr": 18, "sc": 3.18, "ep": 3.47, "bs": 0.0, "d": 0, "age": 5.94, "grav": 41.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 1030, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "getting_hl2", "flbl": "Getting & Hl2 (Interesting)", "urls": [], "ig": 1.016, "fa": 0.34, "gp": 0.079, "bl": 0.0, "ds": 0.0, "txt": "I had a Nvidia RIVA 128 card before I bought a Voodoo 2 instead.\n\nThe Riva came with the OEM PC I got. I remember HL2 looked very washed out on it and being quite unhappy with that. Funny that the 3dfx \"solved\" it for me."}, {"id": 50529264, "au": "Cloudef", "dom": 71, "sr": 19, "sc": 3.16, "ep": 3.31, "bs": 0.0, "d": 1, "age": 6.48, "grav": 46.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 139, "qw": 0, "k": 2018, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "hdr_dark", "flbl": "Hdr & Dark (Gamut)", "urls": [], "ig": 1.409, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "HDR is extra brightness on your display. In practice it's kind of a mess, as both the hardware and software implementation has to be good. If you have cheap display, you'll get something marketed as HDR even though it would look better with it turned off, as they likely use very big extra brightness zones, so it won't end up looking right. On software side, unless it's a console, the PC stack was not designed for HDR and it really takes co-operation of the whole stack to make it look correct on the display. For a while, for best result you had to basically bypass most of your display stack to get correct results. Valve's been working on it for their own platform, and wayland has some experimental support.\n\nEDIT: For TV, HDR works well assuming you don't have cheap TV."}, {"id": 50529200, "au": "herodoturtle", "dom": 2, "sr": 20, "sc": 2.9, "ep": 3.12, "bs": 0.0, "d": 0, "age": 6.63, "grav": 48.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 2617, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "getting_hl2", "flbl": "Getting & Hl2 (Interesting)", "urls": [], "ig": 0.838, "fa": 0.0, "gp": 0.794, "bl": 0.0, "ds": 0.0, "txt": "It's pretty cool that someone can ask an interesting graphics-related question, and John Carmack of all people steps in to answer it. And then even Eric S. Raymond adds a comment further below."}, {"id": 50528717, "au": "rob74", "dom": 14, "sr": 21, "sc": 2.76, "ep": 3.42, "bs": 0.0, "d": 1, "age": 7.84, "grav": 61.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 53, "qw": 0, "k": 17319, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "cards_3dfx", "flbl": "Cards & 3dfx (Gamma)", "urls": [], "ig": 1.331, "fa": 0.0, "gp": 0.204, "bl": 0.0, "ds": 0.0, "txt": "Yeah, 3dfx were the pioneers in the 3D graphics space, but because of various mistakes on their side (relying on their proprietary API and on add-on 3D cards for too long, alienating board partners by starting to build their own cards) and faster development by the competitors, Nvidia (and ATI) ate their lunch."}, {"id": 50528227, "au": "nullc", "dom": 63, "sr": 22, "sc": 2.72, "ep": 3.16, "bs": 0.0, "d": 0, "age": 9.14, "grav": 76.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 19231, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "linear_srgb", "flbl": "Linear & Srgb (Space)", "urls": [], "ig": 1.257, "fa": 0.0, "gp": 0.141, "bl": 0.0, "ds": 0.0, "txt": "A lot of people today trying to 'be correct' and resample in linear space end up getting worse results either because of introducing banding from quarantining back to 8-bits or because the non-linear space resampling often happens to do something closer to the right thing thanks to human contrast-sensitivity function."}, {"id": 50528972, "au": "barrkel", "dom": 59, "sr": 23, "sc": 2.62, "ep": 3.06, "bs": 0.0, "d": 1, "age": 7.25, "grav": 54.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 36301, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "hdr_dark", "flbl": "Hdr & Dark (Gamut)", "urls": [], "ig": 1.303, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Oklab/oklch is good for consistent luminance across hue, but the real world gamut is so limited - our display / print tech is always able to make green/yellow far brighter than red/blue, for any given tech - it can be a little frustrating to use."}, {"id": 50529226, "au": "Cloudef", "dom": 55, "sr": 24, "sc": 2.51, "ep": 2.51, "bs": 0.0, "d": 2, "age": 6.56, "grav": 47.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 62, "qw": 0, "k": 2018, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "software_renderer", "flbl": "Software & Renderer (Lighting)", "urls": [], "ig": 1.07, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Thanks. Thought it would be more interesting though. This is literally what colorspaces are for.\n\nEDIT: I think there's a good point though that the game assets should be produced to the asset pipeline losslessly so that they can be transformed to the game's own internal colorspace(s) (depending what the renderer is doing, it can make sense to have multiple colorspaces for different calculations)"}, {"id": 50528033, "au": "dcrazy", "dom": 31, "sr": 25, "sc": 2.48, "ep": 3.14, "bs": 0.0, "d": 0, "age": 9.68, "grav": 83.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 2461, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "linear_srgb", "flbl": "Linear & Srgb (Space)", "urls": [], "ig": 0.946, "fa": 0.0, "gp": 0.63, "bl": 0.0, "ds": 0.0, "txt": "I remember watching John document his education about linear color blending on Twitter. I believe it was when he was adding HDR to Rage. It was amazing to me that he had had such a blind spot for so long."}, {"id": 50527795, "au": "cyberax", "dom": 73, "sr": 26, "sc": 2.26, "ep": 2.99, "bs": 0.0, "d": 0, "age": 10.45, "grav": 93.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 7168, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "getting_hl2", "flbl": "Getting & Hl2 (Interesting)", "urls": [], "ig": 1.052, "fa": 0.0, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "Another interesting question: I remember getting a 3D accelerator (some Riva card?) and getting surprised how everything started looking reddish in Quake 2, compared to software rendering.\n\nDoes anyone know the reason for that?"}, {"id": 50528824, "au": "anal_reactor", "dom": 68, "sr": 27, "sc": 2.05, "ep": 2.57, "bs": 0.0, "d": 0, "age": 7.59, "grav": 58.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 1367, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "hdr_dark", "flbl": "Hdr & Dark (Gamut)", "urls": [], "ig": 0.718, "fa": 0.0, "gp": 0.606, "bl": 0.0, "ds": 0.0, "txt": "A bit tangential, but in modern games with HDR I still get the fucking banding of dark colors.\n\nSomeone enlighten me what HDR actually does then."}, {"id": 50532747, "au": "cmovq", "dom": 12, "sr": 28, "sc": 1.71, "ep": 2.59, "bs": 0.0, "d": 0, "age": 0.38, "grav": 4.8, "surf": 17.5, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 906, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "linear_srgb", "flbl": "Linear & Srgb (Space)", "urls": [], "ig": 1.04, "fa": 0.0, "gp": 0.103, "bl": 0.0, "ds": 0.0, "txt": "These days you just author your textures in sRGB, convert them to linear when they’re read, do all the filtering and lighting in linear space and convert the final render target to sRGB (or HDR). Of course this was much more diffuser back then with fixed function hardware"}, {"id": 50529112, "au": "cowlevel", "dom": 72, "sr": 29, "sc": 1.61, "ep": 2.49, "bs": 0.0, "d": 1, "age": 6.92, "grav": 51.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "hdr_dark", "flbl": "Hdr & Dark (Gamut)", "urls": [], "ig": 1.059, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "mainly it confuses the heck out of everyone because some display industry association tried to tie it to absolute luminosity and then made HDR content way too bright or dark relative to everything around it"}, {"id": 50528985, "au": "thrdbndndn", "dom": 64, "sr": 30, "sc": 1.46, "ep": 2.71, "bs": 0.0, "d": 1, "age": 7.2, "grav": 54.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 3705, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "linear_srgb", "flbl": "Linear & Srgb (Space)", "urls": [], "ig": 1.153, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Human contrast sensitivity doesn't change the physics of light mixing/blending, which should always happen in linear space.\n\nI do agree with you on the quantisation issues when working in linear space without taking proper care, though."}, {"id": 50528800, "au": "Panzerschrek", "dom": 75, "sr": 31, "sc": 1.28, "ep": 1.72, "bs": 0.0, "d": 1, "age": 7.64, "grav": 59.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 68, "qw": 0, "k": 461, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "software_renderer", "flbl": "Software & Renderer (Lighting)", "urls": [], "ig": 0.671, "fa": 0.0, "gp": 0.1, "bl": 0.0, "ds": 0.0, "txt": "Quake II uses old 8-bit approach in its software rasterizer, which isn't capable of applying colored lighting. It's a shame, that no progress was made since original Quake. Half-Life (also derived from Quake) did better job and supports colored lighting in software mode.\n\nIn OpenGL mode colored lighting is there. But map designers overused it too much, especially in outdoor locations having yellow sky lighting, which looks somewhat depressive."}, {"id": 50528787, "au": "contingencies", "dom": 82, "sr": 32, "sc": 1.18, "ep": 1.84, "bs": 0.0, "d": 2, "age": 7.68, "grav": 59.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 23, "qw": 0, "k": 12748, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "getting_hl2", "flbl": "Getting & Hl2 (Interesting)", "urls": ["https://en.wikipedia.org/wiki/Duke_Nukem_3D", "https://en.wikipedia.org/wiki/3dfx\u0023Entry_to_the_consumer_market"], "ig": 0.785, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It's the period and the hardware, not the studio! I wonder what period gamers would have thought of GPUs and bitcoin :)\n\nFor young'uns: https://en.wikipedia.org/wiki/Duke_Nukem_3D + https://en.wikipedia.org/wiki/3dfx\u0023Entry_to_the_consumer_mar..."}, {"id": 50529017, "au": "barrkel", "dom": 61, "sr": 33, "sc": 1.18, "ep": 2.28, "bs": 0.0, "d": 2, "age": 7.12, "grav": 53.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 36301, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "hdr_dark", "flbl": "Hdr & Dark (Gamut)", "urls": [], "ig": 0.972, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Expecting a full gamut is unreasonable when you consider what it would mean: huge brightness for blue and red, artificial limiting of green.\n\nOur eyes are simply more sensitive to yellowish green. Any reasonable tech will have a gamut that is tented towards green."}, {"id": 50530580, "au": "mrob", "dom": 11, "sr": 34, "sc": 1.13, "ep": 2.38, "bs": 0.0, "d": 2, "age": 3.28, "grav": 20.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 24, "qw": 0, "k": 11378, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "linear_srgb", "flbl": "Linear & Srgb (Space)", "urls": ["https://en.wikipedia.org/wiki/SRGB\u0023Transfer_function_(%22gamma%22)"], "ig": 1.012, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "sRGB intentionally deviates from CRT characteristics to improve fidelity of colors close to black. The difference is small but noticeable in a side-by-side comparison:\n\nhttps://en.wikipedia.org/wiki/SRGB\u0023Transfer_function_(%22gam..."}, {"id": 50532596, "au": "basilgohar", "dom": 26, "sr": 35, "sc": 1.05, "ep": 1.49, "bs": 0.0, "d": 0, "age": 0.54, "grav": 5.4, "surf": 18.8, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 3491, "kpp": 5.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "cards_3dfx", "flbl": "Cards & 3dfx (Gamma)", "urls": [], "ig": 0.565, "fa": 0.0, "gp": 0.114, "bl": 0.0, "ds": 0.0, "txt": "I thought this was going to be about how 3dfx cards rendered only 16 bit color, but I was surprised that this was actually about a hardware issue. Interesting!"}, {"id": 50527614, "au": "vessenes", "dom": 35, "sr": 36, "sc": 0.94, "ep": 1.82, "bs": 0.0, "d": 0, "age": 10.98, "grav": 100.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 14148, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "getting_hl2", "flbl": "Getting & Hl2 (Interesting)", "urls": [], "ig": 0.629, "fa": 0.0, "gp": 0.236, "bl": 0.0, "ds": 0.0, "txt": "I'm so curious what John's AI startup is doing. I got to talk to him briefly right when he was launching, and I was excited to hear about what he's building. John, any recent updates?"}, {"id": 50529404, "au": "oblio", "dom": 32, "sr": 37, "sc": 0.84, "ep": 0.98, "bs": 0.0, "d": 1, "age": 6.06, "grav": 42.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 28103, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.418, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "If you read Masters of Doom and some of his blogposts/comments, you'll notice that he is laser focused in general, which also means that his blind spots are many :-)\n\nWhere he does focus, though, he goes incredibly deep."}, {"id": 50527880, "au": "rasz", "dom": 65, "sr": 38, "sc": 0.83, "ep": 4.68, "bs": 3.05, "d": 0, "age": 10.14, "grav": 89.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 143, "qw": 0, "k": 12081, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "cards_3dfx", "flbl": "Cards & 3dfx (Gamma)", "urls": [], "ig": 1.723, "fa": 0.0, "gp": 0.438, "bl": 1.15, "ds": 0.0, "txt": "In numbers:\n\nVGA  default gamma y = 1 aka linear\n\n3DFX default gamma y = 1.5\n\nYou might, like I did, think wtf is he talking about, default is linear and 3dfx bends it. But CRT monitors y = 2.2! When added up (multiply exponents) 3dfx is closer to linear output than ordinary VGA. You would still have to set 3dfx to 2.2 to get perfect linear output.\n\nTLDR: Carmack is partially right. As he says even game developers were clueless. Nobody had to change their workflows. You could call glide grGammaCorrectionValue or even easier set DOS environment variable SST_GAMMA  to 1 to get Exact same color mapping as ordinary VGA.\n\nWhy did 3dfx boost that? deffo not to get linear output, if they wanted linear they would set 2.2. Probably a Color twist on loudness war, brighter better, or maybe felt bad half the bits would get wasted (crushed into near blacks) in 16bit rendering."}, {"id": 50528759, "au": "trq01758", "dom": 22, "sr": 39, "sc": 0.68, "ep": 2.22, "bs": 0.0, "d": 1, "age": 7.74, "grav": 60.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 51, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "getting_hl2", "flbl": "Getting & Hl2 (Interesting)", "urls": [], "ig": 0.808, "fa": 0.0, "gp": 0.226, "bl": 0.0, "ds": 0.0, "txt": "3dfx founders were ex Silicon Graphics, for Nvidia - Jensen worked at LSI and AMD, others were from Sun."}, {"id": 50532525, "au": "StilesCrisis", "dom": 30, "sr": 40, "sc": 0.39, "ep": 1.42, "bs": 0.0, "d": 1, "age": 0.61, "grav": 5.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 1694, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "hdr_dark", "flbl": "Hdr & Dark (Gamut)", "urls": [], "ig": 0.605, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "If your streaming video is banding in dark areas, it's possible your TV brightness/contrast need adjustment. If it's set too bright that's where you'd see it. Or it's just a cheap panel, and that's where you can most easily see the flaws."}, {"id": 50528947, "au": "thrdbndndn", "dom": 10, "sr": 41, "sc": 0.36, "ep": 1.75, "bs": 0.0, "d": 1, "age": 7.29, "grav": 55.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 3705, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "linear_srgb", "flbl": "Linear & Srgb (Space)", "urls": [], "ig": 0.745, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Sorry for nitpicking, but my understanding is that the sRGB transfer function was designed to approximate CRT characteristics, not to match them exactly. So saying it is \"truly\" linear in terms of signal voltage sounds a bit misleading."}, {"id": 50529641, "au": "frabert", "dom": 42, "sr": 42, "sc": 0.11, "ep": 1.44, "bs": 0.0, "d": 1, "age": 5.49, "grav": 37.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 1730, "kpp": 4.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "cards_3dfx", "flbl": "Cards & 3dfx (Gamma)", "urls": [], "ig": 0.611, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Are you sure it was HL2? That seems way too recent to run on a RIVA 128 or even a Voodoo 2. I think the original HL2 needed DirectX 9 at the minimum, I don't think either of those cards supported that"}, {"id": 50532044, "au": "masfuerte", "dom": 56, "sr": 43, "sc": 0.09, "ep": 1.43, "bs": 1.19, "d": 1, "age": 1.21, "grav": 8.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 2874, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.609, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "You can actually read messages on twitter without JS now.  But Nitter thinks I'm a bot so I can't see the rest of the thread anywhere."}, {"id": 50531468, "au": "Spalau", "dom": 25, "sr": 44, "sc": 0.06, "ep": 3.68, "bs": 2.52, "d": 0, "age": 1.91, "grav": 11.6, "surf": 8.7, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 53, "qw": 0, "k": -1, "kpp": -0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "getting_hl2", "flbl": "Getting & Hl2 (Interesting)", "urls": [], "ig": 1.382, "fa": 0.0, "gp": 0.298, "bl": 0.95, "ds": 0.0, "txt": "Although I never saw Quake on a 3dfx card, it has a recognizable \"style.\" I like that style in modern user-made maps, some of which are entire games with multiple levels.\n\nI always thought the style was an artistic choice rather than a technical limitation.\n\nNow I understand that a lot of old graphics \"styles\" were restricted by the existing hardware."}, {"id": 50531372, "au": "Sharlin", "dom": 3, "sr": 45, "sc": -0.88, "ep": 2.06, "bs": 1.7, "d": 1, "age": 2.05, "grav": 12.4, "surf": 3.7, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 51, "qw": 0, "k": 22376, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "getting_hl2", "flbl": "Getting & Hl2 (Interesting)", "urls": [], "ig": 0.877, "fa": 0.0, "gp": 0.0, "bl": 0.64, "ds": 0.0, "txt": "Yeah, Carmack isn’t super surprising especially as it’s Sanglard who’s asking, but ESR I haven’t really spotted anywhere in a long while. Just some time ago I was thinking that he’s probably a nobody to a lot of the younger folk, or at the very least known only for some of his more terrible political opinions."}, {"id": 50531616, "au": "Spalau", "dom": 16, "sr": 46, "sc": -1.28, "ep": 2.78, "bs": 2.52, "d": 3, "age": 1.73, "grav": 10.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 58, "qw": 0, "k": -1, "kpp": -0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "getting_hl2", "flbl": "Getting & Hl2 (Interesting)", "urls": [], "ig": 0.986, "fa": 0.0, "gp": 0.32, "bl": 0.95, "ds": 0.0, "txt": "Most people believe that the benefit of competition is lower prices. That's not so much true. The real benefit is innovation. Since chip fabrication has been reduced to a small number of manufacturers, innovation in the chip industry stalled. Maybe now, with everyone building their own fabs to manufacture AI chips, we'll see more competition and faster innovation."}, {"id": 50532846, "au": "threeeeed", "dom": 27, "sr": 47, "sc": -1.33, "ep": 2.29, "bs": 2.52, "d": 0, "age": 0.27, "grav": 4.4, "surf": 23.1, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "cards_3dfx", "flbl": "Cards & 3dfx (Gamma)", "urls": [], "ig": 0.938, "fa": 0.0, "gp": 0.057, "bl": 0.95, "ds": 0.0, "txt": "One compounding issue that the article is missing is that alpha blending was not performed in the correct color space on voodoo cards, was not gamma correct. This also contributed to the washed out effect."}, {"id": 50528445, "au": "nopurpose", "dom": 78, "sr": 48, "sc": -1.63, "ep": 1.11, "bs": 1.19, "d": 1, "age": 8.63, "grav": 70.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 1394, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "linear_srgb", "flbl": "Linear & Srgb (Space)", "urls": [], "ig": 0.471, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "I explained to myself at the time that it is because skybox light start to tint everything underneath it."}, {"id": 50529806, "au": "aa-jv", "dom": 24, "sr": 49, "sc": -1.64, "ep": 1.1, "bs": 1.19, "d": 1, "age": 5.07, "grav": 33.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 1015, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "cards_3dfx", "flbl": "Cards & 3dfx (Gamma)", "urls": [], "ig": 0.466, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Imagine if SGI had made a titanium laptop.\n\nNow, imaging if NVIDIA make a titanium laptop.\n\nAs far as I'm concerned, the moment DGXOS appears on a viable laptop, I'm dumping Apple entirely."}, {"id": 50528922, "au": "rasz", "dom": 20, "sr": 50, "sc": -1.82, "ep": 1.67, "bs": 3.05, "d": 2, "age": 7.36, "grav": 56.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 12081, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.37, "fa": 0.28, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Didnt the board specifically push for vertical integration to chase those sweet downstream margins?"}, {"id": 50529820, "au": "ahartmetz", "dom": 45, "sr": 51, "sc": -1.93, "ep": 0.8, "bs": 1.19, "d": 2, "age": 5.02, "grav": 33.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 8620, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "getting_hl2", "flbl": "Getting & Hl2 (Interesting)", "urls": [], "ig": 0.341, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Even Half-Life 1 didn't run optimally on a Riva TNT (which I had), the successor of the Riva 128. It ran better on a friend's Voodoo 2."}, {"id": 50527777, "au": "contingencies", "dom": 80, "sr": 52, "sc": -3.02, "ep": 1.27, "bs": 3.05, "d": 0, "age": 10.5, "grav": 94.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 12748, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "cards_3dfx", "flbl": "Cards & 3dfx (Gamma)", "urls": [], "ig": 0.541, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "It's time to kick ass and render color. And I'm all outta color."}, {"id": 50531946, "au": "gwbas1c", "dom": 28, "sr": 53, "sc": -3.46, "ep": 1.24, "bs": 3.05, "d": 0, "age": 1.31, "grav": 8.6, "surf": 11.7, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 40, "k": 16080, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "hdr_dark", "flbl": "Hdr & Dark (Gamut)", "urls": [], "ig": 0.254, "fa": 0.0, "gp": 0.445, "bl": 1.15, "ds": 0.0, "txt": "> If you only have a small number of discrete pixel values, you definitely don’t want to spread them evenly from 0 to 1! If you do, you will have good precision in the brights, but very stark “intensity bands” in the dark colors.\n\nThat's probably why streaming video has so much banding in dark streams too."}, {"id": 50529736, "au": "cowlevel", "dom": 52, "sr": 54, "sc": -3.74, "ep": 1.01, "bs": 4.24, "d": 3, "age": 5.23, "grav": 35.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.174, "fa": 0.0, "gp": 0.417, "bl": 1.6, "ds": 0.0, "txt": "There are more online Nitter servers than ever before."}, {"id": 50527937, "au": "superjan", "dom": 66, "sr": 55, "sc": -3.81, "ep": 0.63, "bs": 3.05, "d": 1, "age": 9.98, "grav": 87.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 1365, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "cards_3dfx", "flbl": "Cards & 3dfx (Gamma)", "urls": [], "ig": 0.268, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Where was this applied in the 3dfx? In the analog output?"}, {"id": 50528719, "au": "tverbeure", "dom": 21, "sr": 56, "sc": -3.81, "ep": 0.98, "bs": 4.24, "d": 1, "age": 7.84, "grav": 61.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 2614, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "cards_3dfx", "flbl": "Cards & 3dfx (Gamma)", "urls": [], "ig": 0.289, "fa": 0.0, "gp": 0.208, "bl": 1.6, "ds": 0.0, "txt": "It was founded by 2 former Sun engineers and 1 LSI logic engineer."}, {"id": 50528499, "au": "fredoralive", "dom": 79, "sr": 57, "sc": -3.81, "ep": 0.54, "bs": 4.24, "d": 1, "age": 8.47, "grav": 68.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 2131, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "software_renderer", "flbl": "Software & Renderer (Lighting)", "urls": [], "ig": 0.228, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "IIRC the software renderer in Quake 2 doesn't do coloured lighting."}, {"id": 50532051, "au": "s3graham", "dom": 7, "sr": 58, "sc": -3.81, "ep": 0.51, "bs": 4.24, "d": 4, "age": 1.2, "grav": 8.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 1785, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.217, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Gary Tarolli would be the perfect response to this question!"}, {"id": 50529786, "au": "stateoff", "dom": 18, "sr": 59, "sc": -3.81, "ep": 0.48, "bs": 4.24, "d": 3, "age": 5.12, "grav": 34.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 214, "kpp": 6.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.205, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "They understood the embrace, extend part of it."}, {"id": 50530910, "au": "js4ever", "dom": 39, "sr": 60, "sc": -3.81, "ep": 0.46, "bs": 4.24, "d": 3, "age": 2.69, "grav": 16.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 1746, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "cards_3dfx", "flbl": "Cards & 3dfx (Gamma)", "urls": [], "ig": 0.195, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Is this a variant of dog ate my homework?"}, {"id": 50528688, "au": "Cloudef", "dom": 49, "sr": 61, "sc": -3.81, "ep": 0.45, "bs": 4.24, "d": 0, "age": 7.93, "grav": 62.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 2018, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.118, "fa": 0.0, "gp": 0.119, "bl": 1.6, "ds": 0.0, "txt": "Is there repost that's not on that garbage site?"}, {"id": 50530512, "au": "rapist", "dom": 8, "sr": 62, "sc": -3.94, "ep": 0.3, "bs": 4.24, "d": 3, "age": 3.4, "grav": 20.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": -9, "kpp": -1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.127, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "that applies to the parent comment too then"}, {"id": 50533085, "au": "kgkgkkgkd", "dom": 17, "sr": 63, "sc": -4.16, "ep": 1.41, "bs": 5.57, "d": 3, "age": 0.07, "grav": 3.7, "surf": 9.3, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 1, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "getting_hl2", "flbl": "Getting & Hl2 (Interesting)", "urls": [], "ig": 0.599, "fa": 0.0, "gp": 0.0, "bl": 2.1, "ds": 0.0, "txt": "Nvidia’s bigggest issue today is not graphics related. It’s sex related."}, {"id": 50532053, "au": "DavCreator", "dom": 54, "sr": 64, "sc": -4.32, "ep": 0.72, "bs": 5.04, "d": 4, "age": 1.2, "grav": 8.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 12, "qw": 0, "k": 152, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://XNotMe.com"], "ig": 0.305, "fa": 0.0, "gp": 0.0, "bl": 1.9, "ds": 0.0, "txt": "recently migrated to a shorter domain: https://XNotMe.com . But xxcancel.com is also still working!"}, {"id": 50530363, "au": "ahartmetz", "dom": 47, "sr": 65, "sc": -4.35, "ep": 0.82, "bs": 5.17, "d": 4, "age": 3.69, "grav": 22.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 8620, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "software_renderer", "flbl": "Software & Renderer (Lighting)", "urls": [], "ig": 0.349, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "CPU was a Celeron \"416\" (common overclock of the 333). It had been released just a few months before Half-Life and it was maybe 30% slower than the fastest x86 you could buy at the time."}, {"id": 50530458, "au": "odjciemdkwkdk", "dom": 5, "sr": 66, "sc": -6.03, "ep": 0.73, "bs": 6.76, "d": 2, "age": 3.51, "grav": 21.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 0, "kpp": 0.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.309, "fa": 0.0, "gp": 0.0, "bl": 2.55, "ds": 0.0, "txt": "Yes he is. Everyone is “just someone”. Let’s leave the deification for actual religions, yeah?"}, {"id": 50530824, "au": "bni", "dom": 43, "sr": 67, "sc": -8.86, "ep": 0.0, "bs": 6.89, "d": 2, "age": 2.83, "grav": 17.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 1030, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.179, "bl": 2.6, "ds": 0.0, "txt": "Yes my mistake meant HL1 of course"}, {"id": 50529995, "au": "itomato", "dom": 37, "sr": 68, "sc": -8.9, "ep": 0.0, "bs": 6.89, "d": 2, "age": 4.55, "grav": 29.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 872, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.154, "bl": 2.6, "ds": 0.0, "txt": "Yeah, but I need to finger a .plan"}, {"id": 50529305, "au": "parasti", "dom": 4, "sr": 69, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 6.35, "grav": 45.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 1649, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Fabien Sanglard isn't just someone."}, {"id": 50531835, "au": "DoctorDabadedoo", "dom": 6, "sr": 70, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 3, "age": 1.47, "grav": 9.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 497, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Yes, you may call me Gary, tough."}, {"id": 50528855, "au": "po1nt", "dom": 15, "sr": 71, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 7.49, "grav": 57.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 382, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "cards_3dfx", "flbl": "Cards & 3dfx (Gamma)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Funny. Nvidia does the same thing today."}, {"id": 50530454, "au": "redbear2026", "dom": 38, "sr": 72, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 3.53, "grav": 21.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 10, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "cards_3dfx", "flbl": "Cards & 3dfx (Gamma)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Aliens Ate My Baby Sitter!"}, {"id": 50529708, "au": "poglet", "dom": 48, "sr": 73, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 5.3, "grav": 35.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 300, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "software_renderer", "flbl": "Software & Renderer (Lighting)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "I suspect half-life 1 or quake 2"}, {"id": 50529608, "au": "iririririr", "dom": 51, "sr": 74, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 5.57, "grav": 38.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 270, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "getting_hl2", "flbl": "Getting & Hl2 (Interesting)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "i thought nitter was dead?!?!"}, {"id": 50531993, "au": "anthk", "dom": 76, "sr": 75, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 1.26, "grav": 8.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 5373, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "software_renderer", "flbl": "Software & Renderer (Lighting)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Could Unreal do that in software rendering?"}, {"id": 50528052, "au": "drdaeman", "dom": 81, "sr": 76, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 9.62, "grav": 82.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 8542, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Entirely different studio and codebases, I’m afraid."}, {"id": 50529106, "au": "cowlevel", "dom": 50, "sr": 77, "sc": -10.29, "ep": 0.0, "bs": 8.88, "d": 1, "age": 6.93, "grav": 51.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 0, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://nitter.click/id_aa_carmack/status/2122478083319992513"], "ig": -0.95, "fa": 0.0, "gp": 0.562, "bl": 3.35, "ds": 0.0, "txt": "https://nitter.click/id_aa_carmack/status/212247808331999251..."}, {"id": 50527769, "au": "tommica", "dom": 36, "sr": 78, "sc": -11.11, "ep": 0.0, "bs": 8.88, "d": 1, "age": 10.53, "grav": 94.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 5, "qw": 0, "k": 1482, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://keenagi.com/"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.35, "ds": 0.0, "txt": "Seems that this is startup https://keenagi.com/"}, {"id": 50531521, "au": "tommica", "dom": 40, "sr": 79, "sc": -11.11, "ep": 0.0, "bs": 8.88, "d": 4, "age": 1.86, "grav": 11.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 4, "qw": 0, "k": 1482, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "software_renderer", "flbl": "Software & Renderer (Lighting)", "urls": ["https://www.mobygames.com/game/1581/commander-keen-aliens-ate-my-babysitter/"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.35, "ds": 0.0, "txt": "It's a Commander Keen game! https://www.mobygames.com/game/1581/commander-keen-aliens-at..."}, {"id": 50531972, "au": "anthk", "dom": 53, "sr": 80, "sc": -11.11, "ep": 0.0, "bs": 8.88, "d": 3, "age": 1.28, "grav": 8.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 0, "qw": 0, "k": 5373, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://xxcancel.com"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.35, "ds": 0.0, "txt": "https://xxcancel.com"}, {"id": 50533159, "au": "kgkgkkgkd", "dom": 70, "sr": 81, "sc": -11.64, "ep": 0.0, "bs": 9.41, "d": 2, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 1, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "hdr_dark", "flbl": "Hdr & Dark (Gamut)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.55, "ds": 0.0, "txt": "Nits go up to 11 on hdr displays."}, {"id": 50531619, "au": "DavCreator", "dom": 33, "sr": 82, "sc": -14.63, "ep": 0.0, "bs": 12.46, "d": 0, "age": 1.72, "grav": 10.7, "surf": 9.5, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 0, "qw": 0, "k": 152, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://xnotme.com/id_aa_carmack/status/2122478083319992513"], "ig": -0.95, "fa": 0.0, "gp": 0.04, "bl": 4.7, "ds": 0.0, "txt": "https://xnotme.com/id_aa_carmack/status/2122478083319992513"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 40);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 40);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 40);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `${shown.length} of ${pool.length} comments` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

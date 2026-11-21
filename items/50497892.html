@@ -1,0 +1,1356 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50497892 // PyPI's redesigned project pages with clearer security signals are now live — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+    }
+    .kpi-cell {
+      padding: 16px 16px 14px;
+      border-right: 1px solid rgb(205, 205, 200);
+    }
+    .kpi-cell:last-child { border-right: 0; }
+    .kpi-label {
+      font: 600 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 8px 0 4px;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      font-size: 12px;
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 6px;
+      corner-shape: bevel;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer > summary.hn-summary {
+      list-style: none;
+      cursor: pointer;
+      display: block;
+      padding: 2px 0;
+      margin: 0;
+      background: transparent;
+      border: 0;
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      user-select: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: rgb(255, 255, 253);
+      border: 1px solid rgb(13, 13, 13);
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+    }
+    table.ablation th {
+      background: rgb(236, 236, 231);
+      font: 700 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgb(60, 60, 58);
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 6px;
+      corner-shape: bevel;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-decoration: ;
+      text-transform: lowercase;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      border-top: 3px solid rgb(13, 13, 13);
+      padding-top: 14px;
+      margin-top: 36px;
+      font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpi-cell { border-bottom: 1px solid rgb(205, 205, 200); }
+      .filter-bar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in {
+        width: 100%;
+      }
+      .filter-bar input.search-in {
+        grid-column: span 2;
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; }
+      .topbar-right { font-size: 8pt; padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+      </div>
+      <div class="topbar-right">&nbsp;</div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://blog.pypi.org/posts/2026-11-06-ui-updates-complete/">PyPI's redesigned project pages with clearer security signals are now live</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=blog.pypi.org"><span class="sitestr">blog.pypi.org</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">263 points</span> by <a href="https://news.ycombinator.com/user?id=rbanffy">rbanffy</a> <span class="age" title="2026-11-14T15:40:52.000Z"><a href="https://news.ycombinator.com/item?id=50497892">1 day ago</a></span> | <a href="https://news.ycombinator.com/item?id=50497892">109&nbsp;comments</a> | 72.5% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">01 // EVIDENCE</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">109</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 49 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">27.5%</div>
+          <div class="kpi-sub">30 comments (7 Gold / 6.4%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">72.5%</div>
+          <div class="kpi-sub">50 chatter &bull; 29 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">6</div>
+        <div class="kpi-sub">20% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.832</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">39</div>
+          <div class="kpi-sub">HN POS 1..39 (35.8% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="margin-top:10px;font:600 11px/1.5 ui-monospace,Menlo,monospace;color:rgb(70,70,68)"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">02 // EXPLORE</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 109-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 109)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (7)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (23)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (50)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (29)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..109) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 33)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (time4tea, 22.3h); largest subtree (@time4tea) occupies 39 slots (HN POS 1..39).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="modeSelect" class="sel-in" aria-label="Ranking view">
+          <option value="hn_top40">HN Top 40</option>
+          <option value="top_signal">Epistemic Top 50</option>
+          <option value="buried_gems">Buried Gems (HN POS &gt; 33)</option>
+          <option value="bullshit_traps">High-Karma / URL Traps Caught</option>
+          <option value="mod_morgue">Mod Rebukes &amp; Downvoted Morgue</option>
+          <option value="c5a_rescues">c5A Heterodox Rescues</option>
+        </select>
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (109)</option>
+          <option value="trusted_python">Trusted &amp; Python (Attestations) (29)</option>
+          <option value="providers_security">Providers &amp; Security (Builds) (21)</option>
+          <option value="security_devs">Security &amp; Devs (Microsoft) (20)</option>
+          <option value="pki_codeberg">Pki &amp; Codeberg (Keys) (16)</option>
+          <option value="key_workflow">Key &amp; Workflow (Account) (16)</option>
+          <option value="general_commentary">General Commentary (7)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, project, release, provenance, security, check...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50497892 + BLOG.PYPI.ORG + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50497892, "story_title": "PyPI's redesigned project pages with clearer security signals are now live", "story_url": "https://blog.pypi.org/posts/2026-11-06-ui-updates-complete/", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50497892, "story_title": "PyPI's redesigned project pages with clearer security signals are now live", "story_url": "https://blog.pypi.org/posts/2026-11-06-ui-updates-complete/", "points": 263, "story_author": "rbanffy", "article_source": "fetched_url", "t1_ref_utc": "2026-11-15T16:09:16+00:00", "t2_ref_utc": "2026-11-15T16:09:16+00:00", "delta_minutes": 0.0, "story_anchors": ["project", "release", "provenance", "security", "check", "signals", "source", "package", "user", "files", "verified", "attestations", "malicious", "python", "file", "warnings", "publishing", "uploaded", "account", "open", "attestation", "code", "trusted", "projects", "pypi"], "facet_labels": {"trusted_python": "Trusted & Python (Attestations)", "pki_codeberg": "Pki & Codeberg (Keys)", "key_workflow": "Key & Workflow (Account)", "security_devs": "Security & Devs (Microsoft)", "providers_security": "Providers & Security (Builds)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "trusted_python", "label": "Trusted & Python (Attestations)", "count": 29, "top_terms": ["trusted", "python", "attestations", "gitlab"]}, {"slug": "pki_codeberg", "label": "Pki & Codeberg (Keys)", "count": 16, "top_terms": ["pki", "codeberg", "keys", "disk"]}, {"slug": "key_workflow", "label": "Key & Workflow (Account)", "count": 16, "top_terms": ["key", "workflow", "account", "forges"]}, {"slug": "security_devs", "label": "Security & Devs (Microsoft)", "count": 20, "top_terms": ["security", "devs", "microsoft", "centralized"]}, {"slug": "providers_security", "label": "Providers & Security (Builds)", "count": 21, "top_terms": ["providers", "security", "builds", "source"]}], "counts": {"total_comments": 109, "live_t2_comments": 109, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 49, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "fd6ebb43a75f8bc7278f46a861e33c5da57b3b7747d11d639349ab0a4ad874dc"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 7, "grounded_analysis": 23, "crowd_chatter": 50, "bullshit_or_flamewar": 29}, "facets": {"trusted_python": 29, "pki_codeberg": 16, "providers_security": 21, "key_workflow": 16, "security_devs": 20, "general_commentary": 7}, "facet_options": [{"slug": "trusted_python", "label": "Trusted & Python (Attestations)", "count": 29}, {"slug": "providers_security", "label": "Providers & Security (Builds)", "count": 21}, {"slug": "security_devs", "label": "Security & Devs (Microsoft)", "count": 20}, {"slug": "pki_codeberg", "label": "Pki & Codeberg (Keys)", "count": 16}, {"slug": "key_workflow", "label": "Key & Workflow (Account)", "count": 16}, {"slug": "general_commentary", "label": "General Commentary", "count": 7}], "facet_diagnostics": [{"slug": "trusted_python", "label": "Trusted & Python (Attestations)", "count": 29, "useful": 14, "useful_pct": 48.3, "terms": "trusted, python, attestations, gitlab"}, {"slug": "providers_security", "label": "Providers & Security (Builds)", "count": 21, "useful": 6, "useful_pct": 28.6, "terms": "providers, security, builds, source"}, {"slug": "security_devs", "label": "Security & Devs (Microsoft)", "count": 20, "useful": 4, "useful_pct": 20.0, "terms": "security, devs, microsoft, centralized"}, {"slug": "pki_codeberg", "label": "Pki & Codeberg (Keys)", "count": 16, "useful": 4, "useful_pct": 25.0, "terms": "pki, codeberg, keys, disk"}, {"slug": "key_workflow", "label": "Key & Workflow (Account)", "count": 16, "useful": 2, "useful_pct": 12.5, "terms": "key, workflow, account, forges"}, {"slug": "general_commentary", "label": "General Commentary", "count": 7, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 15}, {"category": "github_artifact", "count": 5}, {"category": "code_repository", "count": 1}], "story_anchors": ["project", "release", "provenance", "security", "check", "signals", "source", "package", "user", "files", "verified", "attestations", "malicious", "python", "file", "warnings", "publishing", "uploaded"], "largest_root": {"root_id": 50499102, "author": "time4tea", "slots": 39, "start_dom": 1, "end_dom": 39, "share_pct": 35.8, "top_dom1_age": 22.3, "top_dom1_author": "time4tea"}, "buried_cutoff": 33, "rescue_top_k": 22, "ablations": [], "tournament": [], "comments": [{"id": 50499442, "au": "woodruffw", "dom": 71, "sr": 1, "sc": 12.2, "ep": 12.2, "bs": 0.0, "d": 3, "age": 21.7, "grav": 298.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 102, "qw": 0, "k": 42594, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "epistemic_gold", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": ["https://github.com/pypi/warehouse/issues/18007", "https://docs.pypi.org/attestations/security-model/\u0023trustworthiness"], "ig": 1.311, "fa": 2.35, "gp": 1.672, "bl": 0.0, "ds": 0.0, "txt": "There's a discussion thread for email attestations here[1]. Those would support local builds.\n\nBut to take a step back: if you want attested builds because you think attestation is itself a gold star, then you're working from the wrong priors. Attestations do not imply that a package is secure any more than a hash does; what they are is a cryptographic signature over a set of claims, which allows for authenticated auditing of a project's state over time.\n\nI think PyPI's documentation does a good job of conveying this nuance[2], and that much of the opprobrium of attestations comes from people either not understanding that nuance or imputing conspiracies into it.\n\n[1]: https://github.com/pypi/warehouse/issues/18007\n\n[2]: https://docs.pypi.org/attestations/security-model/\u0023trustwort..."}, {"id": 50498817, "au": "woodruffw", "dom": 61, "sr": 2, "sc": 11.75, "ep": 11.9, "bs": 0.0, "d": 1, "age": 22.73, "grav": 322.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 116, "qw": 0, "k": 42594, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "pki_codeberg", "flbl": "Pki & Codeberg (Keys)", "urls": ["https://github.com/pypi/warehouse/issues/19786"], "ig": 1.528, "fa": 2.35, "gp": 1.113, "bl": 0.0, "ds": 0.0, "txt": "Support for Codeberg is being discussed here[1]. I think there's broad consensus among PyPI's maintainers and admins that more publisher providers are desired, but we also need them to demonstrate strong key management and rotation controls due to the degree of trust and access that becoming a publisher provider grants them (effectively, they become the PyPI credential broker for the projects that use their service).\n\n(If you pan through that thread, you'll note that one of open issues with Codeberg is that their underlying server wants to store OIDC private keys on disk at the moment. This is okay for small deployments of personal services, but not for something that PyPI needs to federate with and trust.)\n\n[1]: https://github.com/pypi/warehouse/issues/19786"}, {"id": 50498514, "au": "mhils", "dom": 49, "sr": 3, "sc": 11.6, "ep": 11.6, "bs": 0.0, "d": 0, "age": 23.23, "grav": 333.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 25, "qw": 0, "k": 1631, "kpp": 9.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": ["https://github.com/pypi/warehouse/issues/11096"], "ig": 0.886, "fa": 2.35, "gp": 1.943, "bl": 0.0, "ds": 0.0, "txt": "Very cool to see PyPI put more emphasis towards exposing provenance info. It would be even cooler if trusted publishing would finally support reusable workflows (https://github.com/pypi/warehouse/issues/11096)."}, {"id": 50501290, "au": "rtpg", "dom": 12, "sr": 4, "sc": 11.59, "ep": 11.59, "bs": 0.0, "d": 1, "age": 18.32, "grav": 226.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 82, "qw": 0, "k": 21243, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "providers_security", "flbl": "Providers & Security (Builds)", "urls": ["https://github.com/pypi/warehouse/issues/20927"], "ig": 1.161, "fa": 2.63, "gp": 0.939, "bl": 0.0, "ds": 0.0, "txt": "I believe you got that wrong.\n\nHere's some extra context [0]: https://github.com/pypi/warehouse/issues/20927. Loooots of links to click in.\n\nthe point here being small service providers are _also_ able to get into this system, but I think there's an expectation of success.\n\nThe bar for trusted publishers is very high though. I don't think it's high \"on purpose\" to leave out certain platforms for being too small, but in effect if (for example) your provider doesn't have a security contact point then that's going to rule them out here."}, {"id": 50499679, "au": "ImJasonH", "dom": 46, "sr": 5, "sc": 10.27, "ep": 10.27, "bs": 0.0, "d": 1, "age": 21.28, "grav": 288.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 55, "qw": 0, "k": 1368, "kpp": 5.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "pki_codeberg", "flbl": "Pki & Codeberg (Keys)", "urls": ["https://codeberg.org/mfenniak/oidc-jwt", "https://tangled.org/docs/spindles/workflows/\u0023audience"], "ig": 1.302, "fa": 2.08, "gp": 0.886, "bl": 0.0, "ds": 0.0, "txt": "Tangled and Codeberg both seem to support issuing JWTs during actions runs.\n\nCodeberg: https://codeberg.org/mfenniak/oidc-jwt\nTangled: https://tangled.org/docs/spindles/workflows/\u0023audience\n\nI think OIDC tokens from workflows is basically table stakes at this point, since the alternative is a static secret, which is basically guaranteed to leak eventually.\n\nAll that's left is for PyPI to accept these tokens in their set of trusted publishers."}, {"id": 50498870, "au": "woodruffw", "dom": 43, "sr": 6, "sc": 10.03, "ep": 10.03, "bs": 0.0, "d": 2, "age": 22.66, "grav": 320.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 16, "qw": 0, "k": 42594, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "providers_security", "flbl": "Providers & Security (Builds)", "urls": ["https://github.com/pypi/warehouse/issues/new?template=bug-report.yml"], "ig": 0.466, "fa": 2.63, "gp": 0.994, "bl": 0.0, "ds": 0.0, "txt": "That's probably a mobile bug (I can't reproduce it on a desktop browser). Could you open an issue here[1]?\n\n[1]: https://github.com/pypi/warehouse/issues/new?template=bug-re..."}, {"id": 50501202, "au": "woodruffw", "dom": 73, "sr": 7, "sc": 7.6, "ep": 7.89, "bs": 0.0, "d": 5, "age": 18.46, "grav": 228.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 139, "qw": 27, "k": 42594, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "epistemic_gold", "facet": "pki_codeberg", "flbl": "Pki & Codeberg (Keys)", "urls": [], "ig": 1.599, "fa": 0.76, "gp": 1.358, "bl": 0.0, "ds": 0.0, "txt": "> Which is great--but does not in any way require that the attestation can only be produced by working through one of a small set of recognized \"forges\"\n\nThat's true, there's some context elsewhere in these threads about how PyPI can enable email attestations. The short version is that PyPI wanted to make this work by default, which was trivial with Trusted Publishing (since it already provides a strong source of verifiable machine identity).\n\n\"Why not a public key?\" is a good question, and the very short answer is that greenfield signing designs should not assume that all users are able to manage the secrecy of long-lived key materials, much less force them to make parameter decisions when (re)generating materials. This is the same mistake that the Web PKI made for decades, and has spent the last 15 years slowly untangling. The ideal setup is one where users demonstrate control over an identity, and then the signing scheme binds that identity to a short-lived signing key. That's how email attestations work."}, {"id": 50498954, "au": "eddythompson80", "dom": 88, "sr": 8, "sc": 6.51, "ep": 6.95, "bs": 0.0, "d": 1, "age": 22.55, "grav": 317.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 106, "qw": 0, "k": 3449, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": ["https://docs.pypi.org/trusted-publishers/", "https://tailscale.com/docs/integrations/identity/custom-oidc"], "ig": 1.334, "fa": 0.9, "gp": 0.861, "bl": 0.0, "ds": 0.0, "txt": "Sounds like it. Currently it seems you'll need to setup your own OIDC provider[0], then work with PyPI to get them to trust your instance as a \"Trusted Publisher\". It seems like a system to scale for multi-tenant publishers (like millions of GitHub or GitLab or Google build or ActiveState users). The design itself should be able to scale for individual OIDC providers through webfinger and OIDC discovery like Tailscale does it[1], but it doesn't look like it's there yet. Not sure if it's planned either the github issue mentiones future PyPI verified email attestation, though I'm not sure if that implies webfinger/OIDC like ts does it.\n\n[0] https://docs.pypi.org/trusted-publishers/\n\n[1] https://tailscale.com/docs/integrations/identity/custom-oidc"}, {"id": 50502295, "au": "pdonis", "dom": 52, "sr": 9, "sc": 6.45, "ep": 6.6, "bs": 0.0, "d": 3, "age": 16.39, "grav": 188.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 158, "qw": 19, "k": 18487, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "key_workflow", "flbl": "Key & Workflow (Account)", "urls": [], "ig": 1.578, "fa": 0.7, "gp": 0.616, "bl": 0.0, "ds": 0.0, "txt": "> this type of attestation is hard to weigh as a trust signal, vs the cloud CI version\n\nIn the sense that I'm not a large corporation and nobody else is auditing my personal computer, yes, that's true. Note, though, that large corporations are also subject to nefarious actors misusing their infrastructure. What if a rogue employee hacks their internal system? Or Russia or China manages to get a backdoor into it?\n\nIn any case, all this doesn't make the method I described impossible. It just means that attestations produced by an individual workflow need to be clearly labeled to distinguish them from attestations produced using a tech forge's workflow, so people will understand what, specifically, is being attested to. Then people could weigh each trust signal as they choose.\n\n> Hand PGP signing\n\nTo be clear, I wasn't talking specifically about this method of signing with a personal key. I agree there are lots of issues with PGP as an overall system. I was only talking about the general idea of having some way for individuals to independently generate an attestation without having to go through a tech forge's workflow."}, {"id": 50498790, "au": "zzzeek", "dom": 99, "sr": 10, "sc": 6.3, "ep": 6.3, "bs": 0.0, "d": 0, "age": 22.77, "grav": 322.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 220, "qw": 0, "k": 12973, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": ["https://fosstodon.org/@zzzeek/117554513935692558"], "ig": 1.454, "fa": 0.62, "gp": 0.772, "bl": 0.0, "ds": 0.0, "txt": "let me tell you something incredibly important about the attestations / trusted publisher thing:\n\nif you have any of your files published by a trusted publisher with attestations, then you must have all of your files published that way (in that package).\n\notherwise pypi determines your project may have been compromised and puts some big red warnings up like [1].  it does not try to look at \"this particular source file was never part of trusted publishing\" or anything like that.  and, CRITICALLY, it does not send you an email or anything like that about the non-acceptable file that you just uploaded, which it REALLY should.  I mean the model is, they think these uploads are malicious by an attacker.  Emailing the project maintainer(s) would be pretty important!  (When pypi wanted to get rid of GPG signatures, they started sending me an email for every single signature that got uploaded.  so i know you guys know how to send emails).\n\nit's also AFAICT a permanent switch.  once you put a single trusted/attested file up there, your account must now do all files in this way forever (or risk big red warnings.  which maybe you're OK with that).\n\nIt would all be easier to take if trusted publishers weren't limited to solely large for-profit corporations (I'm too lazy to research if they're trying to fix this).\n\n[1] https://fosstodon.org/@zzzeek/117554513935692558"}, {"id": 50499865, "au": "bbor", "dom": 30, "sr": 11, "sc": 5.91, "ep": 6.27, "bs": 0.0, "d": 2, "age": 20.91, "grav": 280.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 171, "qw": 0, "k": 3089, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": [], "ig": 1.677, "fa": 0.62, "gp": 0.389, "bl": 0.0, "ds": 0.0, "txt": "1. \"ClosedAI\" is not gonna win people over to your side, IMHO. Apple doesn't plant trees, Microsoft makes big hardware, and Python is not satanic.\n\n2. I'm not entirely sure what the link is supposed to prove -- would appreciate a word of clarification if you find the time. It almost feels like a dogwhistle of some kind, but A) I doubt anyone on HN is anywhere near that problematic, and B) there's no clear pattern in those companies other than \"interested in ID tech\", and none of the usual dogwhistle targets made the list. Also, y'know, OpenAI isn't on it...?\n\nI guess my fundamental confusion isn't about the list and more about what \"we know\". Are you implying that they are against pure, unmanaged PGP for this system because... I mean, why? Because they're playing the long game to promote a verification/attestation/identification (?) technology that you think offers less stringent privacy guarantees, and thus to sell more ads in 2036?\n\nIf so, doesn't that seem like a kinda roundabout way to raise Display Ads revenue, otherwise known as \"that one dying industry\"?"}, {"id": 50506146, "au": "woodruffw", "dom": 76, "sr": 12, "sc": 5.77, "ep": 6.21, "bs": 0.0, "d": 7, "age": 4.57, "grav": 29.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 92, "qw": 0, "k": 42594, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "pki_codeberg", "flbl": "Pki & Codeberg (Keys)", "urls": [], "ig": 1.157, "fa": 0.68, "gp": 1.07, "bl": 0.0, "ds": 0.0, "txt": "As can be seen in every sub-thread of this HN post, users are constantly buffeted by bad advice around key management and generation. It’s the reason applied cryptographers still have to even say “don’t use PGP,” despite it not being a sensible thing to even seek out in 2026 (much less 2016).\n\n(Other large-scale PKI initiatives, like the Web PKI, learned this a long time ago. It’s why we have the CABF BRs instead of asking end users to pinky promise that they’re going to securely generate -‘d store a key and keep it around for 10+ years.)"}, {"id": 50502207, "au": "angry_octet", "dom": 98, "sr": 13, "sc": 5.64, "ep": 6.08, "bs": 0.0, "d": 2, "age": 16.62, "grav": 193.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 66, "qw": 0, "k": 5887, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": ["https://docs.brew.sh/Homebrew-Security-and-Supply-Chain"], "ig": 1.466, "fa": 0.62, "gp": 0.6, "bl": 0.0, "ds": 0.0, "txt": "For curious readers, to turn it on:\n\nbrew install gh\necho HOMEBREW_VERIFY_ATTESTATIONS=1 >> $HOME/.zshrc\nbrew verify gh\n\nDownloading attestations will be quicker if you are logged in to github:\ngh auth login\ngh auth status\n\nFor a box you don't want full login privs on, you can use a GH PAT token with minimal privs.\n\nIf too slow/GitHub down:\n\nHOMEBREW_NO_VERIFY_ATTESTATIONS=1 brew upgrade\n\nhttps://docs.brew.sh/Homebrew-Security-and-Supply-Chain"}, {"id": 50499109, "au": "woodruffw", "dom": 89, "sr": 14, "sc": 5.61, "ep": 6.05, "bs": 0.0, "d": 2, "age": 22.31, "grav": 312.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 136, "qw": 29, "k": 42594, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "providers_security", "flbl": "Providers & Security (Builds)", "urls": [], "ig": 1.512, "fa": 0.42, "gp": 0.899, "bl": 0.0, "ds": 0.0, "txt": "> The design itself should be able to scale for individual OIDC providers through webfinger and OIDC discovery like Tailscale does it[1], but it doesn't look like it's there yet.\n\nThis is the right idea, but it's actually not that simple unfortunately: Trusted Publishing relies on per-IdP claims that are more precise than the `sub` claim (because doing pattern matching on the `sub` claim is brittle and prone to security problems). So we require publisher providers (OIDC IdPs) to provide distinct claims that we can match on. For GitHub and GitLab that's things like the repository name, workflow filename, etc., while for others it might be distinct username and immutable ID claims, etc.\n\nThis is all downstream of OIDC-driven federation being a much weaker and more bespoke process than all parties would like it to be. I think the discourse around this could be much improved by people taking the time to understand these complexities and why they pose a challenge to groups with limited engineering resources (like PyPI)."}, {"id": 50502161, "au": "rcxdude", "dom": 45, "sr": 15, "sc": 5.38, "ep": 5.53, "bs": 0.0, "d": 1, "age": 16.71, "grav": 194.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 94, "qw": 18, "k": 11598, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "providers_security", "flbl": "Providers & Security (Builds)", "urls": [], "ig": 1.383, "fa": 0.64, "gp": 0.314, "bl": 0.0, "ds": 0.0, "txt": ">I'd hope third-party hosted CI/CD services begin to take that gap seriously and work on meeting those requirements.\n\nHow is a third party service, especially a self-hosted one, expected to meet those requirements? They seem to be lengthy, onerous, and also require a detailed vetting by the pypi team that is unlikely to scale beyond a few large hosting providers.\n\n(What's more, this does relatively little to actually signal trust to someone downloading them. All it does is provide a signature that one of the big providers has built the package from a given source (but nothing about the trustworthiness of that source). This is a problem much better solved by reproducable builds and distributed verification of those builds)"}, {"id": 50499153, "au": "zzzeek", "dom": 101, "sr": 16, "sc": 5.15, "ep": 5.95, "bs": 0.0, "d": 2, "age": 22.23, "grav": 310.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 97, "qw": 41, "k": 12973, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": [], "ig": 1.526, "fa": 0.42, "gp": 0.806, "bl": 0.0, "ds": 0.0, "txt": "> This is also the easiest way to reason abductively about PyPI's goals. If PyPI's goal was to support \"large for-profit corporations,\" we'd have dozens of publisher providers of dubious quality and community value, rather than the small subset we currently have.)\n\nI never claimed pypi is trying to \"support large for-profit corporations\".  I fully understand the \"large corporations as trusted publisher\" thing is because this particular subset, e.g. github, gitlab, google, are widely known institutions with \"good\" reputations (in this area).  The issue is that pypi is not, as of yet, supporting individual projects that want trusted publishing without relying on a large for-profit corporation.   I'm not too put off by it but it is definitely a thing that a private for-profit host overnight becomes horrible (see e.g. bitbucket) and I have to get off that company ASAP.   Having some non-profit entities here would be extremely helpful."}, {"id": 50498991, "au": "LdBaringSwallow", "dom": 107, "sr": 17, "sc": 5.09, "ep": 7.61, "bs": 2.52, "d": 0, "age": 22.47, "grav": 316.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 128, "qw": 9, "k": -4, "kpp": -0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "security_devs", "flbl": "Security & Devs (Microsoft)", "urls": ["https://blog.pypi.org/posts/2024-11-14-pypi-now-supports-digital-attestations/"], "ig": 1.665, "fa": 1.04, "gp": 0.507, "bl": 0.95, "ds": 0.0, "txt": "> https://blog.pypi.org/posts/2024-11-14-pypi-now-supports-dig...\n\nThought we already learned years ago an IP address is not a person?\n\nThat is to say; what the screen on my end communicates is not guaranteed to be representative of ground truth.\n\nThe IT world was recently making fun of Sam Altman's eye scanner because remote attestation can be faked.\n\nAll the layers of abstraction wrapped around the code is security through obscurity.\n\nThe code itself must still be verified as safe.\n\nThe cloud era has resulted in a lot of people operating at layers of abstraction so far removed from physics this shit has more in common with baseless dogmas, gospels, and spiritualities at this point.\n\nWe anthropomorphized the cloud inserting ourselves into it. It's just a bunch of networked computers.\n\nAll this stuff is a spoon that doesn't exist."}, {"id": 50499157, "au": "samhclark", "dom": 44, "sr": 18, "sc": 4.99, "ep": 5.5, "bs": 0.0, "d": 0, "age": 22.23, "grav": 310.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 87, "qw": 0, "k": 102, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "providers_security", "flbl": "Providers & Security (Builds)", "urls": [], "ig": 1.503, "fa": 0.0, "gp": 1.358, "bl": 0.0, "ds": 0.0, "txt": "This is great! I want sigstore-based or at least sigstore-style \"keyless\" short lived signatures to become more and more popular, so that support gets better everywhere. In particular, if having secure OIDC handling in a CI/CD pipeline becomes something that keeps people on GHA or GitLab then I'd hope third-party hosted CI/CD services begin to take that gap seriously and work on meeting those requirements.\n\nI'm bought in on keyless signing, and I want there to be many more providers, so I like to see more adoption which builds more momentum."}, {"id": 50503813, "au": "bbor", "dom": 38, "sr": 19, "sc": 4.6, "ep": 5.77, "bs": 0.0, "d": 4, "age": 12.33, "grav": 120.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 178, "qw": 0, "k": 3089, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": [], "ig": 1.684, "fa": 0.34, "gp": 0.583, "bl": 0.0, "ds": 0.0, "txt": "Yeah but aren't we talking about PyPI, here? I love some illegal software (shoutout to Anna) but it seems like leaning on various cyber-sensitive registries to make it more available is a very small reward in exchange for a huge, tangible risk.\n\nAnnasArchive in particular is a decent example to keep in mind, since she seems to host her own GitLab instance for opensource development. Obviously that doesn't solve this exact problem b/c self-hosted instances don't work as trusted publishers, but it speaks to what I've clumisly been trying to, here: when it comes to protecting software & speech that the government is trying to ban, making sure those people can host their own stuff and still access the minimum shared infrastructure to allow people to find and use/read it is a lot more practical than trying to build the 99%'s platforms around criminality.\n\nCause that's what we're talking about, here, to be clear. Criminality. Again I love some criminals and even some crimes, but the word's typical connotations seem like a pretty good reminder of what prioritizing such usecases in the mainstream can cost us."}, {"id": 50498894, "au": "woodruffw", "dom": 100, "sr": 20, "sc": 4.49, "ep": 7.74, "bs": 2.52, "d": 1, "age": 22.64, "grav": 319.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 67, "qw": 65, "k": 42594, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "providers_security", "flbl": "Providers & Security (Builds)", "urls": ["https://discuss.python.org/t/pypis-new-security-indicators-and-unequal-access-to-trusted-publishing/109930/5"], "ig": 1.407, "fa": 1.04, "gp": 1.016, "bl": 0.95, "ds": 0.0, "txt": "> it's also AFAICT a permanent switch. once you put a single trusted/attested file up there, your account must now do all files in this way forever (or risk big red warnings. which maybe you're OK with that).\n\nIt's not[1].\n\n> It would all be easier to take if trusted publishers weren't limited to solely large for-profit corporations (I'm too lazy to research if they're trying to fix this).\n\nAs mentioned in several other places, we're always interested in adding more publisher providers, provided they meet our key management and notability requirements.\n\n(This is also the easiest way to reason abductively about PyPI's goals. If PyPI's goal was to support \"large for-profit corporations,\" we'd have dozens of publisher providers of dubious quality and community value, rather than the small subset we currently have.)\n\n[1]: https://discuss.python.org/t/pypis-new-security-indicators-a..."}, {"id": 50505353, "au": "usr1106", "dom": 29, "sr": 21, "sc": 4.34, "ep": 4.78, "bs": 0.0, "d": 4, "age": 6.79, "grav": 50.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 73, "qw": 0, "k": 4889, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "key_workflow", "flbl": "Key & Workflow (Account)", "urls": [], "ig": 1.345, "fa": 0.34, "gp": 0.45, "bl": 0.0, "ds": 0.0, "txt": "Github workflow public and audible?\n\nThe repos workflow source, yes.\n\nBut the workflow engine implementation? I don't know how much of it is open source, but I am sure nobody external can audit what Microsoft really runs there. Another company starting with M has just been fined for accessing users' photos. So I would not be 100% surprised if Microsoft changed/amended some user code before executing it or interpreted it in an unpublished way e. g. \"for security reasons\""}, {"id": 50500463, "au": "eesmith", "dom": 77, "sr": 22, "sc": 4.25, "ep": 7.49, "bs": 1.7, "d": 4, "age": 19.74, "grav": 255.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 582, "qw": 0, "k": 8935, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 5, "meme": 0, "tier": "grounded_analysis", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": ["https://docs.pypi.org/using-pypi/pypi-basics/"], "ig": 1.857, "fa": 0.62, "gp": 0.937, "bl": 0.64, "ds": 0.0, "txt": "Have you considered that perhaps you are working from the wrong priors?\n\nI believe your prior is that you expect people who read the PyPI page to understand what attestation means. I believe your prior is they will see a notice about \"not from a trusted publisher\" and not treat it like demerit or warning. I believe your prior is that seeing this message will get people to do more due diligence than they currently do, and that the due diligence will be relevant and appropriate.\n\nBased on my experience with my users, I don't have the same confidence.\n\nI don't understand what \"authenticated auditing\" means, so why should they?\n\nWhat project state do people think is important to audit? My code repo is private, hosted on Sourcehut. My build system is private, done locally. The only thing I release is the pre-built binary package. There's very little state to examine, and I can't figure out why anyone cares.\n\nI also have customers who buy a source code license. They have never asked for an audit of the project's state over time.\n\nI read the \"Security model and considerations\" document. I found it opaque, no doubt because the entire topic is foreign to me, but it doesn't do a good job of explaining. Take the second paragraph:\n\n\"The most basic type of attestation (the type enabled by default in pypa/gh-action-pypi-publish) asserts that the project was published by an authorized publish"}, {"id": 50506915, "au": "zbentley", "dom": 4, "sr": 23, "sc": 4.19, "ep": 4.63, "bs": 0.0, "d": 2, "age": 2.38, "grav": 14.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 115, "qw": 0, "k": 6248, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "security_devs", "flbl": "Security & Devs (Microsoft)", "urls": [], "ig": 1.489, "fa": 0.28, "gp": 0.23, "bl": 0.0, "ds": 0.0, "txt": "Reproducible builds only solve small slice of the problem. Build attestation in general solves more, but is useless unless a credible entity is (conceptually) attesting that a package is OK.\n\nThe growth of centralized authorities arises from the reality that the vast majority of devs do not and will not independently vet or attest to the quality of libraries they use. That’s not great, but it is what we have and doesn’t look likely to change.\n\nGiven that, and given that people still want as much security as they can conveniently get, centralized control (from “we run a security scanner and trust its findings” to “packages can only be downloaded from pypi/debian stable/whatever”) is a natural result."}, {"id": 50498704, "au": "eesmith", "dom": 60, "sr": 24, "sc": 4.06, "ep": 5.6, "bs": 0.0, "d": 0, "age": 22.91, "grav": 326.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 80, "qw": 0, "k": 8935, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": [], "ig": 1.395, "fa": 0.0, "gp": 1.599, "bl": 0.0, "ds": 0.0, "txt": "Am I correct in my understanding that the only trusted publishers are for-profit US companies? And these all use proprietary implementations which cannot easily be replicated elsewhere?\n\nLike, if I want to host on Codeberg, or Sourcehut, what is the process needed for those platforms to become a trusted publisher?\n\nAs it happens, I build my releases on my own hardware using a pypa/manylinux release. Can I provide attestation, or am I required to use a third-party service to get that \"x Without provenance\" removed from my entry?"}, {"id": 50506487, "au": "tancop", "dom": 2, "sr": 25, "sc": 4.05, "ep": 4.49, "bs": 0.0, "d": 1, "age": 3.55, "grav": 21.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 119, "qw": 0, "k": 1424, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "security_devs", "flbl": "Security & Devs (Microsoft)", "urls": [], "ig": 1.279, "fa": 0.28, "gp": 0.474, "bl": 0.0, "ds": 0.0, "txt": "I just don't get why the model is absolute trust in a single publisher. They should enforce reproducible builds and set up an attestation system where you can have GitHub or Google build your code and declare that the hash matches what you said.\n\nThat way projects that want to be extra safe can set up multiple providers to check the code independently, and third parties can upload their own attestation that PyPI doesn't trust by default but you can add them to your private whitelist. And they wouldn't have to care about where the release is uploaded from.\n\nCrypto projects know that 1 of 1 is the worst possible trust assumption. If you want real confidence you need more than one party."}, {"id": 50505203, "au": "sublimefire", "dom": 16, "sr": 26, "sc": 3.98, "ep": 4.42, "bs": 0.0, "d": 1, "age": 7.29, "grav": 55.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 93, "qw": 0, "k": 723, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "security_devs", "flbl": "Security & Devs (Microsoft)", "urls": [], "ig": 1.534, "fa": 0.28, "gp": 0.015, "bl": 0.0, "ds": 0.0, "txt": "For example MSFT (not a small player i know) is having its slightly different approach to those signals and they cannot be used here (search scitt). I mean different type signature envelopes, different roots of trust. But in the spirit it is the same. This approach is partially a territorial grab by google (first npm, then pypi, next golang). But importantly I think these security improvements are marginal and you are at the mercy of the dependency developer anyway. Just look at npm, they had some nasty vectors and similar “improvements” were close to useless in those cases."}, {"id": 50500408, "au": "time4tea", "dom": 36, "sr": 27, "sc": 3.47, "ep": 3.91, "bs": 0.0, "d": 3, "age": 19.84, "grav": 257.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 70, "qw": 0, "k": 615, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "key_workflow", "flbl": "Key & Workflow (Account)", "urls": [], "ig": 1.384, "fa": 0.0, "gp": 0.452, "bl": 0.0, "ds": 0.0, "txt": "All absolutely reasonable. At the same time though there are a lot of roads leading to centralisation, and as they all converge it gets just a bit .. problematic.\n\nAbsolutely not claiming its not a pragmatic step, but equal-footing alternatives would be useful.\n\nI'm no tin-foil-hat - but when a website account requires government id (like in the uk), and creating software requires signing by the website, you link all the things - is that a good outcome?"}, {"id": 50500030, "au": "woodruffw", "dom": 32, "sr": 28, "sc": 3.45, "ep": 7.51, "bs": 2.52, "d": 2, "age": 20.57, "grav": 273.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 64, "qw": 11, "k": 42594, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": ["https://blog.yossarian.net/2024/11/18/Security-means-securing-people-where-they-are"], "ig": 1.222, "fa": 1.04, "gp": 1.156, "bl": 0.95, "ds": 0.0, "txt": "> This shows they're not just, IDK, bowing to Microsoft's demands.\n\nNot only don't we, but I must emphasize that Microsoft did not pay for anything involving the implementation of either Trusted Publishing or attestations on PyPI. I wrote a personal blog post explaining some of my own rationale for why we prioritized GitHub and GitLab for PyPI's initial support targets, and it shouldn't be surprising to anybody who knows me that the reasons are pragmatic, not dogmatic[1].\n\n[1]: https://blog.yossarian.net/2024/11/18/Security-means-securin..."}, {"id": 50501524, "au": "eesmith", "dom": 80, "sr": 29, "sc": 3.18, "ep": 8.11, "bs": 3.39, "d": 6, "age": 17.92, "grav": 218.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 246, "qw": 0, "k": 8935, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 7, "meme": 0, "tier": "grounded_analysis", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": ["https://docs.pypi.org/publishing/publishing-to-pypi/", "https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/"], "ig": 1.626, "fa": 0.96, "gp": 1.072, "bl": 1.28, "ds": 0.0, "txt": "Okay, but if the information is on the project page then it's pretty likely that users will look at this stuff without reading the docs.  My feeling was the doc was written for people \"Publishing Projects to PyPI\" and not for people \"Using PyPI\", quoting the relevant sections of the documentation.\n\nOf course, in real life 99.9% of people aren't looking at the page at all, and either following a documentation step which says \"install by doing XYZ\" or transitively from some other project they install.\n\nI'll compare \"attestations aren't something you even really enable\" with this from the email attestation proposal: \"Another possibility here would be to have it be opt-in: maintainers can mark their already-verified emails as being eligible for attestations on PyPI, e.g. via a checkbox in the user settings.\" ;)\n\nI also can't help but wonder who reads https://docs.pypi.org/publishing/publishing-to-pypi/ where it says \"For instructions on how to package your Python project, please refer to the Python Packaging User Guide.\", follows those steps including the one about using twine and TestPyPI, does all that, and then gets to \"Publishing package distribution releases using GitHub Actions CI/CD workflows\" and gives up, since twine works.\n\nOr goes back to the pypi documentation and sees \"To use an API token: Set your username to __token__\" when I can't find anything like that at https://"}, {"id": 50501996, "au": "angry_octet", "dom": 51, "sr": 30, "sc": 3.13, "ep": 3.43, "bs": 0.0, "d": 2, "age": 17.03, "grav": 201.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 67, "qw": 0, "k": 5887, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "key_workflow", "flbl": "Key & Workflow (Account)", "urls": [], "ig": 1.458, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I think the problem is this type of attestation is hard to weigh as a trust signal, vs the cloud CI version.\n\nInherently, if someone steals your key, or gains access to a box that can use that key for signing, they are indistinguishable from you. Hand PGP  signing also lacks time-bound signing, any ratchet mechanism, CT log, consistent key hierarchy, or standard to bind signer name and project identity."}, {"id": 50498233, "au": "cowlevel", "dom": 58, "sr": 31, "sc": 3.08, "ep": 3.3, "bs": 0.0, "d": 0, "age": 23.82, "grav": 347.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "pki_codeberg", "flbl": "Pki & Codeberg (Keys)", "urls": [], "ig": 0.734, "fa": 0.0, "gp": 1.087, "bl": 0.0, "ds": 0.0, "txt": "This is about detecting formerly benign projects that have had their pypi entries hacked, but not their private keys. It does not detect malicious projects."}, {"id": 50503954, "au": "kapilvt", "dom": 13, "sr": 32, "sc": 2.8, "ep": 4.34, "bs": 0.0, "d": 2, "age": 11.93, "grav": 114.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 133, "qw": 0, "k": 546, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": [], "ig": 1.711, "fa": 0.0, "gp": 0.223, "bl": 0.0, "ds": 0.0, "txt": "I’d like to see support for trusted publisher signing and manual upload. Think of it as two step auth for artifact publishing. Pipeline generated artifacts and human upload of those verifiable artifacts. The current reality of trusted publishing, is devoid of trust, except it was triggered by a pipeline that pypi trusted. That pypi is now able to call out such trust is great btw, but as a project that currently does this two step generation, it feels like we are penalized for trying to introduce additional steps out of abundance of caution… separately, what mechanism does a client installer have to verify a pkg install was cryptographically attested to wrt to production?\n\nsans client verification of signatures by default, install is still roulette, and I’m glad package managers have introduced package publication date based cool off options now."}, {"id": 50500048, "au": "woodruffw", "dom": 47, "sr": 33, "sc": 2.71, "ep": 3.59, "bs": 0.0, "d": 2, "age": 20.53, "grav": 272.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 90, "qw": 0, "k": 42594, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "pki_codeberg", "flbl": "Pki & Codeberg (Keys)", "urls": [], "ig": 1.378, "fa": 0.0, "gp": 0.245, "bl": 0.0, "ds": 0.0, "txt": "Please see the other comments in this thread (as well as on PyPI's issue tracker) for some important context here. It's not enough to throw JWTs over the wall, PyPI also needs to know that it can trust any given service to operationalize the ugly and risk-prone parts of managing PKI.\n\n(I haven't looked at Tangled at all. If Tangled has a secret management story for its PKI that's stronger than a private key on disk and can demonstrate that a non-trivial number of PyPI users would benefit from federation, then it's a strong candidate.)"}, {"id": 50502683, "au": "rcxdude", "dom": 8, "sr": 34, "sc": 2.63, "ep": 3.73, "bs": 0.0, "d": 4, "age": 15.53, "grav": 173.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 159, "qw": 0, "k": 11598, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "providers_security", "flbl": "Providers & Security (Builds)", "urls": [], "ig": 1.364, "fa": 0.0, "gp": 0.361, "bl": 0.0, "ds": 0.0, "txt": "Can you explain the misconceptions? Currently what I see is a) a checkmark box that can only come from a large provider, and b) no good idea of what that checkmark box means in a practical sense, or why I should care or why pypi cared to implement it. What is the threat that this prevents? To me this seems to not particularly improve security but that it does create this pressure towards using a small subset of providers (even if that pressure is pretty light at the moment).\n\n(I've had a quick read through the various links but they mostly seem to emphasize what it's not, which is why I say that it doesn't seem to improve security, and especially I don't really see a motivation for why these other parties need to be involved in the way they are: the only benefit I can imagine is a third-party attestation that some artifact corresponds to some source code, which seems to be partly besides the point and partly solvable through better means)"}, {"id": 50508018, "au": "eesmith", "dom": 70, "sr": 35, "sc": 2.61, "ep": 7.2, "bs": 3.05, "d": 7, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 246, "qw": 0, "k": 8935, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": [], "ig": 1.813, "fa": 0.56, "gp": 0.928, "bl": 1.15, "ds": 0.0, "txt": "I'll suggest an alternative. There is a strong selection bias for who can become a core python dev. It takes a lot of time, and there is little direct monetary compensation along the way. Most people aren't independently wealthy, so the best way is find a job which pays them to work on Python development.\n\nThose tend to be companies with a lot of money. Those companies tend to have different needs and preferences than a sole proprietor ISV like my company. They tend to hire people who are aligned with their goals. They tend to fund specific PSF projects which are aligned with those goals. Those with strong objections to those goals, or the source of the funding, don't work for those companies, quit, or get fired.\n\nAs it is, the entire PyPI infrastructure depends on the corporate largess from the likes of Fastly, Amazon, Microsoft and Google - the latter three of which are described in \"From economy of occupation to economy of genocide\", Report of the Special Rapporteur on the situation of human rights in the Palestinian territories occupied since 1967, as corporations profiting from the displacement and genocide of Palestinians in Gaza, in breach of international law.\n\nThat seems rather more concerning than simply being corporate owned, and PGP signatures would not solve it.\n\nThe only real solution I see is to stop using PyPI entirely. Anything else would be the easy bullshit r"}, {"id": 50500865, "au": "pdonis", "dom": 20, "sr": 36, "sc": 2.56, "ep": 3.22, "bs": 0.0, "d": 4, "age": 18.95, "grav": 238.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 103, "qw": 0, "k": 18487, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "key_workflow", "flbl": "Key & Workflow (Account)", "urls": [], "ig": 1.086, "fa": 0.0, "gp": 0.464, "bl": 0.0, "ds": 0.0, "txt": "So what? Ultimately the trust model is supposed to be there to validate that this latest blob of code is coming from the same source as the last blob of code for the same project, authenticated with the same public key. And that's all it is telling you, and all that it can tell you, whether the attestation is generated during a Github workflow or by a program running on my personal computer that you can't see. It is not telling you that this latest blob of code is safe and free from problems. It's just telling you that it comes from the same source."}, {"id": 50505440, "au": "angry_octet", "dom": 53, "sr": 37, "sc": 2.36, "ep": 3.87, "bs": 0.85, "d": 4, "age": 6.51, "grav": 47.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 5887, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "security_devs", "flbl": "Security & Devs (Microsoft)", "urls": [], "ig": 1.306, "fa": 0.28, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "I think their system is vague, subject to political pressure to revoke attestation, and confusing.\n\nWe definitely should have a system that has multiple mechanisms for authorship attestation, of ongoing identity control, code control and binary generation sanctity. The last step can be made repeatable if we can manage reproducible builds."}, {"id": 50499235, "au": "woodruffw", "dom": 97, "sr": 38, "sc": 2.17, "ep": 5.93, "bs": 2.52, "d": 1, "age": 22.06, "grav": 306.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 81, "qw": 0, "k": 42594, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": [], "ig": 1.611, "fa": 0.34, "gp": 0.81, "bl": 0.95, "ds": 0.0, "txt": "Homebrew actually has full provenance. We added it in 2024 (I think, that’s from memory). We never flipped the default verification policy because of some integration concerns, but my understanding is that various downstreams and MDMs do consume and verify Homebrew’s attestations.\n\nEdit: I should qualify: Homebrew’s own processes verify its attestations. But that’s not enabled by default on end user machines because it slows installations down and currently requires the `gh` CLI. Neither of those is a tenable long term constraint for a default feature."}, {"id": 50503040, "au": "akerl_", "dom": 9, "sr": 39, "sc": 2.11, "ep": 3.43, "bs": 0.0, "d": 5, "age": 14.74, "grav": 159.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 48, "qw": 0, "k": 13343, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "providers_security", "flbl": "Providers & Security (Builds)", "urls": ["https://news.ycombinator.com/item?id=50499144", "https://news.ycombinator.com/item?id=50500622", "https://news.ycombinator.com/item?id=50499218"], "ig": 0.387, "fa": 0.62, "gp": 0.521, "bl": 0.0, "ds": 0.0, "txt": "I didn't reference misconceptions, for what it's worth. I referred to strawmanning, and if you're curious for some examples:\n\nhttps://news.ycombinator.com/item?id=50499144\n\nhttps://news.ycombinator.com/item?id=50500622\n\nhttps://news.ycombinator.com/item?id=50499218\n\nIf you're curious to dig into what the checkmark means, why you should care, and why they implemented it, I'm not going to be able to do a better job than https://docs.pypi.org/attestations/security-model/"}, {"id": 50501670, "au": "WhyNotHugo", "dom": 90, "sr": 40, "sc": 2.09, "ep": 2.97, "bs": 0.0, "d": 1, "age": 17.63, "grav": 212.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 56, "qw": 0, "k": 6901, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "security_devs", "flbl": "Security & Devs (Microsoft)", "urls": [], "ig": 1.263, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Provenance attestation is about security compliance, not real security. At a big organisation, you can check off compliance check-boxes because you're using Microsoft's big hosted service.\n\nFor regular developers, provenance makes no difference; whether the package was made in a box controlled by Microsoft with a proprietary stack or on a box controlled by the developer make no difference."}, {"id": 50504383, "au": "rtpg", "dom": 14, "sr": 41, "sc": 2.02, "ep": 3.57, "bs": 0.0, "d": 3, "age": 10.22, "grav": 90.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 91, "qw": 0, "k": 21243, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": [], "ig": 1.44, "fa": 0.0, "gp": 0.124, "bl": 0.0, "ds": 0.0, "txt": "Yeah that's not the worst idea, since in theory signing is about tamper prevention.\n\n(Personally I think that we just shouldn't have automated releases via CI, full stop. There should \"always\" be a person pressing a button to release things. So I'm in a bit of a big tent with manual upload support. At least some second factor for releases!)\n\nI think generally though the idea is that trusted publisher signing + upload is about simplifying .... something. But given how attacks have been happening in the past 24 months I fear that this might not help as much as we want."}, {"id": 50500914, "au": "akerl_", "dom": 21, "sr": 42, "sc": 1.98, "ep": 2.86, "bs": 0.0, "d": 5, "age": 18.86, "grav": 237.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 13343, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "key_workflow", "flbl": "Key & Workflow (Account)", "urls": [], "ig": 0.77, "fa": 0.28, "gp": 0.174, "bl": 0.0, "ds": 0.0, "txt": "The average person using GPG isn’t actually providing me much evidence in that regard, given the number of ways to have technically used a GPG key to sign an artifact that aren’t secure."}, {"id": 50506026, "au": "cowlevel", "dom": 93, "sr": 43, "sc": 1.88, "ep": 2.98, "bs": 0.0, "d": 1, "age": 4.92, "grav": 32.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 69, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": [], "ig": 0.928, "fa": 0.28, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I only ever run \"pip install\" after getting the package name confirmed from some other source like the project's website. Historically it's been too easy for someone to hijack a similar package name with malicious code. For example is it \"pip install requests\" or \"pip install python-requests\"? Is it \"pip install cryptography\" or \"pip install pycrypto\"? At least historically, one of those was correct and the other one pwned your computer."}, {"id": 50501179, "au": "ImJasonH", "dom": 48, "sr": 44, "sc": 1.77, "ep": 2.87, "bs": 0.0, "d": 3, "age": 18.5, "grav": 229.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 70, "qw": 0, "k": 1368, "kpp": 5.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "pki_codeberg", "flbl": "Pki & Codeberg (Keys)", "urls": [], "ig": 1.22, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Sorry I didn't intend to insinuate that pypi should necessarily accept any old tokens just because they're there. Just that increasingly OIDC is more and more an option, which is generally a good thing.\n\nPKI definitely is still hard, but if it can be done well by a smallish number of trusted parties to the benefit of their users, this can have huge ecosystem benefits. Let's hope we live in that timeline."}, {"id": 50499428, "au": "rcxdude", "dom": 109, "sr": 45, "sc": 1.69, "ep": 2.94, "bs": 0.0, "d": 2, "age": 21.73, "grav": 298.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 63, "qw": 0, "k": 11598, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "providers_security", "flbl": "Providers & Security (Builds)", "urls": [], "ig": 1.251, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Yeah, this check basically just proves that you hosted your source code on a big platform and then built the pypi package with their CI. This is not particularly strong as a trust signal. Especially since it doesn't particularly protect against compromise of access to the code repository. I worry that this is going to distract from better approaches (like reproducable builds and/or distributed review)."}, {"id": 50498486, "au": "darkamaul", "dom": 94, "sr": 46, "sc": 1.69, "ep": 2.79, "bs": 0.0, "d": 0, "age": 23.29, "grav": 335.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 949, "kpp": 7.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": [], "ig": 1.115, "fa": 0.0, "gp": 0.114, "bl": 0.0, "ds": 0.0, "txt": "Not directly the subject but they switched from Material for MkDocs to Zensical.\n\nIt’s quite sad to see that one of the main (or the biggest?) documentation system for the Python completely alienated its user base and led to this fork."}, {"id": 50499102, "au": "time4tea", "dom": 1, "sr": 47, "sc": 1.65, "ep": 3.94, "bs": 1.19, "d": 0, "age": 22.32, "grav": 312.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 615, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "security_devs", "flbl": "Security & Devs (Microsoft)", "urls": [], "ig": 0.719, "fa": 0.0, "gp": 1.552, "bl": 0.45, "ds": 0.0, "txt": "Not very keen that the whole story of trust is basically centralisation - requiring \"big cloud\" and essentially promoting lock-in.\n\nDid I get that right? Seems a bit anti-pythonic."}, {"id": 50506373, "au": "lexicality", "dom": 11, "sr": 48, "sc": 1.6, "ep": 3.14, "bs": 0.0, "d": 5, "age": 3.92, "grav": 24.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 3327, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "providers_security", "flbl": "Providers & Security (Builds)", "urls": [], "ig": 1.334, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "FWIW they have at least significantly reduced the size and prominence of the checkmark. The original design had a giant green checkmark front and centre with a bunch of smaller green checkmarks all showing how super special and trustworthy the project was."}, {"id": 50501066, "au": "pdonis", "dom": 72, "sr": 49, "sc": 1.52, "ep": 3.68, "bs": 1.06, "d": 4, "age": 18.64, "grav": 232.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 81, "qw": 20, "k": 18487, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "key_workflow", "flbl": "Key & Workflow (Account)", "urls": [], "ig": 0.716, "fa": 0.7, "gp": 0.0, "bl": 0.4, "ds": 0.0, "txt": "> what they are is a cryptographic signature over a set of claims, which allows for authenticated auditing of a project's state over time.\n\nWhich is great--but does not in any way require that the attestation can only be produced by working through one of a small set of recognized \"forges\". You could do this just as easily by, for example, letting me upload to my PyPI account a public key (the same as forges like Github do to allow SSH access), and then letting me sign builds that I upload using the corresponding private key. But that kind of workflow is not being supported. Why not?"}, {"id": 50499371, "au": "eesmith", "dom": 62, "sr": 50, "sc": 1.09, "ep": 2.63, "bs": 0.0, "d": 2, "age": 21.81, "grav": 300.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 48, "qw": 0, "k": 8935, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "providers_security", "flbl": "Providers & Security (Builds)", "urls": [], "ig": 1.118, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "So I, as someone who does my builds locally, can never have attested builds?\n\nWill PyPI be presenting warnings or statements of caution which might cause users to be concerned about using my distributions? Or imply that my build practices are somehow inferior to depending on a third-party build system?"}, {"id": 50500622, "au": "Kwpolska", "dom": 83, "sr": 51, "sc": 0.96, "ep": 2.51, "bs": 0.0, "d": 4, "age": 19.45, "grav": 249.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 5596, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "providers_security", "flbl": "Providers & Security (Builds)", "urls": [], "ig": 0.654, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Where's the good faith in demanding a non-profit buys a $10k+ HSM just to get a gold star from an OpenAI employee?"}, {"id": 50505417, "au": "angry_octet", "dom": 55, "sr": 52, "sc": 0.86, "ep": 2.18, "bs": 0.0, "d": 4, "age": 6.58, "grav": 47.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 67, "qw": 0, "k": 5887, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "pki_codeberg", "flbl": "Pki & Codeberg (Keys)", "urls": [], "ig": 0.927, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "If you generate the GPG key on the yubikey (every tutorial says not to do this unfortunately). Practically, hardly anyone does it securely with a HSM/yubikey, and they store their key online, where it is collected by info stealers. Even if someone uses a Yubikey, they can prove that they did. The lack of a CT system means signing is secret and not timestamped. We need to do better."}, {"id": 50507307, "au": "woodruffw", "dom": 3, "sr": 53, "sc": 0.85, "ep": 4.91, "bs": 2.52, "d": 2, "age": 1.37, "grav": 8.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 48, "qw": 0, "k": 42594, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": [], "ig": 1.045, "fa": 0.62, "gp": 0.474, "bl": 0.95, "ds": 0.0, "txt": "Given infinite time and engineering talent, PyPI could do a lot of things. The things we actually do reflect the outer envelope of what we can do.\n\n(Python packaging isn’t anywhere close to reproducible, and it isn’t clear how PyPI would enforce that without pissing off >90% of the ecosystem.)"}, {"id": 50501160, "au": "pdonis", "dom": 79, "sr": 54, "sc": 0.73, "ep": 3.11, "bs": 1.06, "d": 6, "age": 18.52, "grav": 230.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 72, "qw": 19, "k": 18487, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "key_workflow", "flbl": "Key & Workflow (Account)", "urls": [], "ig": 0.812, "fa": 0.42, "gp": 0.0, "bl": 0.4, "ds": 0.0, "txt": "> nobody should care or even think about this stuff.\n\nDoes that mean I, as someone who has projects on PyPI, shouldn't care if I am unable to provide any attestations because I don't want to have to go through one of the recognized forges?\n\n> Authenticity and minimally-scoped credentials should be ambient properties of a system\n\nBut if the only way to get them is to go through one of the recognized forges, then they're not \"ambient properties\" of just PyPI alone, because there's no way for me to use them just with PyPI alone."}, {"id": 50499230, "au": "bonoboTP", "dom": 108, "sr": 55, "sc": 0.56, "ep": 1.96, "bs": 0.0, "d": 1, "age": 22.08, "grav": 306.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 9153, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": [], "ig": 0.833, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "You're speaking in such shorthand that I have no idea how to untangle what you're actually trying to say/propose. I suppose you're saying that attested code can still be malware because malicious actors can also go through the attestation process?"}, {"id": 50502613, "au": "ghosty141", "dom": 54, "sr": 56, "sc": 0.56, "ep": 2.03, "bs": 0.0, "d": 3, "age": 15.71, "grav": 176.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 922, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "pki_codeberg", "flbl": "Pki & Codeberg (Keys)", "urls": [], "ig": 0.523, "fa": 0.28, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Use a yubikey and the problem is solved for example. Also compromised private keys are quite a high bar."}, {"id": 50501542, "au": "pdonis", "dom": 74, "sr": 57, "sc": 0.56, "ep": 3.79, "bs": 1.91, "d": 6, "age": 17.88, "grav": 217.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 82, "qw": 2, "k": 18487, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "key_workflow", "flbl": "Key & Workflow (Account)", "urls": [], "ig": 1.136, "fa": 0.28, "gp": 0.223, "bl": 0.72, "ds": 0.0, "txt": "> email attestations\n\nFrom what I can gather from the github issue that was linked to, those would still require the email identity to be vouched for by a provider. (Though if whoever already is hosting my email could be a \"provider\", that would at least greatly expand the list of providers from the current small number of forges.) There doesn't seem to be any way for me to, for example, link a public key I generate myself to an email address that PyPI already has on file for me."}, {"id": 50507558, "au": "woodruffw", "dom": 86, "sr": 58, "sc": 0.56, "ep": 4.38, "bs": 2.52, "d": 7, "age": 0.79, "grav": 6.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 69, "qw": 0, "k": 42594, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": [], "ig": 0.868, "fa": 0.68, "gp": 0.275, "bl": 0.95, "ds": 0.0, "txt": "My employer is a matter of public record, as is the fact that I’ve worked in PyPI for years on both my own time and at other jobs. You’re letting the tail wag the dog.\n\n(Note also that none of the work being talked about right now was paid for by my current employer. I wasn’t even involved in it. I’m only familiar with it circa 2022-24, when I had a different employer.)"}, {"id": 50499832, "au": "theteapot", "dom": 19, "sr": 59, "sc": 0.56, "ep": 1.85, "bs": 0.0, "d": 3, "age": 20.99, "grav": 282.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 1174, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "key_workflow", "flbl": "Key & Workflow (Account)", "urls": [], "ig": 0.564, "fa": 0.0, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "The problem is no one else does. Github workflow is at least public and auditable. Your personal computer is not."}, {"id": 50500737, "au": "akerl_", "dom": 7, "sr": 60, "sc": 0.56, "ep": 1.83, "bs": 0.0, "d": 3, "age": 19.2, "grav": 243.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 13343, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": [], "ig": 0.512, "fa": 0.22, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I'm very in favor of this work, but don't generally comment because these comment threads are full of folks strawmanning the work being done, and in my experience those folks aren't really interested in productive discussion.\n\nI'd be wary of trying to estimate the split of opinions based on who comments."}, {"id": 50500611, "au": "woodruffw", "dom": 78, "sr": 61, "sc": 0.56, "ep": 4.24, "bs": 2.54, "d": 5, "age": 19.48, "grav": 249.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 176, "qw": 0, "k": 42594, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 6, "meme": 0, "tier": "crowd_chatter", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": [], "ig": 1.426, "fa": 0.0, "gp": 0.613, "bl": 0.96, "ds": 0.0, "txt": "I mean, my actual prior here is that nobody should care or even think about this stuff. Authenticity and minimally-scoped credentials should be ambient properties of a system, not something that users even need to read docs for, much less enable. But if we're engaging with the premise that users are looking at this stuff at all, then I think it's facially reasonable to expect them to read the docs.\n\nFor context: attestations aren't something you even really enable. They just happen, by default, if you use Trusted Publishing from a forge like GitHub or GitLab (and hopefully, more in the future).\n\nFWIW, your feedback on the docs is very helpful. It's genuinely useful to hear that the phrasing in it is imprecise, and I'll try and improve some of it this week. The main confusion that I think you're having (which is IMO reasonable) is that the doc was written to be theoretically splittable from the \"Trusted Publishing\" concept, i.e. so that \"publishers\" (principals who can publish) who aren't tied to a Trusted Publisher can attest to their published files."}, {"id": 50498856, "au": "Kwpolska", "dom": 59, "sr": 62, "sc": 0.56, "ep": 1.62, "bs": 0.0, "d": 1, "age": 22.68, "grav": 320.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 5596, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": [], "ig": 0.69, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "And about detecting projects which dared to move their release builds away from GitHub.com/GitLab.com."}, {"id": 50506409, "au": "rcxdude", "dom": 10, "sr": 63, "sc": 0.56, "ep": 2.45, "bs": 0.85, "d": 6, "age": 3.79, "grav": 23.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 93, "qw": 0, "k": 11598, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "security_devs", "flbl": "Security & Devs (Microsoft)", "urls": [], "ig": 1.041, "fa": 0.0, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "All that page really says is \"the signing does what it does\", i.e. that it verifies that the package was signed by one of the 'trusted publishers'. It doesn't do anything to explain why I should care if a package came from github or whatever. Especially it doesn't explain why it should be github and not pypi or the original author that does this signing, since really what I care about is whether the author/maintainer of the package has changed, not their publishing platform, and presumably pypi already has at least the means to authenticate them."}, {"id": 50499218, "au": "125ajh", "dom": 17, "sr": 64, "sc": 0.56, "ep": 4.05, "bs": 2.52, "d": 1, "age": 22.11, "grav": 307.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 40, "qw": 0, "k": 0, "kpp": 0.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "providers_security", "flbl": "Providers & Security (Builds)", "urls": ["https://openid.net/foundation/sponsoring-members/"], "ig": 0.973, "fa": 0.62, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "You got that right. In this thread we have a ClosedAI employee promoting ClosedID services. Look at the sponsors of ClosedID:\n\nhttps://openid.net/foundation/sponsoring-members/\n\nWe know why PyPI ripped out PGP support and has refused any verification mechanisms that other distributions use for decades."}, {"id": 50500742, "au": "woodruffw", "dom": 68, "sr": 65, "sc": 0.56, "ep": 3.91, "bs": 2.52, "d": 5, "age": 19.18, "grav": 243.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 81, "qw": 0, "k": 42594, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": [], "ig": 1.5, "fa": 0.0, "gp": 0.266, "bl": 0.95, "ds": 0.0, "txt": "Attestations are code-signing. PyPI once supported PGP signatures on uploads, but as since disabled it because (1) only a tiny minority of users ever signed, and (2) many of the signatures and corresponding keys were either functionally insecure or unusable.\n\nBoth of these are latent problems when trying to use PGP in packaging ecosystems; the subset of ecosystems that successfully adopt PGP tend to have very different topologies (namely, small rings of trusted...publishers) rather than an \"anyone can publish\" architecture like PyPI has."}, {"id": 50498841, "au": "pdonis", "dom": 50, "sr": 66, "sc": 0.56, "ep": 2.32, "bs": 1.06, "d": 1, "age": 22.69, "grav": 321.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 79, "qw": 0, "k": 18487, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "key_workflow", "flbl": "Key & Workflow (Account)", "urls": [], "ig": 0.987, "fa": 0.0, "gp": 0.0, "bl": 0.4, "ds": 0.0, "txt": "It would be even nicer if there were a way to have an attestation without publishing with a workflow controlled by one of the tech giants. There's no way for me, someone who has had a PyPI account for many years and has used it for all that time to upload packages, to attach my own public key to my PyPI account and then sign uploaded distributions with my private key so the signature can be verified and count as an attestation."}, {"id": 50504417, "au": "pasteleft", "dom": 92, "sr": 67, "sc": 0.56, "ep": 1.2, "bs": 0.0, "d": 0, "age": 10.03, "grav": 88.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 109, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "security_devs", "flbl": "Security & Devs (Microsoft)", "urls": [], "ig": 0.495, "fa": 0.0, "gp": 0.026, "bl": 0.0, "ds": 0.0, "txt": "Are these security signals also available in pip??\n\nI don't really look into PyPI package page before typing pip install numpy."}, {"id": 50498833, "au": "Latty", "dom": 42, "sr": 68, "sc": 0.56, "ep": 1.16, "bs": 0.0, "d": 2, "age": 22.71, "grav": 321.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 5337, "kpp": 4.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "providers_security", "flbl": "Providers & Security (Builds)", "urls": [], "ig": 0.492, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I see the icon for both, but in different places (below the name for the wheel, alongside for the source)."}, {"id": 50499144, "au": "duskdozer", "dom": 5, "sr": 69, "sc": 0.56, "ep": 2.2, "bs": 1.19, "d": 1, "age": 22.25, "grav": 310.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 1723, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "security_devs", "flbl": "Security & Devs (Microsoft)", "urls": [], "ig": 0.38, "fa": 0.0, "gp": 0.899, "bl": 0.45, "ds": 0.0, "txt": "I think at this point the group of devs+ who are not fully on board with control by and dependence on big tech/VC is a small niche unfortunately."}, {"id": 50499796, "au": "bbor", "dom": 31, "sr": 70, "sc": 0.56, "ep": 3.92, "bs": 3.05, "d": 1, "age": 21.07, "grav": 284.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 147, "qw": 0, "k": 3089, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": [], "ig": 1.668, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "It's anti lots of things, but I don't think it's anti-Pythonic. Python is about pragmatism & empathy if it's about anything -- bitcoin and such don't factor into it. See: Astral/OpenAI, Anaconda, most of the PSF board historically being employees of big corporate users of python, NVidia's relation to the ecosystem in general, etc.\n\nAs a passionate anarchosyndicalist, I, for one, am thrilled about it. Decentralization is a tool in our toolbox for identifying and dismantling unjust hierarchies, but it is not a panacea, and can be quite damaging when taken to the extreme. See: cryptocurrency speedrunning 200y of bank regulations in 20y.\n\nTo put my trust for Python in more concrete terms: they support GitLab. As a passionate GitLab shill, I really couldn't be more impressed! It continues to shock me how infrequently the second most popular forge is acknowledged, much less supported. This shows they're not just, IDK, bowing to Microsoft's demands."}, {"id": 50507432, "au": "zmgsabst", "dom": 85, "sr": 71, "sc": 0.56, "ep": 0.82, "bs": 0.0, "d": 6, "age": 1.05, "grav": 7.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 2412, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "providers_security", "flbl": "Providers & Security (Builds)", "urls": [], "ig": 0.348, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Your posts about how you’re restricting people for their own good make a lot more sense knowing you’re funded by OpenAI.\n\nI think you should be more upfront about that funding — because while you may not perceive yourself as biased by that, others do."}, {"id": 50500993, "au": "pdonis", "dom": 22, "sr": 72, "sc": 0.56, "ep": 1.81, "bs": 1.06, "d": 6, "age": 18.73, "grav": 234.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 55, "qw": 0, "k": 18487, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "providers_security", "flbl": "Providers & Security (Builds)", "urls": [], "ig": 0.769, "fa": 0.0, "gp": 0.0, "bl": 0.4, "ds": 0.0, "txt": "That's easy to handle: if the signature isn't secure, it doesn't count as an attestation. I have no problem with putting the onus on the person doing the signing to do it right. But at present doing it right on your own is not even an option. Only going through one of the tech giants is."}, {"id": 50500598, "au": "my-huge-pony", "dom": 6, "sr": 73, "sc": 0.56, "ep": 0.66, "bs": 0.0, "d": 2, "age": 19.51, "grav": 250.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 113, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "security_devs", "flbl": "Security & Devs (Microsoft)", "urls": [], "ig": 0.28, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I don't think this is true. From my experience, developers are the people who care about this topic the most. Just look at HN, almost everyone (who speaks out) is against."}, {"id": 50500697, "au": "woodruffw", "dom": 84, "sr": 74, "sc": 0.56, "ep": 3.15, "bs": 2.52, "d": 5, "age": 19.26, "grav": 245.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 62, "qw": 0, "k": 42594, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "pki_codeberg", "flbl": "Pki & Codeberg (Keys)", "urls": [], "ig": 1.26, "fa": 0.0, "gp": 0.13, "bl": 0.95, "ds": 0.0, "txt": "I don't think we require a Trusted Publishing provider to use a physical HSM. As I've said in other venues, even a self-hosted Vault instance would almost certainly be fine. But storing private keys on disk is not, and we owe PyPI's users a higher standard of care than saying otherwise.\n\n(I also don't hand out gold stars, and my employer does not direct my work on PyPI.)"}, {"id": 50499198, "au": "woodruffw", "dom": 102, "sr": 75, "sc": 0.56, "ep": 4.0, "bs": 3.37, "d": 3, "age": 22.16, "grav": 308.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 9, "k": 42594, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "pki_codeberg", "flbl": "Pki & Codeberg (Keys)", "urls": [], "ig": 1.032, "fa": 0.42, "gp": 0.258, "bl": 1.27, "ds": 0.0, "txt": "> Having some non-profit entities here would be extremely helpful.\n\nI fully agree. I am hopeful that Forgejo or whatever other underlying component of Codeberg can improve its key management primitives here, which would make it very easy to argue for their inclusion as a federated party."}, {"id": 50500885, "au": "pdonis", "dom": 33, "sr": 76, "sc": 0.49, "ep": 1.55, "bs": 1.06, "d": 3, "age": 18.91, "grav": 238.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 47, "qw": 0, "k": 18487, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "key_workflow", "flbl": "Key & Workflow (Account)", "urls": [], "ig": 0.591, "fa": 0.0, "gp": 0.114, "bl": 0.4, "ds": 0.0, "txt": "Is \"a public key that I personally upload to my PyPI account, using the credentials you already have that allow me to use that account\" on the list of targets that will ever be supported?\n\nIf not--i.e., if only recognized \"forges\" are ever going to be supported--why not?"}, {"id": 50499457, "au": "woodruffw", "dom": 64, "sr": 77, "sc": 0.37, "ep": 2.89, "bs": 2.52, "d": 4, "age": 21.68, "grav": 297.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 42594, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "security_devs", "flbl": "Security & Devs (Microsoft)", "urls": [], "ig": 1.16, "fa": 0.0, "gp": 0.111, "bl": 0.95, "ds": 0.0, "txt": "The current formats (publish and SLSA provenance) are for attesting publishing and build steps, respectively, but there's nothing stopping PyPI from adding a different, new attestation statement for local builds (something that conveys \"I did this locally, and I was this principal (email address) when I did it\")."}, {"id": 50500519, "au": "woodruffw", "dom": 37, "sr": 78, "sc": 0.26, "ep": 2.78, "bs": 2.52, "d": 4, "age": 19.64, "grav": 253.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 42594, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "security_devs", "flbl": "Security & Devs (Microsoft)", "urls": [], "ig": 1.06, "fa": 0.0, "gp": 0.197, "bl": 0.95, "ds": 0.0, "txt": "This is true, and it’s why I’m hopeful that some of the newer forges can make meaningful default posture improvements that make migration away from centralized services the dispassionate choice to a user who cares about availability and security."}, {"id": 50504049, "au": "zahlman", "dom": 75, "sr": 79, "sc": -0.15, "ep": 1.04, "bs": 1.19, "d": 6, "age": 11.58, "grav": 109.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 45, "k": 8568, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "providers_security", "flbl": "Providers & Security (Builds)", "urls": [], "ig": 0.442, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "> \"Why not a public key?\" is a good question, and the very short answer is that greenfield signing designs should not assume that all users are able to manage the secrecy of long-lived key materials, much less force them to make parameter decisions when (re)generating materials.\n\nHow is offering the public-key option in any way making such an assumption or applying any such force?"}, {"id": 50498356, "au": "djoldman", "dom": 40, "sr": 80, "sc": -0.36, "ep": 2.68, "bs": 3.05, "d": 0, "age": 23.56, "grav": 341.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 8, "qw": 0, "k": 11626, "kpp": 7.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "security_devs", "flbl": "Security & Devs (Microsoft)", "urls": ["https://pypi.org/project/dlt/\u0023files", "https://pypi.org/project/datasette/\u0023files"], "ig": 0.54, "fa": 0.0, "gp": 0.974, "bl": 1.15, "ds": 0.0, "txt": "Some examples:\n\ndlt (no provenance): https://pypi.org/project/dlt/\u0023files\n\ndatasette (yes provenance): https://pypi.org/project/datasette/\u0023files"}, {"id": 50503001, "au": "akerl_", "dom": 25, "sr": 81, "sc": -0.4, "ep": 2.15, "bs": 2.54, "d": 9, "age": 14.81, "grav": 160.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 67, "qw": 0, "k": 13343, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 6, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "security_devs", "flbl": "Security & Devs (Microsoft)", "urls": [], "ig": 0.914, "fa": 0.0, "gp": 0.0, "bl": 0.96, "ds": 0.0, "txt": "These aren't really comparable things.\n\nThe fact that a large company can mess things up doesn't change the fact that it's way more viable to review how Github or Gitlab or Codeberg handles key material and security than it is to make a comparable local developer flow that avoids common mistakes like just dropping the signing key on disk on whatever servers you want to run your builds from."}, {"id": 50499013, "au": "duskdozer", "dom": 95, "sr": 82, "sc": -0.5, "ep": 0.69, "bs": 1.19, "d": 1, "age": 22.45, "grav": 315.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 1723, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "providers_security", "flbl": "Providers & Security (Builds)", "urls": [], "ig": 0.295, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Judging by the readme and homepage, there were probably some large differences brewing. Can't say I'm a fan of how it looks like they'll take the UI"}, {"id": 50499223, "au": "duskdozer", "dom": 57, "sr": 83, "sc": -0.52, "ep": 0.67, "bs": 1.19, "d": 2, "age": 22.09, "grav": 307.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 1723, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "key_workflow", "flbl": "Key & Workflow (Account)", "urls": [], "ig": 0.286, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Maybe they'll implement PGoogleP, where your private key is safely and securely stored on Google's servers"}, {"id": 50502443, "au": "cozzyd", "dom": 27, "sr": 84, "sc": -0.59, "ep": 0.6, "bs": 1.19, "d": 9, "age": 16.04, "grav": 182.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 7472, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "security_devs", "flbl": "Security & Devs (Microsoft)", "urls": [], "ig": 0.257, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Microsoft can't even figure out how to send email reliably. But sure everyone should trust them with signing packages."}, {"id": 50499282, "au": "cozzyd", "dom": 18, "sr": 85, "sc": -0.72, "ep": 0.47, "bs": 1.19, "d": 2, "age": 21.98, "grav": 304.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 7472, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "key_workflow", "flbl": "Key & Workflow (Account)", "urls": [], "ig": 0.201, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "I trust myself way more to with with a pgp key on my computer than figuring out how to use GitHub actions properly..."}, {"id": 50506488, "au": "BigTTYGothGF", "dom": 15, "sr": 86, "sc": -0.79, "ep": 0.4, "bs": 1.19, "d": 1, "age": 3.55, "grav": 21.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 3, "k": 1361, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.146, "fa": 0.0, "gp": 0.04, "bl": 0.45, "ds": 0.0, "txt": ">  Seems a bit anti-pythonic\n\nQuite the opposite. \"There should be one-- and preferably only one --obvious way to do it\"."}, {"id": 50499413, "au": "guipsp", "dom": 63, "sr": 87, "sc": -0.85, "ep": 0.34, "bs": 1.19, "d": 3, "age": 21.74, "grav": 299.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 883, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "security_devs", "flbl": "Security & Devs (Microsoft)", "urls": [], "ig": 0.147, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Yes, that is right - that's the purpose of attesting builds.\n\nDo you see any other alternative?"}, {"id": 50498987, "au": "tzlahp", "dom": 104, "sr": 88, "sc": -1.05, "ep": 1.47, "bs": 2.52, "d": 1, "age": 22.48, "grav": 316.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": -5, "kpp": -1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "pki_codeberg", "flbl": "Pki & Codeberg (Keys)", "urls": [], "ig": 0.624, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "This should be the top comment. PyPI as usual screws up and spreads misinformation about projects."}, {"id": 50501056, "au": "akerl_", "dom": 23, "sr": 89, "sc": -1.09, "ep": 0.95, "bs": 2.04, "d": 7, "age": 18.66, "grav": 232.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 13343, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "key_workflow", "flbl": "Key & Workflow (Account)", "urls": [], "ig": 0.404, "fa": 0.0, "gp": 0.0, "bl": 0.77, "ds": 0.0, "txt": "How is PyPI supposed to tell if the person signing the artifacts is handling their key securely?"}, {"id": 50507464, "au": "woodruffw", "dom": 66, "sr": 90, "sc": -1.14, "ep": 1.38, "bs": 2.52, "d": 6, "age": 0.96, "grav": 7.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 42594, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": [], "ig": 0.586, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "There’s an open issue for it, but nobody is currently working on it. It’s not a mandatory feature or even something that installers current look at; if and when they do I think it’d be a much higher priority subject."}, {"id": 50503129, "au": "pdonis", "dom": 26, "sr": 91, "sc": -1.45, "ep": 3.0, "bs": 4.45, "d": 10, "age": 14.48, "grav": 155.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 72, "qw": 33, "k": 18487, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 7, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "key_workflow", "flbl": "Key & Workflow (Account)", "urls": [], "ig": 0.768, "fa": 0.42, "gp": 0.0, "bl": 1.68, "ds": 0.0, "txt": "> it's way more viable to review how Github or Gitlab or Codeberg handles key material and security\n\nOnly if you already trust them.\n\n> dropping the signing key on disk on whatever servers you want to run your builds from\n\nI run my builds on my local machine. The private key I would use to sign them if PyPI supported that is not anywhere in the repo I'm using.\n\nOf course you would have to trust that I'm telling the truth in what I just said. But, as above, you also need to trust what the large tech forges are telling you in order to review how they handle their keys."}, {"id": 50500428, "au": "chrisweekly", "dom": 39, "sr": 92, "sc": -1.78, "ep": 1.27, "bs": 3.05, "d": 3, "age": 19.8, "grav": 256.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 9, "qw": 0, "k": 9922, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://blog.yossarian.net/2026/04/11/Brocards-for-vulnerability-triage"], "ig": 0.539, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Thanks for the link - your blog is great! eg https://blog.yossarian.net/2026/04/11/Brocards-for-vulnerabi..."}, {"id": 50498595, "au": "MeteorMarc", "dom": 41, "sr": 93, "sc": -1.86, "ep": 1.18, "bs": 3.05, "d": 1, "age": 23.08, "grav": 330.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 597, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "providers_security", "flbl": "Providers & Security (Builds)", "urls": [], "ig": 0.504, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "The source distributions have icons while the wheels have not. Strange and confusing."}, {"id": 50499056, "au": "woodruffw", "dom": 82, "sr": 94, "sc": -2.1, "ep": 1.61, "bs": 3.71, "d": 3, "age": 22.38, "grav": 313.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 42594, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "pki_codeberg", "flbl": "Pki & Codeberg (Keys)", "urls": [], "ig": 0.684, "fa": 0.0, "gp": 0.0, "bl": 1.4, "ds": 0.0, "txt": "Storing your private keys somewhere other than a regular file on disk is not a perpetual technical difficulty. Please assume good faith."}, {"id": 50507186, "au": "ashfdgq", "dom": 69, "sr": 95, "sc": -2.27, "ep": 3.3, "bs": 5.57, "d": 6, "age": 1.66, "grav": 10.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "security_devs", "flbl": "Security & Devs (Microsoft)", "urls": [], "ig": 0.992, "fa": 0.34, "gp": 0.0, "bl": 2.1, "ds": 0.0, "txt": "Adoption of PGP would change if PyPI started nagging about PGP signatures instead of some corporate centralized ID scheme.\n\nBut that is not done, because python-dev is essentially corporate owned and has always done the bidding of corporations for at least 10 years because their \"leaders\" want to keep their easy bullshit jobs."}, {"id": 50501572, "au": "pdonis", "dom": 24, "sr": 96, "sc": -2.73, "ep": 1.22, "bs": 3.95, "d": 8, "age": 17.8, "grav": 215.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 18487, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 5, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "providers_security", "flbl": "Providers & Security (Builds)", "urls": [], "ig": 0.518, "fa": 0.0, "gp": 0.0, "bl": 1.49, "ds": 0.0, "txt": "They can't. But they can't tell for sure if large tech corporations are doing that either. Data breaches are a thing. Auditing Github workflows doesn't prevent them."}, {"id": 50499006, "au": "tzlahp", "dom": 103, "sr": 97, "sc": -2.95, "ep": 0.76, "bs": 3.71, "d": 2, "age": 22.46, "grav": 315.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": -5, "kpp": -1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "security_devs", "flbl": "Security & Devs (Microsoft)", "urls": [], "ig": 0.323, "fa": 0.0, "gp": 0.0, "bl": 1.4, "ds": 0.0, "txt": "You want the ones that employ core devs through Microsoft or are approved by OpenAI, which codeberg.org is not."}, {"id": 50499201, "au": "s_u_d_o", "dom": 96, "sr": 98, "sc": -3.07, "ep": 1.17, "bs": 4.24, "d": 0, "age": 22.14, "grav": 308.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 31, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": [], "ig": 0.417, "fa": 0.0, "gp": 0.133, "bl": 1.6, "ds": 0.0, "txt": "Great news! Would love to see provenance on Homebrew (brew) as well."}, {"id": 50503546, "au": "UltraSane", "dom": 28, "sr": 99, "sc": -3.18, "ep": 1.06, "bs": 4.24, "d": 5, "age": 13.18, "grav": 133.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 3355, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "pki_codeberg", "flbl": "Pki & Codeberg (Keys)", "urls": [], "ig": 0.449, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Every private key not created inside a HSM should be assumed to be compromised."}, {"id": 50502628, "au": "ghosty141", "dom": 87, "sr": 100, "sc": -3.55, "ep": 0.69, "bs": 4.24, "d": 5, "age": 15.66, "grav": 175.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 922, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "pki_codeberg", "flbl": "Pki & Codeberg (Keys)", "urls": [], "ig": 0.296, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "A yubikey is cheap and is good enough for that... No 10k jam necessary"}, {"id": 50500646, "au": "breakwaterlabs", "dom": 67, "sr": 101, "sc": -3.61, "ep": 0.63, "bs": 4.24, "d": 4, "age": 19.41, "grav": 248.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 299, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.27, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "If I understand this correctly the fundamental problem here is what codesigning / pgp solve."}, {"id": 50501183, "au": "pdonis", "dom": 65, "sr": 102, "sc": -5.16, "ep": 0.14, "bs": 5.3, "d": 5, "age": 18.5, "grav": 229.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 18487, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "pki_codeberg", "flbl": "Pki & Codeberg (Keys)", "urls": [], "ig": 0.058, "fa": 0.0, "gp": 0.0, "bl": 2.0, "ds": 0.0, "txt": "So are there any plans for PyPI to do this?"}, {"id": 50499016, "au": "tzlahp", "dom": 81, "sr": 103, "sc": -6.07, "ep": 0.69, "bs": 6.76, "d": 2, "age": 22.44, "grav": 315.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": -5, "kpp": -1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "security_devs", "flbl": "Security & Devs (Microsoft)", "urls": [], "ig": 0.294, "fa": 0.0, "gp": 0.0, "bl": 2.55, "ds": 0.0, "txt": "Of course: In principle we'd welcome a change, but there are technical difficulties in perpetuity."}, {"id": 50499033, "au": "tzlahp", "dom": 56, "sr": 104, "sc": -6.39, "ep": 0.37, "bs": 6.76, "d": 1, "age": 22.41, "grav": 314.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": -5, "kpp": -1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "trusted_python", "flbl": "Trusted & Python (Attestations)", "urls": [], "ig": 0.157, "fa": 0.0, "gp": 0.0, "bl": 2.55, "ds": 0.0, "txt": "If only there had been PGP signatures. Oh wait ..."}, {"id": 50506708, "au": "zoobab", "dom": 91, "sr": 105, "sc": -9.1, "ep": 0.0, "bs": 6.89, "d": 0, "age": 2.92, "grav": 17.6, "surf": 19.2, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 3854, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "providers_security", "flbl": "Providers & Security (Builds)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.019, "bl": 2.6, "ds": 0.0, "txt": "Is this security scanning actually open source?"}, {"id": 50498422, "au": "mistursinistur", "dom": 105, "sr": 106, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 0, "age": 23.4, "grav": 337.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 172, "kpp": 7.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Nobody is looking at these pages"}, {"id": 50501015, "au": "pdonis", "dom": 35, "sr": 107, "sc": -10.18, "ep": 0.0, "bs": 7.95, "d": 5, "age": 18.71, "grav": 233.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 18487, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.0, "ds": 0.0, "txt": "Thanks, I'll comment further in that subthread."}, {"id": 50499010, "au": "tzlahp", "dom": 106, "sr": 108, "sc": -10.84, "ep": 0.0, "bs": 9.41, "d": 1, "age": 22.45, "grav": 315.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 0, "k": -5, "kpp": -1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.28, "gp": 0.0, "bl": 3.55, "ds": 0.0, "txt": "True, therefore downvoted."}, {"id": 50500932, "au": "akerl_", "dom": 34, "sr": 109, "sc": -11.11, "ep": 0.0, "bs": 8.88, "d": 4, "age": 18.83, "grav": 236.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 3, "qw": 0, "k": 13343, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://news.ycombinator.com/item?id=50499442"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.35, "ds": 0.0, "txt": "https://news.ycombinator.com/item?id=50499442 Seems relevant here."}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 60);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 50);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 50);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 50);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `Showing ${shown.length} of ${pool.length} matching comments (mode: ${activeMode})` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeSelect = document.getElementById("modeSelect");
+  modeSelect.addEventListener("change", () => {
+    activeMode = modeSelect.value;
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

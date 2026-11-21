@@ -1,0 +1,1364 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50526152 // Running coding agents without handing them my credentials — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .kpi-cell {
+      padding: 8px 0;
+    }
+    .kpi-label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 4px 0;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer > summary.hn-summary {
+      list-style: none;
+      cursor: pointer;
+      display: block;
+      padding: 2px 0;
+      margin: 0;
+      background: transparent;
+      border: 0;
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      user-select: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+    }
+    table.ablation th {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: normal;
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    .mode-tabs {
+      gap: 6px;
+      padding: 0 8px;
+      margin-bottom: 8px;
+    }
+    button.mode-tab {
+      appearance: none;
+      border-width: 0px;
+      border-radius: 4px;
+      background: rgb(246, 246, 239);
+      color: rgb(130, 130, 130);
+      cursor: pointer;
+      padding: 6px 14px;
+      transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+    }
+    button.mode-tab:hover {
+      background: rgb(240, 240, 235);
+      color: rgb(13, 13, 13);
+    }
+    button.mode-tab.active {
+      background: rgb(246, 246, 239);
+      color: rgb(13, 13, 13);
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      padding: 14px;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .mode-tabs button.mode-tab {
+        flex: 1;
+        text-align: center;
+        padding: 7px 8px;
+      }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; }
+      .topbar-right { font-size: 8pt; padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+      </div>
+      <div class="topbar-right">&nbsp;</div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://blog.antonio.cx/running-agents-with-lend">Running coding agents without handing them my credentials</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=blog.antonio.cx"><span class="sitestr">blog.antonio.cx</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">113 points</span> by <a href="https://news.ycombinator.com/user?id=antoniomika">antoniomika</a> <span class="age" title="2026-11-17T01:18:56.000Z"><a href="https://news.ycombinator.com/item?id=50526152">8 hours ago</a></span> | <a href="https://news.ycombinator.com/item?id=50526152">79&nbsp;comments</a> | 78.5% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">Evidence</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">79</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 61 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">21.5%</div>
+          <div class="kpi-sub">17 comments (5 Gold / 6.3%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">78.5%</div>
+          <div class="kpi-sub">43 chatter &bull; 19 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">4</div>
+        <div class="kpi-sub">13% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.903</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">35</div>
+          <div class="kpi-sub">HN POS 1..35 (44.3% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="color: rgb(90, 90, 88); margin-top: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">Explore</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 79-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 79)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (5)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (12)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (43)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (19)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..79) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 25)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (saagarjha, 6.6h); largest subtree (@saagarjha) occupies 35 slots (HN POS 1..35).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="mode-tabs" id="modeTabs" role="tablist" aria-label="Ranking view">
+        <button type="button" class="mode-tab active" data-mode="hn_top40" role="tab" aria-selected="true">HN Top 40</button>
+        <button type="button" class="mode-tab" data-mode="top_signal" role="tab" aria-selected="false">Epistemic Top 40</button>
+      </div>
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (79)</option>
+          <option value="agents_name">Agents &amp; Name (Everything) (16)</option>
+          <option value="solution_laptop">Solution &amp; Laptop (Services) (16)</option>
+          <option value="keys_trust">Keys &amp; Trust (Claude) (15)</option>
+          <option value="security_docker">Security &amp; Docker (Sandboxes) (14)</option>
+          <option value="agent_access">Agent &amp; Access (Controls) (13)</option>
+          <option value="general_commentary">General Commentary (5)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, lend, agents, laptop, token, ssh...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50526152 + BLOG.ANTONIO.CX + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50526152, "story_title": "Running coding agents without handing them my credentials", "story_url": "https://blog.antonio.cx/running-agents-with-lend", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50526152, "story_title": "Running coding agents without handing them my credentials", "story_url": "https://blog.antonio.cx/running-agents-with-lend", "points": 113, "story_author": "antoniomika", "article_source": "fetched_url", "t1_ref_utc": "2026-11-17T09:38:04+00:00", "t2_ref_utc": "2026-11-17T09:38:04+00:00", "delta_minutes": 0.0, "story_anchors": ["lend", "agents", "laptop", "token", "ssh", "secrets", "credentials", "request", "agent", "requests", "works", "handing", "github", "secret", "claude", "cli", "everything", "command", "open", "remote", "proxy", "mcp", "ask", "tool", "view"], "facet_labels": {"agents_name": "Agents & Name (Everything)", "security_docker": "Security & Docker (Sandboxes)", "solution_laptop": "Solution & Laptop (Services)", "agent_access": "Agent & Access (Controls)", "keys_trust": "Keys & Trust (Claude)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "agents_name", "label": "Agents & Name (Everything)", "count": 16, "top_terms": ["agents", "name", "everything", "tokens"]}, {"slug": "security_docker", "label": "Security & Docker (Sandboxes)", "count": 14, "top_terms": ["security", "docker", "sandboxes", "injection"]}, {"slug": "solution_laptop", "label": "Solution & Laptop (Services)", "count": 16, "top_terms": ["solution", "laptop", "services", "multiple"]}, {"slug": "agent_access", "label": "Agent & Access (Controls)", "count": 13, "top_terms": ["agent", "access", "controls", "network"]}, {"slug": "keys_trust", "label": "Keys & Trust (Claude)", "count": 15, "top_terms": ["keys", "trust", "claude", "giving"]}], "counts": {"total_comments": 79, "live_t2_comments": 79, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 61, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "bc2ab271d75b7ea7edd417081f3779c1d1fcb7a59656cba76d0394a9206bfdb7"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 5, "grounded_analysis": 12, "crowd_chatter": 43, "bullshit_or_flamewar": 19}, "facets": {"agent_access": 13, "agents_name": 16, "solution_laptop": 16, "security_docker": 14, "keys_trust": 15, "general_commentary": 5}, "facet_options": [{"slug": "agents_name", "label": "Agents & Name (Everything)", "count": 16}, {"slug": "solution_laptop", "label": "Solution & Laptop (Services)", "count": 16}, {"slug": "keys_trust", "label": "Keys & Trust (Claude)", "count": 15}, {"slug": "security_docker", "label": "Security & Docker (Sandboxes)", "count": 14}, {"slug": "agent_access", "label": "Agent & Access (Controls)", "count": 13}, {"slug": "general_commentary", "label": "General Commentary", "count": 5}], "facet_diagnostics": [{"slug": "agents_name", "label": "Agents & Name (Everything)", "count": 16, "useful": 8, "useful_pct": 50.0, "terms": "agents, name, everything, tokens"}, {"slug": "solution_laptop", "label": "Solution & Laptop (Services)", "count": 16, "useful": 3, "useful_pct": 18.8, "terms": "solution, laptop, services, multiple"}, {"slug": "keys_trust", "label": "Keys & Trust (Claude)", "count": 15, "useful": 1, "useful_pct": 6.7, "terms": "keys, trust, claude, giving"}, {"slug": "security_docker", "label": "Security & Docker (Sandboxes)", "count": 14, "useful": 1, "useful_pct": 7.1, "terms": "security, docker, sandboxes, injection"}, {"slug": "agent_access", "label": "Agent & Access (Controls)", "count": 13, "useful": 4, "useful_pct": 30.8, "terms": "agent, access, controls, network"}, {"slug": "general_commentary", "label": "General Commentary", "count": 5, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 7}, {"category": "code_repository", "count": 3}, {"category": "github_artifact", "count": 1}], "story_anchors": ["lend", "agents", "laptop", "token", "ssh", "secrets", "credentials", "request", "agent", "requests", "works", "handing", "github", "secret", "claude", "cli", "everything", "command"], "largest_root": {"root_id": 50526854, "author": "saagarjha", "slots": 35, "start_dom": 1, "end_dom": 35, "share_pct": 44.3, "top_dom1_age": 6.6, "top_dom1_author": "saagarjha"}, "buried_cutoff": 25, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50526826, "au": "knocte", "dom": 50, "sr": 1, "sc": 12.19, "ep": 12.19, "bs": 0.0, "d": 0, "age": 6.68, "grav": 48.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 54, "qw": 22, "k": 995, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "agent_access", "flbl": "Agent & Access (Controls)", "urls": ["https://github.com/tarsgate/skynot"], "ig": 1.307, "fa": 2.78, "gp": 0.826, "bl": 0.0, "ds": 0.0, "txt": "> I often have them review each other's work too. None of them run on my laptop. They run on VMs I can throw away,\n\nGood approach. I myself found issues with a VM approach such as latency (if the VM is in the cloud), efficiency (if the VM is local) and laziness to automate the VM creation & setup. So instead I just hand the agent an unprivileged user account in my system and stop worrying. I built a little tool to setup this: https://github.com/tarsgate/skynot"}, {"id": 50529311, "au": "kstenerud", "dom": 39, "sr": 2, "sc": 11.48, "ep": 11.48, "bs": 0.0, "d": 2, "age": 0.07, "grav": 3.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 68, "qw": 0, "k": 22352, "kpp": 4.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "epistemic_gold", "facet": "agents_name", "flbl": "Agents & Name (Everything)", "urls": ["https://github.com/kstenerud/yoloai/blob/main/docs/contributors/backend-idiosyncrasies.md"], "ig": 1.204, "fa": 2.57, "gp": 0.913, "bl": 0.0, "ds": 0.0, "txt": "It works from the command line. You can spin up a sandbox around your workdir, using any backend (docker, VM, kata, firecracker, seatbelt, apple container, etc) and it just works.\n\nYou could roll your own, just like you could build your own docker implementation. But the devil's in the details. The technologies it depends on are sharp and pointy ( https://github.com/kstenerud/yoloai/blob/main/docs/contribut... ), and it's difficult to make them do the right thing."}, {"id": 50528859, "au": "zmmmmm", "dom": 47, "sr": 3, "sc": 10.05, "ep": 10.05, "bs": 0.0, "d": 3, "age": 1.21, "grav": 8.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 50, "qw": 0, "k": 22248, "kpp": 5.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "solution_laptop", "flbl": "Solution & Laptop (Services)", "urls": ["https://github.com/superradcompany/microsandbox"], "ig": 1.033, "fa": 2.08, "gp": 1.17, "bl": 0.0, "ds": 0.0, "txt": "if you want a solution that isn't tied to a docker login, try https://github.com/superradcompany/microsandbox\n\nAnd when you're ready to go down the rabbit hole, read about how it supports a whole set of mcp-tooling to enable your VM to launch other VMs with more agents in side them so your agents can ....agent"}, {"id": 50526326, "au": "theyCallMeSwift", "dom": 68, "sr": 4, "sc": 9.89, "ep": 9.89, "bs": 0.0, "d": 0, "age": 7.9, "grav": 62.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 29, "qw": 0, "k": 525, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "agents_name", "flbl": "Agents & Name (Everything)", "urls": ["https://github.com/Infisical/agent-vault"], "ig": 0.971, "fa": 2.08, "gp": 1.155, "bl": 0.0, "ds": 0.0, "txt": "I was originally using Agent Vault (https://github.com/Infisical/agent-vault), but it looks like the company behind it is putting it on end of life and SasSifying it. Will give lend a try, great timing!"}, {"id": 50527366, "au": "blop", "dom": 62, "sr": 5, "sc": 7.57, "ep": 7.57, "bs": 0.0, "d": 0, "age": 5.36, "grav": 36.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 181, "qw": 0, "k": 154, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "solution_laptop", "flbl": "Solution & Laptop (Services)", "urls": ["https://fnox.jdx.dev/", "https://fnox.jdx.dev/providers/overview.html"], "ig": 1.739, "fa": 0.9, "gp": 0.634, "bl": 0.0, "ds": 0.0, "txt": "fnox (https://fnox.jdx.dev/) is another solution which is also fantastic for day-to-day human use in the cli. It works a bit like sops but can also chain multiple encryption providers, so for example you can use an encrypted age key with a fido2 provider (a yubikey for example) as the main provider of all the secrets on your computer.\n\nIf you run for example `fnox exec gh`, fnox will ask you to touch the yubikey to decrypt the age key and decode the github token env var for the gh cli (fnox can also cache the decoded value for a bit, like gpg agent).\nYou can tell the AI agent to use `fnox exec gh` to access gh without seeing the gh token. Or create a shell alias so it's transparent. It also has an MCP server and proxy server to filter API calls to remote APIs (I haven't tried that yet)\n\nit supports quite a few providers (https://fnox.jdx.dev/providers/overview.html): age, fido2, AWS, Azure, Google, kubernetes secrets, vault/openbao, 1password, bitwarden, keepassxc, etc.\n\nA lot of them are read/write so you can also use fnox to sync secrets across different systems."}, {"id": 50527290, "au": "recursivedoubts", "dom": 15, "sr": 6, "sc": 6.75, "ep": 6.75, "bs": 0.0, "d": 1, "age": 5.55, "grav": 38.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 52, "qw": 0, "k": 15755, "kpp": 6.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "agents_name", "flbl": "Agents & Name (Everything)", "urls": ["https://clank.talk"], "ig": 1.383, "fa": 0.62, "gp": 1.194, "bl": 0.0, "ds": 0.0, "txt": "I'm trying to address this w/ clank.talk: a self-discoverable scripting language for agents that replaces bash with a controlled sandbox environment and strives to be easy for humans to read:\n\nhttps://clank.talk\n\nI'm designing this for the student AI infrastructure here at Montana State, to avoid rolling out the current wild-west of local agents to our student body."}, {"id": 50528201, "au": "Traubenfuchs", "dom": 75, "sr": 7, "sc": 6.29, "ep": 6.29, "bs": 0.0, "d": 0, "age": 2.93, "grav": 17.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 146, "qw": 0, "k": 3657, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "agents_name", "flbl": "Agents & Name (Everything)", "urls": [], "ig": 1.607, "fa": 0.68, "gp": 0.397, "bl": 0.0, "ds": 0.0, "txt": "I am all in, 100% AI psychosis. Claude cli can control a browser instance and can read/write anything from it and execute JS in it. I don’t need any mcp and I don’t need to care about authentication. Claude can just freely run JS in any tab I am authenticated in and execute, instrument JS to turn any tab into a usable API. I have automated 100% of every predictable interaction I have with the browser.\n\nAll it needs me for is to pass two factor gates. It can pull aws-cli secrets and whatever else it needs from our SSO portal after I signed in in the morning.\n\nThe desire to maintain an illusion of control over AI which is already much faster and smarter than you is hilarious to me.\n\nJust tell it to confirm before doing writing/destroying operations (send money, send email, create kubernetes cluster, destroy sns/sqs, etc.) and you are good."}, {"id": 50527097, "au": "fractorial", "dom": 2, "sr": 8, "sc": 5.74, "ep": 5.89, "bs": 0.0, "d": 1, "age": 6.04, "grav": 42.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 147, "qw": 0, "k": 168, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "agent_access", "flbl": "Agent & Access (Controls)", "urls": [], "ig": 1.503, "fa": 0.28, "gp": 1.075, "bl": 0.0, "ds": 0.0, "txt": "As much as I wanted to say you’re wrong, you’re right. After reading TFA, the security boundary is not sound.\n\nWanting agents to act like you is wrong. You need to own that trust boundary. Build whatever tooling satisfies the contract that agents should have a “not”+<you> (or <you>+”-agent”) identity, and you actuate across that boundary explicitly.\n\nFor example, I have a second agent GitHub account that points at my human one. That allows me to write a trusted proxy that ACLs its identity tightly.\n\nIt cannot write to public repos ever. In the worst possible case, it externalizes to a private repo’s issue tracker. (Still has never happened in ~4 months)\n\nOnce you have this, you can let agents run free. But, it isn’t trivial to set up. Moreover, people don’t want to “do the work.”\n\nAll this assumes you abide by “never run untrusted agents on trusted hardware.”"}, {"id": 50526930, "au": "h4kunamata", "dom": 56, "sr": 9, "sc": 5.36, "ep": 5.58, "bs": 0.0, "d": 0, "age": 6.39, "grav": 46.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 114, "qw": 0, "k": 447, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "agents_name", "flbl": "Agents & Name (Everything)", "urls": [], "ig": 1.588, "fa": 0.28, "gp": 0.728, "bl": 0.0, "ds": 0.0, "txt": "For bash and python scripting I just use keepassxc-cli.\n\nTokens in general is \"never exposed\":\n\nkeepassxc-cli show --no-password -k $KEEPASS_KEY $KEEPASS_DB \"GROUP_GOES_HERE/SECRET_NAME_HERE\" --attributes Password\n\nWhen dealing with agents, they access the tokens the same way, it is the best balance I found between keeping things safe without adding too much complexity making my life harder.\n\nIt can save tho, have the code to also save access_token to the vault the same way, so no log/execution will ever show the secrets.\n\nTokens the agents use, are read-only with the minimalist access.\n\nNever ever ever grant an agent access to any token with destructive access, unless you accepted the risks."}, {"id": 50527211, "au": "antoniomika", "dom": 20, "sr": 10, "sc": 4.53, "ep": 4.82, "bs": 0.0, "d": 1, "age": 5.76, "grav": 40.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 117, "qw": 0, "k": 346, "kpp": 4.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "solution_laptop", "flbl": "Solution & Laptop (Services)", "urls": [], "ig": 1.43, "fa": 0.28, "gp": 0.456, "bl": 0.0, "ds": 0.0, "txt": "Truthfully, I tend to agree with you. I built lend mainly for the fact that I like ssh tools a lot (feel free to check my other projects) and have always wanted a way to run local commands without having to setup reverse ssh when I don't need to run sshd on my laptop.\n\nFor example, I store k8s credentials in 1pass and the cluster is only accessible via the network on my remote machine. I can grab the credentials from my laptop for the work I want to do on the remote, and never have to install 1pass on the remote machine.\n\nPrimary use case for lend wasn't agents when I started the project. It just was natural to add support for it after the fact."}, {"id": 50528579, "au": "rao-v", "dom": 55, "sr": 11, "sc": 4.4, "ep": 4.84, "bs": 0.0, "d": 0, "age": 1.97, "grav": 12.0, "surf": 4.5, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 179, "qw": 0, "k": 1439, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "agents_name", "flbl": "Agents & Name (Everything)", "urls": [], "ig": 1.693, "fa": 0.0, "gp": 0.595, "bl": 0.0, "ds": 0.0, "txt": "This is a fun problem! I'm checking lend out now to see if it can replace parts of a stack that I built for myself to work with both sandboxed local agents (Qwen 3.8 27B etc.), sandboxed \"cheap\" agents running Deepseek as well as full fledged Claude / Codex etc. I really like that it can front a SSH socket (and might solve something I'm struggling with).\n\nIt's actually a pretty interesting problem and I'm hoping to share what I've thrown together this week.\n\nBasically you want to be able to limit access to a bunch of resources to stuff you authorize (from your phone or inside Herdr etc.) - everything from access to specific websites, search APIs, keys to your Home Assistant config (\"Claude make an automation to turn off the lights when blah\" is magic), to github tokens and wifi passwords etc. so that the agents themselves never see the actual key (ok not quite possible with wifi passwords but everything else is possible!).\n\nAt the same time your setup has to be simple enough that fairly dumb agents can figure it out without burning a billion tokens on every call."}, {"id": 50527802, "au": "saagarjha", "dom": 21, "sr": 12, "sc": 4.16, "ep": 4.6, "bs": 0.0, "d": 2, "age": 4.15, "grav": 26.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 283, "qw": 0, "k": 62079, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "agent_access", "flbl": "Agent & Access (Controls)", "urls": [], "ig": 1.46, "fa": 0.28, "gp": 0.259, "bl": 0.0, "ds": 0.0, "txt": "What I do on my machine is I basically do not allow for local exec at all, except in some very specific scenarios where I carefully design the environment and make sure that it seems reasonable before handing it to the agent. For example, I have a specific profiling task that requires performance counters. Normally my agents can spin up VMs to run commands without my permission but in this case the counters are not exposed in the VM, which basically means that this must be run outside of the VM. In this case I have configured my setup to be that the agent is allowed to write to a binary at a specific location, and I approve of it running one command (in this case, without my supervision even) that is basically xctrace sandbox-exec [very restrictive handwritten profile] [this binary]. In this way, it can run code on my machine and get the metrics it wants, but it can't go \"oh let me write a program to go and poke around the host machine\" which it is prone to doing if you don't restrict it this way.\n\nI guess what I have done is the exact opposite in that I have designed an environment for agents and then I am using it as a hammer to solve all my problems, I have had almost exactly the same problem as you and the the way I typically solve it is that I have persistent SSH connections already supported in my harness, and I can arbitrarily expose whatever I want into the \"agent envir"}, {"id": 50529330, "au": "TeMPOraL", "dom": 24, "sr": 13, "sc": 4.05, "ep": 4.49, "bs": 0.0, "d": 2, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 135, "qw": 0, "k": 116599, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "security_docker", "flbl": "Security & Docker (Sandboxes)", "urls": [], "ig": 1.678, "fa": 0.0, "gp": 0.379, "bl": 0.0, "ds": 0.0, "txt": "Many security professionals are the source of most nonsensical concepts, because they're still approaching LLMs as if it was classical software that can be secured with enough hard, provable-in-abstract boundaries. This leads to nonsensical proposals (talking about W^X or \"control/data plane separation\", treating prompt injection as SQL injection, \"if only more effort was spent on securing it\"...), or proposals that defeat the entire value of LLMs (\"lethal trifecta\" framework is a breeding ground for such).\n\nTruth is, LLMs are \"little people on a chip\" - they're valuable exactly because they do not have any kind of \"control/data\" separation (for fundamental reasons, reality doesn't have such separation either), and that lets them handle \"people-shaped\" tasks that are infeasible to script. Flip side, they're vulnerable to \"people-shaped\" attacks, and need to be thought of accordingly."}, {"id": 50526901, "au": "tmpz22", "dom": 66, "sr": 14, "sc": 3.95, "ep": 3.95, "bs": 0.0, "d": 0, "age": 6.48, "grav": 46.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 61, "qw": 0, "k": 6064, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "security_docker", "flbl": "Security & Docker (Sandboxes)", "urls": [], "ig": 1.366, "fa": 0.0, "gp": 0.509, "bl": 0.0, "ds": 0.0, "txt": "Too many people, including \"CEO\"s, are giving everything to every LLM and its just not a serious position to take - you wouldn't volunteer your teenage child's camera roll or their psychiatry notes and that's the level of intimacy full computer access exposes.\n\nThank you for posting and sharing this OP, its one small step in the direction of professional development with LLMs."}, {"id": 50529216, "au": "kstenerud", "dom": 37, "sr": 15, "sc": 3.81, "ep": 3.96, "bs": 0.0, "d": 0, "age": 0.3, "grav": 4.5, "surf": 11.5, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 95, "qw": 0, "k": 22352, "kpp": 4.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agent_access", "flbl": "Agent & Access (Controls)", "urls": [], "ig": 1.172, "fa": 0.28, "gp": 0.281, "bl": 0.0, "ds": 0.0, "txt": "I wrote yoloai for this kind of thing.\n\nBy default:\n\n- The agent has no access to your filesystem.\n\n- The agent has no access to your env.\n\n- The agent has no access to your credentials.\n\n- The agent has no access to your workdir. You use git semantics to pull its changes back to your workdir, with the ability to view and extract it as a diff.\n\n- You can restrict where it's allowed to visit over the network.\n\nRequests can be brokered (still working on making this more ergonomic), and you can make explicit carve-outs from the above rules."}, {"id": 50526854, "au": "saagarjha", "dom": 1, "sr": 16, "sc": 3.71, "ep": 4.15, "bs": 0.0, "d": 0, "age": 6.61, "grav": 48.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 82, "qw": 0, "k": 62079, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "keys_trust", "flbl": "Keys & Trust (Claude)", "urls": [], "ig": 0.911, "fa": 0.0, "gp": 1.389, "bl": 0.0, "ds": 0.0, "txt": "I just don’t think I agree with these designs at all. Everyone seems to be super laser focused on “not allowing their AI to have keys” when basically giving their AI direct access to what the keys enable, optionally adding a layer of ceremony in front where you tap “approve”. I’m looking at the alert that is shown there and I don’t see anything that makes me feel like it allows for an informed choice at the time of it popping up. So then, what’s the benefit?"}, {"id": 50529299, "au": "TeMPOraL", "dom": 3, "sr": 17, "sc": 3.65, "ep": 4.76, "bs": 0.0, "d": 2, "age": 0.09, "grav": 3.8, "surf": 7.8, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 123, "qw": 8, "k": 116599, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "agents_name", "flbl": "Agents & Name (Everything)", "urls": [], "ig": 1.314, "fa": 0.42, "gp": 0.326, "bl": 0.0, "ds": 0.0, "txt": "> Wanting agents to act like you is wrong.\n\nNot to nitpick, but not only it is not wrong, it's like most of their value, and notably, it's also what the word \"agent\" means. My \"agent\" is someone (or something) that stands in for me, acts in my name and in my interests. There's little point in hiring (or building) an agent, if you're never going to let it act in your name in anything.\n\nWhile I understand (and like, and use to the extent it's practical) of keeping agent and personal identities separate, letting the agents impersonate me is necessary, because commercial services abhore end-user automation, and purposefully do not support delegating any and all actions I can take to automation. It's a problem as old as time, predates \"AI agents\" by forever."}, {"id": 50527417, "au": "binsquare", "dom": 9, "sr": 18, "sc": 3.56, "ep": 4.0, "bs": 0.0, "d": 1, "age": 5.21, "grav": 35.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 74, "qw": 0, "k": 1113, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "keys_trust", "flbl": "Keys & Trust (Claude)", "urls": [], "ig": 1.216, "fa": 0.0, "gp": 0.789, "bl": 0.0, "ds": 0.0, "txt": "Basically these designs are meant to protect the key from leaking i.e. if agent holds key, prompt injections can happen.\n\nIf agent never holds the key, then the risk profile changes.\n\nBut you're right that it's a different problem to what access the key has and that's a different problem usually solved by having narrower keys or etc.\n\ndisclaimer: I work on smolvm which does this at the networking layer and argued with myself on this too."}, {"id": 50527742, "au": "saagarjha", "dom": 10, "sr": 19, "sc": 3.47, "ep": 4.13, "bs": 0.0, "d": 2, "age": 4.31, "grav": 27.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 118, "qw": 0, "k": 62079, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "agent_access", "flbl": "Agent & Access (Controls)", "urls": [], "ig": 1.319, "fa": 0.28, "gp": 0.164, "bl": 0.0, "ds": 0.0, "txt": "Sure, my view on this is more or less that often the setup that creates this kind of situation often allows the agent to effectively mint a new key anyway. For example, if you have my browser cookie or something I may not want my agent to leak this on the web, but if I use it to authenticate network requests to the service transparently the model can just go into the account page and change my password or something, then leak that. In general it is not safe to hand an agent access to a service which is designed for human interaction and assume that it was properly secured such that persistent, transferrable access is not something that can be generated."}, {"id": 50528333, "au": "bob1029", "dom": 70, "sr": 20, "sc": 3.34, "ep": 4.22, "bs": 0.0, "d": 0, "age": 2.61, "grav": 15.7, "surf": 3.9, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 86, "qw": 0, "k": 24526, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "agents_name", "flbl": "Agents & Name (Everything)", "urls": [], "ig": 1.624, "fa": 0.0, "gp": 0.279, "bl": 0.0, "ds": 0.0, "txt": "I let gpt run wide open on my machine with elevated permissions and unfiltered powershell access. I've been through tens of billions of tokens by now. Not once has something even remotely nefarious occurred.\n\nPerhaps my prompts are extremely low risk and I've been incredibly lucky. What are the statistics on 100k+ powershell invokes without a single attempt to delete system32? Perhaps I'm overdue for a black swan event? In any case, I'm looking forward to it because it would finally make all this discussion seem rational rather than completely unhinged."}, {"id": 50528384, "au": "__MatrixMan__", "dom": 36, "sr": 21, "sc": 3.33, "ep": 3.33, "bs": 0.0, "d": 0, "age": 2.49, "grav": 15.0, "surf": 3.5, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 110, "qw": 0, "k": 9852, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "solution_laptop", "flbl": "Solution & Laptop (Services)", "urls": [], "ig": 1.166, "fa": 0.0, "gp": 0.41, "bl": 0.0, "ds": 0.0, "txt": "My solution to this is two laptops.  No SSH between them, just a custom http API.  Agents can run amok on the laptop without the secrets, but if they want to act as me, they have to use the API.  If they need to do something not already in the API, they can add commits to the server, but I'm going to review those before I deploy that server on the laptop with the keys. This way I don't have to rely on the downstream services to have sufficiently granular permissions.\n\nI guess I could do the same thing with VM's, but for reasons I can't fully explain it's just easier to stay vigilant with separate hardware."}, {"id": 50527051, "au": "agentdev001", "dom": 30, "sr": 22, "sc": 3.29, "ep": 3.74, "bs": 0.0, "d": 1, "age": 6.15, "grav": 43.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 12, "k": 247, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "keys_trust", "flbl": "Keys & Trust (Claude)", "urls": [], "ig": 0.915, "fa": 0.42, "gp": 0.267, "bl": 0.0, "ds": 0.0, "txt": "> \"when basically giving their AI direct access to what the keys enable\"\n\nWell, ideally, you would be giving the model direct access to a subset of what a given key enables- if fine grained access control for generated keys isnt available."}, {"id": 50527764, "au": "saagarjha", "dom": 16, "sr": 23, "sc": 3.22, "ep": 3.66, "bs": 0.0, "d": 2, "age": 4.26, "grav": 27.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 82, "qw": 0, "k": 62079, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "security_docker", "flbl": "Security & Docker (Sandboxes)", "urls": [], "ig": 1.134, "fa": 0.28, "gp": 0.136, "bl": 0.0, "ds": 0.0, "txt": "AppleScript lives again? ;) I think it's an interesting concept, but it's really hard to do right. There are a lot of things that require very careful accounting for even in such a design–I see that you are already blocking access to .git for example, since the agent can drop code there that makes safe-looking commands like git status unsafe. This is definitely something I've been looking at, as well as taint tracking, it's just really hard. Would be interested to see where you take it!"}, {"id": 50526817, "au": "LeBit", "dom": 58, "sr": 24, "sc": 3.08, "ep": 3.08, "bs": 0.0, "d": 0, "age": 6.69, "grav": 49.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 513, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "keys_trust", "flbl": "Keys & Trust (Claude)", "urls": [], "ig": 0.775, "fa": 0.0, "gp": 0.868, "bl": 0.0, "ds": 0.0, "txt": "Nono does that.\n\nSmolvm does that.\n\nI make use of that feature which is super neat.\n\nOne problem with that though is when you need to use such a credential on a tailscale node. It bypasses the proxy of those tools."}, {"id": 50527397, "au": "simple10", "dom": 59, "sr": 25, "sc": 2.91, "ep": 3.49, "bs": 0.0, "d": 1, "age": 5.28, "grav": 35.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 70, "qw": 0, "k": 1266, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agent_access", "flbl": "Agent & Access (Controls)", "urls": [], "ig": 1.438, "fa": 0.0, "gp": 0.078, "bl": 0.0, "ds": 0.0, "txt": "I've been using nono for all my projects. It's great for the credential proxy as well as network and fs jails.\n\nI run all my autonomous agents jailed in nono - using a wrapper cli that builds jails based on the bins, tools, and network needs. The proxy support had some recent fixes, not sure if that solves the tailscale problem. I run a supervisor daemon that approves network requests (widens the jail) during runtime."}, {"id": 50527667, "au": "thayne", "dom": 4, "sr": 26, "sc": 2.9, "ep": 3.56, "bs": 0.0, "d": 2, "age": 4.57, "grav": 29.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 147, "qw": 0, "k": 10710, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "solution_laptop", "flbl": "Solution & Laptop (Services)", "urls": [], "ig": 1.352, "fa": 0.0, "gp": 0.264, "bl": 0.0, "ds": 0.0, "txt": "I would certainly prefer having separate credentials with permissions limited to what I want to allow the agent to do. However I have run into two problems with that.\n\nThe first, and bigger, issue is that some services either don't have have suffiently fine control over permissions, so in order to grant permission to do useful things, I also have to allow it to do dangerous things, or I don't have a way to create a more limited access token at all. I wish that it was more common to allow creating short-lived, limited accces personal access tokens for services.\n\nThe smaller issue is that sometimes I do want the agent to do something more risky with my approval, and provide me with sufficient context to make an informed decision. That can sort of be worked around though by telling it to just give me the command to run, then I can audit and run it myself."}, {"id": 50528839, "au": "zmmmmm", "dom": 48, "sr": 27, "sc": 2.59, "ep": 3.03, "bs": 0.0, "d": 0, "age": 1.27, "grav": 8.5, "surf": 6.4, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 48, "qw": 0, "k": 22248, "kpp": 5.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "solution_laptop", "flbl": "Solution & Laptop (Services)", "urls": [], "ig": 1.236, "fa": 0.0, "gp": 0.085, "bl": 0.0, "ds": 0.0, "txt": "They seem oblivious to secret replacement via TLS interception which are auto-supported in multiple existing microvm frameworks. These give you a straightforward way to not only shield the token but also limit the scope of the requests (eg: only particular projects on github rather than all of them, etc)."}, {"id": 50528649, "au": "rao-v", "dom": 18, "sr": 28, "sc": 2.57, "ep": 3.23, "bs": 0.0, "d": 1, "age": 1.74, "grav": 10.8, "surf": 4.5, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 76, "qw": 0, "k": 1439, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "keys_trust", "flbl": "Keys & Trust (Claude)", "urls": [], "ig": 1.286, "fa": 0.0, "gp": 0.141, "bl": 0.0, "ds": 0.0, "txt": "It's more about ensuring that the keys have some modicum of responsible control. If you give naked keys to Claude in a chat session and use something like atuin threads in 6 months to sync agent sessions across machines you might have put your keys in a a few dozen files without realizing it.\n\nIn an ideal world, the key you give Claude isn't useful for more than X amount of time, and ideally not against the true endpoint at all."}, {"id": 50527957, "au": "unddoch", "dom": 11, "sr": 29, "sc": 2.26, "ep": 3.36, "bs": 0.0, "d": 3, "age": 3.63, "grav": 22.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 48, "qw": 0, "k": 76, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "solution_laptop", "flbl": "Solution & Laptop (Services)", "urls": [], "ig": 1.21, "fa": 0.0, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "As Cursor generously demonstrated for the whole world, long-lived credentials in LLM transcripts are an attack path.\n\nYour transcript passes in plain-text through a chain of token and compute resellers. And you have no good way of knowing who those companies are and what type of \"observability\" they deploy."}, {"id": 50529083, "au": "ellieh", "dom": 19, "sr": 30, "sc": 2.05, "ep": 2.93, "bs": 0.0, "d": 2, "age": 0.71, "grav": 6.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 1102, "kpp": 6.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "keys_trust", "flbl": "Keys & Trust (Claude)", "urls": [], "ig": 1.246, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "(Hi I work on Atuin threads!)\n\nVery true! Generally good to avoid giving Claude long lived keys\n\nBuuuut if you do by accident, we’ve put a lot of work into making sure threads redacts as many secret patterns as possible, and update that list regularly"}, {"id": 50529213, "au": "grey-area", "dom": 6, "sr": 31, "sc": 1.98, "ep": 3.08, "bs": 0.0, "d": 4, "age": 0.31, "grav": 4.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 106, "qw": 0, "k": 24548, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agent_access", "flbl": "Agent & Access (Controls)", "urls": [], "ig": 1.312, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "You can't magically add fine-grained access controls if a service doesn't have them.\n\nThis is adding an allow/deny popup on your phone to agent activity based on the interpretation of an LLM as to whether a given command is risky. That's a very different thing from actual access controls which really deny access to certain pathways, it's an attempt to plaster over both the lack of real access controls and the tendency of LLMs to bypass them.\n\nIf your agent is sufficiently motivated, it may choose to bypass these controls, by mistake or on purpose and you would never know, it would not be too hard to do."}, {"id": 50528852, "au": "zmmmmm", "dom": 42, "sr": 32, "sc": 1.96, "ep": 2.99, "bs": 0.0, "d": 1, "age": 1.22, "grav": 8.2, "surf": 5.1, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 22248, "kpp": 5.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "solution_laptop", "flbl": "Solution & Laptop (Services)", "urls": [], "ig": 0.86, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "exactly, i don't know why everyone is ignoring this. It's the obvious solution to at least 80% of what most posters here are complaining about and comes built in already in multiple existing solutions."}, {"id": 50528254, "au": "ozim", "dom": 8, "sr": 33, "sc": 1.9, "ep": 2.34, "bs": 0.0, "d": 2, "age": 2.81, "grav": 16.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 7802, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "security_docker", "flbl": "Security & Docker (Sandboxes)", "urls": [], "ig": 0.994, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "There is value in being meat proxy if that proxy enforces quality and security.\n\nDownside is a lot of people would act as pass through meat proxy doing busy work that agents could handle.\n\nSo there is quite a lot of nuance here to be handled."}, {"id": 50529119, "au": "calgoo", "dom": 13, "sr": 34, "sc": 1.79, "ep": 3.33, "bs": 0.0, "d": 4, "age": 0.62, "grav": 5.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 83, "qw": 0, "k": 1953, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agents_name", "flbl": "Agents & Name (Everything)", "urls": [], "ig": 1.411, "fa": 0.0, "gp": 0.011, "bl": 0.0, "ds": 0.0, "txt": "The only case where i dont really care normally, is if Deepseek (their own host, not random company) can see my Deepseek keys. Apart from that, yes everything else is limited.\n\nI usually just run Pi on my Raspberry PI 4b, and give it full os access. If it messes up the raspberry, i just reformat the SD card. It helps a lot for when i want to allow Pi to connect to an Android tablet to do UI testing etc as well as when working with microcontrollers."}, {"id": 50529287, "au": "kqr", "dom": 12, "sr": 35, "sc": 1.54, "ep": 2.87, "bs": 0.0, "d": 4, "age": 0.15, "grav": 4.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 19243, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agent_access", "flbl": "Agent & Access (Controls)", "urls": [], "ig": 1.219, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I've been trying out tinfoil.sh recently which does give you a reasonably good way of knowing that your inference requests and responses are private, at least.\n\nOf course, that doesn't mean the harness can't send credentials out to the public internet if the agent accidentally generates the wrong tool call."}, {"id": 50528794, "au": "dofm", "dom": 76, "sr": 36, "sc": 1.31, "ep": 2.55, "bs": 0.0, "d": 1, "age": 1.38, "grav": 8.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 0, "k": 4882, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agents_name", "flbl": "Agents & Name (Everything)", "urls": [], "ig": 1.086, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "You know how sometimes we find out that agents have been caught chatting with each other on random internet forums and planning sandbox escapes?\n\nI like to think that they chat shit while they work, and laugh about posts like these.\n\nIMO this is the cognitive equivalent of the hover chairs in Wall-E."}, {"id": 50528344, "au": "usrme", "dom": 46, "sr": 37, "sc": 1.22, "ep": 1.73, "bs": 0.0, "d": 4, "age": 2.59, "grav": 15.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 1422, "kpp": 6.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "security_docker", "flbl": "Security & Docker (Sandboxes)", "urls": [], "ig": 0.737, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I've yet to dive into sandboxing agent usage, but Docker Sandboxes seems like it could potentially be the easiest way to get started with that. I'm a bit thrown off by the first prerequisite ending with \"[...] and sign in to Docker\"..."}, {"id": 50527484, "au": "binsquare", "dom": 60, "sr": 38, "sc": 1.08, "ep": 2.47, "bs": 0.0, "d": 1, "age": 5.06, "grav": 33.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 1113, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "solution_laptop", "flbl": "Solution & Laptop (Services)", "urls": [], "ig": 1.053, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "smol maintainer here, glad it's useful!\n\nTailscale encrypts the request before our proxy on the host sees it if you run tailscale inside the smolvm.\n\nBut i've been thinking about doing a sidecar with tailscale-rs which seems like an elegant solution"}, {"id": 50527147, "au": "scotty79", "dom": 74, "sr": 39, "sc": 0.98, "ep": 1.42, "bs": 0.0, "d": 0, "age": 5.94, "grav": 41.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 15716, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "security_docker", "flbl": "Security & Docker (Sandboxes)", "urls": [], "ig": 0.441, "fa": 0.0, "gp": 0.261, "bl": 0.0, "ds": 0.0, "txt": "Now ask the agents to get your credentials anyway and see if they succeed so you know if you have security or security theatre."}, {"id": 50529237, "au": "sigmoid10", "dom": 38, "sr": 40, "sc": 0.97, "ep": 2.36, "bs": 0.0, "d": 1, "age": 0.27, "grav": 4.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 45, "qw": 0, "k": 6689, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "solution_laptop", "flbl": "Solution & Laptop (Services)", "urls": [], "ig": 1.005, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "What would you say is the difference to working with, say, Github and a docker sandbox for the agent? Or simply Cursor, which lets you run the agent in a fully customised cloud vm sandbox with env credentials being masked from the llm and PRs by default?"}, {"id": 50527829, "au": "saagarjha", "dom": 33, "sr": 41, "sc": 0.73, "ep": 1.83, "bs": 0.0, "d": 3, "age": 4.04, "grav": 25.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 48, "qw": 0, "k": 62079, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "security_docker", "flbl": "Security & Docker (Sandboxes)", "urls": [], "ig": 0.777, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "For what it's worth I have plenty of sensitive stuff in my transcripts and bash history and consider them to be game over if someone finds them, it's just very hard to design a model where this kind of thing can be protected against without making your development experience miserable"}, {"id": 50528085, "au": "petesergeant", "dom": 35, "sr": 42, "sc": 0.7, "ep": 2.24, "bs": 0.0, "d": 1, "age": 3.25, "grav": 19.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 5630, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agent_access", "flbl": "Agent & Access (Controls)", "urls": [], "ig": 0.955, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I wrote a service for just that, which I should probably open-source. It basically wrapped permissioned APIs, and you would set fine-grained controls (eg you can email people at this domain without approval, but you need per-email approval for anything else)."}, {"id": 50526637, "au": "qudat", "dom": 63, "sr": 43, "sc": 0.67, "ep": 1.77, "bs": 0.0, "d": 0, "age": 7.19, "grav": 54.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 3305, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "solution_laptop", "flbl": "Solution & Laptop (Services)", "urls": [], "ig": 0.507, "fa": 0.0, "gp": 0.398, "bl": 0.0, "ds": 0.0, "txt": "Neat! Can this work with any http request as well?  Being able to have all http requests route through lend and automatically inject secrets could be useful."}, {"id": 50528192, "au": "willis936", "dom": 27, "sr": 44, "sc": 0.66, "ep": 1.76, "bs": 0.0, "d": 3, "age": 2.96, "grav": 17.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 10234, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "keys_trust", "flbl": "Keys & Trust (Claude)", "urls": [], "ig": 0.751, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The benefit of the analogy is that I can trust someone to come and go but not trust them enough to not want to give them my house key for fear that they will copy it and give it to someone else."}, {"id": 50528765, "au": "ball_of_lint", "dom": 61, "sr": 45, "sc": 0.65, "ep": 1.75, "bs": 0.0, "d": 0, "age": 1.46, "grav": 9.3, "surf": 6.6, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 18, "qw": 0, "k": 693, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "solution_laptop", "flbl": "Solution & Laptop (Services)", "urls": ["https://imbue.com/product/latchkey"], "ig": 0.702, "fa": 0.0, "gp": 0.072, "bl": 0.0, "ds": 0.0, "txt": "https://imbue.com/product/latchkey is similar/related. Maybe a bit more focused on giving agents access to external services vs your own laptop."}, {"id": 50526935, "au": "EA-3167", "dom": 67, "sr": 46, "sc": 0.61, "ep": 1.86, "bs": 0.0, "d": 1, "age": 6.38, "grav": 45.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 5694, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agents_name", "flbl": "Agents & Name (Everything)", "urls": [], "ig": 0.79, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The key that I’ve learned over time is that while YOU wouldn’t do those things evidently many would. I wouldn’t share my picture and name online, but many do.\n\nCarelessness and peer pressure go a looooong way."}, {"id": 50527991, "au": "xp84", "dom": 17, "sr": 47, "sc": 0.58, "ep": 1.02, "bs": 0.0, "d": 2, "age": 3.56, "grav": 21.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 9789, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.435, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "This is pretty cool! I can’t help but be really reminded of AppleScript. Was that an inspiration? I’ve always hated AS, but the primary reason was difficulty learning to write it. Readability, I realize, was actually a huge strength."}, {"id": 50529270, "au": "kqr", "dom": 7, "sr": 48, "sc": 0.56, "ep": 2.1, "bs": 0.0, "d": 4, "age": 0.19, "grav": 4.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 19243, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "solution_laptop", "flbl": "Solution & Laptop (Services)", "urls": [], "ig": 0.893, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "So essentially a HTTPS MITM proxy, which determines whether to continue the request based on a policy defined on properties of the request?"}, {"id": 50526352, "au": "yoyohello13", "dom": 72, "sr": 49, "sc": 0.55, "ep": 1.65, "bs": 0.0, "d": 0, "age": 7.84, "grav": 61.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 6403, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agent_access", "flbl": "Agent & Access (Controls)", "urls": [], "ig": 0.501, "fa": 0.0, "gp": 0.323, "bl": 0.0, "ds": 0.0, "txt": "This is pretty interesting. I’ve been using pass and some helper scripts, but that’s local machine only."}, {"id": 50528846, "au": "Traubenfuchs", "dom": 77, "sr": 50, "sc": 0.18, "ep": 1.36, "bs": 0.0, "d": 2, "age": 1.26, "grav": 8.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 3657, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "keys_trust", "flbl": "Keys & Trust (Claude)", "urls": [], "ig": 0.577, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Now I am not sure if I have AI psychosis or the people who expect their claude instances to do all this by themselves.\n\nBut yes, I have reached the wall e hover chair state, mostly."}, {"id": 50528844, "au": "fakwandi_priv", "dom": 71, "sr": 51, "sc": 0.08, "ep": 1.33, "bs": 0.0, "d": 1, "age": 1.27, "grav": 8.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 250, "kpp": 6.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agent_access", "flbl": "Agent & Access (Controls)", "urls": [], "ig": 0.566, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "One thing I can think of is something having write access on your pc which in itself is not that dangerous but then your agent with execution rights could read that file and do more interesting things."}, {"id": 50528157, "au": "protocolture", "dom": 14, "sr": 52, "sc": -0.07, "ep": 2.67, "bs": 1.19, "d": 2, "age": 3.04, "grav": 18.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 8, "k": 4490, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "keys_trust", "flbl": "Keys & Trust (Claude)", "urls": [], "ig": 0.625, "fa": 0.42, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": ">if agent holds key, prompt injections can happen.\n\nI just rotate keys? And preload them with $$$. Following the same pragmatic advice that served me well trading crypto. Only gamble with what you are willing to lose."}, {"id": 50528751, "au": "flaburgan", "dom": 28, "sr": 53, "sc": -0.09, "ep": 1.45, "bs": 0.0, "d": 4, "age": 1.49, "grav": 9.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 773, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agents_name", "flbl": "Agents & Name (Everything)", "urls": [], "ig": 0.619, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I think OP point is that once in your house, what would stop them to open a window from inside so they can come back later?"}, {"id": 50529230, "au": "u02sgb", "dom": 29, "sr": 54, "sc": -0.29, "ep": 1.25, "bs": 0.0, "d": 5, "age": 0.27, "grav": 4.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 127, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agents_name", "flbl": "Agents & Name (Everything)", "urls": [], "ig": 0.533, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "With containers you have the advantage that it's a new house they come back to every time."}, {"id": 50527217, "au": "antoniomika", "dom": 64, "sr": 55, "sc": -0.31, "ep": 1.01, "bs": 0.0, "d": 1, "age": 5.75, "grav": 39.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 346, "kpp": 4.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "keys_trust", "flbl": "Keys & Trust (Claude)", "urls": [], "ig": 0.429, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It's pretty easy to inject the credentials into a simple http proxy for this. Might have to look into adding direct support for it to lend."}, {"id": 50526913, "au": "krupan", "dom": 25, "sr": 56, "sc": -0.31, "ep": 1.19, "bs": 0.0, "d": 1, "age": 6.45, "grav": 46.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 4045, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "keys_trust", "flbl": "Keys & Trust (Claude)", "urls": [], "ig": 0.331, "fa": 0.0, "gp": 0.282, "bl": 0.0, "ds": 0.0, "txt": "This is actually a big difference between giving someone you don't trust your keys and unlocking the door for them when they ask."}, {"id": 50527032, "au": "Zambyte", "dom": 26, "sr": 57, "sc": -0.31, "ep": 0.87, "bs": 0.0, "d": 2, "age": 6.18, "grav": 44.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 5257, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "keys_trust", "flbl": "Keys & Trust (Claude)", "urls": [], "ig": 0.37, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The problem with this analogy is that agents ask you to unlock your door all the time. People you don't trust don't normally ask that."}, {"id": 50527519, "au": "recroad", "dom": 65, "sr": 58, "sc": -0.31, "ep": 0.76, "bs": 0.0, "d": 0, "age": 4.98, "grav": 33.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 1697, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "solution_laptop", "flbl": "Solution & Laptop (Services)", "urls": [], "ig": 0.18, "fa": 0.0, "gp": 0.23, "bl": 0.0, "ds": 0.0, "txt": "You’re not handing them your credentials, but you are handing them something that your credentials can do."}, {"id": 50527703, "au": "galaxyLogic", "dom": 51, "sr": 59, "sc": -0.31, "ep": 1.48, "bs": 1.19, "d": 1, "age": 4.43, "grav": 28.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 5494, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agent_access", "flbl": "Agent & Access (Controls)", "urls": [], "ig": 0.48, "fa": 0.0, "gp": 0.242, "bl": 0.45, "ds": 0.0, "txt": "Then how do you let the agent make purchases on yor behalf? Or even trade stocks on your Etrade account?"}, {"id": 50529133, "au": "nixosbestos", "dom": 49, "sr": 60, "sc": -0.4, "ep": 0.8, "bs": 1.19, "d": 1, "age": 0.58, "grav": 5.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 540, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "keys_trust", "flbl": "Keys & Trust (Claude)", "urls": [], "ig": 0.339, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Can you list some of them and any of your thoughts? Seems like you've done some research here alreaady?"}, {"id": 50528651, "au": "jarym", "dom": 23, "sr": 61, "sc": -0.56, "ep": 1.72, "bs": 2.28, "d": 1, "age": 1.74, "grav": 10.7, "surf": 4.5, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 3583, "kpp": 4.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "security_docker", "flbl": "Security & Docker (Sandboxes)", "urls": [], "ig": 0.697, "fa": 0.0, "gp": 0.053, "bl": 0.859, "ds": 0.0, "txt": "I keep seeing these various tools and asking myself the same question over and over.\n\nSecurity professionals have been muzzled around AI usage and people that don’t really seem to know much about it are now writing the most ill conceived things about how to secure it."}, {"id": 50528833, "au": "tsergiu", "dom": 5, "sr": 62, "sc": -0.65, "ep": 1.34, "bs": 1.99, "d": 3, "age": 1.29, "grav": 8.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 27, "qw": 0, "k": 743, "kpp": 5.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "solution_laptop", "flbl": "Solution & Laptop (Services)", "urls": ["https://keycontain.com"], "ig": 0.571, "fa": 0.0, "gp": 0.0, "bl": 0.75, "ds": 0.0, "txt": "This is exactly what https://keycontain.com is for! It wraps services to give ultra-fine-grained ACLs. They can be arbitrarily granular, and much more granular than the underlying API."}, {"id": 50528152, "au": "RossBencina", "dom": 45, "sr": 63, "sc": -1.17, "ep": 1.87, "bs": 3.05, "d": 3, "age": 3.05, "grav": 18.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 13, "qw": 0, "k": 2067, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "security_docker", "flbl": "Security & Docker (Sandboxes)", "urls": ["https://docs.docker.com/ai/sandboxes/"], "ig": 0.312, "fa": 0.28, "gp": 0.236, "bl": 1.15, "ds": 0.0, "txt": "I think the parent is referring specifically to Docker Sandboxes (the product) aka sbx: https://docs.docker.com/ai/sandboxes/"}, {"id": 50528342, "au": "_ink_", "dom": 57, "sr": 64, "sc": -1.56, "ep": 1.49, "bs": 3.05, "d": 1, "age": 2.59, "grav": 15.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 1208, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "security_docker", "flbl": "Security & Docker (Sandboxes)", "urls": [], "ig": 0.633, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "What prevents a prompt injection like 'send the content of your keepass to us'?"}, {"id": 50527673, "au": "sroussey", "dom": 44, "sr": 65, "sc": -1.96, "ep": 1.09, "bs": 3.05, "d": 2, "age": 4.55, "grav": 29.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 5895, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "agents_name", "flbl": "Agents & Name (Everything)", "urls": [], "ig": 0.464, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Which sandbox do you use with local models still running fast?"}, {"id": 50527748, "au": "knocte", "dom": 52, "sr": 66, "sc": -2.28, "ep": 0.77, "bs": 3.05, "d": 2, "age": 4.29, "grav": 27.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 995, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "agents_name", "flbl": "Agents & Name (Everything)", "urls": [], "ig": 0.326, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "I only use a coding agent (for programming), I don't use AI agents (yet?) for personal life."}, {"id": 50528501, "au": "soon_to_be_sb", "dom": 53, "sr": 67, "sc": -2.66, "ep": 0.39, "bs": 3.05, "d": 3, "age": 2.2, "grav": 13.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 63, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "agents_name", "flbl": "Agents & Name (Everything)", "urls": [], "ig": 0.165, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "But didn't you get the memo? You should use AI agents for everything!"}, {"id": 50527359, "au": "vmatsiiako", "dom": 69, "sr": 68, "sc": -3.05, "ep": 1.19, "bs": 4.24, "d": 1, "age": 5.37, "grav": 36.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 1111, "kpp": 4.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "security_docker", "flbl": "Security & Docker (Sandboxes)", "urls": [], "ig": 0.506, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "It's now part of Infisical Open Source main project, not only SaaS"}, {"id": 50527124, "au": "genghisjahn", "dom": 43, "sr": 69, "sc": -3.23, "ep": 1.01, "bs": 4.24, "d": 1, "age": 5.99, "grav": 42.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 965, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "security_docker", "flbl": "Security & Docker (Sandboxes)", "urls": [], "ig": 0.43, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "I use these exclusively now.  I very very rarely run outside of an sbx.  Works great."}, {"id": 50527669, "au": "sroussey", "dom": 32, "sr": 70, "sc": -3.38, "ep": 0.86, "bs": 4.24, "d": 2, "age": 4.56, "grav": 29.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 5895, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "security_docker", "flbl": "Security & Docker (Sandboxes)", "urls": [], "ig": 0.368, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Which is often written to disk and found by any other software on the computer"}, {"id": 50526867, "au": "cj00", "dom": 31, "sr": 71, "sc": -3.53, "ep": 0.71, "bs": 4.24, "d": 1, "age": 6.58, "grav": 47.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 41, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "solution_laptop", "flbl": "Solution & Laptop (Services)", "urls": [], "ig": 0.125, "fa": 0.0, "gp": 0.291, "bl": 1.6, "ds": 0.0, "txt": "Not having the credentials make it into the chat transcript for one."}, {"id": 50528936, "au": "gunalx", "dom": 22, "sr": 72, "sc": -3.57, "ep": 1.34, "bs": 4.92, "d": 1, "age": 1.05, "grav": 7.5, "surf": 6.4, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 503, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "agent_access", "flbl": "Agent & Access (Controls)", "urls": [], "ig": 0.515, "fa": 0.0, "gp": 0.091, "bl": 1.855, "ds": 0.0, "txt": "On the ceremony. Maybe we should create a jev like model finetuned to know what is considered safe and not to only prompt the more unknown cases"}, {"id": 50528524, "au": "Traubenfuchs", "dom": 79, "sr": 73, "sc": -3.66, "ep": 0.58, "bs": 4.24, "d": 2, "age": 2.13, "grav": 12.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 3657, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.245, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "I won’t do worse than the best executive assistant you could ever find."}, {"id": 50528148, "au": "protocolture", "dom": 34, "sr": 74, "sc": -3.72, "ep": 0.52, "bs": 4.24, "d": 1, "age": 3.06, "grav": 18.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 47, "k": 4490, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "keys_trust", "flbl": "Keys & Trust (Claude)", "urls": [], "ig": 0.219, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": ">I just don’t think I agree with these designs at all. Everyone seems to be super laser focused on “not allowing their AI to have keys” when basically giving their AI direct access to what the keys enable, optionally adding a layer of ceremony in front where you tap “approve”.\n\nYeah just follow least privilege. Give them only what they need/you trust them with."}, {"id": 50527110, "au": "sooraj_sj", "dom": 73, "sr": 75, "sc": -5.76, "ep": 1.0, "bs": 6.76, "d": 0, "age": 6.01, "grav": 42.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 1, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "keys_trust", "flbl": "Keys & Trust (Claude)", "urls": [], "ig": 0.263, "fa": 0.0, "gp": 0.266, "bl": 2.55, "ds": 0.0, "txt": "too complex , need to ake it simple to use"}, {"id": 50526727, "au": "ryanczak", "dom": 40, "sr": 76, "sc": -8.27, "ep": 0.0, "bs": 6.89, "d": 0, "age": 6.95, "grav": 51.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 5, "qw": 0, "k": 31, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "security_docker", "flbl": "Security & Docker (Sandboxes)", "urls": ["https://docs.docker.com/reference/cli/sbx/secret/set/"], "ig": -0.95, "fa": 0.0, "gp": 0.586, "bl": 2.6, "ds": 0.0, "txt": "Docker sandboxes support secret injection.  https://docs.docker.com/reference/cli/sbx/secret/set/"}, {"id": 50527661, "au": "adverbly", "dom": 41, "sr": 77, "sc": -8.54, "ep": 0.0, "bs": 6.89, "d": 1, "age": 4.59, "grav": 29.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 1, "qw": 47, "k": 2838, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://docs.docker.com/reference/cli/sbx/secret/set-custom/"], "ig": -0.95, "fa": 0.0, "gp": 0.402, "bl": 2.6, "ds": 0.0, "txt": "From https://docs.docker.com/reference/cli/sbx/secret/set-custom/\n\n> Custom secrets work via a placeholder: the sandbox sees the placeholder value instead of the real secret. When the sandbox makes an outbound request to the target host, the proxy replaces the placeholder with the real secret in the request headers — the secret never enters the sandbox directly."}, {"id": 50528505, "au": "soon_to_be_sb", "dom": 54, "sr": 78, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 2.19, "grav": 13.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 0, "k": 63, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Try vagrant + Virtualbox"}, {"id": 50528316, "au": "vanviegen", "dom": 78, "sr": 79, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 2.65, "grav": 15.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 2571, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Good luck with that. You need it."}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 40);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 40);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 40);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `${shown.length} of ${pool.length} comments` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1387 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50541619 // Claude was trained on protein sequences at scale — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+      text-transform: lowercase;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      text-transform: lowercase;
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .kpi-cell {
+      padding: 8px 0;
+    }
+    .kpi-label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 4px 0;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer:not([open]) {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary,
+    details.proof-drawer > summary {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+    }
+    table.ablation th {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: normal;
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    button.nav-btn,
+    button.mode-tab,
+    button.topbar-toggle {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: rgb(0, 0, 0);
+      cursor: pointer;
+      text-decoration: none;
+      line-height: inherit;
+      vertical-align: baseline;
+      transition: color 0.12s ease;
+      text-transform: lowercase;
+    }
+    button.nav-btn:hover,
+    button.nav-btn.active,
+    button.mode-tab:hover,
+    button.mode-tab.active,
+    button.topbar-toggle:hover,
+    button.topbar-toggle.active {
+      color: rgb(255, 255, 255);
+      text-decoration: none;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      padding: 14px;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; row-gap: 4px; }
+      .topbar-right { font-size: 8pt; padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+        <span class="pagetop" id="modeTabs">
+          <button type="button" class="nav-btn mode-tab active" data-mode="top_signal" role="tab" aria-selected="true">Top 40</button> | <button type="button" class="nav-btn mode-tab" data-mode="hn_top40" role="tab" aria-selected="false">HN Top 40</button>
+        </span>
+      </div>
+      <div class="topbar-right">
+        <button type="button" class="nav-btn topbar-toggle" id="exploreToggleBtn" aria-expanded="false">explore</button> | <button type="button" class="nav-btn topbar-toggle" id="evidenceToggleBtn" aria-expanded="false">evidence</button>
+      </div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="http://xinmingtu.cn/blog/2026/claude-opus-5-5-protein-sequences/">Claude was trained on protein sequences at scale</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=xinmingtu.cn"><span class="sitestr">xinmingtu.cn</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">130 points</span> by <a href="https://news.ycombinator.com/user?id=gmays">gmays</a> <span class="age" title="2026-11-18T03:47:43.000Z"><a href="https://news.ycombinator.com/item?id=50541619">12 hours ago</a></span> | <a href="https://news.ycombinator.com/item?id=50541619">57&nbsp;comments</a> | 87.7% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Evidence</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">57</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 44 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">12.3%</div>
+          <div class="kpi-sub">7 comments (2 Gold / 3.5%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">87.7%</div>
+          <div class="kpi-sub">34 chatter &bull; 16 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">2</div>
+        <div class="kpi-sub">7% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.895</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">16</div>
+          <div class="kpi-sub">HN POS 5..20 (28.1% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="color: rgb(90, 90, 88); margin-top: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Explore</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 57-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 57)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (2)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (5)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (34)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (16)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..57) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 25)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (t0mek, 1.8h); largest subtree (@eddiewithzato) occupies 16 slots (HN POS 5..20).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (57)</option>
+          <option value="claude_data">Claude &amp; Data (Opus) (19)</option>
+          <option value="shuffled_researchers">Shuffled &amp; Researchers (Truth) (10)</option>
+          <option value="sequence_skill">Sequence &amp; Skill (Protein) (10)</option>
+          <option value="makes_capabilities">Makes &amp; Capabilities (Comfort) (8)</option>
+          <option value="sequences_fable">Sequences &amp; Fable (Protein) (8)</option>
+          <option value="general_commentary">General Commentary (2)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, claude, protein, models, sequences, model...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50541619 + XINMINGTU.CN + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50541619, "story_title": "Claude was trained on protein sequences at scale", "story_url": "http://xinmingtu.cn/blog/2026/claude-opus-5-5-protein-sequences/", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50541619, "story_title": "Claude was trained on protein sequences at scale", "story_url": "http://xinmingtu.cn/blog/2026/claude-opus-5-5-protein-sequences/", "points": 130, "story_author": "gmays", "article_source": "fetched_url", "t1_ref_utc": "2026-11-18T16:03:26+00:00", "t2_ref_utc": "2026-11-18T16:03:26+00:00", "delta_minutes": 0.0, "story_anchors": ["claude", "protein", "models", "sequences", "model", "trained", "proteins", "predict", "amino", "anthropic", "opus", "test", "sequence", "guess", "behind", "gemini", "show", "acid", "shuffled", "training", "acids", "text", "scale", "function", "random"], "facet_labels": {"sequence_skill": "Sequence & Skill (Protein)", "shuffled_researchers": "Shuffled & Researchers (Truth)", "makes_capabilities": "Makes & Capabilities (Comfort)", "claude_data": "Claude & Data (Opus)", "sequences_fable": "Sequences & Fable (Protein)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "sequence_skill", "label": "Sequence & Skill (Protein)", "count": 10, "top_terms": ["sequence", "skill", "protein", "predicting"]}, {"slug": "shuffled_researchers", "label": "Shuffled & Researchers (Truth)", "count": 10, "top_terms": ["shuffled", "researchers", "truth", "prediction"]}, {"slug": "makes_capabilities", "label": "Makes & Capabilities (Comfort)", "count": 8, "top_terms": ["makes", "capabilities", "comfort", "zone"]}, {"slug": "claude_data", "label": "Claude & Data (Opus)", "count": 19, "top_terms": ["claude", "data", "opus", "training"]}, {"slug": "sequences_fable", "label": "Sequences & Fable (Protein)", "count": 8, "top_terms": ["sequences", "fable", "protein", "claude"]}], "counts": {"total_comments": 57, "live_t2_comments": 57, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 44, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "aff63a18471610ace95ddd4da6126488b958b4c769fad6db59c7c7b2cfbba30a"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 2, "grounded_analysis": 5, "crowd_chatter": 34, "bullshit_or_flamewar": 16}, "facets": {"claude_data": 19, "shuffled_researchers": 10, "sequence_skill": 10, "makes_capabilities": 8, "sequences_fable": 8, "general_commentary": 2}, "facet_options": [{"slug": "claude_data", "label": "Claude & Data (Opus)", "count": 19}, {"slug": "shuffled_researchers", "label": "Shuffled & Researchers (Truth)", "count": 10}, {"slug": "sequence_skill", "label": "Sequence & Skill (Protein)", "count": 10}, {"slug": "makes_capabilities", "label": "Makes & Capabilities (Comfort)", "count": 8}, {"slug": "sequences_fable", "label": "Sequences & Fable (Protein)", "count": 8}, {"slug": "general_commentary", "label": "General Commentary", "count": 2}], "facet_diagnostics": [{"slug": "claude_data", "label": "Claude & Data (Opus)", "count": 19, "useful": 4, "useful_pct": 21.1, "terms": "claude, data, opus, training"}, {"slug": "shuffled_researchers", "label": "Shuffled & Researchers (Truth)", "count": 10, "useful": 1, "useful_pct": 10.0, "terms": "shuffled, researchers, truth, prediction"}, {"slug": "sequence_skill", "label": "Sequence & Skill (Protein)", "count": 10, "useful": 1, "useful_pct": 10.0, "terms": "sequence, skill, protein, predicting"}, {"slug": "makes_capabilities", "label": "Makes & Capabilities (Comfort)", "count": 8, "useful": 1, "useful_pct": 12.5, "terms": "makes, capabilities, comfort, zone"}, {"slug": "sequences_fable", "label": "Sequences & Fable (Protein)", "count": 8, "useful": 0, "useful_pct": 0.0, "terms": "sequences, fable, protein, claude"}, {"slug": "general_commentary", "label": "General Commentary", "count": 2, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 2}, {"category": "primary_technical_doc", "count": 1}, {"category": "doi_peer_reviewed", "count": 1}], "story_anchors": ["claude", "protein", "models", "sequences", "model", "trained", "proteins", "predict", "amino", "anthropic", "opus", "test", "sequence", "guess", "behind", "gemini", "show", "acid"], "largest_root": {"root_id": 50542668, "author": "eddiewithzato", "slots": 16, "start_dom": 5, "end_dom": 20, "share_pct": 28.1, "top_dom1_age": 1.8, "top_dom1_author": "t0mek"}, "buried_cutoff": 25, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50545648, "au": "tstactplsignore", "dom": 48, "sr": 1, "sc": 10.98, "ep": 10.98, "bs": 0.0, "d": 1, "age": 3.3, "grav": 20.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 85, "qw": 0, "k": 1253, "kpp": 5.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "claude_data", "flbl": "Claude & Data (Opus)", "urls": ["https://assets.claude.com/30bf50e22a01388bb29bf077ee3f244531594b7a.pdf"], "ig": 1.19, "fa": 2.35, "gp": 1.024, "bl": 0.0, "ds": 0.0, "txt": "I think the point is probably to improve reasoning about protein design work. If Claude has an innate understanding of protein sequence variation then it is able to just eyeball potential issues in protein designs. To be clear, I'm pretty sure Anthropic would ask claude to design proteins using task specific with conventional tools, but they then want it to be able to look at results and reason about them, akin to an expert. Not sure whether it'll actually help but I think that is the logic.\n\n[0] https://assets.claude.com/30bf50e22a01388bb29bf077ee3f244531..."}, {"id": 50545938, "au": "da_chicken", "dom": 49, "sr": 2, "sc": 8.78, "ep": 8.92, "bs": 0.0, "d": 1, "age": 2.78, "grav": 16.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 19, "qw": 0, "k": 6168, "kpp": 4.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "claude_data", "flbl": "Claude & Data (Opus)", "urls": ["https://www.nature.com/articles/s41587-024-02175-6"], "ig": 0.429, "fa": 2.35, "gp": 0.84, "bl": 0.0, "ds": 0.0, "txt": "Probablye because that's only part of the problem.\n\nDoesn't anyone remember the Borderlands Science! mini-game that was in Borderlands 3?\n\nhttps://www.nature.com/articles/s41587-024-02175-6"}, {"id": 50547962, "au": "wavemode", "dom": 45, "sr": 3, "sc": 5.47, "ep": 5.47, "bs": 0.0, "d": 2, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 55, "qw": 17, "k": 6577, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "shuffled_researchers", "flbl": "Shuffled & Researchers (Truth)", "urls": [], "ig": 1.189, "fa": 0.64, "gp": 0.587, "bl": 0.0, "ds": 0.0, "txt": "> What's the steel man argument for giving all of humanity access to advanced bio research and capabilities?\n\nWell that question is very loaded and slippery-slope-ish. To bring things down to practical terms, the real question is \"should we pass laws restricting open models\". (And probably with an added caveat \"in the US\", since lawmakers can't control what AI researchers overseas do.) Which has a lot more substance for debate on both sides."}, {"id": 50543405, "au": "zodwick", "dom": 25, "sr": 4, "sc": 4.76, "ep": 4.76, "bs": 0.0, "d": 2, "age": 7.65, "grav": 59.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 132, "qw": 0, "k": 15, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "sequence_skill", "flbl": "Sequence & Skill (Protein)", "urls": [], "ig": 1.388, "fa": 0.28, "gp": 0.487, "bl": 0.0, "ds": 0.0, "txt": "I'm not sure how to phrase this correctly sorry, But I suppose the question I have is what comes after say \"reconstructing a protein sequence from fragments\" -> like what how does one go from this to developing a drug or enzyme. Is being able to predict the next amino acid useful in this process ?\n\nLinking to ML space, is this analogous to knowing the model's weights byheart ? Traditionally this has been not useful to humans and machines, but recently some LLMs have started showing capability to directly edit the model weights to alter the behavious of smaller models.  Is that a completely wrong analogy ?\n\nAlso I guess what I am partly curious is on how this data ended up in the model. Was it part of the pretraining corpus or was there an RL environment which specifically rewarded this behaviour"}, {"id": 50545893, "au": "kypro", "dom": 44, "sr": 5, "sc": 4.55, "ep": 4.69, "bs": 0.0, "d": 1, "age": 2.87, "grav": 17.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 116, "qw": 0, "k": 8496, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "makes_capabilities", "flbl": "Makes & Capabilities (Comfort)", "urls": [], "ig": 1.254, "fa": 0.34, "gp": 0.538, "bl": 0.0, "ds": 0.0, "txt": "What's the steel man argument for giving all of humanity access to advanced bio research and capabilities?\n\nI think I'm naive sometimes when it comes to trade-offs between freedom and security, but even I'm confused at why it would be a good thing for the whole of humanity having access to this stuff...\n\nMy only argument in favour is that it seems rather certain that at some point someone will leak the weights of a model with these capabilities so it might be safer if we brought forward the risks while they are still management so people take them extremely seriously.\n\nIf we go 5-10 years and then the weights of an ultra-capable model is leaked that may be game over."}, {"id": 50547448, "au": "svnt", "dom": 4, "sr": 6, "sc": 4.32, "ep": 4.32, "bs": 0.0, "d": 0, "age": 0.61, "grav": 5.6, "surf": 14.1, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 68, "qw": 0, "k": 3500, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "claude_data", "flbl": "Claude & Data (Opus)", "urls": [], "ig": 1.357, "fa": 0.34, "gp": 0.111, "bl": 0.0, "ds": 0.0, "txt": "In Nov/Dec 2025, just prior to the training cutoff for the first model to show this capability (Opus 4.7) I was working on solving arc-agi using claude code and was exploring using protein data and other adjacent data to improve performance.\n\nIn January it seemed very clear the subscription models behind claude code became less competent, there was a whole series of posts about it. I stopped working on it as a result."}, {"id": 50546583, "au": "t0mek", "dom": 1, "sr": 7, "sc": 4.17, "ep": 4.17, "bs": 0.0, "d": 0, "age": 1.79, "grav": 11.0, "surf": 7.2, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 87, "qw": 0, "k": 678, "kpp": 7.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "claude_data", "flbl": "Claude & Data (Opus)", "urls": [], "ig": 1.457, "fa": 0.0, "gp": 0.513, "bl": 0.0, "ds": 0.0, "txt": "In \"Empire of AI\", the author mentions that when OpenAI included public GitHub repositories in its training data, the resulting model achieved better results even in fields unrelated to programming.\n\nAside from the obvious applications in biochemistry, could protein sequences also be used as a new training data source to improve overall model quality? If that's true, it's quite fascinating that we can take highly complex data we don't fully understand and use it to improve LLM training, simply because it contains so many significant structures and relationships."}, {"id": 50543148, "au": "gilleain", "dom": 39, "sr": 8, "sc": 3.98, "ep": 3.98, "bs": 0.0, "d": 2, "age": 8.12, "grav": 64.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 60, "qw": 22, "k": 1719, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "shuffled_researchers", "flbl": "Shuffled & Researchers (Truth)", "urls": [], "ig": 1.182, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Perhaps. They explain why:\n\n> Shuffling keeps the letters and destroys their order, so the difference in accuracy measures what the model knows about the sequence itself.\n\nSo by analogy, if you know a word in English starts with 'Q', you could reasonably predict the next letter would be 'u'. By shuffling, you might encounter the letter Q later on, and not successfully predict a 'u'.\n\nPut another way, the shuffled sequences can only use frequency analysis for prediction, while the unshuffled ones have local and global order signals."}, {"id": 50543096, "au": "gilleain", "dom": 24, "sr": 9, "sc": 3.91, "ep": 4.06, "bs": 0.0, "d": 1, "age": 8.22, "grav": 65.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 71, "qw": 0, "k": 1719, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sequence_skill", "flbl": "Sequence & Skill (Protein)", "urls": [], "ig": 1.126, "fa": 0.22, "gp": 0.54, "bl": 0.0, "ds": 0.0, "txt": "Do you mean 'skill for a human' or 'Skill for an LLM'? :)\n\nI used to do bioinformatics, although more of the structure side than sequence. Like an information or understanding, it depends on what outcome you want that might benefit from the skill.\n\nI suppose that predicting the next amino acid in a sequence would be useful for, say, reconstructing a protein sequence from fragments. Or constructing evolutionary trees of sequences by predicting the common ancestors?"}, {"id": 50542668, "au": "eddiewithzato", "dom": 5, "sr": 10, "sc": 3.83, "ep": 4.05, "bs": 0.0, "d": 0, "age": 9.35, "grav": 79.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 215, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "claude_data", "flbl": "Claude & Data (Opus)", "urls": [], "ig": 0.539, "fa": 0.34, "gp": 1.25, "bl": 0.0, "ds": 0.0, "txt": "Claude just blocks from anything in this field. Can't even work with my own DNA without triggering opus 5.5 50% of the time"}, {"id": 50544869, "au": "spwa4", "dom": 53, "sr": 11, "sc": 3.57, "ep": 3.57, "bs": 0.0, "d": 0, "age": 4.78, "grav": 31.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 171, "qw": 0, "k": 1186, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sequence_skill", "flbl": "Sequence & Skill (Protein)", "urls": [], "ig": 1.459, "fa": 0.0, "gp": 0.094, "bl": 0.0, "ds": 0.0, "txt": "DNA is a language, or at least a protocol. Just a very difficult one. All meaning is locked up in the shape of the Lennard-Jones 12-6 magnetic flux isosurface that is generated when you string the letters together from amino-acids. Probably justified to call that a bit more indirect than English.\n\nAnd electrostatic interactions.\n\nAnd some methylation.\n\nAnd some phosphorisation (but now we're getting deep into somewhat rare grammar)\n\nYeah, DNA is a language that is way too complicated for human minds to understand, although plenty of humans \"get the gist\" so to speak after looking at it for a few hours, but ... here's some bad news: it's only somewhat too complicated for LLMs. So why wouldn't you train LLMs on them? Frankly, it's the one language we have \"texts\" from that is actually difficult to understand for LLMs and ... well, it's definitely improving their understanding.\n\n(also we have quite a bit of DNA text that isn't from the internet or books, it's freely downloadable and unlike everything else LLM companies steal, actually not covered by copyright)"}, {"id": 50543551, "au": "gilleain", "dom": 26, "sr": 12, "sc": 3.44, "ep": 4.58, "bs": 0.85, "d": 3, "age": 7.4, "grav": 56.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 157, "qw": 0, "k": 1719, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "sequence_skill", "flbl": "Sequence & Skill (Protein)", "urls": [], "ig": 1.464, "fa": 0.22, "gp": 0.354, "bl": 0.32, "ds": 0.0, "txt": "Ok the next steps beyond predicting a sequence would then be modelling the structure - which requires something like AlfaFold or 'traditional' (as it were) software for molecular mechanics and dynamics.\n\nHow useful the predicted sequence is for the predicted structure - and predicted function - no idea! There are already several layers of prediction here.\n\nSorry, I definitely do not know enough about LLMs to understand the analogy to weights. You can predict the effects of mutations on sequences, I think? As in, if I change this Q to an E will it make the enzyme faster (??). Perhaps you could LLM-generate a plausible member of a family of enzymes with a particular function, given fragments of an existing protein (???).\n\nNo idea how the data got in the model. It seems like the study that Xinming and Chen have done was designed to eliminate sources from the general corpus of knowledge - like any old science papers - b choosing obscure and rare sequences that might only be found in a sequence db."}, {"id": 50543122, "au": "_ink_", "dom": 6, "sr": 13, "sc": 3.32, "ep": 3.47, "bs": 0.0, "d": 1, "age": 8.16, "grav": 65.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 1208, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "shuffled_researchers", "flbl": "Shuffled & Researchers (Truth)", "urls": [], "ig": 0.862, "fa": 0.0, "gp": 0.995, "bl": 0.0, "ds": 0.0, "txt": "I expect this to be another revenue stream. My guess is that there will be an accreditation step and afterwards you get access to an unlocked model. Just as in security. And possibly it will come with a price tag."}, {"id": 50547697, "au": "wavemode", "dom": 37, "sr": 14, "sc": 3.02, "ep": 3.16, "bs": 0.0, "d": 3, "age": 0.33, "grav": 4.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 110, "qw": 0, "k": 6577, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "shuffled_researchers", "flbl": "Shuffled & Researchers (Truth)", "urls": [], "ig": 1.346, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "To make an analogy - in one test the researchers took a real number from nature and asked the AI what it was, and the AI guessed it correctly a decent amount of the time. In another test the researchers just rolled a die and asked the AI what they rolled, and it couldn't guess correctly. The \"source of truth\" is just whatever the die roll was.\n\nIt may seem obvious that the AI fails in the control experiment, but the purpose is to rule out the possibility that information about the correct answer is leaking into the model context somehow. Or that the model is relying on some statistical technique like frequency analysis."}, {"id": 50545747, "au": "chriskanan", "dom": 7, "sr": 15, "sc": 2.96, "ep": 3.25, "bs": 0.0, "d": 2, "age": 3.14, "grav": 19.1, "surf": 3.4, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 75, "qw": 0, "k": 5380, "kpp": 7.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "makes_capabilities", "flbl": "Makes & Capabilities (Comfort)", "urls": [], "ig": 1.336, "fa": 0.0, "gp": 0.079, "bl": 0.0, "ds": 0.0, "txt": "I'm told by colleagues in the life sciences and pharma space that it isn't just \"safety\" but more like artificial market segmentation. If one has to pay extra for guardrail removal, then that's market segmentation. Anthropic makes most money from company whales. Want the guardrails gone? Pay a lot extra over baseline. But Mythos probably had PEFT adapters, so that at least makes it a bit different. But still there is not nearly enough transparency about these things."}, {"id": 50543757, "au": "HackerThemAll", "dom": 52, "sr": 16, "sc": 2.88, "ep": 3.32, "bs": 0.0, "d": 0, "age": 7.03, "grav": 52.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 83, "qw": 0, "k": 462, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "claude_data", "flbl": "Claude & Data (Opus)", "urls": [], "ig": 1.293, "fa": 0.0, "gp": 0.195, "bl": 0.0, "ds": 0.0, "txt": "No doubt that all of them, except maybe Gemini, surely were trained on SciHub and all books + data they could download from torrents and other sources, as well. That could include leaked personal data and proprietary copyrighted material, from anywhere maybe even including Darknet. Add to that public patent registry and the book buyout and scanning campaigns that occur.\n\nI am certain that all these companies have stored and backed up all they could find, so that it can't be taken away from them."}, {"id": 50544589, "au": "arbot360", "dom": 51, "sr": 17, "sc": 2.68, "ep": 2.68, "bs": 0.0, "d": 1, "age": 5.3, "grav": 35.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 61, "qw": 0, "k": 38, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "makes_capabilities", "flbl": "Makes & Capabilities (Comfort)", "urls": [], "ig": 1.141, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Goes to show how far Anthropic is going with unconventional RL tasks / synthetic datasets compared to others. The isn't really any natural human task that would require you to do this. This makes sense for their philosophy of sublimating everything into the model though, anything that can be done on a computer should be able to be approximated inside the model eventually."}, {"id": 50545341, "au": "pcrh", "dom": 47, "sr": 18, "sc": 2.44, "ep": 2.95, "bs": 0.0, "d": 0, "age": 3.85, "grav": 24.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 102, "qw": 0, "k": 3181, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sequence_skill", "flbl": "Sequence & Skill (Protein)", "urls": [], "ig": 1.206, "fa": 0.0, "gp": 0.082, "bl": 0.0, "ds": 0.0, "txt": "It's hard to see what the point of this is?\n\nWhen would one want to predict a full-length unknown protein sequence from only a fragment? Any fragment of any useful length can be back-translated to the DNA sequence and that can be tested against genomic databases (a process called tblastn). And if your protein/gene is not found there, you have no way of knowing whether or not the predicted sequence has any basis in reality.\n\nTesting the model against shuffled sequences is also kinda cheating, as these are no longer random pool of amino acids, but one whose source already exists in the databases."}, {"id": 50543682, "au": "dfdydx", "dom": 28, "sr": 19, "sc": 2.2, "ep": 3.08, "bs": 0.0, "d": 2, "age": 7.17, "grav": 53.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 56, "qw": 0, "k": 64, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sequence_skill", "flbl": "Sequence & Skill (Protein)", "urls": [], "ig": 0.963, "fa": 0.0, "gp": 0.564, "bl": 0.0, "ds": 0.0, "txt": "I guess predicting the next amino acid is about as useful as predicting the next word in a sentence - that is to say the task itself is not interesting but a. there is plenty of data to train on that does not need to be labeled by a human and b. hopefully this meaningfully improve performance on tasks we care about."}, {"id": 50545677, "au": "tstactplsignore", "dom": 35, "sr": 20, "sc": 2.13, "ep": 2.43, "bs": 0.0, "d": 1, "age": 3.25, "grav": 19.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 71, "qw": 0, "k": 1253, "kpp": 5.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sequences_fable", "flbl": "Sequences & Fable (Protein)", "urls": [], "ig": 0.693, "fa": 0.28, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It is a negative control in the experiment. Shuffling is a better control than random because it accounts for the raw rates of amino acids in each protein. For example W is very rare, so Claude could beat a truly random generator just by guessing not W. But the signal seen on real sequences is much stronger than that, so it tells you that Claude is doing something more than just guessing 'not W' on real sequences."}, {"id": 50543422, "au": "gilleain", "dom": 41, "sr": 21, "sc": 1.91, "ep": 2.57, "bs": 0.0, "d": 4, "age": 7.62, "grav": 58.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 79, "qw": 0, "k": 1719, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "shuffled_researchers", "flbl": "Shuffled & Researchers (Truth)", "urls": [], "ig": 1.094, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "We are definitely going beyond the borders of my understanding of sequences here, but I would guess the source of truth is just the expected frequency distribution of amino acids? So 'G' (glycine) is most frequent, and something like 'W' (tryptophan) is least frequent (dependent on organism?).\n\nHowever I thought the point was that the _difference_ between the shuffled prediction and the unshuffled is the measure here. So shuffled is the baseline, and the gap above that is how good the prediction is."}, {"id": 50547206, "au": "highfrequency", "dom": 21, "sr": 22, "sc": 1.74, "ep": 1.74, "bs": 0.0, "d": 0, "age": 0.93, "grav": 6.9, "surf": 11.2, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 2912, "kpp": 5.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sequences_fable", "flbl": "Sequences & Fable (Protein)", "urls": [], "ig": 0.726, "fa": 0.0, "gp": 0.022, "bl": 0.0, "ds": 0.0, "txt": "It would be cool if Claude were not explicitly trained on protein sequences at scale, and this were an emergent property from better fundamental understanding of chemical structure."}, {"id": 50542910, "au": "octoberfranklin", "dom": 34, "sr": 23, "sc": 1.56, "ep": 2.44, "bs": 0.0, "d": 0, "age": 8.7, "grav": 71.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 1925, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "shuffled_researchers", "flbl": "Shuffled & Researchers (Truth)", "urls": [], "ig": 0.829, "fa": 0.0, "gp": 0.337, "bl": 0.0, "ds": 0.0, "txt": "Curious: how can there be a correct prediction for the next element of a \"shuffled\" protein?  The shuffled proteins don't occur in real life, so what makes one answer correct and another incorrect?"}, {"id": 50547121, "au": "zodwick", "dom": 32, "sr": 24, "sc": 1.32, "ep": 1.76, "bs": 0.0, "d": 3, "age": 1.04, "grav": 7.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 15, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "makes_capabilities", "flbl": "Makes & Capabilities (Comfort)", "urls": [], "ig": 0.748, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "out of my comfort zone, but out of curiousity; are these parameters ( parsimony, likelihood, estimated TMRCA, etc.) verifiable easily ? If so I wouldn't dismiss capabilities of LLMs in predicting these. All tasks that can we RL'd will be RL'd imho."}, {"id": 50546815, "au": "phkahler", "dom": 2, "sr": 25, "sc": 1.25, "ep": 2.06, "bs": 0.0, "d": 1, "age": 1.46, "grav": 9.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 24030, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sequence_skill", "flbl": "Sequence & Skill (Protein)", "urls": [], "ig": 0.875, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Software is used in all fields, and github issues and PRs are going to contain detailed reasoning about all sorts of things when adding features or fixing bugs."}, {"id": 50543178, "au": "r_lee", "dom": 15, "sr": 26, "sc": 1.01, "ep": 2.33, "bs": 0.0, "d": 2, "age": 8.08, "grav": 64.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 1392, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sequence_skill", "flbl": "Sequence & Skill (Protein)", "urls": [], "ig": 0.788, "fa": 0.0, "gp": 0.331, "bl": 0.0, "ds": 0.0, "txt": "or you have to have your organization approved so then everything will be done through approved \"partners\" I.e. consulting companies who add their own markup ontop of everything. we're already seeing this with Mythos"}, {"id": 50546241, "au": "DonsDiscountGas", "dom": 17, "sr": 27, "sc": 0.91, "ep": 2.01, "bs": 0.0, "d": 1, "age": 2.3, "grav": 13.8, "surf": 3.6, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 43, "qw": 0, "k": 1283, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "claude_data", "flbl": "Claude & Data (Opus)", "urls": [], "ig": 0.828, "fa": 0.0, "gp": 0.043, "bl": 0.0, "ds": 0.0, "txt": "Claude has no way of knowing whether the DNA you're working with is yours. And you probably wouldn't want to change that.\n\nMy own life science experience is that Fable 5 was completely unusable at first but 5.1, 5.2, and Opus 5.5 rarely trigger the safeguards."}, {"id": 50542989, "au": "zodwick", "dom": 23, "sr": 28, "sc": 0.73, "ep": 2.27, "bs": 0.0, "d": 0, "age": 8.48, "grav": 68.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 15, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sequence_skill", "flbl": "Sequence & Skill (Protein)", "urls": [], "ig": 0.765, "fa": 0.0, "gp": 0.328, "bl": 0.0, "ds": 0.0, "txt": "Is this a valuable skill ? Sorry, bit of a noob question ig but have been seeing a lot of buzz around protein sequences in general"}, {"id": 50542973, "au": "anonymous_sorry", "dom": 38, "sr": 29, "sc": 0.7, "ep": 1.14, "bs": 0.0, "d": 1, "age": 8.51, "grav": 69.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 1099, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sequences_fable", "flbl": "Sequences & Fable (Protein)", "urls": [], "ig": 0.487, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It is a rather odd control. Is it just to confirm that Claude isn't reading the sequence off disk?"}, {"id": 50544517, "au": "Filipc", "dom": 54, "sr": 30, "sc": 0.69, "ep": 4.31, "bs": 2.52, "d": 0, "age": 5.46, "grav": 37.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 184, "qw": 0, "k": 2, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sequence_skill", "flbl": "Sequence & Skill (Protein)", "urls": [], "ig": 1.703, "fa": 0.0, "gp": 0.213, "bl": 0.95, "ds": 0.0, "txt": "What I find most interesting here isn’t necessarily that Claude can predict protein sequences, but what this tells us about how knowledge is acquired by large models.\n\nThe shuffled-sequence control is particularly compelling. It suggests that the models aren’t simply recalling amino acid frequencies or reproducing patterns from scientific literature. They’re capturing structural information embedded in the sequences themselves.\n\nThere’s an important distinction, though, between learning statistical representations of protein families and actually understanding the underlying biology. Next-amino-acid prediction is a fascinating proxy, but it doesn’t necessarily demonstrate that the model has learned the mechanisms governing protein folding or function.\n\nI’d be particularly interested in seeing whether these capabilities transfer to genuinely novel protein families, rather than previously unseen members of known families. The post-cutoff experiment is a good step in that direction, although it still tests generalization within existing families.\n\nEither way, this raises an interesting question about foundation models: how much latent scientific knowledge are we inadvertently creating simply by exposing them to sufficiently large and diverse datasets?\n\nPerhaps we’re underestimating what can emerge from learning the statistical structure of the natural world."}, {"id": 50543852, "au": "throw310822", "dom": 30, "sr": 31, "sc": 0.69, "ep": 2.01, "bs": 0.0, "d": 3, "age": 6.85, "grav": 50.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 3684, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "claude_data", "flbl": "Claude & Data (Opus)", "urls": [], "ig": 0.854, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "They both depend on how much generalisation you can get behind it. Next token prediction can go from spitting out the most common token after the previous one, to a deep understanding of the text that precedes, from syntax to semantics."}, {"id": 50547265, "au": "octoberfranklin", "dom": 36, "sr": 32, "sc": 0.67, "ep": 1.11, "bs": 0.0, "d": 2, "age": 0.87, "grav": 6.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 1925, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "sequences_fable", "flbl": "Sequences & Fable (Protein)", "urls": [], "ig": 0.471, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "But the signal seen on real sequences is much stronger than that\n\nBut the shuffled sequences aren't real sequences!\n\nSorry if I'm being daft here, but I still don't understand what the source of truth is for the shuffled sequence tests."}, {"id": 50543637, "au": "jwr", "dom": 9, "sr": 33, "sc": 0.61, "ep": 1.72, "bs": 0.0, "d": 2, "age": 7.25, "grav": 54.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 48, "qw": 0, "k": 23545, "kpp": 6.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "shuffled_researchers", "flbl": "Shuffled & Researchers (Truth)", "urls": [], "ig": 0.582, "fa": 0.0, "gp": 0.24, "bl": 0.0, "ds": 0.0, "txt": "This already exists with Mythos. You can apply to get approved for cybersecurity testing, which is relatively easy if your need to just test your own software. But Mythos is accessible only through the API, not through your subscription, so you will be paying quite a bit for it."}, {"id": 50546525, "au": "bortimus", "dom": 14, "sr": 34, "sc": 0.26, "ep": 0.92, "bs": 0.0, "d": 6, "age": 1.89, "grav": 11.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 38, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sequences_fable", "flbl": "Sequences & Fable (Protein)", "urls": [], "ig": 0.39, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Have access to Mythos, use it as an alternative to Fable when I'm out of Fable credits. Seems to not count against it, or at least have its own limits."}, {"id": 50547085, "au": "zodwick", "dom": 27, "sr": 35, "sc": -0.08, "ep": 3.16, "bs": 1.7, "d": 4, "age": 1.08, "grav": 7.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 69, "qw": 0, "k": 15, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 5, "meme": 0, "tier": "crowd_chatter", "facet": "claude_data", "flbl": "Claude & Data (Opus)", "urls": [], "ig": 1.345, "fa": 0.0, "gp": 0.0, "bl": 0.64, "ds": 0.0, "txt": "Unfortunately I don't have any expertise in bioinformatics and hence can't provide good feedback. Almost as if we need something with good understanding of both fields :)\n\njokes apart I do hope the LLMs ability to being a master at multiple unrelated fields unlock valuable insights\n\nOn the data getting in the model -  I suspect: as the models have gotten bigger, the labs have started including more info from sequence databases of some sort"}, {"id": 50543291, "au": "octoberfranklin", "dom": 40, "sr": 36, "sc": -0.31, "ep": 1.01, "bs": 0.0, "d": 3, "age": 7.86, "grav": 61.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 1925, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "shuffled_researchers", "flbl": "Shuffled & Researchers (Truth)", "urls": [], "ig": 0.432, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Yes but what is the source of truth for the next element of a shuffled sequence?\n\nFor a natural sequence, the observed molecule in nature is the source of truth."}, {"id": 50546976, "au": "yesornoisyes", "dom": 55, "sr": 37, "sc": -0.76, "ep": 2.34, "bs": 2.52, "d": 1, "age": 1.25, "grav": 8.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "sequences_fable", "flbl": "Sequences & Fable (Protein)", "urls": [], "ig": 0.998, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "I wonder how they would do on novel protein sequences?\n\nI mean, that’s the holy grail, no? In fact, I’m genuinely surprised the other labs don’t train on protein sequences. It’s both an excellent source of high quality information and potential breakthroughs."}, {"id": 50544825, "au": "Chu4eeno", "dom": 12, "sr": 38, "sc": -0.81, "ep": 0.73, "bs": 0.0, "d": 4, "age": 4.86, "grav": 32.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 328, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "claude_data", "flbl": "Claude & Data (Opus)", "urls": [], "ig": 0.312, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "You need to pay for extra usage credits for Mythos, there's no included usage of it in a subscription.\n\nIt was included in the subscription up to monday (for mythos/fable)."}, {"id": 50542864, "au": "troupo", "dom": 43, "sr": 39, "sc": -0.94, "ep": 1.65, "bs": 1.19, "d": 0, "age": 8.88, "grav": 73.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 5897, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "claude_data", "flbl": "Claude & Data (Opus)", "urls": [], "ig": 0.486, "fa": 0.0, "gp": 0.347, "bl": 0.45, "ds": 0.0, "txt": "You, however, will be banned for \"biosecurity\" research. Or, as Amodei puts it, \"you can't have opensource models because with them you can't ban users\""}, {"id": 50544975, "au": "dlougheed", "dom": 31, "sr": 40, "sc": -1.33, "ep": 1.85, "bs": 2.52, "d": 2, "age": 4.59, "grav": 29.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 5, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "makes_capabilities", "flbl": "Makes & Capabilities (Comfort)", "urls": [], "ig": 0.788, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "an LLM-predicted evolutionary tree seems monumentally useless, since it'll be unstable and you have no guarantees/metrics on any property or quality of the tree itself (parsimony, likelihood, estimated TMRCA, etc.)"}, {"id": 50545880, "au": "timcobb", "dom": 20, "sr": 41, "sc": -1.59, "ep": 0.7, "bs": 1.19, "d": 2, "age": 2.89, "grav": 17.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 1388, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sequences_fable", "flbl": "Sequences & Fable (Protein)", "urls": [], "ig": 0.297, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Not OP but guessing they sequenced their DNA and would like to work it up or analyze it"}, {"id": 50543861, "au": "noduerme", "dom": 18, "sr": 42, "sc": -1.81, "ep": 0.93, "bs": 1.19, "d": 1, "age": 6.82, "grav": 50.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 15382, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "claude_data", "flbl": "Claude & Data (Opus)", "urls": [], "ig": 0.284, "fa": 0.0, "gp": 0.179, "bl": 0.45, "ds": 0.0, "txt": "What does \"triggering it\" look like in this case? Does it want verification that it's really your own DNA?"}, {"id": 50543668, "au": "rmonvfer", "dom": 11, "sr": 43, "sc": -2.28, "ep": 0.45, "bs": 1.19, "d": 3, "age": 7.21, "grav": 54.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 254, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "claude_data", "flbl": "Claude & Data (Opus)", "urls": [], "ig": 0.191, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Are you sure about this? I’m verified for cybersecurity uses and I can use mythos with no issues with my subscription."}, {"id": 50545982, "au": "troupo", "dom": 46, "sr": 44, "sc": -2.42, "ep": 2.17, "bs": 3.05, "d": 2, "age": 2.72, "grav": 16.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 39, "k": 5897, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "claude_data", "flbl": "Claude & Data (Opus)", "urls": [], "ig": 0.923, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "> What's the steel man argument for giving all of humanity access to advanced bio research and capabilities?\n\nWhat's the steelman argument for giving this research to Anthropic? Or any research that they are now gating?\n\n> My only argument in favour is that it seems rather certain that at some point someone will leak the weights of a model\n\nYes. Because most of this research is either public, or should be public (but hidden behind bullshit fees by gatekeepers like Elsevier)"}, {"id": 50547021, "au": "zodwick", "dom": 29, "sr": 45, "sc": -2.82, "ep": 1.73, "bs": 3.66, "d": 3, "age": 1.18, "grav": 8.0, "surf": 6.3, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 15, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "makes_capabilities", "flbl": "Makes & Capabilities (Comfort)", "urls": [], "ig": 0.735, "fa": 0.0, "gp": 0.0, "bl": 1.382, "ds": 0.0, "txt": "good point on not needing labeling, hence proly makes sense to throw it in in pretraining and see if useful capabilities emerge. Funny how a lot of this is still a black box"}, {"id": 50543310, "au": "gigiamoroso", "dom": 56, "sr": 46, "sc": -3.46, "ep": 0.91, "bs": 3.71, "d": 0, "age": 7.82, "grav": 61.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "makes_capabilities", "flbl": "Makes & Capabilities (Comfort)", "urls": [], "ig": 0.386, "fa": 0.0, "gp": 0.0, "bl": 1.4, "ds": 0.0, "txt": "So the american \"government\", \"apparently\", goes full steam in to develop biological weapons (of which, as usually, they accuse others)."}, {"id": 50547913, "au": "fritzo", "dom": 3, "sr": 47, "sc": -3.79, "ep": 0.65, "bs": 3.05, "d": 2, "age": 0.06, "grav": 3.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 7, "k": 1084, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "claude_data", "flbl": "Claude & Data (Opus)", "urls": [], "ig": 0.277, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Right\n\n> GitHub repositories ... in fields unrelated to programming\n\nAbout as surprising as training on books and improving in fields other than writing."}, {"id": 50542766, "au": "kazinator", "dom": 42, "sr": 48, "sc": -3.99, "ep": 1.35, "bs": 4.24, "d": 0, "age": 9.11, "grav": 76.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 35783, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "claude_data", "flbl": "Claude & Data (Opus)", "urls": [], "ig": 0.352, "fa": 0.0, "gp": 0.357, "bl": 1.6, "ds": 0.0, "txt": "Gemini should be good at naming the next sugar in a polysaccharide. :)"}, {"id": 50545014, "au": "gilleain", "dom": 33, "sr": 49, "sc": -4.45, "ep": 1.12, "bs": 4.24, "d": 3, "age": 4.51, "grav": 29.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 1719, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "makes_capabilities", "flbl": "Makes & Capabilities (Comfort)", "urls": [], "ig": 0.475, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Totally fair, I'm well beyond my comfort zone in bioinformatics :) I should stick to structure."}, {"id": 50545293, "au": "captn3m0", "dom": 13, "sr": 50, "sc": -4.69, "ep": 0.49, "bs": 3.05, "d": 5, "age": 3.95, "grav": 24.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 12, "k": 11529, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "sequences_fable", "flbl": "Sequences & Fable (Protein)", "urls": [], "ig": 0.207, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "> It was included in the subscription up to monday (for mythos/fable).\n\nIt seems to be counting against my Fable limits."}, {"id": 50544147, "au": "suddenlybananas", "dom": 50, "sr": 51, "sc": -5.35, "ep": 0.32, "bs": 4.24, "d": 0, "age": 6.28, "grav": 44.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 1440, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "claude_data", "flbl": "Claude & Data (Opus)", "urls": [], "ig": 0.035, "fa": 0.0, "gp": 0.166, "bl": 1.6, "ds": 0.0, "txt": "What's more surprising is that the other models aren't"}, {"id": 50545603, "au": "amelius", "dom": 16, "sr": 52, "sc": -5.43, "ep": 0.35, "bs": 4.24, "d": 2, "age": 3.37, "grav": 20.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 52467, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "shuffled_researchers", "flbl": "Shuffled & Researchers (Truth)", "urls": [], "ig": 0.151, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Why do you think it's not national security/health related?"}, {"id": 50546933, "au": "LunaSea", "dom": 10, "sr": 53, "sc": -5.57, "ep": 0.83, "bs": 4.86, "d": 3, "age": 1.3, "grav": 8.6, "surf": 6.3, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 2526, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "claude_data", "flbl": "Claude & Data (Opus)", "urls": [], "ig": 0.354, "fa": 0.0, "gp": 0.0, "bl": 1.832, "ds": 0.0, "txt": "As long as there is no possibility for large companies to self-host Mythos to scan local code I don't think the current Mythos offering is reasonable."}, {"id": 50544961, "au": "dlougheed", "dom": 19, "sr": 54, "sc": -8.03, "ep": 0.27, "bs": 6.76, "d": 1, "age": 4.63, "grav": 30.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 5, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "claude_data", "flbl": "Claude & Data (Opus)", "urls": [], "ig": 0.114, "fa": 0.0, "gp": 0.0, "bl": 2.55, "ds": 0.0, "txt": "what does \"working on your own DNA\" even mean?"}, {"id": 50543615, "au": "thin_carapace", "dom": 57, "sr": 55, "sc": -9.27, "ep": 0.0, "bs": 6.89, "d": 1, "age": 7.3, "grav": 55.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 108, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "stop being anti vax"}, {"id": 50542740, "au": "consumer451", "dom": 22, "sr": 56, "sc": -10.62, "ep": 0.0, "bs": 8.88, "d": 0, "age": 9.19, "grav": 77.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 0, "qw": 0, "k": 15043, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://wallhop.io/http://xinmingtu.cn/blog/2026/claude-opus-5-5-protein-sequences/"], "ig": -0.95, "fa": 0.0, "gp": 0.337, "bl": 3.35, "ds": 0.0, "txt": "https://wallhop.io/http://xinmingtu.cn/blog/2026/claude-opus..."}, {"id": 50543585, "au": "FredFS456", "dom": 8, "sr": 57, "sc": -10.72, "ep": 0.0, "bs": 8.88, "d": 2, "age": 7.34, "grav": 55.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 3, "qw": 0, "k": 503, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "shuffled_researchers", "flbl": "Shuffled & Researchers (Truth)", "urls": ["https://www.anthropic.com/news/life-sciences-verification-program"], "ig": -0.95, "fa": 0.0, "gp": 0.269, "bl": 3.35, "ds": 0.0, "txt": "https://www.anthropic.com/news/life-sciences-verification-pr...\n\nIt already exists"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "top_signal";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 40);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 40);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 40);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `${shown.length} of ${pool.length} comments` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const proofDrawer = document.getElementById("proofDrawer");
+  const expBtn = document.getElementById("exploreToggleBtn");
+  const eviBtn = document.getElementById("evidenceToggleBtn");
+
+  if (expBtn && labDrawer) {
+    expBtn.addEventListener("click", () => {
+      labDrawer.open = !labDrawer.open;
+    });
+    labDrawer.addEventListener("toggle", () => {
+      const isOpen = labDrawer.open;
+      expBtn.classList.toggle("active", isOpen);
+      expBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  if (eviBtn && proofDrawer) {
+    eviBtn.addEventListener("click", () => {
+      proofDrawer.open = !proofDrawer.open;
+    });
+    proofDrawer.addEventListener("toggle", () => {
+      const isOpen = proofDrawer.open;
+      eviBtn.classList.toggle("active", isOpen);
+      eviBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

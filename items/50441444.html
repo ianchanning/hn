@@ -1,0 +1,1362 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50441444 // Generative AI uses more energy on non-English text — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      font: 700 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 16px;
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+    }
+    .kpi-cell {
+      padding: 16px 16px 14px;
+      border-right: 1px solid rgb(205, 205, 200);
+    }
+    .kpi-cell:last-child { border-right: 0; }
+    .kpi-label {
+      font: 600 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 8px 0 4px;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      font-size: 12px;
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 6px;
+      corner-shape: bevel;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(156, 166, 176);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      background: rgb(9, 11, 13);
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(180, 188, 196);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 58px;
+      border-left: 3px solid rgb(0, 230, 118);
+      font: 12px/19px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 38px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      border-bottom: 1px solid rgb(216, 216, 206);
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer > summary.hn-summary {
+      list-style: none;
+      cursor: pointer;
+      display: block;
+      padding: 2px 0;
+      margin: 0;
+      background: transparent;
+      border: 0;
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      user-select: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: rgb(255, 255, 253);
+      border: 1px solid rgb(13, 13, 13);
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+    }
+    table.ablation th {
+      background: rgb(236, 236, 231);
+      font: 700 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgb(60, 60, 58);
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 6px;
+      corner-shape: bevel;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-decoration: ;
+      text-transform: lowercase;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      border-width: 1px;
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      background: rgb(255, 255, 253);
+      font: 600 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { flex: 1; min-width: 220px; font-weight: 400; }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      border-top: 3px solid rgb(13, 13, 13);
+      padding-top: 14px;
+      margin-top: 36px;
+      font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        background: rgb(239, 239, 234);
+        border: 1px solid rgb(13, 13, 13);
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        font-size: 17px;
+        margin: 0;
+        white-space: normal;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        background: rgb(13, 13, 13);
+        color: rgb(247, 247, 245);
+        font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-] HIDE"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+] SHOW"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpi-cell { border-bottom: 1px solid rgb(205, 205, 200); }
+      .filter-bar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in {
+        width: 100%;
+        font-size: 16px;
+        padding: 8px 9px;
+      }
+      .filter-bar input.search-in {
+        grid-column: span 2;
+        width: 100%;
+        min-width: 0;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+      </div>
+      <div class="topbar-right">&nbsp;</div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://news.umich.edu/generative-ai-uses-more-energy-on-non-english-text/">Generative AI uses more energy on non-English text</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=news.umich.edu"><span class="sitestr">news.umich.edu</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">223 points</span> by <a href="https://news.ycombinator.com/user?id=DeepLogin">DeepLogin</a> <span class="age" title="2026-11-10T15:07:28.000Z"><a href="https://news.ycombinator.com/item?id=50441444">5 days ago</a></span> | <a href="https://news.ycombinator.com/flag?id=50441444">flag</a> | <a href="https://news.ycombinator.com/hide?id=50441444">hide</a> | <a href="https://hn.algolia.com/?query=Generative+AI+uses+more+energy+on+non-English+text&sort=byDate&dateRange=all&type=story" class="hnpast">past</a> | <a href="https://news.ycombinator.com/fave?id=50441444">favorite</a> | <a href="https://news.ycombinator.com/item?id=50441444">118&nbsp;comments</a>
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">01 // EVIDENCE</span>
+        <span class="sec-headline">83.9% bullshit</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">118</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 90 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">16.1%</div>
+          <div class="kpi-sub">19 comments (6 Gold / 5.1%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">83.9%</div>
+          <div class="kpi-sub">62 chatter &bull; 37 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">2</div>
+        <div class="kpi-sub">7% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.945</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">23</div>
+          <div class="kpi-sub">HN POS 19..41 (19.5% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="margin-top:10px;font:600 11px/1.5 ui-monospace,Menlo,monospace;color:rgb(70,70,68)"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">02 // EXPLORE</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p style="line-height:1.42;color:rgb(85,85,82);margin:12px 0 0">
+              Drag any weight to watch the 118-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 118)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (6)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (13)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (62)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (37)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..118) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 35)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (@esperent, 24.3h); largest subtree (@vova_hn2) occupies 23 slots (HN POS 19..41).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="modeSelect" class="sel-in" aria-label="Ranking view">
+          <option value="hn_top40">HN Top 40</option>
+          <option value="top_signal">Epistemic Top 50</option>
+          <option value="buried_gems">Buried Gems (HN POS &gt; 35)</option>
+          <option value="bullshit_traps">High-Karma / URL Traps Caught</option>
+          <option value="mod_morgue">Mod Rebukes &amp; Downvoted Morgue</option>
+          <option value="c5a_rescues">c5A Heterodox Rescues</option>
+        </select>
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (118)</option>
+          <option value="models_text">Models &amp; Text (Tokens) (30)</option>
+          <option value="bytes_tokens">Bytes &amp; Tokens (Utf-8) (28)</option>
+          <option value="llms_tokenizer">LLMS &amp; Tokenizer (Training) (23)</option>
+          <option value="languages_word">Languages &amp; Word (Texts) (17)</option>
+          <option value="decode_chinese">Decode &amp; Chinese (Tok) (13)</option>
+          <option value="general_commentary">General Commentary (7)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, text, ai, non-english, energy, generative...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50441444 + NEWS.UMICH.EDU + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50441444, "story_title": "Generative AI uses more energy on non-English text", "story_url": "https://news.umich.edu/generative-ai-uses-more-energy-on-non-english-text/", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50441444, "story_title": "Generative AI uses more energy on non-English text", "story_url": "https://news.umich.edu/generative-ai-uses-more-energy-on-non-english-text/", "points": 223, "story_author": "DeepLogin", "article_source": "fallback_metadata", "t1_ref_utc": "2026-11-15T13:52:37+00:00", "t2_ref_utc": "2026-11-15T13:52:37+00:00", "delta_minutes": 0.0, "story_anchors": ["text", "ai", "non-english", "energy", "generative", "interesting", "native", "obvious", "trained", "translation", "per", "llm", "llms", "translate", "training", "assume", "current", "done", "human", "impact", "makes", "users", "words", "input", "number"], "facet_labels": {"bytes_tokens": "Bytes & Tokens (Utf-8)", "decode_chinese": "Decode & Chinese (Tok)", "languages_word": "Languages & Word (Texts)", "llms_tokenizer": "LLMS & Tokenizer (Training)", "models_text": "Models & Text (Tokens)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "bytes_tokens", "label": "Bytes & Tokens (Utf-8)", "count": 28, "top_terms": ["bytes", "tokens", "utf-8", "character"]}, {"slug": "decode_chinese", "label": "Decode & Chinese (Tok)", "count": 13, "top_terms": ["decode", "chinese", "tok", "req"]}, {"slug": "languages_word", "label": "Languages & Word (Texts)", "count": 17, "top_terms": ["languages", "word", "texts", "german"]}, {"slug": "llms_tokenizer", "label": "LLMS & Tokenizer (Training)", "count": 23, "top_terms": ["llms", "tokenizer", "training", "weights"]}, {"slug": "models_text", "label": "Models & Text (Tokens)", "count": 30, "top_terms": ["models", "text", "tokens", "energy"]}], "counts": {"total_comments": 118, "live_t2_comments": 118, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 90, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "13200887b1f932f250d01cd501994044b632e02df9a4a973a3e82378e16b6027"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 6, "grounded_analysis": 13, "crowd_chatter": 62, "bullshit_or_flamewar": 37}, "facets": {"models_text": 30, "bytes_tokens": 28, "decode_chinese": 13, "languages_word": 17, "llms_tokenizer": 23, "general_commentary": 7}, "facet_options": [{"slug": "models_text", "label": "Models & Text (Tokens)", "count": 30}, {"slug": "bytes_tokens", "label": "Bytes & Tokens (Utf-8)", "count": 28}, {"slug": "llms_tokenizer", "label": "LLMS & Tokenizer (Training)", "count": 23}, {"slug": "languages_word", "label": "Languages & Word (Texts)", "count": 17}, {"slug": "decode_chinese", "label": "Decode & Chinese (Tok)", "count": 13}, {"slug": "general_commentary", "label": "General Commentary", "count": 7}], "facet_diagnostics": [{"slug": "models_text", "label": "Models & Text (Tokens)", "count": 30, "useful": 4, "useful_pct": 13.3, "terms": "models, text, tokens, energy"}, {"slug": "bytes_tokens", "label": "Bytes & Tokens (Utf-8)", "count": 28, "useful": 4, "useful_pct": 14.3, "terms": "bytes, tokens, utf-8, character"}, {"slug": "llms_tokenizer", "label": "LLMS & Tokenizer (Training)", "count": 23, "useful": 3, "useful_pct": 13.0, "terms": "llms, tokenizer, training, weights"}, {"slug": "languages_word", "label": "Languages & Word (Texts)", "count": 17, "useful": 4, "useful_pct": 23.5, "terms": "languages, word, texts, german"}, {"slug": "decode_chinese", "label": "Decode & Chinese (Tok)", "count": 13, "useful": 4, "useful_pct": 30.8, "terms": "decode, chinese, tok, req"}, {"slug": "general_commentary", "label": "General Commentary", "count": 7, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 11}, {"category": "doi_peer_reviewed", "count": 1}, {"category": "gov_legal", "count": 1}], "story_anchors": ["text", "ai", "non-english", "energy", "generative", "interesting", "native", "obvious", "trained", "translation", "per", "llm", "llms", "translate", "training", "assume", "current", "done"], "largest_root": {"root_id": 50498551, "author": "vova_hn2", "slots": 23, "start_dom": 19, "end_dom": 41, "share_pct": 19.5, "top_dom1_age": 24.3, "top_dom1_author": "esperent"}, "buried_cutoff": 35, "rescue_top_k": 24, "ablations": [], "tournament": [], "comments": [{"id": 50497064, "au": "NoahZuniga", "dom": 42, "sr": 1, "sc": 13.65, "ep": 13.65, "bs": 0.0, "d": 0, "age": 23.93, "grav": 350.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 71, "qw": 6, "k": 550, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": ["https://aclanthology.org/2026.emnlp-main.2113.pdf"], "ig": 1.385, "fa": 3.11, "gp": 1.057, "bl": 0.0, "ds": 0.0, "txt": "There's some interesting info here, but the presentation is pretty poor. The worst languages are where the AI gets confused and loops keeps repeating the same text a bunch of time.\n\nFrom the table on page 6 [1]\n\n> Token explosion. The sentence repeated 45 times.\n\nFigure 4/table 3 is pretty interesting. It shows that essentially all languages clustered at 0.1J/token, with a few outshots up to in some cases 4.8J/token.\n\nThey have 900 runs per language, so that's a pretty good sample size.\n\n[1]: https://aclanthology.org/2026.emnlp-main.2113.pdf"}, {"id": 50499228, "au": "Phemist", "dom": 22, "sr": 2, "sc": 12.27, "ep": 12.27, "bs": 0.0, "d": 3, "age": 19.8, "grav": 256.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 91, "qw": 0, "k": 1588, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": ["https://digital-strategy.ec.europa.eu/en/news/commission-welcomes-new-initiative-support-european-cultural-and-linguistic-diversity-artificial\u0023:~:text=Developed%20by%20the,large%20language%20models."], "ig": 1.456, "fa": 2.63, "gp": 0.932, "bl": 0.0, "ds": 0.0, "txt": "Ive always thought that Serbian is the worst off out of all European languages. Both cyrillic and latin script are widely used. Latin also has a naked variant, where all diacritics are left out (which is especially prevalent online). So all Serbian text is in a three-way split between these scripts.\n\nAlso, it is non-EU, so initiatives like [0] will only indirectly help with representation (Croatian being the same* language, but it does not use cyrillic script)\n\n* Contentious point maybe, but they are mutually intelligible with what would otherwise be considered only dialectical variations\n\n[0] https://digital-strategy.ec.europa.eu/en/news/commission-wel..."}, {"id": 50497505, "au": "scottcha", "dom": 43, "sr": 3, "sc": 10.45, "ep": 10.45, "bs": 0.0, "d": 0, "age": 22.98, "grav": 327.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 149, "qw": 0, "k": 1005, "kpp": 6.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "decode_chinese", "flbl": "Decode & Chinese (Tok)", "urls": [], "ig": 1.833, "fa": 1.23, "gp": 1.817, "bl": 0.0, "ds": 0.0, "txt": "I was able to pretty easily reproduce parts of this paper at Neuralwatt Cloud's SoA models where we do all our optimizations and pricing by energy.\n\nAccuracy uses the paper's strict \"\u0023\u0023\u0023\u0023 N\" parser and lenient fallback. acc is strict/lenient percent. len_cap is the number of responses truncated at the generation-length limit, not an energy cap. Each language has 50 responses.\n\n  nw-flash (DeepSeek V4.1 Flash 1017)\n  Language    J/req   xEN   tok/req   J/tok    acc       len_cap\n  English      23.4  1.00       174   0.134   100/100        0\n  Chinese      16.8  0.72       389   0.043     96/96        0\n  Russian      18.8  0.80       352   0.054     96/96        0\n  French       25.1  1.07       272   0.092     98/98        0\n  S. Pashto    69.2  2.96       752   0.092     92/92        1\n  Tigrinya     65.3  2.79      2299   0.028      0/76        8\n  Shan         98.5  4.21      2823   0.035     48/54       14\n  Tibetan      42.3  1.81      2227   0.019      0/76        9\n\n  nw-small (Qwen3.8-27B-FP8)\n  Language    J/req   xEN   tok/req   J/tok    acc       len_cap\n  English      62.2  1.00       300   0.207   100/100        0\n  Chinese     154.1  2.48       605   0.255     94/94        1\n  Russian     147.7  2.37       576   0.257     96/96        1\n  French      163.3  2.62       323   0.506     98/98        0\n  S. Pashto   777.2 12.49      1510   0.515     84/84        6\n  T"}, {"id": 50505143, "au": "rhdunn", "dom": 14, "sr": 4, "sc": 9.14, "ep": 9.14, "bs": 0.0, "d": 6, "age": 5.28, "grav": 35.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 330, "qw": 0, "k": 1410, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "epistemic_gold", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": ["https://ikriv.com/blog/?p=5322"], "ig": 1.54, "fa": 1.57, "gp": 0.722, "bl": 0.0, "ds": 0.0, "txt": "You may be right, but I'd need to see the data and analysis of the number of passes through each stage for the various languages.\n\nThe reason I think speculative decoding would scale the same is that the smaller predictive model has the same token behaviour as any other model compared to the other models. So the only savings would be if the smaller model can better predict more tokens for non-English compared with English such that the ratio of tokens between the two becomes the same or lower for the non-English language.\n\nFor Latin-script languages like Spanish I can see the smaller model predicting verb endings correctly, improving performance there. These languages have 1.5x-2x more tokens [1] so will need to be 1.5x-2x better than English in the speculative decoder for the performance of the non-English languages to be comparable.\n\nFor Han characters (Chinese and Japanese) it looks like the tokenizer is splitting the characters in the middle of UTF-8 byte sequences, at least in [1] where the number of tokens is larger than the number of Han characters. This would potentially make the paired tokens harder to predict by the smaller model. Given that there are ~2 Han tokens per English token the speculative decoding would need to be 2x better for Han than for English to make it perform the same compute energy wise.\n\nIf we assume that the smaller decoder model is perfect and th"}, {"id": 50497840, "au": "QuantumNomad_", "dom": 118, "sr": 5, "sc": 8.44, "ep": 8.44, "bs": 0.0, "d": 1, "age": 22.29, "grav": 311.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 182, "qw": 53, "k": 1459, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "languages_word", "flbl": "Languages & Word (Texts)", "urls": ["https://no.wikipedia.org/wiki/Menneskerettighetserkl%C3%A6ringen", "https://en.wikipedia.org/wiki/Universal_Declaration_of_Human_Rights"], "ig": 1.497, "fa": 1.32, "gp": 0.801, "bl": 0.0, "ds": 0.0, "txt": "> One of my favourite is \"Donaudampfschiffahrtsgesellschaftskapitän\" - the semi-literal translation is, sort of, a \"marine\" captain on the danube river, as part of an incorporation/company. See that wikipedia article, but don't buy it 100%, since nobody is really using that word anyway; it is just a demo of what monstrous word combinations may exist in german\n\nPeople keep saying that sort of thing but we have a similar thing in Norwegian where we are allowed to combine words to make a new “word”. But people who use other languages that don’t do this sort of combining of words misunderstand the (in)significance of combined words.\n\nTake for example menneskerettighetserklæringen. This is the name we use in Norwegian for the Universal Declaration of Human Rights. Menneskerettighetserklæringen, wow what a long and strange word right? No. It is formed from three words in sequence, “menneske” (human), “rettighet” (right), “erklæring” (declaration).\n\nIt’s just a quirk of Norwegian and German and other languages that do the same, that we consider that we should removing spaces between words like this. But there is no actual meaningful difference between a Norwegian saying hey guys we came up with this thing and we’re gonna call it “menneskerettighetserklæringen”, and an English speaker saying the same thing about the “Universal Declaration of Human Rights”. Only that we remove the space"}, {"id": 50498055, "au": "rhdunn", "dom": 9, "sr": 6, "sc": 8.15, "ep": 8.3, "bs": 0.0, "d": 2, "age": 21.88, "grav": 302.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 153, "qw": 0, "k": 1410, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": ["https://ikriv.com/blog/?p=5322", "https://medium.com/@programmerraja/how-your-llm-costs-5x-more-if-you-dont-speak-english-e65912a870e0"], "ig": 1.734, "fa": 1.24, "gp": 0.474, "bl": 0.0, "ds": 0.0, "txt": "The Anthropic and OAI APIs report token usage (input, output, and in some cases reasoning/thinking). The input tokens consist of the system prompt, the user input/messages, and any other context data.\n\nGiven the same model the only variable is the token count. The more tokens, the more passes through the LLM (to generate the next output token), the more energy used.\n\nIt's well known that non-English text consumes more tokens [1], [2] and thus more energy. This is due to two factors:\n\n1. Latin script languages having different character pairings to English and modified characters, including language features like modifying verbs for person/tense/etc. (e.g. Spanish);\n\n2. Non-Latin scripts that take more bytes to represent in UTF-8 and (esp. for ideographic and syllabic languages like Chinese, Japanese, and Korean) have lower common character pair sequences, meaning shorter tokens for those scripts and thus more tokens for a given text sequence.\n\n[1] https://ikriv.com/blog/?p=5322 \"LLM tokens and foreign languages\" (5 Aug 2025)\n\n[2] https://medium.com/@programmerraja/how-your-llm-costs-5x-mor..."}, {"id": 50499210, "au": "vova_hn2", "dom": 27, "sr": 7, "sc": 6.99, "ep": 7.14, "bs": 0.0, "d": 3, "age": 19.84, "grav": 257.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 77, "qw": 21, "k": 783, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "llms_tokenizer", "flbl": "LLMS & Tokenizer (Training)", "urls": ["https://claude.ai/share/da277189-f23a-4071-bd9f-2d75fe6aa779"], "ig": 1.423, "fa": 1.04, "gp": 0.574, "bl": 0.0, "ds": 0.0, "txt": "> It's just that byte pair encoding naturally favours English and other Latin languages because they are dominant in the training data.\n\nNot really, because I don't think anyone use the whole training dataset to train the tokenizer.\n\nFrom my brief (disclosure: claude-assisted [0]) internet search I learned that typically they use from tens to hundreds GB of data to train the tokenizer. Sometimes it is hand-curated, sometimes it is randomly sampled.\n\nOf course, you can deliberately choose how much text in each language do you include in the training set for the BPE and deliberately optimize for (or against) a specific language.\n\n[0] https://claude.ai/share/da277189-f23a-4071-bd9f-2d75fe6aa779"}, {"id": 50498111, "au": "scottcha", "dom": 45, "sr": 8, "sc": 6.98, "ep": 7.13, "bs": 0.0, "d": 2, "age": 21.79, "grav": 300.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 67, "qw": 0, "k": 1005, "kpp": 6.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "decode_chinese", "flbl": "Decode & Chinese (Tok)", "urls": [], "ig": 1.316, "fa": 0.95, "gp": 0.919, "bl": 0.0, "ds": 0.0, "txt": "We do use spec decode on all these models (I don't know if the paper is using that but I'm assuming not given the models listed) but not all these models have integrated spec decode stats in the responses. Turns out GLM 5.3 does though so here is a pass on that model.\n\n   Language      Accept   Tokens/step   0/3 steps   3/3 steps   Output tok/req\n   English       76.53%      3.296         9.4%        62.8%            549\n   Chinese       73.37%      3.201        11.3%        58.2%            754\n   Russian       73.88%      3.217        11.1%        58.5%            739\n   French        75.50%      3.265         9.8%        60.9%            631\n   S. Pashto     70.44%      3.113        12.9%        54.5%           1332\n   Tigrinya      79.72%      3.391         8.2%        67.8%           3643\n   Shan          75.64%      3.269        11.2%        63.0%           3675\n   Tibetan       74.67%      3.240        10.3%        60.2%           2857\n   Overall       75.75%      3.273        10.3%        62.2%           1772"}, {"id": 50497634, "au": "shevy-java", "dom": 117, "sr": 9, "sc": 6.85, "ep": 7.0, "bs": 0.0, "d": 0, "age": 22.73, "grav": 321.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 197, "qw": 0, "k": 2084, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "languages_word", "flbl": "Languages & Word (Texts)", "urls": ["https://de.wikipedia.org/wiki/Donaudampfschiffahrtsgesellschaftskapit%C3%A4n"], "ig": 1.526, "fa": 0.96, "gp": 0.466, "bl": 0.0, "ds": 0.0, "txt": "Well. German sucks. :)\n\n(Longer explanation though: I don't think german per se sucks, but\nenglish is in many ways much simpler than other languages, excluding\nthe fact that english has more words, e. g. more expressions in\ngeneral. German is more convoluted, you have \"der\", \"die\", \"das\";\nin english you just have \"the\". There are also super-long words\nin german; you don't have that in english usually. One of my\nfavourite is \"Donaudampfschiffahrtsgesellschaftskapitän\" - the\nsemi-literal translation is, sort of, a \"marine\" captain on the\ndanube river, as part of an incorporation/company. See that\nwikipedia article, but don't buy it 100%, since nobody is really\nusing that word anyway; it is just a demo of what monstrous\nword combinations may exist in german: https://de.wikipedia.org/wiki/Donaudampfschiffahrtsgesellsch...)\n\nSo I think the title should be \"more energy on more complex\nlanguages\", because I think this would be somewhat more correct;\nas well as most likely the fact, that there are more english texts\nthan non-english (singular) texts as example. You can see this on\nWikipedia, where the english wikipedia is miles ahead of most other\nlanguages too. More people use english and I bet there are more \nenglish texts too. And Generative AI will prefer english over other\nlanguages in general."}, {"id": 50501758, "au": "lifthrasiir", "dom": 30, "sr": 10, "sc": 6.63, "ep": 6.93, "bs": 0.0, "d": 3, "age": 15.18, "grav": 167.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 53, "qw": 0, "k": 14220, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": ["https://lifthrasiir.github.io/aqueous/"], "ig": 1.266, "fa": 0.9, "gp": 0.957, "bl": 0.0, "ds": 0.0, "txt": "I've done my own research on that as a part of my Aqueous [1] archiver, and the conclusion is that the inherent information entropy is about as same (CJK scripts, for example, compresses much better when they are turned into their native character encodings). So a script-aware tokenization should make that irrelevant.\n\n[1] https://lifthrasiir.github.io/aqueous/ (specifically wrt-recons-hangul codec)"}, {"id": 50498551, "au": "vova_hn2", "dom": 19, "sr": 11, "sc": 6.31, "ep": 6.75, "bs": 0.0, "d": 0, "age": 20.9, "grav": 280.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 82, "qw": 0, "k": 783, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": ["https://www.cartesia.ai/blog/from-tokens-to-bytes-part-1", "https://news.ycombinator.com/item?id=50278253"], "ig": 1.333, "fa": 0.9, "gp": 0.726, "bl": 0.0, "ds": 0.0, "txt": "I think that switching from fixed token sets to something like H-Nets [0] (discussed on HN [1]) can at least improve on this issue, if not solve it completely.\n\nBecause, right now the main issue is that some languages are tokenized much more efficiently than others and it is a zero sum game, since there are a limited number of tokens and by adding tokens that are needed for one language you will inevitably have to remove tokens for another language and therefore decrease efficiency for it.\n\n[0] https://www.cartesia.ai/blog/from-tokens-to-bytes-part-1\n\n[1] https://news.ycombinator.com/item?id=50278253"}, {"id": 50500020, "au": "raddan", "dom": 4, "sr": 12, "sc": 5.28, "ep": 5.57, "bs": 0.0, "d": 2, "age": 18.32, "grav": 226.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 128, "qw": 0, "k": 1287, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "llms_tokenizer", "flbl": "LLMS & Tokenizer (Training)", "urls": [], "ig": 1.616, "fa": 0.28, "gp": 0.675, "bl": 0.0, "ds": 0.0, "txt": "It's challenging to keep running experiments.  In a perfect world, we would run our experiments again and update the results.  But some experiments are expensive, and some experiments are inherently difficult to reproduce.  I have a paper nearing completion that involves interaction between trained (human) professionals and a model.  It was a logistical challenge to bring those people together (also, we had to pay them), and the roleplaying that we asked LLMs to do can't be done anymore--they refuse for safety reasons.  Stuff like this is pretty common.\n\nI am hopeful that we can eventually move to open weights models, but at the time we did the experiments, the open weights models did not have the capabilities we needed.  The ever-shifting sands of frontier models makes reproducibility difficult, and not just for scientists."}, {"id": 50497695, "au": "wongarsu", "dom": 101, "sr": 13, "sc": 5.23, "ep": 5.23, "bs": 0.0, "d": 3, "age": 22.6, "grav": 318.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 171, "qw": 0, "k": 33589, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "llms_tokenizer", "flbl": "LLMS & Tokenizer (Training)", "urls": [], "ig": 1.723, "fa": 0.0, "gp": 0.813, "bl": 0.0, "ds": 0.0, "txt": "I don't think the concept of natural language reasoning tokens is here to stay\n\nCurrent open source LLMs have an emergent structure where the first couple layers transform the input into some internal representation. Then the middle does multiple reasoning steps, and the end transforms it back to one output token. You can repeat the middle to get a stronger, slower model, so it is abstract reasoning. And Anthropic had a blog post about actually looking at what the middle does and mapping it back to concept for inspection\n\nWith that in mind, what's the point of reasoning tokens? They throw rich internal state away, for the benefit of inspectability and variable-length reasoning. But now that we understand the internal structure better we can dynamically vary how many loops the model spins through those middle layers, and still get enough insight into what's happening by decoding internal state. This takes some reengineering of model architecture and inference engines (especially to still get good batch performance), but the potential benefits seem to big to ignore"}, {"id": 50502765, "au": "anigbrowl", "dom": 68, "sr": 14, "sc": 5.18, "ep": 5.18, "bs": 0.0, "d": 1, "age": 13.08, "grav": 132.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 114, "qw": 0, "k": 101686, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "languages_word", "flbl": "Languages & Word (Texts)", "urls": [], "ig": 1.856, "fa": 0.0, "gp": 0.565, "bl": 0.0, "ds": 0.0, "txt": "I have not done the experiment, but got occupied by the same question a while back and spent a fair bit of time reading up on ablation and so on. Theoretical consensus seems to be that yes, different languages have different impact on reasoning capability. German linguistic structures were correlated with pure analytical ability, some Balkan languages with superior performance on classification tasks (because of a grammar that features 60 distinct noun declensions) and so on.\n\nIn other words, the reasoning required to fluently navigate particular linguistic structures si transferable to other domains, suggesting that native default and subsequent acquisition choices can have significant positive or negative impact on different cognitive tasks. These weren't exclusive to particular geographic regions."}, {"id": 50497622, "au": "sorenjan", "dom": 56, "sr": 15, "sc": 5.12, "ep": 5.12, "bs": 0.0, "d": 0, "age": 22.75, "grav": 322.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 78, "qw": 0, "k": 7730, "kpp": 4.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "languages_word", "flbl": "Languages & Word (Texts)", "urls": [], "ig": 1.229, "fa": 0.28, "gp": 0.989, "bl": 0.0, "ds": 0.0, "txt": "Doesn't this indicate that there's not a lot of transfer learning between languages? If the networks read a prompt, reason about it and then present the result, only the reading and writing part would differ between languages, and that should be a small part of the full energy use.\n\nIt would be interesting to see if it would make any difference if you posttrained with translations of the same texts, i.e. focusing on teaching the model to specifically translate concepts between languages."}, {"id": 50496999, "au": "PhilipRoman", "dom": 51, "sr": 16, "sc": 5.1, "ep": 5.1, "bs": 0.0, "d": 0, "age": 24.1, "grav": 354.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 0, "k": 1986, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "decode_chinese", "flbl": "Decode & Chinese (Tok)", "urls": [], "ig": 1.271, "fa": 0.34, "gp": 0.79, "bl": 0.0, "ds": 0.0, "txt": "I didn't read the full PDF, but at least in the linked article, I think the number of native speakers as a metric penalizes English (and French), making them look more efficient in the graphs. There are about 3x more non-native speakers than native, and vast amounts of training material has been written by them."}, {"id": 50505242, "au": "thundoe", "dom": 54, "sr": 17, "sc": 4.52, "ep": 4.52, "bs": 0.0, "d": 0, "age": 4.86, "grav": 32.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 47, "qw": 0, "k": 11, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": 1.354, "fa": 0.34, "gp": 0.255, "bl": 0.0, "ds": 0.0, "txt": "Old news, 2023. Not only more energy, but processing the same information is also more expensive and less precise for users in countries using non English text. The problem comes from researchers, tech and stolen web content being too English centric and biased by west world commercial opportunities"}, {"id": 50498306, "au": "scottcha", "dom": 47, "sr": 18, "sc": 4.45, "ep": 6.44, "bs": 1.7, "d": 4, "age": 21.37, "grav": 290.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 80, "qw": 0, "k": 1005, "kpp": 6.0, "td": 0.0, "mod": 0, "pp": 5, "meme": 0, "tier": "grounded_analysis", "facet": "decode_chinese", "flbl": "Decode & Chinese (Tok)", "urls": [], "ig": 0.981, "fa": 0.95, "gp": 0.985, "bl": 0.64, "ds": 0.0, "txt": "Yes it looks that way.  I pulled the energy data for GLM 5.3 as well just to check the core findings are roughly the same and they do seem to be so spec decode doesn't seem to have the same divergence as the prefill/decode energy (which is rougly a function of thinking/decode lenghts and less a property of individual tokens).\n\n  Language      Strict  Lenient   Cap   Tok/req     J/req    J/tok   Req x EN  Tok x EN  J/tok x EN\n   English        100%     100%     0      548.7    230.33   0.4198       1.00      1.00         1.00\n   Chinese         96%      96%     1      754.0    694.47   0.9210       3.02      1.37         2.19\n   Russian         96%      98%     2      738.8    592.15   0.8015       2.57      1.35         1.91\n   French         100%     100%     0      631.0   1101.84   1.7462       4.78      1.15         4.16\n   S. Pashto       88%      98%     6     1332.1    208.06   0.1562       0.90      2.43         0.37\n   Tigrinya        56%      62%    19     3642.9   1445.84   0.3969       6.28      6.64         0.95\n   Shan            44%      54%    27     3674.8   3791.59   1.0318      16.46      6.70         2.46\n   Tibetan          2%      70%    15     2856.9   5306.68   1.8575      23.04      5.21         4.42"}, {"id": 50497124, "au": "wongarsu", "dom": 3, "sr": 19, "sc": 3.87, "ep": 4.31, "bs": 0.0, "d": 1, "age": 23.79, "grav": 347.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 51, "qw": 0, "k": 33589, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": 1.358, "fa": 0.28, "gp": 0.221, "bl": 0.0, "ds": 0.0, "txt": "Is the publishing cycle this long? Those models were relevant 18 months ago\n\nWorking out the kinks in your methodology obviously takes some time. But is there any structural reason not to rerun the benchmarks on current models in the final stages before submission? Assuming the results generalize to those newer models"}, {"id": 50499791, "au": "juleiie", "dom": 105, "sr": 20, "sc": 3.82, "ep": 3.82, "bs": 0.0, "d": 0, "age": 18.8, "grav": 235.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 97, "qw": 0, "k": 104, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "llms_tokenizer", "flbl": "LLMS & Tokenizer (Training)", "urls": [], "ig": 1.571, "fa": 0.0, "gp": 0.085, "bl": 0.0, "ds": 0.0, "txt": "This is what I have been proposing all along:\n\nBan any language other than English from prompting.\n\nThis has multiple benefits - first you restrict third world from spamming USA data centers. Why would America pay for some guy in India using free model?\n\nThis alone is worth considering but also you can optimise LLMs further for a single language as opposed to having to translate and couple weights for every single concept.\n\nWhy would American LLMs support Chinese language or Arabic? Make them learn English and come to work for us. No more free stuff for the third world."}, {"id": 50499877, "au": "wickedsight", "dom": 103, "sr": 21, "sc": 3.57, "ep": 3.79, "bs": 0.0, "d": 0, "age": 18.62, "grav": 232.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 74, "qw": 0, "k": 5558, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "llms_tokenizer", "flbl": "LLMS & Tokenizer (Training)", "urls": [], "ig": 1.099, "fa": 0.28, "gp": 0.281, "bl": 0.0, "ds": 0.0, "txt": "Recently, while I was doing a presentation on LLMs at work, I got the question whether prompting in Dutch was fine, or whether English was better. I made the argument that English was probably better, since much more of the content it was trained in was probably English than Dutch and therefore I would assume it would have better understanding of it. I never considered this would also have an impact on the amount of energy being used. Pretty interesting."}, {"id": 50497728, "au": "ozgung", "dom": 57, "sr": 22, "sc": 3.43, "ep": 3.79, "bs": 0.0, "d": 1, "age": 22.53, "grav": 317.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 68, "qw": 0, "k": 1498, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": [], "ig": 1.282, "fa": 0.0, "gp": 0.54, "bl": 0.0, "ds": 0.0, "txt": "My understanding is that it’s about tokenization. English input is converted into less tokens because tokenizer is optimized for English. This makes huge difference because all the output tokens are fed back into the input at each token generation. And attention blocks are generally quadratic with the input tokens. So foreign language means more tokens everywhere and more tokens mean more passes and much more compute and memory."}, {"id": 50497854, "au": "pama", "dom": 44, "sr": 23, "sc": 3.28, "ep": 3.94, "bs": 0.0, "d": 1, "age": 22.25, "grav": 310.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 68, "qw": 0, "k": 3798, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "decode_chinese", "flbl": "Decode & Chinese (Tok)", "urls": [], "ig": 1.385, "fa": 0.0, "gp": 0.472, "bl": 0.0, "ds": 0.0, "txt": "Thanks for this table! Do you happen to have the fraction of accepted speculative decoding outputs as well? I know it is asking much, but do you possibly measure differences in different across speculation techniques (dspark vs dflash) and differences in framework/code used (unless you only use in house code for these and cannot run sglang or vllm)?  Your table is more interesting than the blog for sure."}, {"id": 50502721, "au": "dofm", "dom": 90, "sr": 24, "sc": 3.2, "ep": 3.42, "bs": 0.0, "d": 1, "age": 13.18, "grav": 133.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 64, "qw": 0, "k": 4882, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": 1.439, "fa": 0.0, "gp": 0.025, "bl": 0.0, "ds": 0.0, "txt": "Realism: If you want good research, done well, checked, reviewed and vetted well, you might have to accept that some of it will have been done a year or more ago, with an experimental setup that might have carried over from previous work.\n\nCynical side note: re-running your tests with newer experimental models and updating your findings is usually good for a poster at a scientific conference"}, {"id": 50498811, "au": "cubefox", "dom": 20, "sr": 25, "sc": 3.09, "ep": 3.97, "bs": 0.0, "d": 1, "age": 20.46, "grav": 270.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 59, "qw": 0, "k": 8109, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "llms_tokenizer", "flbl": "LLMS & Tokenizer (Training)", "urls": [], "ig": 1.424, "fa": 0.22, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Exactly. Currently LLMs use a fixed tokenizer optimized for English and (to a lesser degree) Western languages. The H-Net architecture doesn't use a fixed tokenizer, it uses dynamicaly adaptive chunks of bytes, and (in a two-stage setup) chunks of chunks of bytes.\n\nHowever, they (Cartesia)  haven't yet published a technical paper on their new version of H-Net, and it is unclear if they will."}, {"id": 50498013, "au": "everforward", "dom": 59, "sr": 26, "sc": 2.92, "ep": 3.44, "bs": 0.0, "d": 2, "age": 21.98, "grav": 304.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 102, "qw": 0, "k": 3014, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_word", "flbl": "Languages & Word (Texts)", "urls": [], "ig": 1.462, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "My understanding (which may be wrong) is that English is best but most of the Romance languages do okay because English has borrowed from them so much.\n\nI think you only start getting seriously bad impacts in non-Romance languages where they have their own alphabet, or use the English alphabet phonetically causing letters to appear next to each other that never would in English.  E.g. in English \"qu\" is a pretty obvious token, you rarely see a Q without a U after it.  Happens all the time in anglicized Middle Eastern words, though.  Quran is like a whole other thing, you'd almost always expect another vowel after qu, not a consonant."}, {"id": 50497019, "au": "fxwin", "dom": 2, "sr": 27, "sc": 2.92, "ep": 3.8, "bs": 0.0, "d": 1, "age": 24.05, "grav": 353.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 779, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": 1.469, "fa": 0.0, "gp": 0.241, "bl": 0.0, "ds": 0.0, "txt": "I feel like that info is placed appropriately. The abstract mentions that energy disparity persists across models, the rest follows the standard Intro -> Related Work -> Experiments structure\n\nEdit: sorry, i went straight to the paper. I agree, the article itself (and the headline) are bad (as they tend to be on this topic)"}, {"id": 50500371, "au": "ion_trapper", "dom": 89, "sr": 28, "sc": 2.7, "ep": 3.51, "bs": 0.0, "d": 0, "age": 17.63, "grav": 212.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 66, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "llms_tokenizer", "flbl": "LLMS & Tokenizer (Training)", "urls": [], "ig": 1.037, "fa": 0.28, "gp": 0.188, "bl": 0.0, "ds": 0.0, "txt": "The choice to measure in “energy” instead of just “cost” suggests to me this is an unserious attempt at activism instead of a worthwhile benchmarks of LLMs.\n\nAlso: Gemma 3, Llama 3.1, come on…"}, {"id": 50499878, "au": "yipinwong", "dom": 80, "sr": 29, "sc": 2.65, "ep": 3.31, "bs": 0.0, "d": 0, "age": 18.62, "grav": 232.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 204, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": 1.197, "fa": 0.0, "gp": 0.343, "bl": 0.0, "ds": 0.0, "txt": "I am dumb to internal works of AI.\n\nGenuinely curious, not sacastic question below.\n\nIs this one of those posts like \"eating more sugar causes bad health\" type of post because most of info on internet is in English? Or a new insight people was not aware of?"}, {"id": 50499159, "au": "cubefox", "dom": 28, "sr": 30, "sc": 2.53, "ep": 3.41, "bs": 0.0, "d": 3, "age": 19.95, "grav": 259.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 34, "qw": 0, "k": 8109, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "languages_word", "flbl": "Languages & Word (Texts)", "urls": ["https://x.com/_albertgu/status/2113687798826111283"], "ig": 0.362, "fa": 0.9, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "They are typically optimized for English, for example, they often use rules for English contractions. See this thread: https://x.com/_albertgu/status/2113687798826111283\n\nI don't know whether European languages work inherently better with tokenizers, but I don't see why they would."}, {"id": 50497763, "au": "breakwaterlabs", "dom": 63, "sr": 31, "sc": 2.5, "ep": 3.38, "bs": 0.0, "d": 1, "age": 22.45, "grav": 315.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 105, "qw": 0, "k": 299, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": [], "ig": 1.106, "fa": 0.0, "gp": 0.54, "bl": 0.0, "ds": 0.0, "txt": "\"Reason about it\" is where your abstraction has sprung a leak.\n\nLLMs do what they say on the tin: they model language. If you ask an LLM \"find security vulnerabilities in my code\" for hello_world.rs, the next likely tokens are \"I found the following vulnerabilities\", regardless of what logic or reason say.\n\nIt happens to be true that predicting next tokens on your own output mocks actual reasoning fairly well. But it still just a simulacrum rather than the real thing, and when held as an abstraction it leaks everywhere.\n\nUnderstanding this is critical to avoiding the common failure case of scope creep and code slop."}, {"id": 50503912, "au": "tuukkah", "dom": 106, "sr": 32, "sc": 2.4, "ep": 3.42, "bs": 0.0, "d": 1, "age": 9.78, "grav": 84.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 13, "k": 3569, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "llms_tokenizer", "flbl": "LLMS & Tokenizer (Training)", "urls": [], "ig": 0.94, "fa": 0.42, "gp": 0.012, "bl": 0.0, "ds": 0.0, "txt": "I really hope you're being sarcastic:\n\n> some guy in India\n\nAren't they bilingual in English?\n\n> the third world\n\nIsn't there a second world as well?\n\n> Why would American LLMs support Chinese\n\nAren't there American companies that want to use LLMs for translation tasks or to provide their LLM-powered services in other languages? Spanish anyone?"}, {"id": 50498709, "au": "larodi", "dom": 84, "sr": 33, "sc": 2.4, "ep": 2.84, "bs": 0.0, "d": 1, "age": 20.62, "grav": 274.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 1966, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "decode_chinese", "flbl": "Decode & Chinese (Tok)", "urls": [], "ig": 1.206, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "theoretically, if the model is properly trained, it should grok that влъхвъ and magician semantically are the seam thus must land relatively close in the latent space. the same way a cat from an image encodes the same way, so that it can decode later in arbitrary language."}, {"id": 50497101, "au": "dbvdh", "dom": 72, "sr": 34, "sc": 2.28, "ep": 2.94, "bs": 0.0, "d": 2, "age": 23.84, "grav": 348.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 60, "qw": 0, "k": 24, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": [], "ig": 1.25, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I think they’re probably just passing some context on the user (region) and instructing it to use that language. I assume many queries you cannot trace to the user language because they’re just some generic search terms (‘taj mahal’,’Donald Trump China’ or whatever) so they probably instruct the model to answer in a specific language and they overdo it a bit"}, {"id": 50501976, "au": "pona-a", "dom": 50, "sr": 35, "sc": 2.11, "ep": 2.99, "bs": 0.0, "d": 0, "age": 14.78, "grav": 160.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 1260, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": 0.982, "fa": 0.0, "gp": 0.472, "bl": 0.0, "ds": 0.0, "txt": "This should be an obvious corollary. Transformers scale exponentially with context tokens, and it was well-known current tokenizers perform worse on non-English text, splitting it into more tokens."}, {"id": 50497531, "au": "load-bearing", "dom": 52, "sr": 36, "sc": 2.01, "ep": 5.63, "bs": 2.52, "d": 0, "age": 22.92, "grav": 326.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 44, "qw": 0, "k": 47, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "llms_tokenizer", "flbl": "LLMS & Tokenizer (Training)", "urls": ["https://partyfly.github.io/tokenizer-fairness-2026/"], "ig": 1.053, "fa": 0.62, "gp": 0.959, "bl": 0.95, "ds": 0.0, "txt": "This reminded me of this link, which I've just posted to HN\n\nhttps://partyfly.github.io/tokenizer-fairness-2026/\n\nAlready been using English to conserve tokens, and then translate the final result to other languages if necessary. I think this was already obvious to most international LLM users proficient in multiple languages."}, {"id": 50506388, "au": "geocar", "dom": 10, "sr": 37, "sc": 1.97, "ep": 3.07, "bs": 0.0, "d": 3, "age": 1.6, "grav": 10.0, "surf": 27.9, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 156, "qw": 0, "k": 6362, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "decode_chinese", "flbl": "Decode & Chinese (Tok)", "urls": [], "ig": 1.303, "fa": 0.0, "gp": 0.003, "bl": 0.0, "ds": 0.0, "txt": "You say this is well-known, but my experience is talking chinese to the chinese LLM produces more efficient work, with less rambling in the thinking/reporting steps, and I have been presuming that it is because longer utf8-token still beats a bunch of utf7-compatible words for expressing the kinds of big ideas maths and code requires. 省字臃思\n\nSo I have to wonder why is token count so high in their examples? Here is my theory: I would not say 我遇见了一只大狗, but I would just say 遇大狗. I know I can't do that in English, but I think surely the researchers should know (or would ask someone?) how this works trying to compare phrases in isolation, so I wonder why is this test meaningful to them? Why are they doing that? Are they looking for this result? 字省思臊 I don't talk like google translate.\n\nSo who are these people and why are you listening to them and repeating what they say like it is so? Why exactly are you so convinced?"}, {"id": 50499073, "au": "brainwad", "dom": 21, "sr": 38, "sc": 1.92, "ep": 3.24, "bs": 0.0, "d": 2, "age": 20.09, "grav": 262.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 1167, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": [], "ig": 1.039, "fa": 0.0, "gp": 0.55, "bl": 0.0, "ds": 0.0, "txt": "It's not optimised deliberately for English, right? It's just that byte pair encoding naturally favours English and other Latin languages because they are dominant in the training data.\n\nEven if you use bytes only, Unicode is biased towards English and other Latin languages, too."}, {"id": 50498873, "au": "poopingatwork", "dom": 60, "sr": 39, "sc": 1.84, "ep": 2.94, "bs": 0.0, "d": 3, "age": 20.39, "grav": 269.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 71, "qw": 0, "k": 26, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_word", "flbl": "Languages & Word (Texts)", "urls": [], "ig": 1.251, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I've heard English is one of the most expressive languages, but is complex to learn due to absorbing words and ideas from so many other languages. Lots of contradictions, situational rules, and unwritten rules (like the order of adjectives: the big, brown chair instead of the brown, big chair).\n\nI don't know how true that is, and I can't imagine knowing more than one language. I'm impressed by anyone who knows more than one...."}, {"id": 50497073, "au": "vorticalbox", "dom": 97, "sr": 40, "sc": 1.72, "ep": 2.96, "bs": 0.0, "d": 1, "age": 23.91, "grav": 350.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 85, "qw": 0, "k": 1627, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": 1.191, "fa": 0.0, "gp": 0.114, "bl": 0.0, "ds": 0.0, "txt": "Internally I don’t think anyone knows.\n\nI read an article once that talk about this the first few layers are like a translation layers then middle is thinking and the output layers translate it back.\n\nIt’s pretty interesting actually, you can cut out the middle layers and stack them back to back and that increases the models performance without much memory increase.\n\nIf you want to try it out you can get a LLM with no tools and pass it base64 and it will understand what’s in the message"}, {"id": 50498274, "au": "sorenjan", "dom": 64, "sr": 41, "sc": 1.71, "ep": 3.25, "bs": 0.0, "d": 2, "age": 21.44, "grav": 292.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 54, "qw": 0, "k": 7730, "kpp": 4.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": 1.323, "fa": 0.0, "gp": 0.094, "bl": 0.0, "ds": 0.0, "txt": "I only used \"reason about\" as shorthand for the computation that takes place between input text gets tokenized and output tokens gets translated back to text. There are a lot of layers in the middle where the tokens no longer represent text directly but rather a combination of the different tokens through the attention and MLP projections."}, {"id": 50498236, "au": "elcritch", "dom": 65, "sr": 42, "sc": 1.68, "ep": 3.22, "bs": 0.0, "d": 2, "age": 21.52, "grav": 294.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 90, "qw": 0, "k": 5481, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "llms_tokenizer", "flbl": "LLMS & Tokenizer (Training)", "urls": [], "ig": 1.37, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "There’s enough experience with LLMs now and comparisons to our own thinking that we can say LLMs are thinking and doing so not so differently from us - at least for some aspects of reasoning.\n\nTrying to pretend otherwise at this point doesn’t help us to utilize them or understand their limits. We’re better off accepting that intelligence isn’t unique to us as a species. Then we can see that modeling language as a tool for us as a vehicle for thinking and reasoning, which philosophers like Wittgenstein already landed upon before LLMs."}, {"id": 50497777, "au": "davidmurdoch", "dom": 112, "sr": 43, "sc": 1.62, "ep": 2.72, "bs": 0.0, "d": 2, "age": 22.42, "grav": 314.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 62, "qw": 0, "k": 2723, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": [], "ig": 1.158, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Written English is still pretty good when compared to all languages. When considering UTF-8 bytes, a English is almost as good as Chinese, since Chinese uses about 3 bytes per character.\n\nFor spoken language, French and English are at the top, but most languages are about the same bits/second. Languages with less information density are just spoken faster to make up for it."}, {"id": 50498734, "au": "vova_hn2", "dom": 48, "sr": 44, "sc": 1.57, "ep": 3.11, "bs": 0.0, "d": 2, "age": 20.56, "grav": 272.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 111, "qw": 0, "k": 783, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": 1.323, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I think that the fact that TFA doesn't mention speculative decoding at all is not a good sign. It casts doubt both on the accuracy of the data and on the competence of whoever collected it.\n\nI can imagine that in some cases the acceptance rate for non-English responses may be much higher, because while words on average need more tokens to spell, it is more \"obvious\" what the next token should be, so it is easier for the speculation model to predict it accurately. Information density per token is lower.\n\nOr, maybe the acceptance rate is much lower, if the speculation model is tuned for English and doesn't work well with other languages."}, {"id": 50496980, "au": "macrolime", "dom": 69, "sr": 45, "sc": 1.5, "ep": 2.53, "bs": 0.0, "d": 0, "age": 24.14, "grav": 355.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 970, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "decode_chinese", "flbl": "Decode & Chinese (Tok)", "urls": [], "ig": 0.792, "fa": 0.0, "gp": 0.458, "bl": 0.0, "ds": 0.0, "txt": "Google AI overviews refusing to answer in English unless explicitly instructed with \"Answer in English only\" is pretty annoying."}, {"id": 50503506, "au": "make3", "dom": 13, "sr": 46, "sc": 1.44, "ep": 2.99, "bs": 0.0, "d": 5, "age": 11.08, "grav": 102.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 94, "qw": 0, "k": 1918, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": 1.27, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Your counterpoint is incorrect. The savings of speculative decoding are a direct function of how hard it is to predict the next token. Which means that for a specific task, the smaller model can be used more in a language which uses more tokens to say the same thing (to perform the same task), as the difficulty of the task is fixed between languages and the language that takes more tokens \"spreads the same difficulty\" over more tokens.\n\nI suspect that it still ends up being cheaper in English, but parent's point that speculative decoding helps is valid."}, {"id": 50497619, "au": "cnczeric", "dom": 109, "sr": 47, "sc": 1.42, "ep": 5.03, "bs": 2.52, "d": 0, "age": 22.75, "grav": 322.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 91, "qw": 0, "k": 1, "kpp": 0.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": 1.522, "fa": 0.28, "gp": 0.454, "bl": 0.95, "ds": 0.0, "txt": "The part that surprised me most was not the energy per token, which the paper says clusters around 0.1J across languages, but how much of the gap comes from output length: token explosion and models looping and repeating the same text, sometimes 45 times, in the worst cases. That makes this a fairness problem as well as an efficiency one, since per-token pricing means non-English users can pay more for a worse answer. I would like to see the benchmark rerun on current models, though, since the ones tested here are already about 18 months old."}, {"id": 50497062, "au": "alex43578", "dom": 98, "sr": 48, "sc": 1.4, "ep": 2.79, "bs": 0.0, "d": 1, "age": 23.94, "grav": 350.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 711, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "llms_tokenizer", "flbl": "LLMS & Tokenizer (Training)", "urls": [], "ig": 1.188, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It seems a ton of the chain of thought tokens are English. It just processes weights, though, not tokens - maybe compute efficiency for using \"cached\" tokens/weights or it more efficiently learned to process English tokens by virtue of their greater weight in the corpus."}, {"id": 50498248, "au": "sorenjan", "dom": 62, "sr": 49, "sc": 1.39, "ep": 2.93, "bs": 0.0, "d": 2, "age": 21.5, "grav": 293.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 51, "qw": 0, "k": 7730, "kpp": 4.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": 1.248, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Can't you train a model to translate tokens from human languages to a separate NN token language with a compressed representation like a VAE? It seems like a leaky abstraction to have these trillion parameter models be dependant on the fact that English gets tokenized in a certain way, and I assume this has been researched a lot already."}, {"id": 50497943, "au": "hsuduebc2", "dom": 108, "sr": 50, "sc": 1.24, "ep": 2.34, "bs": 0.0, "d": 0, "age": 22.09, "grav": 307.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 1063, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": 0.929, "fa": 0.0, "gp": 0.111, "bl": 0.0, "ds": 0.0, "txt": "I mean, this was pretty obvious once companies started saying that non-English text uses around a third more tokens. More tokens generally mean more energy used, so it's not exactly surprising."}, {"id": 50499406, "au": "rhdunn", "dom": 12, "sr": 51, "sc": 1.24, "ep": 2.78, "bs": 0.0, "d": 4, "age": 19.48, "grav": 249.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 67, "qw": 0, "k": 1410, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": [], "ig": 1.184, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Speculative decoding will be model/software based and apply to all languages. The time, compute, and energy will be less compared to other models, but for the same model, hardware, and software used my reasoning still applies -- comparing English to other languages (unless optimized by the tokenizer) then English will consume less tokens and thus less energy. That is, it is still a function of the tokens used."}, {"id": 50502630, "au": "suresk", "dom": 67, "sr": 52, "sc": 1.23, "ep": 2.48, "bs": 0.0, "d": 0, "age": 13.38, "grav": 136.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 1425, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "llms_tokenizer", "flbl": "LLMS & Tokenizer (Training)", "urls": [], "ig": 0.937, "fa": 0.0, "gp": 0.19, "bl": 0.0, "ds": 0.0, "txt": "Sort of orthogonal, but I've always wondered that if you trained an LLM primarily on another language other than English, if that would change its reasoning behavior at all. ie, would it be better at Math and worse at poetry or something like that?"}, {"id": 50499162, "au": "sznio", "dom": 25, "sr": 53, "sc": 1.22, "ep": 2.54, "bs": 0.0, "d": 3, "age": 19.94, "grav": 259.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 1186, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_word", "flbl": "Languages & Word (Texts)", "urls": [], "ig": 1.011, "fa": 0.0, "gp": 0.111, "bl": 0.0, "ds": 0.0, "txt": "logographic languages still win I guess, a 4-byte chinese character beats a n-character English word for that same concept.\n\nbut yeah, anything alphabetic yet not latin gets the worst tradeoff."}, {"id": 50500836, "au": "brainwad", "dom": 24, "sr": 54, "sc": 1.09, "ep": 2.63, "bs": 0.0, "d": 4, "age": 16.74, "grav": 195.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 1167, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": [], "ig": 1.12, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It is desirable for all alphabets/abjads/abugidas/syllabaries, not just Latin. Chinese is rather the special case of a human language with very high character inventory and hence low character/word ratio."}, {"id": 50497909, "au": "not_a_bot_4sho", "dom": 58, "sr": 55, "sc": 1.08, "ep": 2.62, "bs": 0.0, "d": 2, "age": 22.17, "grav": 309.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 757, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "llms_tokenizer", "flbl": "LLMS & Tokenizer (Training)", "urls": [], "ig": 1.051, "fa": 0.0, "gp": 0.106, "bl": 0.0, "ds": 0.0, "txt": "This is absolutely correct.\n\nBut I would subtly add it's also about the training data, which is optimized towards English. Not intentionally, just incidentally. (And this is a really hot area of improvement with a long way to go.)\n\nWhich is largely why the tokenization part that you mentioned is what it is."}, {"id": 50497873, "au": "scottcha", "dom": 49, "sr": 56, "sc": 1.08, "ep": 2.46, "bs": 0.0, "d": 1, "age": 22.23, "grav": 310.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 1005, "kpp": 6.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "decode_chinese", "flbl": "Decode & Chinese (Tok)", "urls": [], "ig": 1.045, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I actually think beyond the large increase in energy noted in the paper the decrease in energy for Russian and Chinese was a bit unexpected.  I would have actually expected the Chinese DBCS to use more energy but at least for Chinese there could be a training impact here given these are Chinese models."}, {"id": 50497253, "au": "gundugi-man", "dom": 99, "sr": 57, "sc": 1.08, "ep": 2.35, "bs": 0.0, "d": 1, "age": 23.46, "grav": 339.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 48, "qw": 0, "k": 94, "kpp": 23.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": [], "ig": 0.999, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "In Deepseek app you can see its reasoning tokens.\n\nIf I ask something in my native language (Korean), the model often switches into English in the middle and translate the answer into Korean.\n\nBut not sure about what happens below the token, in embedding space or per decoder layers."}, {"id": 50504315, "au": "geysersam", "dom": 32, "sr": 58, "sc": 1.08, "ep": 2.3, "bs": 0.0, "d": 3, "age": 8.21, "grav": 65.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 2843, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": [], "ig": 0.623, "fa": 0.28, "gp": 0.026, "bl": 0.0, "ds": 0.0, "txt": "Non-latin characters use more bytes due to utf-8. But texts don't necessarily use more bytes because of that. I'd be surprised if, for example mandarin, uses significantly more bytes on average."}, {"id": 50505497, "au": "stephantul", "dom": 33, "sr": 59, "sc": 1.08, "ep": 2.17, "bs": 0.0, "d": 4, "age": 4.1, "grav": 25.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 714, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": [], "ig": 0.925, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "This is incidental and a cherry pick. Cyrillic and greek are regular alphabets, and cost two bytes per character instead of one."}, {"id": 50497285, "au": "Andrex", "dom": 100, "sr": 60, "sc": 1.08, "ep": 2.1, "bs": 0.0, "d": 2, "age": 23.38, "grav": 337.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 4661, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": 0.892, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Wonder if this is the final step in English becoming true lingua franca. It's what every single AI will be using internally."}, {"id": 50500083, "au": "numpad0", "dom": 23, "sr": 61, "sc": 1.08, "ep": 2.06, "bs": 0.0, "d": 3, "age": 18.18, "grav": 223.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 9595, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_word", "flbl": "Languages & Word (Texts)", "urls": [], "ig": 0.81, "fa": 0.0, "gp": 0.106, "bl": 0.0, "ds": 0.0, "txt": "Aren't tokenizers a hack to turn Latin alphabet texts into a pseudo Chinese with better per-unit information density?"}, {"id": 50497805, "au": "pmontra", "dom": 53, "sr": 62, "sc": 1.08, "ep": 2.04, "bs": 0.0, "d": 1, "age": 22.36, "grav": 313.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 17815, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "llms_tokenizer", "flbl": "LLMS & Tokenizer (Training)", "urls": [], "ig": 0.868, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I do use English for coding AIs. Most CS resources are in English so I thought that it should be far more efficient and accurate to use English. Some of my coworkers use our native language though."}, {"id": 50503658, "au": "akssri", "dom": 55, "sr": 63, "sc": 1.08, "ep": 3.17, "bs": 1.19, "d": 0, "age": 10.56, "grav": 95.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 17, "k": 159, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": 0.749, "fa": 0.42, "gp": 0.149, "bl": 0.45, "ds": 0.0, "txt": "> When working in other languages, the models used more energy because they had to generate more tokens...\n\nSeems a bit dated. Sarvam has been taking about the inefficiency of the tokenization schemes used by mainstream models when it comes to Indic-languages for years now."}, {"id": 50502195, "au": "dosinga", "dom": 16, "sr": 64, "sc": 1.08, "ep": 1.97, "bs": 0.0, "d": 4, "age": 14.38, "grav": 153.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 946, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "llms_tokenizer", "flbl": "LLMS & Tokenizer (Training)", "urls": [], "ig": 0.838, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "roughly the tokenizer is optimized such that the training data (for the tokenizer) can be represented with the smallest number of tokens. and yes, English tends to be overrepresented in training data."}, {"id": 50497737, "au": "curt15", "dom": 8, "sr": 65, "sc": 1.08, "ep": 1.93, "bs": 0.0, "d": 1, "age": 22.51, "grav": 316.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 3270, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": 0.822, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "How would one evaluate the energy consumption of models accessible only through Anthropic or OAI APIs? You can't fire them up on your own computers and measure power consumption."}, {"id": 50497566, "au": "tinza123", "dom": 111, "sr": 66, "sc": 1.08, "ep": 1.93, "bs": 0.0, "d": 1, "age": 22.84, "grav": 324.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 257, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_word", "flbl": "Languages & Word (Texts)", "urls": [], "ig": 0.822, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "English is not dense at all. I had to change my thread naming to Chinese because the side bar in codex is narrow and English just can’t be as expressive per word"}, {"id": 50497043, "au": "derac", "dom": 71, "sr": 67, "sc": 1.08, "ep": 1.82, "bs": 0.0, "d": 1, "age": 24.01, "grav": 352.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 1166, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": [], "ig": 0.773, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I often get answers in non-english languages. I don't understand why they aren't forcing the language that the user is browsing with unless otherwise specified."}, {"id": 50499403, "au": "brainwad", "dom": 26, "sr": 68, "sc": 1.08, "ep": 1.79, "bs": 0.0, "d": 4, "age": 19.48, "grav": 249.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 1167, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "languages_word", "flbl": "Languages & Word (Texts)", "urls": [], "ig": 0.764, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Most CJK characters are 3 bytes in UTF-8. But then most English words translate to more than one character, so 5 bytes might be more realistic (apparently Chinese averages 1.6-1.7 characters per word); for comparison English gets like 4.7 characters/bytes per word on average."}, {"id": 50497773, "au": "quickthrowman", "dom": 116, "sr": 69, "sc": 1.08, "ep": 1.72, "bs": 0.0, "d": 2, "age": 22.43, "grav": 315.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 4229, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": [], "ig": 0.733, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Yeah I’d imagine having several thousand pictograms is more information dense, but there are huge drawbacks to using pictograms in computing that alphabets do not have, text input being a major one."}, {"id": 50500431, "au": "ImprobableTruth", "dom": 81, "sr": 70, "sc": 1.08, "ep": 1.7, "bs": 0.0, "d": 1, "age": 17.51, "grav": 210.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 1698, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_word", "flbl": "Languages & Word (Texts)", "urls": [], "ig": 0.725, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The former (it's well known that non-English languages don't tokenize well), but it's nice to put a concrete number to the impact."}, {"id": 50502349, "au": "janalsncm", "dom": 94, "sr": 71, "sc": 1.08, "ep": 1.62, "bs": 0.0, "d": 0, "age": 13.98, "grav": 146.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 12965, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_word", "flbl": "Languages & Word (Texts)", "urls": [], "ig": 0.646, "fa": 0.0, "gp": 0.072, "bl": 0.0, "ds": 0.0, "txt": "Another way to word this is that the models use less energy for English texts. This can be optimal depending on the distribution of languages the model is actually using."}, {"id": 50499889, "au": "ben_w", "dom": 36, "sr": 72, "sc": 1.08, "ep": 1.3, "bs": 0.0, "d": 5, "age": 18.59, "grav": 231.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 30242, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": 0.552, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "A token is an index into a dictionary. What the dictionary uses isn't seen, this is why they couldn't count the 'r's in 'strawberry'."}, {"id": 50497852, "au": "bloak", "dom": 113, "sr": 73, "sc": 1.08, "ep": 1.28, "bs": 0.0, "d": 3, "age": 22.26, "grav": 311.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 2627, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "decode_chinese", "flbl": "Decode & Chinese (Tok)", "urls": [], "ig": 0.206, "fa": 0.28, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "How fast people speak is more a cultural thing than a language thing. People in Texas, for example, speak more slowly than other speakers of American English."}, {"id": 50496902, "au": "esperent", "dom": 1, "sr": 74, "sc": 1.08, "ep": 2.36, "bs": 1.19, "d": 0, "age": 24.32, "grav": 360.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 27, "k": 9615, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.2, "fa": 0.0, "gp": 1.306, "bl": 0.45, "ds": 0.0, "txt": "You have to read about half of the article before it mentions this, which should have been in the first paragraph:\n\n> The researchers found the energy and accuracy disparity by measuring the amount of energy used by three open-source AI models, Alibaba’s Qwen 3, Google’s Gemma 3, and Meta’s Llama 3.1."}, {"id": 50497286, "au": "ejazarain", "dom": 85, "sr": 75, "sc": 0.99, "ep": 3.51, "bs": 2.52, "d": 0, "age": 23.38, "grav": 337.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 0, "kpp": 0.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": 1.211, "fa": 0.0, "gp": 0.459, "bl": 0.95, "ds": 0.0, "txt": "Training is what makes neural networks faster, language usage makes one fluent and English’s frequent usage speeds up generative translation.\n\nwhy not to test different language with similar and repeated tasks?\n\nThe language inter-operability is improving every  movement for many models."}, {"id": 50499148, "au": "wat10000", "dom": 66, "sr": 76, "sc": 0.7, "ep": 1.89, "bs": 1.19, "d": 2, "age": 19.96, "grav": 260.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 6970, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": [], "ig": 0.804, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "No decent modern LLM is going to start its reply with “I found the following vulnerabilities” when you ask it to find security vulnerabilities in a straightforward hello world."}, {"id": 50503229, "au": "paulryanrogers", "dom": 38, "sr": 77, "sc": 0.41, "ep": 1.26, "bs": 0.85, "d": 6, "age": 11.95, "grav": 114.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 12247, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": [], "ig": 0.536, "fa": 0.0, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "I was thinking both of input and latent data. Hadn't thought of tokens that way. Thanks for the heads up."}, {"id": 50498641, "au": "manmal", "dom": 83, "sr": 78, "sc": 0.28, "ep": 1.48, "bs": 1.19, "d": 0, "age": 20.73, "grav": 276.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 7123, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_word", "flbl": "Languages & Word (Texts)", "urls": [], "ig": 0.385, "fa": 0.0, "gp": 0.395, "bl": 0.45, "ds": 0.0, "txt": "I don’t think that’s true for SOTA models. The responses come just as fast in German as in English."}, {"id": 50497220, "au": "armcat", "dom": 5, "sr": 79, "sc": 0.23, "ep": 1.42, "bs": 1.19, "d": 2, "age": 23.55, "grav": 341.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 2773, "kpp": 6.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.318, "fa": 0.0, "gp": 0.468, "bl": 0.45, "ds": 0.0, "txt": "Unfortunately it is this long. I know people in academia studying human-AI interfaces and up until recently they were still using gpt-3.5."}, {"id": 50499435, "au": "guipsp", "dom": 39, "sr": 80, "sc": -0.1, "ep": 1.09, "bs": 1.19, "d": 3, "age": 19.44, "grav": 248.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 883, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": [], "ig": 0.465, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "utf8 is just one of the encodings that exist, and is kind of irrelevant at the point it contacts the llm"}, {"id": 50498779, "au": "vova_hn2", "dom": 11, "sr": 81, "sc": -0.56, "ep": 1.43, "bs": 1.99, "d": 3, "age": 20.51, "grav": 271.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 23, "qw": 2, "k": 783, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": ["https://news.ycombinator.com/item?id=50441444\u002350497854"], "ig": 0.607, "fa": 0.0, "gp": 0.0, "bl": 0.75, "ds": 0.0, "txt": "> token usage\n\nIt is not exactly accurate, because it ignores speculative decoding which can often save a lot of time, compute and energy.\n\nSee this branch: https://news.ycombinator.com/item?id=50441444\u002350497854"}, {"id": 50498685, "au": "bandit-x", "dom": 86, "sr": 82, "sc": -0.67, "ep": 1.85, "bs": 2.52, "d": 0, "age": 20.65, "grav": 274.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "llms_tokenizer", "flbl": "LLMS & Tokenizer (Training)", "urls": [], "ig": 0.543, "fa": 0.0, "gp": 0.394, "bl": 0.95, "ds": 0.0, "txt": "I think that depends to the language not the LLM. they do not translate, but if a lnaguage express same thing with longer tokens that counts."}, {"id": 50505502, "au": "stephantul", "dom": 37, "sr": 83, "sc": -0.67, "ep": 0.52, "bs": 1.19, "d": 6, "age": 4.08, "grav": 25.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 714, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": [], "ig": 0.22, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "H net directly operates on bytes. This is what the comment was about and what I was referring to."}, {"id": 50506739, "au": "sgt", "dom": 74, "sr": 84, "sc": -0.75, "ep": 0.45, "bs": 1.19, "d": 4, "age": 0.54, "grav": 5.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 8603, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "decode_chinese", "flbl": "Decode & Chinese (Tok)", "urls": [], "ig": 0.19, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Your browser's language doesn't necessarily map to what you'll want responses to be in. A lot of people speak different languages."}, {"id": 50506949, "au": "sgt", "dom": 78, "sr": 85, "sc": -1.22, "ep": 1.32, "bs": 2.54, "d": 8, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 8603, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 6, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "llms_tokenizer", "flbl": "LLMS & Tokenizer (Training)", "urls": [], "ig": 0.562, "fa": 0.0, "gp": 0.0, "bl": 0.96, "ds": 0.0, "txt": "It's not that complex. Say your OS or system setting is US English and you're downloading say, an app in Spanish that was developed with that in mind, you'd want that, wouldn't you?"}, {"id": 50499887, "au": "mh-", "dom": 6, "sr": 86, "sc": -1.27, "ep": 1.77, "bs": 3.05, "d": 3, "age": 18.6, "grav": 231.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 3554, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": 0.755, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Yes and let's all remember that lag when the studies about AI outcomes are posted."}, {"id": 50497922, "au": "adolph", "dom": 104, "sr": 87, "sc": -1.36, "ep": 1.68, "bs": 3.05, "d": 0, "age": 22.14, "grav": 308.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 8439, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": 0.623, "fa": 0.0, "gp": 0.152, "bl": 1.15, "ds": 0.0, "txt": "Non-English or non-ascii?\n\nSeems not to be the case given Arabic’s energy score."}, {"id": 50497488, "au": "baggy_trough", "dom": 92, "sr": 88, "sc": -1.47, "ep": 1.58, "bs": 3.05, "d": 0, "age": 23.01, "grav": 328.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 1191, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": 0.5, "fa": 0.0, "gp": 0.28, "bl": 1.15, "ds": 0.0, "txt": "Clearly, to save water and the climate, international AI users must learn and use English."}, {"id": 50505504, "au": "stephantul", "dom": 40, "sr": 89, "sc": -1.52, "ep": 1.53, "bs": 3.05, "d": 4, "age": 4.08, "grav": 25.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 714, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": [], "ig": 0.65, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "No, the model is trained on utf-8, so switching encodings entails a full retrain"}, {"id": 50498095, "au": "j45", "dom": 102, "sr": 90, "sc": -1.89, "ep": 1.16, "bs": 3.05, "d": 0, "age": 21.82, "grav": 300.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 4918, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": 0.385, "fa": 0.0, "gp": 0.174, "bl": 1.15, "ds": 0.0, "txt": "I suspect the quality might be higher too when using more energy."}, {"id": 50502009, "au": "bajard", "dom": 107, "sr": 91, "sc": -1.94, "ep": 1.77, "bs": 3.71, "d": 1, "age": 14.73, "grav": 159.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 12, "k": 31, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "llms_tokenizer", "flbl": "LLMS & Tokenizer (Training)", "urls": [], "ig": 0.755, "fa": 0.0, "gp": 0.0, "bl": 1.4, "ds": 0.0, "txt": ">Why would America pay for some guy in India using a free model?\n\nBecause the US government subsidizes all internet companies to establish a monopoly over everything on the internet, like Google, Microsoft, Facebook, Reddit, ..."}, {"id": 50506821, "au": "stavros", "dom": 77, "sr": 92, "sc": -2.31, "ep": 0.58, "bs": 2.89, "d": 7, "age": 0.31, "grav": 4.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 78699, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 5, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": [], "ig": 0.248, "fa": 0.0, "gp": 0.0, "bl": 1.09, "ds": 0.0, "txt": "So this hypothetical user is setting a different language and then complaining that they're getting that language?"}, {"id": 50499771, "au": "paulryanrogers", "dom": 35, "sr": 93, "sc": -2.63, "ep": 0.42, "bs": 3.05, "d": 4, "age": 18.84, "grav": 236.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 12247, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": [], "ig": 0.177, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "If tokens use UTF-8 bytes then it could be a factor."}, {"id": 50497149, "au": "IsTom", "dom": 79, "sr": 94, "sc": -2.78, "ep": 1.46, "bs": 4.24, "d": 2, "age": 23.74, "grav": 346.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 1701, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.621, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "When I was googling something about oil refining equipment it started answering in Arabic, obviously."}, {"id": 50497593, "au": "robrenaud", "dom": 87, "sr": 95, "sc": -3.22, "ep": 1.02, "bs": 4.24, "d": 0, "age": 22.79, "grav": 323.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 2528, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "languages_word", "flbl": "Languages & Word (Texts)", "urls": [], "ig": 0.188, "fa": 0.0, "gp": 0.399, "bl": 1.6, "ds": 0.0, "txt": "Use different tokenizers for different languages. Or at least, use different tokenizers for different scripts."}, {"id": 50497667, "au": "komatar", "dom": 70, "sr": 96, "sc": -3.23, "ep": 0.48, "bs": 3.71, "d": 1, "age": 22.65, "grav": 320.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 3, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "llms_tokenizer", "flbl": "LLMS & Tokenizer (Training)", "urls": [], "ig": 0.204, "fa": 0.0, "gp": 0.0, "bl": 1.4, "ds": 0.0, "txt": "For me, it's always in the language I'm asking in, though my Google account language is set to English."}, {"id": 50505490, "au": "stephantul", "dom": 31, "sr": 97, "sc": -3.27, "ep": 0.97, "bs": 4.24, "d": 4, "age": 4.11, "grav": 26.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 714, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": 0.414, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "The models the top post refers to are not script aware. This is my point"}, {"id": 50504507, "au": "huijzer", "dom": 7, "sr": 98, "sc": -3.45, "ep": 0.79, "bs": 4.24, "d": 2, "age": 7.44, "grav": 56.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 6, "k": 3989, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "llms_tokenizer", "flbl": "LLMS & Tokenizer (Training)", "urls": [], "ig": 0.335, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "> Is the publishing cycle this long?\n\nI did a PhD and the answer is yes. Often longer than this."}, {"id": 50499939, "au": "numpad0", "dom": 41, "sr": 99, "sc": -3.46, "ep": 0.78, "bs": 4.24, "d": 3, "age": 18.49, "grav": 229.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 9595, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": [], "ig": 0.332, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "bit configurations aren't uniform across those bytes, everything should compress to similar sizes"}, {"id": 50499325, "au": "stephantul", "dom": 29, "sr": 100, "sc": -3.49, "ep": 0.75, "bs": 4.24, "d": 2, "age": 19.62, "grav": 252.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 714, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": [], "ig": 0.095, "fa": 0.0, "gp": 0.36, "bl": 1.6, "ds": 0.0, "txt": "Non-latin languages also take more bytes due to utf-8 though"}, {"id": 50500879, "au": "yipinwong", "dom": 82, "sr": 101, "sc": -3.53, "ep": 0.71, "bs": 4.24, "d": 2, "age": 16.64, "grav": 193.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 204, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.302, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "ty. so basically a formalization so others can build upon this idea."}, {"id": 50499367, "au": "ben_w", "dom": 34, "sr": 102, "sc": -3.61, "ep": 0.63, "bs": 4.24, "d": 3, "age": 19.55, "grav": 251.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 30242, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": [], "ig": 0.197, "fa": 0.0, "gp": 0.117, "bl": 1.6, "ds": 0.0, "txt": "Are bytes relevant? These things are billed by the megatoken, not the megabyte."}, {"id": 50498538, "au": "gavinsyancey", "dom": 15, "sr": 103, "sc": -3.65, "ep": 0.59, "bs": 4.24, "d": 3, "age": 20.91, "grav": 280.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 912, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "llms_tokenizer", "flbl": "LLMS & Tokenizer (Training)", "urls": [], "ig": 0.251, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "So basically, the tokenizer is optimized for English and performs worse on other languages?"}, {"id": 50506059, "au": "nmstoker", "dom": 61, "sr": 104, "sc": -3.79, "ep": 0.45, "bs": 4.24, "d": 4, "age": 2.54, "grav": 15.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 3921, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.19, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Given the complexities involved, maybe we should be impressed by someone who masters even one!"}, {"id": 50497430, "au": "davidmurdoch", "dom": 110, "sr": 105, "sc": -4.03, "ep": 0.21, "bs": 4.24, "d": 0, "age": 23.12, "grav": 331.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 2723, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "languages_word", "flbl": "Languages & Word (Texts)", "urls": [], "ig": 0.089, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Isn't English one of the most information dense languages?"}, {"id": 50506762, "au": "stavros", "dom": 75, "sr": 106, "sc": -4.07, "ep": 0.17, "bs": 4.24, "d": 5, "age": 0.48, "grav": 5.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 78699, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "decode_chinese", "flbl": "Decode & Chinese (Tok)", "urls": [], "ig": 0.072, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Why wouldn't those people set the browser to the languages they speak?"}, {"id": 50504137, "au": "ArchEagle", "dom": 88, "sr": 107, "sc": -4.27, "ep": 1.29, "bs": 5.57, "d": 0, "age": 8.89, "grav": 73.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 0, "kpp": 0.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": 0.512, "fa": 0.0, "gp": 0.06, "bl": 2.1, "ds": 0.0, "txt": "That is the biggest problem ai loves energy and the more advanced the more energy"}, {"id": 50506813, "au": "sgt", "dom": 76, "sr": 108, "sc": -4.32, "ep": 0.77, "bs": 5.09, "d": 6, "age": 0.34, "grav": 4.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 8603, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "llms_tokenizer", "flbl": "LLMS & Tokenizer (Training)", "urls": [], "ig": 0.327, "fa": 0.0, "gp": 0.0, "bl": 1.92, "ds": 0.0, "txt": "Because the translation of that specific software might be  superior in e.g US English?"}, {"id": 50498240, "au": "pama", "dom": 46, "sr": 109, "sc": -4.52, "ep": 0.56, "bs": 5.09, "d": 3, "age": 21.51, "grav": 294.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 3798, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "languages_word", "flbl": "Languages & Word (Texts)", "urls": [], "ig": 0.24, "fa": 0.0, "gp": 0.0, "bl": 1.92, "ds": 0.0, "txt": "Thanks. So the acceptance rates are rather similar across languages."}, {"id": 50497884, "au": "davidmurdoch", "dom": 114, "sr": 110, "sc": -4.76, "ep": 0.28, "bs": 5.04, "d": 4, "age": 22.2, "grav": 309.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 12, "qw": 0, "k": 2723, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://verbavia.com/blog/which-language-is-spoken-the-fastest"], "ig": 0.117, "fa": 0.0, "gp": 0.0, "bl": 1.9, "ds": 0.0, "txt": "Here's a study on it, I don't know if they included Texans or not: https://verbavia.com/blog/which-language-is-spoken-the-faste..."}, {"id": 50497410, "au": "Dwedit", "dom": 95, "sr": 111, "sc": -8.86, "ep": 0.0, "bs": 6.89, "d": 0, "age": 23.15, "grav": 331.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 4828, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.179, "bl": 2.6, "ds": 0.0, "txt": "How does Multi-Token Prediction factor into this?"}, {"id": 50500525, "au": "oytis", "dom": 91, "sr": 112, "sc": -8.87, "ep": 0.0, "bs": 6.89, "d": 0, "age": 17.35, "grav": 207.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 4354, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "llms_tokenizer", "flbl": "LLMS & Tokenizer (Training)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.172, "bl": 2.6, "ds": 0.0, "txt": "English is the most climate-friendly language, yay!"}, {"id": 50497972, "au": "simonw", "dom": 17, "sr": 113, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 22.04, "grav": 305.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 121922, "kpp": 7.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Look at the token usage counts."}, {"id": 50497826, "au": "yolo1897", "dom": 18, "sr": 114, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 22.32, "grav": 312.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 0, "k": 29, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "It's explained too.."}, {"id": 50497154, "au": "stavros", "dom": 73, "sr": 115, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 3, "age": 23.72, "grav": 345.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 78699, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "decode_chinese", "flbl": "Decode & Chinese (Tok)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "But my browser is sending my language."}, {"id": 50505011, "au": "snvzz", "dom": 93, "sr": 116, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 5.77, "grav": 40.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 11649, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Save the planet, learn English."}, {"id": 50497474, "au": "aprilthird2021", "dom": 115, "sr": 117, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 23.03, "grav": 329.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 1733, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "bytes_tokens", "flbl": "Bytes & Tokens (Utf-8)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Maybe Chinese / Japanese / Korean is more"}, {"id": 50496955, "au": "pridy", "dom": 96, "sr": 118, "sc": -10.56, "ep": 0.0, "bs": 9.41, "d": 0, "age": 24.19, "grav": 357.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 2, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "models_text", "flbl": "Models & Text (Tokens)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.746, "bl": 3.55, "ds": 0.0, "txt": "Does AI process maybe in English?"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      const jumpBtns = isPinned
+        ? `<button type="button" class="probe-inline-btn" data-probe-jump="1">Comment &darr;</button>` +
+          `<button type="button" class="probe-inline-btn" data-probe-clear="1">Clear &times;</button>`
+        : "";
+      probeEl.innerHTML =
+        `<strong>@${escHtml(hit.au)}</strong> | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})` +
+        jumpBtns +
+        `<br>"${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 60);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 50);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 50);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 50);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `Showing ${shown.length} of ${pool.length} matching comments (mode: ${activeMode})` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear selection</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeSelect = document.getElementById("modeSelect");
+  modeSelect.addEventListener("change", () => {
+    activeMode = modeSelect.value;
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

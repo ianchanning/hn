@@ -1,0 +1,1387 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>50527444 // The G1 Garbage Collector - Better Signal News</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+      text-transform: lowercase;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      text-transform: lowercase;
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .kpi-cell {
+      padding: 8px 0;
+    }
+    .kpi-label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 4px 0;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer:not([open]) {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary,
+    details.proof-drawer > summary {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+    }
+    table.ablation th {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: normal;
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    button.nav-btn,
+    button.mode-tab,
+    button.topbar-toggle {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: rgb(0, 0, 0);
+      cursor: pointer;
+      text-decoration: none;
+      line-height: inherit;
+      vertical-align: baseline;
+      transition: color 0.12s ease;
+      text-transform: lowercase;
+    }
+    button.nav-btn:hover,
+    button.nav-btn.active,
+    button.mode-tab:hover,
+    button.mode-tab.active,
+    button.topbar-toggle:hover,
+    button.topbar-toggle.active {
+      color: rgb(255, 255, 255);
+      text-decoration: none;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      padding: 14px;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; row-gap: 4px; }
+      .topbar-right { padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">BS</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Better Signal News</a>
+        <span class="pagetop" id="modeTabs">
+          <button type="button" class="nav-btn mode-tab active" data-mode="top_signal" role="tab" aria-selected="true">Top 40</button> | <button type="button" class="nav-btn mode-tab" data-mode="hn_top40" role="tab" aria-selected="false">HN Top 40</button>
+        </span>
+      </div>
+      <div class="topbar-right">
+        <button type="button" class="nav-btn topbar-toggle" id="exploreToggleBtn" aria-expanded="false">explore</button> | <button type="button" class="nav-btn topbar-toggle" id="evidenceToggleBtn" aria-expanded="false">evidence</button>
+      </div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://dev.java/learn/jvm/tool/garbage-collection/g1gc-overview/">The G1 Garbage Collector</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=dev.java"><span class="sitestr">dev.java</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">94 points</span> by <a href="https://news.ycombinator.com/user?id=ejboy">ejboy</a> <span class="age" title="2026-11-17T04:29:07.000Z"><a href="https://news.ycombinator.com/item?id=50527444">4 days ago</a></span> | <a href="https://news.ycombinator.com/item?id=50527444">49&nbsp;comments</a> | 83.7% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Evidence</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">49</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 34 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">16.3%</div>
+          <div class="kpi-sub">8 comments (1 Gold / 2.0%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">83.7%</div>
+          <div class="kpi-sub">27 chatter &bull; 14 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">0</div>
+        <div class="kpi-sub">0% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.863</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">16</div>
+          <div class="kpi-sub">HN POS 34..49 (32.7% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="color: rgb(90, 90, 88); margin-top: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Explore</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">CALIBRATE</div>
+              <h2>Signal Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 49-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Bullshit (Y) // Signal (X) </span>
+                <span class="sig">TAP POINT (N = 49)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (1)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (7)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (27)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (14)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>HN POS (1..49) (Y) // Age (Hours) (X)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 25)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (brunoborges, 3.8h); largest subtree (@pancakeguy) occupies 16 slots (HN POS 34..49).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (49)</option>
+          <option value="jvm_container">Jvm &amp; Container (Jdk) (11)</option>
+          <option value="management_memory">Management &amp; Memory (Manual) (10)</option>
+          <option value="efficiency_languages">Efficiency &amp; Languages (Gcs) (9)</option>
+          <option value="collector_automatic">Collector &amp; Automatic (Sizing) (8)</option>
+          <option value="core_single">Core &amp; Single (Limit) (6)</option>
+          <option value="general_commentary">General Commentary (5)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, g1, garbage, collector, size, default...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT</span>
+    <span>SOURCE: HN 50527444 + DEV.JAVA + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50527444, "story_title": "The G1 Garbage Collector", "story_url": "https://dev.java/learn/jvm/tool/garbage-collection/g1gc-overview/", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50527444, "story_title": "The G1 Garbage Collector", "story_url": "https://dev.java/learn/jvm/tool/garbage-collection/g1gc-overview/", "points": 94, "story_author": "ejboy", "article_source": "fetched_url", "t1_ref_utc": "2026-11-20T22:42:15+00:00", "t2_ref_utc": "2026-11-20T22:42:15+00:00", "delta_minutes": 0.0, "story_anchors": ["g1", "garbage", "collector", "size", "default", "heap", "java", "jdk", "jvm", "collectors", "setting", "performance", "large", "parallel", "special", "single", "available", "memory", "amount", "based", "introduced", "unless", "app", "definitely", "indeed"], "facet_labels": {"efficiency_languages": "Efficiency & Languages (Gcs)", "jvm_container": "Jvm & Container (Jdk)", "collector_automatic": "Collector & Automatic (Sizing)", "core_single": "Core & Single (Limit)", "management_memory": "Management & Memory (Manual)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "efficiency_languages", "label": "Efficiency & Languages (Gcs)", "count": 9, "top_terms": ["efficiency", "languages", "gcs", "ways"]}, {"slug": "jvm_container", "label": "Jvm & Container (Jdk)", "count": 11, "top_terms": ["jvm", "container", "jdk", "default"]}, {"slug": "collector_automatic", "label": "Collector & Automatic (Sizing)", "count": 8, "top_terms": ["collector", "automatic", "sizing", "pauses"]}, {"slug": "core_single", "label": "Core & Single (Limit)", "count": 6, "top_terms": ["core", "single", "limit", "node"]}, {"slug": "management_memory", "label": "Management & Memory (Manual)", "count": 10, "top_terms": ["management", "memory", "manual", "programs"]}], "counts": {"total_comments": 49, "live_t2_comments": 49, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 34, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "37464d69d806b31d802892dd4bbf2b1a4a5ebb62f3bc9a0e5cbca9c73e98a3fe"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 1, "grounded_analysis": 7, "crowd_chatter": 27, "bullshit_or_flamewar": 14}, "facets": {"jvm_container": 11, "efficiency_languages": 9, "collector_automatic": 8, "management_memory": 10, "core_single": 6, "general_commentary": 5}, "facet_options": [{"slug": "jvm_container", "label": "Jvm & Container (Jdk)", "count": 11}, {"slug": "management_memory", "label": "Management & Memory (Manual)", "count": 10}, {"slug": "efficiency_languages", "label": "Efficiency & Languages (Gcs)", "count": 9}, {"slug": "collector_automatic", "label": "Collector & Automatic (Sizing)", "count": 8}, {"slug": "core_single", "label": "Core & Single (Limit)", "count": 6}, {"slug": "general_commentary", "label": "General Commentary", "count": 5}], "facet_diagnostics": [{"slug": "jvm_container", "label": "Jvm & Container (Jdk)", "count": 11, "useful": 4, "useful_pct": 36.4, "terms": "jvm, container, jdk, default"}, {"slug": "management_memory", "label": "Management & Memory (Manual)", "count": 10, "useful": 0, "useful_pct": 0.0, "terms": "management, memory, manual, programs"}, {"slug": "efficiency_languages", "label": "Efficiency & Languages (Gcs)", "count": 9, "useful": 3, "useful_pct": 33.3, "terms": "efficiency, languages, gcs, ways"}, {"slug": "collector_automatic", "label": "Collector & Automatic (Sizing)", "count": 8, "useful": 1, "useful_pct": 12.5, "terms": "collector, automatic, sizing, pauses"}, {"slug": "core_single", "label": "Core & Single (Limit)", "count": 6, "useful": 0, "useful_pct": 0.0, "terms": "core, single, limit, node"}, {"slug": "general_commentary", "label": "General Commentary", "count": 5, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 3}, {"category": "low_cred_or_joke", "count": 3}], "story_anchors": ["g1", "garbage", "collector", "size", "default", "heap", "java", "jdk", "jvm", "collectors", "setting", "performance", "large", "parallel", "special", "single", "available", "memory"], "largest_root": {"root_id": 50579840, "author": "pancakeguy", "slots": 16, "start_dom": 34, "end_dom": 49, "share_pct": 32.7, "top_dom1_age": 3.8, "top_dom1_author": "brunoborges"}, "buried_cutoff": 25, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50582824, "au": "gavinray", "dom": 5, "sr": 1, "sc": 8.47, "ep": 8.47, "bs": 0.0, "d": 3, "age": 0.79, "grav": 6.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 152, "qw": 0, "k": 8150, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "epistemic_gold", "facet": "jvm_container", "flbl": "Jvm & Container (Jdk)", "urls": [], "ig": 1.646, "fa": 1.23, "gp": 0.754, "bl": 0.0, "ds": 0.0, "txt": "On that note, here's my favorite little-known tip for running Docker/Container JVM apps:\n\nThe Redhat image distros, like UBI and the JDK ones, have a really handy bash script, \"run-java.sh\". It's a wrapper script for best-practice and intelligent JVM runtime args inside of container envs:\n\n  /opt/jboss/container/java/run/run-java.sh\n\nIt started life as fabric8's run-java-sh, and it's what the Dockerfile.jvm generated by Quarkus apps uses as its entrypoint.\n\nThe script handles, among other things:\n\n- Heap sized as a percentage of the container's memory limit via -XX:MaxRAMPercentage (default 80%, compared with JVM's default of 25%). Tunalbe with JAVA_MAX_MEM_RATIO env.\n\n- -XX:+ExitOnOutOfMemoryError, so an OOM kills the container and your orchestrator restarts it\n\n- Defaults for GC and metaspace\n\n- JAVA_DEBUG=true / JAVA_DEBUG_PORT=*:5005 turns on JDWP without you having to edit the Dockerfile\n\n- http_proxy/https_proxy/no_proxy env vars get translated into -Dhttp.proxyHost etc"}, {"id": 50581981, "au": "hibikir", "dom": 4, "sr": 2, "sc": 6.07, "ep": 6.22, "bs": 0.0, "d": 2, "age": 1.74, "grav": 10.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 188, "qw": 0, "k": 7485, "kpp": 6.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "jvm_container", "flbl": "Jvm & Container (Jdk)", "urls": [], "ig": 1.419, "fa": 0.68, "gp": 0.652, "bl": 0.0, "ds": 0.0, "txt": "While you are replying to someone that definitely knows this, you'd be surprised by the number of production containers out there, in big companies, that haven't turned on container support, or hand tuned their memory well, and thus end up throwing away large parts of the memory they are allocated.\n\nHaving used Java since the days where you needed to do very heavy tuning to get it to run properly, it all seems alien, as understanding the old garbage collectors was basically mandatory 20 year ago. But even if you reply to someone that does understand the new features, you might be helping a bunch of people that don't. In my unit of about 100 programmers I am the only one that even bothered looking, given how every single pod we deployed was either completely unconfigured, or so badly misconfigured, using settings that haven't been ideal since Java 6.\n\nIn one of the pods, running a batch job that was using way too much memory, about a third of the memory in the old generation were millions of copies of the very same string. Interning of strings loaded like that has been a JVM option since 2014."}, {"id": 50580112, "au": "rileymichael", "dom": 19, "sr": 3, "sc": 5.44, "ep": 5.44, "bs": 0.0, "d": 2, "age": 3.61, "grav": 22.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 30, "qw": 16, "k": 431, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "jvm_container", "flbl": "Jvm & Container (Jdk)", "urls": ["https://bugs.openjdk.org/browse/JDK-8146115"], "ig": 0.804, "fa": 1.04, "gp": 0.403, "bl": 0.0, "ds": 0.0, "txt": "> Setting your CPU limit to 1 in Kubernetes does not mean the container sees a single logical processor\n\nthat's incorrect, the jvm has been container aware for nearly a decade (https://bugs.openjdk.org/browse/JDK-8146115)\n\nyou are correct about the underlying scheduling. limits don't pin you to a core, you get quotas across all available"}, {"id": 50581924, "au": "pron", "dom": 35, "sr": 4, "sc": 5.17, "ep": 5.17, "bs": 0.0, "d": 1, "age": 1.79, "grav": 11.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 367, "qw": 0, "k": 25584, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "efficiency_languages", "flbl": "Efficiency & Languages (Gcs)", "urls": [], "ig": 1.647, "fa": 0.34, "gp": 0.226, "bl": 0.0, "ds": 0.0, "txt": "That is just wrong. Moving GCs were invented because they're more efficient than manual memory management. In fact, in his famous 1986 paper, Garbage Collection Can Be Faster Than Stack Allocation, Andrew Appel wrote: \"It is easy to believe that one must pay a price in efficiency for this ease in programming… But this is simply not true.\"\n\nMoving GCs free you from the high overhead of malloc/free runtimes, something that us old C and C++ programmers have had decades of experience with, and why our colleagues developed large, complex runtimes such as TCMalloc and jemalloc to remove some of that overhead, even though not nearly as much as moving GCs do.\n\nThe reason low-level languages don't use moving collectors despite their superior efficiency is because they must give up on some performance optimisations for the abillity to interact with the hardware or OS directly, and that means that pointers must be stable machine addresses (this is why you need a richer FFI layer in Java). Moving collectors work in many ways like arenas. They don't need to maintain free lists whenever an object is allocated or freed (in fact, they never free any object at all), and memory is freed in bulk. This is not the only performance that low-level languages leave on the table because above everything else they must be low level.\n\nEvery single language that can use moving collectors does (it's also a "}, {"id": 50583299, "au": "pron", "dom": 26, "sr": 5, "sc": 4.8, "ep": 4.94, "bs": 0.0, "d": 5, "age": 0.15, "grav": 4.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 111, "qw": 0, "k": 25584, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "efficiency_languages", "flbl": "Efficiency & Languages (Gcs)", "urls": [], "ig": 1.389, "fa": 0.28, "gp": 0.609, "bl": 0.0, "ds": 0.0, "txt": "Even ZGC now offers better predictablity than malloc/free allocators (which are a long way from predictable as far latency goes). But some hard-realtime software uses (or at least used to) RTSJ, a hard-realtime version of Java, that separates the heap to a part that uses a GC and a part that uses nested arenas. It was a big deal twenty years ago, when I worked on such software. I don't know how much it's still used. Probably not much. C is still king in that world, and Ada too, to some extent.\n\nIt's important to know that for hard realtime, even C alone isn't enough, though, and you need special kernels. Ordinary OS schedulers aren't predictable enough for hard realtime."}, {"id": 50578940, "au": "cogman10", "dom": 16, "sr": 6, "sc": 4.16, "ep": 4.45, "bs": 0.0, "d": 3, "age": 4.83, "grav": 31.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 62, "qw": 0, "k": 22900, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "collector_automatic", "flbl": "Collector & Automatic (Sizing)", "urls": [], "ig": 0.952, "fa": 0.68, "gp": 0.19, "bl": 0.0, "ds": 0.0, "txt": "Lower CPU and Memory overhead.\n\nSerial will be your best choice if your app is constantly using 100% of that core or if you need to minimize the amount of memory overhead.\n\nG1 is a better choice if you can be flexible with your memory and if you have a lot of periods in your app where it's below 100% CPU usage (maybe a lot of IO)."}, {"id": 50580313, "au": "xxpor", "dom": 43, "sr": 7, "sc": 4.11, "ep": 4.26, "bs": 0.0, "d": 1, "age": 3.42, "grav": 20.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 79, "qw": 0, "k": 9538, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "efficiency_languages", "flbl": "Efficiency & Languages (Gcs)", "urls": [], "ig": 1.335, "fa": 0.28, "gp": 0.221, "bl": 0.0, "ds": 0.0, "txt": "Disagree. Maybe the naive business app use case will, but there are plenty of places where you want to implement effective GC regardless. Anywhere you batch frees to avoid calling it in a hot path is a GC. So it's not _always_ an efficiency sacrifice. Or, a different perspective is you always have to ask \"efficient with what resource?\" CPU time efficiency vs memory efficiency for example (an interesting case where the _money efficiency_ has obviously moved severely in the past year!)."}, {"id": 50576755, "au": "Fizzadar", "dom": 8, "sr": 8, "sc": 3.89, "ep": 3.89, "bs": 0.0, "d": 0, "age": 6.68, "grav": 48.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 1313, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "jvm_container", "flbl": "Jvm & Container (Jdk)", "urls": [], "ig": 1.036, "fa": 0.34, "gp": 0.334, "bl": 0.0, "ds": 0.0, "txt": "I remember switching on G1GC for Elasticsearch back in 2014 and it was a total game changer for cluster stability (ES had plenty of other warts back then to counter the improvement). Cool to see it land as the default everywhere over a decade later."}, {"id": 50578874, "au": "cogman10", "dom": 9, "sr": 9, "sc": 3.67, "ep": 3.82, "bs": 0.0, "d": 1, "age": 4.9, "grav": 32.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 110, "qw": 0, "k": 22900, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "collector_automatic", "flbl": "Collector & Automatic (Sizing)", "urls": [], "ig": 1.44, "fa": 0.0, "gp": 0.298, "bl": 0.0, "ds": 0.0, "txt": "It's definitely gotten a LOT better since it was introduced.  Java 17, in particular, really made G1 great.\n\nBut if you've not already looked at it for your usages, I suggest people check out both the parallel collector and ZGC.  ZGC in particular has been getting a lot of very nice features.  Semi recently getting fast heap freeing (to the OS).  The parallel collector for small heaps can generally beat G1 pause times.\n\nWhere G1 really shines over the parallel collector is the fact that it regularly collects old gen.  If your app has a lot of caches, then G1 is very good at keeping the VM from ending up with very long pauses."}, {"id": 50579586, "au": "karussell", "dom": 28, "sr": 10, "sc": 3.6, "ep": 3.6, "bs": 0.0, "d": 1, "age": 4.13, "grav": 26.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 29, "qw": 0, "k": 1598, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "collector_automatic", "flbl": "Collector & Automatic (Sizing)", "urls": ["https://openjdk.org/jeps/8359211"], "ig": 0.772, "fa": 0.62, "gp": 0.01, "bl": 0.0, "ds": 0.0, "txt": "What do you mean? G1 definitely has automatic heap sizing, i.e. Xmx just defines the maximum it is allowed to use.\n\nedit: looks like you probably mean sth like this: https://openjdk.org/jeps/8359211"}, {"id": 50527736, "au": "Sid_Lmao", "dom": 12, "sr": 11, "sc": 3.56, "ep": 6.73, "bs": 2.52, "d": 0, "age": 89.4, "grav": 3386.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 45, "qw": 0, "k": 3, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "jvm_container", "flbl": "Jvm & Container (Jdk)", "urls": [], "ig": 1.109, "fa": 0.68, "gp": 1.51, "bl": 0.95, "ds": 0.0, "txt": "Easy-to-miss detail: before JDK 27, the JVM only picked G1 with 2+ CPUs and ~1.8 GB of memory; otherwise, it silently used SerialGC. So a lot of 1- CPU Kubernetes pods have been on serial all along. Worth checking with -XX:+PrintCommandLineFlags before upgrading, since GC behaviour will change."}, {"id": 50581172, "au": "jitix", "dom": 48, "sr": 12, "sc": 3.26, "ep": 3.55, "bs": 0.0, "d": 4, "age": 2.58, "grav": 15.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 113, "qw": 0, "k": 836, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "management_memory", "flbl": "Management & Memory (Manual)", "urls": [], "ig": 1.461, "fa": 0.0, "gp": 0.08, "bl": 0.0, "ds": 0.0, "txt": "Programming languages are just an intermediate representation of the solution, just like bytecode or assembly.\n\nWith AI we don't need expressive programming languages for humans to read and understand at line-level details. Instead, we need stronger guardrails and fewer building blocks so that AI generates consistent solutions.\n\nGC became poplar only because it was hard for programmers to keep track of memory management in languages like C and C++. And back then I was a huge proponent of GC based languages.\n\nThis is just a step along the same path that Go introduced. Many programmers switching from other languages complain about Go's restrictive and seemingly verbose syntax but once the benefits are realized the tradeoffs become worth it."}, {"id": 50579926, "au": "brunoborges", "dom": 1, "sr": 13, "sc": 3.01, "ep": 7.32, "bs": 3.58, "d": 0, "age": 3.77, "grav": 23.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": -1, "lu": 1, "w": 143, "qw": 0, "k": 659, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "jvm_container", "flbl": "Jvm & Container (Jdk)", "urls": ["https://www.youtube.com/watch?v=wApqCjHWF8Q"], "ig": 1.337, "fa": 1.23, "gp": 0.466, "bl": 1.35, "ds": 0.0, "txt": "Lots of details that teams miss when tuning the JVM on Kubernetes:\n\n1. Default heap size varies: it can be 50% of the available memory for any amount of available memory up to 256mb; ~128mb for anywhere between 256 and 512; and then 25% for anything above 512mb;\n\n2. The JVM will still do parallel threads even when CPU limit is 1,000 or below , which triggers CPU throttling much faster. Threads such as GC (even when it is SerialGC), ForkJoin pools, Database connection pools, HTTP server, and so on.\n\n3. The JVM behaves MUCH better with 2,000 or more milicores, and a well sized heap. Having very small containers and dozens of replicas is worse than having slightly bigger containers (cpu/memory limits) and fewer replicas, even with a different ratio (e.g. 6 replicas will perform worse than 3 replicas, even when aggregated CPU and memory limits are the same).\n\nI've been advocating on this for years [1].\n\n[1] https://www.youtube.com/watch?v=wApqCjHWF8Q"}, {"id": 50580761, "au": "titzer", "dom": 36, "sr": 14, "sc": 2.87, "ep": 3.31, "bs": 0.0, "d": 1, "age": 2.97, "grav": 17.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 85, "qw": 0, "k": 20388, "kpp": 4.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "management_memory", "flbl": "Management & Memory (Manual)", "urls": [], "ig": 1.332, "fa": 0.0, "gp": 0.122, "bl": 0.0, "ds": 0.0, "txt": "No, manual memory management, with or without static ownership, is not inherently more efficient than GC. Bump pointer allocation is crazy fast. GC work is proportional to live data, not dead data. GC can do compaction and locality optimizations. Manual deallocation is proportional to dead data, unless you are doing bulk deallocation with regions. Stack allocation is crazy fast. It's a little beyond what state-of-the-art compilers do by default, but it's just pointer analysis that will also get better with AI optimizing and improving compilers."}, {"id": 50579643, "au": "seabrookmx", "dom": 18, "sr": 15, "sc": 2.84, "ep": 3.28, "bs": 0.0, "d": 1, "age": 4.07, "grav": 25.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 100, "qw": 12, "k": 2117, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "core_single", "flbl": "Core & Single (Limit)", "urls": [], "ig": 0.812, "fa": 0.42, "gp": 0.122, "bl": 0.0, "ds": 0.0, "txt": "> So a lot of 1- CPU Kubernetes pods have been on serial all along\n\nI don't think this is true.\n\nSetting your CPU limit to 1 in Kubernetes does not mean the container sees a single logical processor. It only means the kernel allows it to use 1 core worth of CPU _time_.\n\nIf your k8s node is an 8 core node, Java will still see 8 logical processors. It just means you can only use 1/8th of each, or all of one, or some combination in-between.\n\nI've never seen a k8s node running on a single core VM, as most of the cloud providers only use these for their free tier or shared core VM's for the lightest of light workloads."}, {"id": 50581238, "au": "hashmash", "dom": 39, "sr": 16, "sc": 2.84, "ep": 3.28, "bs": 0.0, "d": 1, "age": 2.52, "grav": 15.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 69, "qw": 0, "k": 275, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "collector_automatic", "flbl": "Collector & Automatic (Sizing)", "urls": [], "ig": 1.33, "fa": 0.0, "gp": 0.108, "bl": 0.0, "ds": 0.0, "txt": "Implementing efficient concurrent algorithms without a tracing collector is quite difficult, and it often requires the use of hazard pointers or epochs. Both act like mini collectors, and they also require special tuning.\n\nUnless you want AI generated code to be single threaded and not take advantage of multiple cores, some form of collector is still required. If you want to avoid heap fragmentation issues, a compacting collector is generally recommended."}, {"id": 50575711, "au": "_verandaguy", "dom": 30, "sr": 17, "sc": 2.75, "ep": 2.75, "bs": 0.0, "d": 0, "age": 7.57, "grav": 58.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 1712, "kpp": 5.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "management_memory", "flbl": "Management & Memory (Manual)", "urls": [], "ig": 0.693, "fa": 0.28, "gp": 0.226, "bl": 0.0, "ds": 0.0, "txt": "Tangential, but I really dislike that the `.java` gTLD was allowed to come about given it's also a reasonably popular file extension.\n\nThe `.zip` gTLD set a really bad precedent."}, {"id": 50579691, "au": "cyberax", "dom": 29, "sr": 18, "sc": 2.09, "ep": 2.23, "bs": 0.0, "d": 2, "age": 4.0, "grav": 25.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 7223, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "core_single", "flbl": "Core & Single (Limit)", "urls": [], "ig": 0.951, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Indeed.\n\nOne great feature in Go (or Python, or Node JS) is that you don't have to care about setting the -Xmx. The runtime will just use more RAM as needed, and you can use normal mechanisms like cgroups to limit the maximum size."}, {"id": 50579840, "au": "pancakeguy", "dom": 34, "sr": 19, "sc": 2.03, "ep": 2.47, "bs": 0.0, "d": 0, "age": 3.86, "grav": 24.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 10, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "efficiency_languages", "flbl": "Efficiency & Languages (Gcs)", "urls": [], "ig": 0.713, "fa": 0.0, "gp": 0.55, "bl": 0.0, "ds": 0.0, "txt": "garbage collection will almost certainly be a relic of the past surprisingly soon. Fundamentally it exchanges efficiency for readability & developer experience, to things that do not matter when using AI to write code."}, {"id": 50581222, "au": "quotemstr", "dom": 42, "sr": 20, "sc": 1.93, "ep": 2.37, "bs": 0.0, "d": 1, "age": 2.53, "grav": 15.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 70, "qw": 0, "k": 8715, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "management_memory", "flbl": "Management & Memory (Manual)", "urls": [], "ig": 0.954, "fa": 0.0, "gp": 0.088, "bl": 0.0, "ds": 0.0, "txt": "Why would you think that malloc/free style memory management is more efficient? Both functions can be quite expensive, and they work synchronously. GCes give you compaction, compressed pointers, and bump pointer young generation operation as well as offloading allocation machinery to threads other than your business logic one. It's manual memory management that's going the way of the dinosaur, and the current interest in manual memory management is a fad."}, {"id": 50579829, "au": "brunoborges", "dom": 14, "sr": 21, "sc": 1.57, "ep": 2.01, "bs": 0.0, "d": 2, "age": 3.86, "grav": 24.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 659, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "core_single", "flbl": "Core & Single (Limit)", "urls": [], "ig": 0.407, "fa": 0.34, "gp": 0.06, "bl": 0.0, "ds": 0.0, "txt": "A 1,000 millicore CPU limit on Kubernetes does not mean the JVM can only use a single core. But that is indeed how the JVM interprets the limit: as a single core being available."}, {"id": 50577451, "au": "ahmedfromtunis", "dom": 11, "sr": 22, "sc": 1.26, "ep": 1.92, "bs": 0.0, "d": 0, "age": 6.08, "grav": 42.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 3051, "kpp": 4.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "jvm_container", "flbl": "Jvm & Container (Jdk)", "urls": [], "ig": 0.712, "fa": 0.0, "gp": 0.169, "bl": 0.0, "ds": 0.0, "txt": "I love that they also have learn.java and inside.java.\n\nThey should make get.java point to the download page. Oh and docs.java would be very cool!"}, {"id": 50577522, "au": "antonhag", "dom": 15, "sr": 23, "sc": 1.19, "ep": 1.85, "bs": 0.0, "d": 2, "age": 6.02, "grav": 42.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 74, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "collector_automatic", "flbl": "Collector & Automatic (Sizing)", "urls": [], "ig": 0.787, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Lower overhead yes - but G1 should have shorter pauses. And shorter pauses is probably worth it unless you run only background jobs in your jvms."}, {"id": 50575639, "au": "citrin_ru", "dom": 13, "sr": 24, "sc": 1.13, "ep": 1.57, "bs": 0.0, "d": 1, "age": 7.65, "grav": 59.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 2345, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "core_single", "flbl": "Core & Single (Limit)", "urls": [], "ig": 0.274, "fa": 0.0, "gp": 0.639, "bl": 0.0, "ds": 0.0, "txt": "Isn't the reason for this that on a single core SerialGC is better (lower CPU overhead at least)?"}, {"id": 50580795, "au": "titzer", "dom": 47, "sr": 25, "sc": 1.1, "ep": 1.76, "bs": 0.0, "d": 3, "age": 2.93, "grav": 17.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 56, "qw": 0, "k": 20388, "kpp": 4.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "management_memory", "flbl": "Management & Memory (Manual)", "urls": [], "ig": 0.751, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Memory management is a resource issue that should be orthogonal to the logic of code. Moving away from GC is not the right direction for writing smaller, more concise, and more correct programs.\n\nI don't think that making programs a lot more complicated because they have to prove a very specific memory management discipline is the right way to go."}, {"id": 50581738, "au": "gavinray", "dom": 3, "sr": 26, "sc": 0.85, "ep": 2.17, "bs": 0.0, "d": 1, "age": 2.01, "grav": 12.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 8150, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "jvm_container", "flbl": "Jvm & Container (Jdk)", "urls": [], "ig": 0.925, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Modern JVM's (JDK +10) have runtime detection for whether they're operating in a container environment, and apply sensible defaults based dynamically on resources if so.\n\nGoogle term: \"-XX:+UseContainerSupport\""}, {"id": 50577366, "au": "ch4s3", "dom": 17, "sr": 27, "sc": 0.65, "ep": 1.31, "bs": 0.0, "d": 2, "age": 6.14, "grav": 43.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 10610, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "core_single", "flbl": "Core & Single (Limit)", "urls": [], "ig": 0.557, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I'd imagine so. The kind of bookkeeping they're talking about here would negatively effect performance on a single core."}, {"id": 50580330, "au": "jitix", "dom": 46, "sr": 28, "sc": 0.57, "ep": 1.23, "bs": 0.0, "d": 2, "age": 3.39, "grav": 20.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 59, "qw": 0, "k": 836, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "efficiency_languages", "flbl": "Efficiency & Languages (Gcs)", "urls": [], "ig": 0.525, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Disagree, we need to move ahead with progress.\n\nHobby and domain specific languages may still use GC but getting rid of the concept of GC is the right direction, along with removing different ways of doing things in a programming language. Go was right when it forced developers to use only pattern for loops, one pattern for error handling, etc."}, {"id": 50581277, "au": "paulddraper", "dom": 37, "sr": 29, "sc": 0.42, "ep": 1.31, "bs": 0.0, "d": 2, "age": 2.48, "grav": 14.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 18142, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "management_memory", "flbl": "Management & Memory (Manual)", "urls": [], "ig": 0.556, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "GC is fast.\n\nGC is not memory efficient.\n\nIf a primary concern is optimizing memory usage, you will avoid GC languages."}, {"id": 50579962, "au": "ogogmad", "dom": 45, "sr": 30, "sc": 0.42, "ep": 0.86, "bs": 0.0, "d": 1, "age": 3.74, "grav": 23.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 3149, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.367, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "If true, it's sad. So much work and so much accumulated wisdom. It's like seeing a cathedral built by thousands of hands over dozens of years collapse in an earthquake."}, {"id": 50580213, "au": "IncreasePosts", "dom": 44, "sr": 31, "sc": 0.33, "ep": 1.21, "bs": 0.0, "d": 1, "age": 3.51, "grav": 21.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 63, "qw": 0, "k": 4243, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "efficiency_languages", "flbl": "Efficiency & Languages (Gcs)", "urls": [], "ig": 0.514, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Doesn't this assume infinite abundance of compute? For most problems, using a GC is probably easier for AI than to track everything manually(just like with humans). Similarly, we could probably ask AI to output everything in optimized assembler code, but it will almost certainly burn more tokens getting to a solution than if we allow it to write in python or some other HLL"}, {"id": 50580840, "au": "jeffbee", "dom": 40, "sr": 32, "sc": 0.09, "ep": 1.19, "bs": 0.0, "d": 1, "age": 2.89, "grav": 17.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 24584, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "efficiency_languages", "flbl": "Efficiency & Languages (Gcs)", "urls": [], "ig": 0.426, "fa": 0.0, "gp": 0.133, "bl": 0.0, "ds": 0.0, "txt": "Can't agree. GC language platforms are more efficient in many ways. Look at the hoops that C allocators try to jump through just to get decent THP coverage which a compacting GC gets essentially for free."}, {"id": 50579810, "au": "brunoborges", "dom": 20, "sr": 33, "sc": -0.59, "ep": 4.53, "bs": 3.58, "d": 1, "age": 3.88, "grav": 24.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": -1, "lu": 1, "w": 52, "qw": 0, "k": 659, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "jvm_container", "flbl": "Jvm & Container (Jdk)", "urls": ["https://www.youtube.com/watch?v=wApqCjHWF8Q"], "ig": 1.103, "fa": 0.68, "gp": 0.0, "bl": 1.35, "ds": 0.0, "txt": "This is correct. I have been advocating about this for years now [1].\n\nI have also seen customers wasting resources across Kubernetes because their developers would eventually tune JVMs with lowercase `-xmx` flag, which the JVM ignores, and thus by default, the JVM only sets heap size to 25% by default (for => 512mb of available memory).\n\n[1] https://www.youtube.com/watch?v=wApqCjHWF8Q"}, {"id": 50581824, "au": "froh", "dom": 7, "sr": 34, "sc": -0.85, "ep": 0.78, "bs": 1.19, "d": 3, "age": 1.91, "grav": 11.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 2382, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.331, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "I (and presumably some others) didn't.  TIL and thx for sharing.\n\nand I also read it not as contradiction but simply as useful additional information."}, {"id": 50581852, "au": "pron", "dom": 38, "sr": 35, "sc": -0.94, "ep": 3.96, "bs": 3.58, "d": 3, "age": 1.88, "grav": 11.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": -1, "lu": 1, "w": 217, "qw": 0, "k": 25584, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "efficiency_languages", "flbl": "Efficiency & Languages (Gcs)", "urls": ["https://youtu.be/xr73mR7ii9M"], "ig": 1.271, "fa": 0.28, "gp": 0.117, "bl": 1.35, "ds": 0.0, "txt": "That is not so simple. First, the differences among different GCs are bigger than between some GCs and no GC. Second, moving GCs - of the kind used in HotSpot (as well as V8 and .NET), but not Go or Python (which are as different from each other as they are from moving GCs) - do, indeed have a higher memory utilisation, but it's not necessarily inefficient, because most of it comes into effect when CPU is under higher pressure than RAM (that's when you get a larger young-gen, as the heap overhead is a function of the allocation rate, not of the live set which, in turn, means a high CPU usage). RAM and CPU are not independent resources; the most basic way to think about this is that your machine is exhausted when the first of CPU and RAM is exhausted. For example, I can take your car battery or I can take your petrol, but if I take your car battery when you don't have petrol, I'm not impacting your use of the car, so I'm not really creating any \"inefficiency\".\n\nYou are right, though, that in a very memory-constrained environment, usually embedded devices, you may want to lower memory consumption regardless of anything else, and in such environments moving GCs are probably not what you want (although other kinds of GC could be).\n\nMore here: https://youtu.be/xr73mR7ii9M"}, {"id": 50581843, "au": "titzer", "dom": 49, "sr": 36, "sc": -1.03, "ep": 2.51, "bs": 2.44, "d": 5, "age": 1.89, "grav": 11.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 190, "qw": 40, "k": 20388, "kpp": 4.3, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "management_memory", "flbl": "Management & Memory (Manual)", "urls": [], "ig": 0.558, "fa": 0.42, "gp": 0.0, "bl": 0.92, "ds": 0.0, "txt": "> GC became poplar only because it was hard for programmers to keep track of memory management in languages like C and C++. And back then I was a huge proponent of GC based languages.\n\nAs I said elsewhere in the thread, GC is not inherently less efficient than manual memory management, so I don't really agree with this. It's better for programmers and makes for more ergonomic and evolvable APIs.\n\nGC is a pervasive, system-wide service that makes ownership and management orthogonal to program logic. It does this by being a runtime service that comes with some runtime cost. Even manual memory management comes with runtime cost--different ones.\n\n> With AI we don't need expressive programming languages for humans\n\nActually I think it's completely the opposite. PL is for humans to understand algorithms. We need AIs to reduce their thinking to algorithms and then present their solutions as algorithms to us. When we want to communicate precisely, reason and understand precisely, we don't write prompts, we write and understand programs.\n\nThat's not really a popular opinion right now because so many people are excited to be freed from thinking and staring at shitty code, but that isn't how it's going to go down. Programs are proofs that something has been reduced to a deterministic algorithm instead of a sloppy, ill-defined prompt or skill.\n\nAnd to that, I for one do not want to have th"}, {"id": 50581474, "au": "hashmash", "dom": 22, "sr": 37, "sc": -1.2, "ep": 0.87, "bs": 1.19, "d": 2, "age": 2.29, "grav": 13.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 275, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "core_single", "flbl": "Core & Single (Limit)", "urls": [], "ig": 0.372, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Not really, other than OpenJ9. In my experience, it's way behind OpenJDK in terms of performance and stability."}, {"id": 50580328, "au": "sealWithIt", "dom": 41, "sr": 38, "sc": -1.73, "ep": 1.0, "bs": 1.19, "d": 1, "age": 3.4, "grav": 20.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 4, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "efficiency_languages", "flbl": "Efficiency & Languages (Gcs)", "urls": [], "ig": 0.329, "fa": 0.0, "gp": 0.159, "bl": 0.45, "ds": 0.0, "txt": "On the one hand, I agree with you; on the other, I also find reasonable that lower cognitive load may keep justifying the existence of GC-based languages even for AI."}, {"id": 50581895, "au": "hashmash", "dom": 24, "sr": 39, "sc": -1.81, "ep": 1.11, "bs": 2.04, "d": 4, "age": 1.82, "grav": 11.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 275, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "collector_automatic", "flbl": "Collector & Automatic (Sizing)", "urls": [], "ig": 0.251, "fa": 0.0, "gp": 0.36, "bl": 0.77, "ds": 0.0, "txt": "Nope. What kind of collectors do they use to be real time? I've never understood how this is possible."}, {"id": 50578725, "au": "dbt00", "dom": 32, "sr": 40, "sc": -1.99, "ep": 1.21, "bs": 3.05, "d": 2, "age": 5.04, "grav": 33.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 2219, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.102, "fa": 0.34, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "The potential for confusion in 1985 wasn't really on anyone's radar."}, {"id": 50582741, "au": "joosd", "dom": 2, "sr": 41, "sc": -2.29, "ep": 1.77, "bs": 2.52, "d": 1, "age": 0.87, "grav": 6.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 45, "qw": 0, "k": 3, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "jvm_container", "flbl": "Jvm & Container (Jdk)", "urls": [], "ig": 0.752, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "Hey man just wanted to let you know years ago our team used your Devoxx talk as a starting point for tuning our Java apps that are running on K8s and it has been of tremendous help. I still refer back to it every now and then!"}, {"id": 50581629, "au": "pjmlp", "dom": 23, "sr": 42, "sc": -3.18, "ep": 1.11, "bs": 3.05, "d": 3, "age": 2.14, "grav": 12.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 134322, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "collector_automatic", "flbl": "Collector & Automatic (Sizing)", "urls": [], "ig": 0.134, "fa": 0.28, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Then you never embedded development with real time JVMs, for example."}, {"id": 50583381, "au": "pjmlp", "dom": 25, "sr": 43, "sc": -3.72, "ep": 1.28, "bs": 3.68, "d": 5, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 25, "qw": 0, "k": 134322, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 5, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "management_memory", "flbl": "Management & Memory (Manual)", "urls": ["https://www.amazon.com/dp/3831138931/ref=mp_s_a_1_1"], "ig": 0.546, "fa": 0.0, "gp": 0.0, "bl": 1.39, "ds": 0.0, "txt": "Real time algorithms, plenty of material on the matter.\n\nHere is the book on the first implementation that was on the genesis of Aicas JamaicaVM.\n\nhttps://www.amazon.com/dp/3831138931/ref=mp_s_a_1_1"}, {"id": 50581762, "au": "gavinray", "dom": 6, "sr": 44, "sc": -4.01, "ep": 0.67, "bs": 4.24, "d": 2, "age": 1.99, "grav": 12.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 8150, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.286, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "I just realized the username of the comment I replied to.\n\nThe OP undoubtedly knows this, whoops."}, {"id": 50579820, "au": "pjmlp", "dom": 21, "sr": 45, "sc": -4.21, "ep": 0.38, "bs": 3.05, "d": 1, "age": 3.87, "grav": 24.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 134322, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "jvm_container", "flbl": "Jvm & Container (Jdk)", "urls": [], "ig": 0.161, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Open JDK, not The JVM.\n\nThere are other implementations."}, {"id": 50579174, "au": "cyberax", "dom": 27, "sr": 46, "sc": -4.97, "ep": 0.63, "bs": 4.24, "d": 0, "age": 4.58, "grav": 29.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 7223, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "collector_automatic", "flbl": "Collector & Automatic (Sizing)", "urls": [], "ig": 0.184, "fa": 0.0, "gp": 0.139, "bl": 1.6, "ds": 0.0, "txt": "And still no automatic heap sizing... Maybe next year?"}, {"id": 50579809, "au": "pjmlp", "dom": 10, "sr": 47, "sc": -5.96, "ep": 0.27, "bs": 4.24, "d": 1, "age": 3.88, "grav": 24.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 134322, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "management_memory", "flbl": "Management & Memory (Manual)", "urls": [], "ig": 0.116, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "It is not everywhere, because there are other JVM implementations, with their own GC algorithms."}, {"id": 50576456, "au": "dboreham", "dom": 33, "sr": 48, "sc": -9.64, "ep": 0.0, "bs": 6.89, "d": 2, "age": 6.94, "grav": 51.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 18248, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Old school."}, {"id": 50576220, "au": "lmz", "dom": 31, "sr": 49, "sc": -10.66, "ep": 0.0, "bs": 6.89, "d": 1, "age": 7.14, "grav": 53.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 0, "k": 2389, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "management_memory", "flbl": "Management & Memory (Manual)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": ".zip? Not .com?"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "top_signal";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Signal Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("SIGNAL (INFO + FALSIFIABILITY) →", W - 295, H - 7);
+    pCtx.fillText("↑ BULLSHIT", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 40);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 40);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 40);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `${shown.length} of ${pool.length} comments` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const proofDrawer = document.getElementById("proofDrawer");
+  const expBtn = document.getElementById("exploreToggleBtn");
+  const eviBtn = document.getElementById("evidenceToggleBtn");
+
+  if (expBtn && labDrawer) {
+    expBtn.addEventListener("click", () => {
+      labDrawer.open = !labDrawer.open;
+    });
+    labDrawer.addEventListener("toggle", () => {
+      const isOpen = labDrawer.open;
+      expBtn.classList.toggle("active", isOpen);
+      expBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  if (eviBtn && proofDrawer) {
+    eviBtn.addEventListener("click", () => {
+      proofDrawer.open = !proofDrawer.open;
+    });
+    proofDrawer.addEventListener("toggle", () => {
+      const isOpen = proofDrawer.open;
+      eviBtn.classList.toggle("active", isOpen);
+      eviBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

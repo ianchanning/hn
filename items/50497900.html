@@ -1,0 +1,1259 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50497900 // Formalizing US Tax Code (Using Lean) — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      background: rgb(247, 247, 245);
+      color: rgb(13, 13, 13);
+      font: 15px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+    }
+    .sheet-top {
+      border-top: 3px solid rgb(13, 13, 13);
+      border-bottom: 1px solid rgb(13, 13, 13);
+      padding: 16px 0 26px;
+    }
+    .eyebrow {
+      font: 600 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .eyebrow strong { color: rgb(255, 51, 0); }
+    h1 {
+      font-size: clamp(36px, 5.2vw, 72px);
+      line-height: 0.96;
+      letter-spacing: -0.045em;
+      margin: 18px 0 14px;
+      font-weight: 800;
+    }
+    h1 .accent { color: rgb(255, 51, 0); }
+    .sublead {
+      max-width: 920px;
+      font-size: 16px;
+      color: rgb(52, 52, 50);
+      margin: 0;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      font: 700 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 24px;
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+    }
+    .kpi-cell {
+      padding: 16px 16px 14px;
+      border-right: 1px solid rgb(205, 205, 200);
+    }
+    .kpi-cell:last-child { border-right: 0; }
+    .kpi-label {
+      font: 600 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 8px 0 4px;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      font-size: 12px;
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      background: rgb(13, 15, 17);
+      color: rgb(228, 232, 236);
+      border: 2px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 6px;
+      corner-shape: bevel;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(156, 166, 176);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      background: rgb(9, 11, 13);
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(180, 188, 196);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 58px;
+      background: rgb(20, 24, 28);
+      border-left: 3px solid rgb(0, 230, 118);
+      font: 12px/19px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(220, 226, 232);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 38px;
+    }
+
+    /* Collapsible 03A / 03B Justification Drawer */
+    details.proof-drawer {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 12px 0;
+    }
+    details.proof-drawer > summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      font: 700 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      user-select: none;
+    }
+    details.proof-drawer > summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary:hover { border-color: rgb(255, 51, 0); }
+    details.proof-drawer > summary .toggle-pill {
+      flex-shrink: 0;
+      padding: 3px 8px;
+      background: rgb(13, 13, 13);
+      color: rgb(247, 247, 245);
+      font-size: 10px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 16px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: rgb(255, 255, 253);
+      border: 1px solid rgb(13, 13, 13);
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+    }
+    table.ablation th {
+      background: rgb(236, 236, 231);
+      font: 700 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgb(60, 60, 58);
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      font: 600 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+      color: rgb(13, 13, 13);
+      padding: 7px 11px;
+      font: 600 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      box-shadow: 0 2px 0 rgb(13, 13, 13);
+    }
+    button.tab-btn.active {
+      background: rgb(13, 13, 13);
+      color: rgb(247, 247, 245);
+    }
+    button.tab-btn:hover {
+      border-color: rgb(255, 51, 0);
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      padding: 8px 11px;
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+      font: 600 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { flex: 1; min-width: 220px; font-weight: 400; }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border: 1px solid rgb(216, 216, 206);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      border-top: 3px solid rgb(13, 13, 13);
+      padding-top: 14px;
+      margin-top: 36px;
+      font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        background: rgb(239, 239, 234);
+        border: 1px solid rgb(13, 13, 13);
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        font-size: 17px;
+        margin: 0;
+        white-space: normal;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        background: rgb(13, 13, 13);
+        color: rgb(247, 247, 245);
+        font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-] HIDE"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+] SHOW"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpi-cell { border-bottom: 1px solid rgb(205, 205, 200); }
+      .filter-bar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .filter-bar select.sel-in {
+        width: 100%;
+        font-size: 16px;
+        padding: 8px 9px;
+      }
+      .filter-bar input.search-in {
+        grid-column: span 2;
+        width: 100%;
+        min-width: 0;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="sheet-top">
+    <div class="eyebrow">
+      <span>NYX OBSERVATORY // <a class="ext-link" href="https://news.ycombinator.com/item?id=50497900">HN ITEM 50497900</a> // LEXIFINA.COM</span>
+      <span><strong>BULLSHIT: 84.4%</strong>
+    </div>
+    <h1>Bullshit vs. <span class="accent">Epistemic.</span></h1>
+    <p class="sublead">
+      <strong>64</strong> Hacker News comments on <a class="ext-link" href="https://lexifina.com/blog/formalizing-the-us-tax-code">Formalizing US Tax Code (Using Lean) (lexifina.com)</a>.
+    </p>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary>
+      <span>01 // EVIDENCE</span>
+      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    </summary>
+    <p>
+      Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+      Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+    </p>
+    <div class="proof-body">
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">64</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 47 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">15.6%</div>
+          <div class="kpi-sub">10 comments (3 Gold / 4.7%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">84.4%</div>
+          <div class="kpi-sub">35 chatter &bull; 18 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">1</div>
+        <div class="kpi-sub">3% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.901</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">18</div>
+          <div class="kpi-sub">HN POS 9..26 (28.1% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="margin-top:10px;font:600 11px/1.5 ui-monospace,Menlo,monospace;color:rgb(70,70,68)"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary>
+      <span>02 // EXPLORE</span>
+      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / INTERACTIVE EQUATION</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p style="font-size:11.5px;line-height:1.42;color:rgb(85,85,82);margin:12px 0 0">
+              Drag any weight to watch the 64-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 64)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (3)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (7)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (35)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (1)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (18)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..64) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 25)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (@patrickmay, 2.9h); largest subtree (@rancar2) occupies 18 slots (HN POS 9..26).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="modeSelect" class="sel-in" aria-label="Ranking view">
+          <option value="hn_top40">HN Top 40</option>
+          <option value="top_signal">Epistemic Top 50</option>
+          <option value="buried_gems">Buried Gems (HN POS &gt; 25)</option>
+          <option value="bullshit_traps">High-Karma / URL Traps Caught</option>
+          <option value="mod_morgue">Mod Rebukes &amp; Downvoted Morgue</option>
+          <option value="c5a_rescues">c5A Heterodox Rescues</option>
+        </select>
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (64)</option>
+          <option value="code_tax">Code &amp; Tax (Lean) (18)</option>
+          <option value="tax_inconsistent">Tax &amp; Inconsistent (300k) (16)</option>
+          <option value="judge_law">Judge &amp; Law (Explicitly) (8)</option>
+          <option value="vague_laws">Vague &amp; Laws (Intended) (8)</option>
+          <option value="deduction_states">Deduction &amp; States (Salt) (7)</option>
+          <option value="general_commentary">General Commentary (7)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, code, income, credit, lean, formalizing...">
+      </div>
+      <div id="resultMeta" style="font:600 11px/1.4 ui-monospace,Menlo,monospace;color:rgb(90,90,88);margin-bottom:10px"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50497900 + LEXIFINA.COM + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50497900, "story_title": "Formalizing US Tax Code (Using Lean)", "story_url": "https://lexifina.com/blog/formalizing-the-us-tax-code", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50497900, "story_title": "Formalizing US Tax Code (Using Lean)", "story_url": "https://lexifina.com/blog/formalizing-the-us-tax-code", "points": 103, "story_author": "dnw", "article_source": "fetched_url", "t1_ref_utc": "2026-11-14T20:13:52+00:00", "t2_ref_utc": "2026-11-14T20:13:52+00:00", "delta_minutes": 0.0, "story_anchors": ["code", "income", "credit", "lean", "formalizing", "instead", "loopholes", "benefits", "couple", "deduction", "returns", "makes", "tax", "us", "formal", "large", "particular", "result", "whole", "amount", "bill", "state", "logic", "change", "per"], "facet_labels": {"tax_inconsistent": "Tax & Inconsistent (300k)", "judge_law": "Judge & Law (Explicitly)", "deduction_states": "Deduction & States (Salt)", "code_tax": "Code & Tax (Lean)", "vague_laws": "Vague & Laws (Intended)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "tax_inconsistent", "label": "Tax & Inconsistent (300k)", "count": 16, "top_terms": ["tax", "inconsistent", "300k", "pay"]}, {"slug": "judge_law", "label": "Judge & Law (Explicitly)", "count": 8, "top_terms": ["judge", "law", "explicitly", "purpose"]}, {"slug": "deduction_states", "label": "Deduction & States (Salt)", "count": 7, "top_terms": ["deduction", "states", "salt", "tax"]}, {"slug": "code_tax", "label": "Code & Tax (Lean)", "count": 18, "top_terms": ["code", "tax", "lean", "cpa"]}, {"slug": "vague_laws", "label": "Vague & Laws (Intended)", "count": 8, "top_terms": ["vague", "laws", "intended", "courts"]}], "counts": {"total_comments": 64, "live_t2_comments": 64, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 47, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 1, "pages_fetched": 1}, "sha256": {"corpus.json": "d420efc7b74fc61fa8ef7edeecdc8801c8f4ea3e62575e52b01f9efd2ffd00b0"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 3, "grounded_analysis": 7, "crowd_chatter": 35, "bullshit_or_flamewar": 18, "meme_or_snark": 1}, "facets": {"tax_inconsistent": 16, "deduction_states": 7, "judge_law": 8, "code_tax": 18, "vague_laws": 8, "general_commentary": 7}, "facet_options": [{"slug": "code_tax", "label": "Code & Tax (Lean)", "count": 18}, {"slug": "tax_inconsistent", "label": "Tax & Inconsistent (300k)", "count": 16}, {"slug": "judge_law", "label": "Judge & Law (Explicitly)", "count": 8}, {"slug": "vague_laws", "label": "Vague & Laws (Intended)", "count": 8}, {"slug": "deduction_states", "label": "Deduction & States (Salt)", "count": 7}, {"slug": "general_commentary", "label": "General Commentary", "count": 7}], "facet_diagnostics": [{"slug": "code_tax", "label": "Code & Tax (Lean)", "count": 18, "useful": 1, "useful_pct": 5.6, "terms": "code, tax, lean, cpa"}, {"slug": "tax_inconsistent", "label": "Tax & Inconsistent (300k)", "count": 16, "useful": 4, "useful_pct": 25.0, "terms": "tax, inconsistent, 300k, pay"}, {"slug": "judge_law", "label": "Judge & Law (Explicitly)", "count": 8, "useful": 2, "useful_pct": 25.0, "terms": "judge, law, explicitly, purpose"}, {"slug": "vague_laws", "label": "Vague & Laws (Intended)", "count": 8, "useful": 1, "useful_pct": 12.5, "terms": "vague, laws, intended, courts"}, {"slug": "deduction_states", "label": "Deduction & States (Salt)", "count": 7, "useful": 2, "useful_pct": 28.6, "terms": "deduction, states, salt, tax"}, {"slug": "general_commentary", "label": "General Commentary", "count": 7, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 6}, {"category": "code_repository", "count": 1}], "story_anchors": ["code", "income", "credit", "lean", "formalizing", "instead", "loopholes", "benefits", "couple", "deduction", "returns", "makes", "tax", "us", "formal", "large", "particular", "result"], "largest_root": {"root_id": 50498403, "author": "rancar2", "slots": 18, "start_dom": 9, "end_dom": 26, "share_pct": 28.1, "top_dom1_age": 2.9, "top_dom1_author": "patrickmay"}, "buried_cutoff": 25, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50498403, "au": "rancar2", "dom": 9, "sr": 1, "sc": 8.65, "ep": 8.65, "bs": 0.0, "d": 0, "age": 3.51, "grav": 21.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 199, "qw": 0, "k": 462, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "tax_inconsistent", "flbl": "Tax & Inconsistent (300k)", "urls": [], "ig": 1.698, "fa": 1.23, "gp": 0.794, "bl": 0.0, "ds": 0.0, "txt": "Wow, if I'm reading this correctly, the Big Beautiful Bill introduced a pretty large gap that punishes married couples filing jointly: a couple making about $300K each can lose up to $15K in write-offs compared with filing separately, pretty much everywhere except the nine states with no broad income tax (Alaska, Florida, Nevada, New Hampshire, South Dakota, Tennessee, Texas, Washington, and Wyoming), where few couples pay the $25K in state and local taxes needed to trigger it. I think most tax software will assume the $5K cap each, but the regulation here is inconsistent. Here’s the take-away quote from the article:\n\n“A married couple can deduct more state and local tax by filing separately. The deduction for state and local taxes (SALT) is capped, and the cap shrinks as income rises: by 30 cents for each dollar over $500,000 on a joint return. On a separate return, the law halves the cap after shrinking it, so it shrinks by only 15 cents a dollar. A couple earning $300,000 each can deduct up to $25,000 on two separate returns, but only $10,000 on one joint return.”\n\nThis is non-trivial impact to joint returns if this is true, and I won’t be surprised if there are multiple appeals for refunds and more people filling separately going towards."}, {"id": 50499272, "au": "qrobit", "dom": 32, "sr": 2, "sc": 8.13, "ep": 8.13, "bs": 0.0, "d": 0, "age": 2.07, "grav": 12.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 27, "qw": 0, "k": 109, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "deduction_states", "flbl": "Deduction & States (Salt)", "urls": ["https://catala-lang.org/", "https://github.com/CatalaLang/catala-examples", "https://docs.aides.beta.gouv.fr/03_mutualiser/02_outils.html"], "ig": 0.805, "fa": 2.08, "gp": 0.21, "bl": 0.0, "ds": 0.0, "txt": "There's whole language for law formalization called Catala.\n\nSee https://catala-lang.org/\n\nand https://github.com/CatalaLang/catala-examples\n\nFrench government seems to actually use it in one of their web services, see https://docs.aides.beta.gouv.fr/03_mutualiser/02_outils.html (page in French)"}, {"id": 50500362, "au": "rancar2", "dom": 11, "sr": 3, "sc": 8.05, "ep": 8.19, "bs": 0.0, "d": 2, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 252, "qw": 0, "k": 462, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "epistemic_gold", "facet": "tax_inconsistent", "flbl": "Tax & Inconsistent (300k)", "urls": [], "ig": 1.677, "fa": 1.23, "gp": 0.516, "bl": 0.0, "ds": 0.0, "txt": "I just think the team did a good job from what I’m reading. This inconsistency doesn’t impact the top 1% household (who commonly use larger loopholes to avoid taxation at magnitudes more significant than this inconsistency like using loan against assets which they can write off interest against taxes instead of paying taxes to the government). This quirk impacts households in the 2% level for just one fiscal year or more where they might just have a taxed event like a real estate sale (non reinvested primary within the timeline), a taxable equity grant (that the pay taxes on but may lose), one time capital gains from investment sales, etc.\n\nTax law is supposed to be consistent and fair in general, and the introduction of the Big Beautiful Bill created a weird quirk here, that gets quirkier that you can file separately and correct to jointly but not the other way around legally right now. From 2018–2024, the tax code was consistent on SALT, then in 2025 and looking forward to 2029 SALT taxation becomes inconsistent under certain joint filing conditions that impact a non-trivial number of households especially when it starts at $250k each, or a lopsided earnings of that combined amount and peaks at the $600k.\n\nThis team is identifying a pretty big quirk that goes against the principle of consistency in tax law and did a very good job of it applying formal logic to law if they pro"}, {"id": 50499189, "au": "well_ackshually", "dom": 47, "sr": 4, "sc": 6.43, "ep": 6.43, "bs": 0.0, "d": 1, "age": 2.24, "grav": 13.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 56, "qw": 14, "k": 521, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "judge_law", "flbl": "Judge & Law (Explicitly)", "urls": [], "ig": 1.251, "fa": 1.04, "gp": 0.363, "bl": 0.0, "ds": 0.0, "txt": "> Because they rule on the sprit of the law, not as it was written.\n\nExtremely funny to say that about US law when it is entirely based on precedent, and a single judge having vibes on a particular day changes how your entire country works for the next 50 years.\n\nUS law is explicitly made to be skirted, as is every common law system in the world and they are all irrevocably flawed."}, {"id": 50498656, "au": "jghn", "dom": 10, "sr": 5, "sc": 6.01, "ep": 6.31, "bs": 0.0, "d": 1, "age": 3.05, "grav": 18.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 60, "qw": 10, "k": 7860, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "tax_inconsistent", "flbl": "Tax & Inconsistent (300k)", "urls": [], "ig": 1.061, "fa": 1.04, "gp": 0.584, "bl": 0.0, "ds": 0.0, "txt": "> punishes married couples filing jointly: a couple making about $300K each\n\nThe number of married couples where each partner is making $300K each is a very, very small percentage of the population. Not sure this is a big deal to be concerned about in the grand scheme of things. For instance, only a few %age of households have an income over 300K in the first place, much less coming from 2 earners of that amount."}, {"id": 50499749, "au": "emtel", "dom": 43, "sr": 6, "sc": 5.93, "ep": 6.93, "bs": 0.85, "d": 3, "age": 1.24, "grav": 8.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 66, "qw": 0, "k": 1802, "kpp": 6.0, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "grounded_analysis", "facet": "tax_inconsistent", "flbl": "Tax & Inconsistent (300k)", "urls": [], "ig": 1.255, "fa": 0.9, "gp": 0.973, "bl": 0.32, "ds": 0.0, "txt": "It depends on how you are making these millions. A W-2 employee at meta making $1M or more per year is almost certainly paying over 50% marginal tax rates (combined state and federal). And there is virtually nothing you can do to lower that burden by any significant amount.\n\nThe tax code benefits certain types of income, but it does not uniformly benefit high earners, as you say."}, {"id": 50499284, "au": "delichon", "dom": 27, "sr": 7, "sc": 5.06, "ep": 5.06, "bs": 0.0, "d": 0, "age": 2.05, "grav": 12.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 85, "qw": 17, "k": 11624, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "code_tax", "flbl": "Code & Tax (Lean)", "urls": [], "ig": 1.246, "fa": 0.42, "gp": 0.643, "bl": 0.0, "ds": 0.0, "txt": "> Today, we set out to formalize the entire Internal Revenue Code to hunt for unknown loopholes (bugs).\n\nSaying that loopholes are bugs is a political statement that a particular allocation of resources is inherently fraudulent. There is no data that Lean code could use to decide whether a result is intentional or not.\n\nIt's like deciding that any tax provision that increases income inequality is illegitimate, and writing code to identify them. That could be a useful exercise, but it isn't a way to justify a human value with math. It may be a formalization of an ethic as applied to a tax code, but not of the tax code."}, {"id": 50498871, "au": "jedberg", "dom": 12, "sr": 8, "sc": 4.89, "ep": 5.33, "bs": 0.0, "d": 2, "age": 2.74, "grav": 16.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 107, "qw": 0, "k": 80184, "kpp": 5.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "deduction_states", "flbl": "Deduction & States (Salt)", "urls": [], "ig": 1.431, "fa": 0.28, "gp": 0.806, "bl": 0.0, "ds": 0.0, "txt": "It might be a few people nationwide, but it's a whole lot of families in the Bay Area, New York, Los Angeles, and a few other major cities.\n\nThe law was specifically designed to punish these people.  Remember, at first they wanted to drop the SALT deduction completely to punish blue states.\n\nEdit:  It seems that people are assuming I'm against removing the SALT deduction.  Far from it.  I am glad they got it done despite being a political third rail for a long time.  And despite being a huge beneficiary of the SALT deductions myself.\n\nI don't think people choosing to live in high tax states should get to save on their federal income taxes."}, {"id": 50498736, "au": "patrickmay", "dom": 1, "sr": 9, "sc": 4.38, "ep": 4.38, "bs": 0.0, "d": 0, "age": 2.92, "grav": 17.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 77, "qw": 0, "k": 2452, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "vague_laws", "flbl": "Vague & Laws (Intended)", "urls": [], "ig": 1.388, "fa": 0.0, "gp": 0.77, "bl": 0.0, "ds": 0.0, "txt": "I worked for a company pre-LLMs that analyzed laws and regulations in order to answer questions about financial transaction legality and reporting requirements.  One problem that came up frequently is that the rules governments make don't have to be consistent.  There are conflicts, some quite significant.  The best we could do was make them visible and escalate to a human.\n\nIt would be interesting to require laws to be compilable.  Charles Stross wrote a couple of books that include that idea."}, {"id": 50499213, "au": "emtel", "dom": 41, "sr": 10, "sc": 4.06, "ep": 4.35, "bs": 0.0, "d": 1, "age": 2.19, "grav": 13.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 58, "qw": 0, "k": 1802, "kpp": 6.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "judge_law", "flbl": "Judge & Law (Explicitly)", "urls": ["https://taxfoundation.org/data/all/federal/latest-federal-income-tax-data-2025/"], "ig": 0.838, "fa": 0.62, "gp": 0.423, "bl": 0.0, "ds": 0.0, "txt": "This is ridiculous - first of all you don’t have to be rich to afford a CPA, second of all high earners almost always pay the highest rates (both effective and marginal). And even in the cases where they don’t pay huge marginal rates (dividends and LTCG), they don’t need a CPA to take advantage of that because it’s dead simple.\n\nhttps://taxfoundation.org/data/all/federal/latest-federal-in..."}, {"id": 50499874, "au": "jamienk", "dom": 48, "sr": 11, "sc": 3.75, "ep": 3.75, "bs": 0.0, "d": 0, "age": 0.98, "grav": 7.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 169, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "deduction_states", "flbl": "Deduction & States (Salt)", "urls": [], "ig": 1.133, "fa": 0.34, "gp": 0.082, "bl": 0.0, "ds": 0.0, "txt": "I'm struck by this:\n\n\"The comparison caught ... mistakes in our own model too. We had not counted self-employment profit toward the 20% deduction for small-business income\"\n\nThis seems like a pretty big oversight? Makes it feel like there might be a lot more low-hanging fruit, much less subtitles to explore?"}, {"id": 50498920, "au": "jedberg", "dom": 33, "sr": 12, "sc": 3.61, "ep": 4.05, "bs": 0.0, "d": 0, "age": 2.67, "grav": 16.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 149, "qw": 0, "k": 80184, "kpp": 5.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "judge_law", "flbl": "Judge & Law (Explicitly)", "urls": [], "ig": 1.248, "fa": 0.0, "gp": 0.771, "bl": 0.0, "ds": 0.0, "txt": "It's important to remember that the loopholes are often intentional.  They are left there so that rich people who can afford CPAs can take advantage of them, while middle income and poor people cannot afford to.\n\nThey are also left there so there is wiggle room for interpretation if it comes in front of an auditor or a judge.\n\nAnd also, it's important to remember that in tax matters, the final arbiter of interpretation is a judge.  Judges are humans, not machines.  You can't \"Trick\" them by saying \"well technically this is allowed!\".  Because they rule on the sprit of the law, not as it was written.  Judges aren't amused when you try to be cute with how you interpret a law.  And some Judges have biases, where you get a different ruling depending on if you play at their golf club or not.\n\nLaws aren't computer code.  They are vague on purpose."}, {"id": 50499042, "au": "rendaw", "dom": 34, "sr": 13, "sc": 3.58, "ep": 4.02, "bs": 0.0, "d": 1, "age": 2.47, "grav": 14.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 97, "qw": 0, "k": 4394, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "vague_laws", "flbl": "Vague & Laws (Intended)", "urls": [], "ig": 1.344, "fa": 0.0, "gp": 0.596, "bl": 0.0, "ds": 0.0, "txt": "I've heard this repeated a couple times here on HN. Do you have any citations for laws being vague on purpose? The whole point of laws, and the formal structure they take, is to reduce vagueness. Is this rock on person A's land or person B's land? When it turns out, despite best efforts, that a law is vague we even have a second system to step in and reduce the vagueness further: case law. I have no doubt that people are trying to exploit vagueness on both sides, but naysaying here is nonsense. And almost nobody wants law to be vague either."}, {"id": 50499896, "au": "DannyBee", "dom": 35, "sr": 14, "sc": 3.49, "ep": 3.94, "bs": 0.0, "d": 2, "age": 0.93, "grav": 6.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 207, "qw": 0, "k": 31680, "kpp": 5.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "vague_laws", "flbl": "Vague & Laws (Intended)", "urls": [], "ig": 1.449, "fa": 0.0, "gp": 0.367, "bl": 0.0, "ds": 0.0, "txt": "Lawyer here (but I don't make any money from it and absolutely have no dog in this fight). I agree.  Law is vague for two reasons - first it is often as a compromise between two positions that people were okay having decided on a case by case basis instead of fighting to the death over what to write down. It also is vague sometimes to intentionally capture the spirit of what it is trying to do.   While I won't claim vagueness is never left to benefit someone ( I'm sure it happens), I would claim it is rare.\n\nLaw is basically a representation of  societal judgement. While criminal law is intended to be clear enough to know when you've violated it, that is not the same as beimg logical or consistent. Civil law is even less logical and consistent.    Formalizing it into logic generally does not make sense overall - it isn't really broken in most cases because it was never intended to be totally consistent.  There are certainly areas that could use cleaner rewriting but courts are generally well equipped to figure out what it means. Congress and the states can always overturn interpretations of law, but the rate at which they rewrite laws because they thought courts interpreted it wrong is very, very low."}, {"id": 50499200, "au": "nixonaddiction", "dom": 62, "sr": 15, "sc": 3.47, "ep": 3.47, "bs": 0.0, "d": 0, "age": 2.23, "grav": 13.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 71, "qw": 0, "k": 36, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_tax", "flbl": "Code & Tax (Lean)", "urls": [], "ig": 1.377, "fa": 0.0, "gp": 0.164, "bl": 0.0, "ds": 0.0, "txt": "interesting idea. the concept of formalizing legal code is attractive to me, if only because i am addicted to logic. but realistically this will be hard to extend past tax code. formalization of law is more difficult in common law, which is heavily driven by judicial presedent, which is fluid and resists codification. a machine learning algo trained on cases might perform better, but even then, so many cases cant be determined easily."}, {"id": 50498643, "au": "marcta", "dom": 52, "sr": 16, "sc": 3.38, "ep": 3.38, "bs": 0.0, "d": 2, "age": 3.08, "grav": 18.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 35, "qw": 0, "k": 44, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_tax", "flbl": "Code & Tax (Lean)", "urls": ["https://xkcd.com/1494"], "ig": 0.686, "fa": 0.62, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Yes, the tax code is basically \"if this condition and that condition then pay $\".  So if they can find a condition that isn't covered, they can theoretically pay less tax.  There is an XKCD of course: https://xkcd.com/1494."}, {"id": 50499923, "au": "airstrike", "dom": 14, "sr": 17, "sc": 3.23, "ep": 3.89, "bs": 0.0, "d": 4, "age": 0.88, "grav": 6.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 18996, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "tax_inconsistent", "flbl": "Tax & Inconsistent (300k)", "urls": [], "ig": 0.719, "fa": 0.68, "gp": 0.179, "bl": 0.0, "ds": 0.0, "txt": "Why? You're not adjusting for cost of living.\n\nA family making $300k in Manhattan should not be taxed a lot, unless you think a family making ~$115k in Montgomery, Alabama should also be taxed a lot.\n\nPolicy is best written by the informed rather than the emotional."}, {"id": 50499732, "au": "djoldman", "dom": 39, "sr": 18, "sc": 2.77, "ep": 3.21, "bs": 0.0, "d": 1, "age": 1.26, "grav": 8.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 64, "qw": 91, "k": 11626, "kpp": 7.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "vague_laws", "flbl": "Vague & Laws (Intended)", "urls": [], "ig": 0.809, "fa": 0.42, "gp": 0.076, "bl": 0.0, "ds": 0.0, "txt": "> And also, it's important to remember that in tax matters, the final arbiter of interpretation is a judge. Judges are humans, not machines. You can't \"Trick\" them by saying \"well technically this is allowed!\". Because they rule on the sprit of the law, not as it was written. Judges aren't amused when you try to be cute with how you interpret a law. And some Judges have biases, where you get a different ruling depending on if you play at their golf club or not.\n\n> Laws aren't computer code. They are vague on purpose.\n\nYes... but. Tax law is a bit different because it is similar to an equation: you put in your inputs and you get your outputs.\n\nThere have been famous cases where the courts have said in essence, \"yes you completely and exactly and precisely followed the law, but we're not going to allow you to do that anyway.\" Those rulings have become less frequent."}, {"id": 50499203, "au": "chrisnight", "dom": 54, "sr": 19, "sc": 2.67, "ep": 2.81, "bs": 0.0, "d": 1, "age": 2.21, "grav": 13.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 61, "qw": 0, "k": 290, "kpp": 4.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_tax", "flbl": "Code & Tax (Lean)", "urls": [], "ig": 1.106, "fa": 0.0, "gp": 0.149, "bl": 0.0, "ds": 0.0, "txt": "You wouldn’t be proving the tax code, you’re proving that a procedure follows the tax code. This way you’d be able to know for certain if an AI that tried reducing your taxes actually gives you a valid procedure/result, assuming you can trust the Lean formalization (hint: you can’t given the nature of law, especially if it’s vibe coded like this)"}, {"id": 50499124, "au": "Auracle", "dom": 19, "sr": 20, "sc": 2.28, "ep": 2.72, "bs": 0.0, "d": 3, "age": 2.36, "grav": 14.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 0, "k": 3438, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "deduction_states", "flbl": "Deduction & States (Salt)", "urls": [], "ig": 1.158, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Don’t tax the rich (and yes, 600k for a couple per year is absolutely rich territory)?  “They need to pay their fair share!”  Tax the rich?  “They’re targeting people in blue cities!”\n\nThe SALT deduction is nonsense. Why should high tax states effectively be able to take money from the federal government?"}, {"id": 50498417, "au": "matthewbauer", "dom": 49, "sr": 21, "sc": 2.19, "ep": 2.71, "bs": 0.0, "d": 0, "age": 3.49, "grav": 21.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 1889, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_tax", "flbl": "Code & Tax (Lean)", "urls": [], "ig": 0.675, "fa": 0.0, "gp": 0.772, "bl": 0.0, "ds": 0.0, "txt": "It’s a neat idea but I don’t understand what value Lean adds here. Is there really anything to “prove” in the tax code? Or are they just using Lean as a scripting language?"}, {"id": 50499552, "au": "AnthonyMouse", "dom": 46, "sr": 22, "sc": 2.04, "ep": 2.48, "bs": 0.0, "d": 1, "age": 1.58, "grav": 9.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 89, "qw": 25, "k": 39844, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "judge_law", "flbl": "Judge & Law (Explicitly)", "urls": [], "ig": 0.546, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> Because they rule on the sprit of the law, not as it was written.\n\nI feel like this attitude is responsible for the modern destruction of the rule of law.\n\nIt doesn't matter what the law says, the only thing that matters is vibes! And whether you play golf with the right government officials.\n\n> You can't \"Trick\" them by saying \"well technically this is allowed!\".\n\nThe obvious problem being that sometimes it is allowed. And then do you want that being decided by democratically elected representatives and specified ahead of time so the public can know what's expected of them and of others, or decided ex post facto on the basis of feels and discrimination?"}, {"id": 50499360, "au": "AnthonyMouse", "dom": 53, "sr": 23, "sc": 2.0, "ep": 2.88, "bs": 0.0, "d": 3, "age": 1.92, "grav": 11.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 149, "qw": 0, "k": 39844, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "tax_inconsistent", "flbl": "Tax & Inconsistent (300k)", "urls": [], "ig": 1.227, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "This is the case where the xkcd doesn't apply though.\n\nThe thing about insurance fraud is that the major thing that will cause it to be fraud is when you set the fire on purpose.\n\nThe tax code doesn't really have that. You'll often even see confused people inserting nonsense language in various places to the effect that doing something to avoid taxes isn't allowed, but meanwhile \"doing something to avoid taxes\" is the expected mechanism of operation for tax incentives meant to get people to do something they otherwise wouldn't have done.\n\nAnd then because of that you need to actually care about what the tax code says and what the unnecessarily complicated nonsense allows someone to get away with without breaking the law, instead of pretending that it's all common sense and people can be punished for being \"bad\" without ever actually specifying what that means."}, {"id": 50499333, "au": "jedberg", "dom": 20, "sr": 24, "sc": 2.0, "ep": 2.66, "bs": 0.0, "d": 4, "age": 1.96, "grav": 11.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 84, "qw": 0, "k": 80184, "kpp": 5.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "deduction_states", "flbl": "Deduction & States (Salt)", "urls": [], "ig": 1.131, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It's funny that me pointing out the fact removing the SALT deduction was meant to punish rich people makes people think I don't like it.\n\nIn fact, I was glad they got it done.  The Dems didn't object very hard because they knew it had to go too.  It's interesting that they didn't put it back when they had the chance.\n\nI don't think the federal government should lose money when people choose to live in high tax states.  And I pay high taxes in a high tax state."}, {"id": 50498962, "au": "AnthonyMouse", "dom": 25, "sr": 25, "sc": 1.94, "ep": 2.82, "bs": 0.0, "d": 1, "age": 2.61, "grav": 15.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 58, "qw": 0, "k": 39844, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_tax", "flbl": "Code & Tax (Lean)", "urls": [], "ig": 1.119, "fa": 0.0, "gp": 0.133, "bl": 0.0, "ds": 0.0, "txt": "The tax code has significantly punished dual-income married couples for quite a while. It presumably started some time in the 20th century as some sexists not wanting women in the workplace and then continued because changing it to have them pay the same taxes as they would if they were unmarried would result in a significant reduction in government revenue."}, {"id": 50499363, "au": "jedberg", "dom": 42, "sr": 26, "sc": 1.67, "ep": 2.77, "bs": 0.0, "d": 2, "age": 1.91, "grav": 11.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 84, "qw": 0, "k": 80184, "kpp": 5.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "tax_inconsistent", "flbl": "Tax & Inconsistent (300k)", "urls": [], "ig": 1.179, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I'm not talking about a high earner who makes a few hundred thousand a year.  I'm talking about the high earner who is making a few million a year and taking advantage of the vague tax laws by paying a CPA tens of thousands of dollars to do their returns for them and then save them a few hundred thousand in taxes.\n\nAnd yes I'm aware that the wealthy pay most of the taxes.  I'm fine with that. I'm just pointing out that these laws are made so they still pay less than they would otherwise."}, {"id": 50498694, "au": "gigatexal", "dom": 64, "sr": 27, "sc": 1.54, "ep": 2.2, "bs": 0.0, "d": 0, "age": 3.0, "grav": 18.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 7375, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_tax", "flbl": "Code & Tax (Lean)", "urls": [], "ig": 0.936, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "i love that people are trying to do this and democratizing access to the code. one day i hope to have the power of a compentent CPA just an API call away. Until then I trust my highly paid CPA."}, {"id": 50499332, "au": "arjie", "dom": 31, "sr": 28, "sc": 1.4, "ep": 1.98, "bs": 0.0, "d": 1, "age": 1.96, "grav": 11.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 10968, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "deduction_states", "flbl": "Deduction & States (Salt)", "urls": [], "ig": 0.844, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Agreed. In fact, you'll see things termed loopholes vs. benefits depending entirely on politics so it can't be a property of the law itself. An EV tax credit or SALT deduction are \"loopholes\" too."}, {"id": 50499814, "au": "bawolff", "dom": 29, "sr": 29, "sc": 1.19, "ep": 1.7, "bs": 0.0, "d": 2, "age": 1.11, "grav": 7.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 68, "qw": 0, "k": 29266, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "vague_laws", "flbl": "Vague & Laws (Intended)", "urls": [], "ig": 0.725, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I suppose, but most of the times loopholes aren't like that.\n\nEither they are intentional things that have unintended consequences or they are unintentional things that people didn't realize what they meant.\n\nSometimes they are just laws that are working as intended but somebody doesn't like them so they are labelled as a loophole.\n\nI think there are very few loopholes that people intended to create by intentionally phrasing it weirdly."}, {"id": 50499614, "au": "rendaw", "dom": 55, "sr": 30, "sc": 1.15, "ep": 2.47, "bs": 0.0, "d": 1, "age": 1.49, "grav": 9.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 93, "qw": 0, "k": 4394, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_tax", "flbl": "Code & Tax (Lean)", "urls": [], "ig": 1.053, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Maybe you could validate stuff, like \"how much would I be taxed if I did X\" and then have it come up with all the questions that need to be answered to determine the answer or \"what's the max I could be taxed if I did Y\"?\n\nI don't know much about Lean, but I assume that beyond proving things it functions as a truth graph you could walk to calculate things...\n\nEdit, it might also be (someday) useful when drafting tax law to make sure the law is actually sound (e.g. isn't contradicting something else) or to see what it's overlapping with?"}, {"id": 50500071, "au": "AnthonyMouse", "dom": 4, "sr": 31, "sc": 1.11, "ep": 1.47, "bs": 0.0, "d": 3, "age": 0.56, "grav": 5.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 89, "qw": 0, "k": 39844, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "judge_law", "flbl": "Judge & Law (Explicitly)", "urls": [], "ig": 0.627, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Suppose you have a law that says that in order to build new multi-unit housing, a given percentage of the new units have to be affordable housing and have to be built within reasonable distance of a transit stop in the same town. Meanwhile you have a town with poor mass transit and very little land zoned for multi-unit housing, and none of it overlaps. In other words, you're both required to and prohibited from building new affordable housing units near a transit stop. Which means you also can't build the other units."}, {"id": 50499779, "au": "djoldman", "dom": 37, "sr": 32, "sc": 0.95, "ep": 1.83, "bs": 0.0, "d": 2, "age": 1.18, "grav": 8.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 47, "qw": 0, "k": 11626, "kpp": 7.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "vague_laws", "flbl": "Vague & Laws (Intended)", "urls": [], "ig": 0.778, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Much of the US Constitution is vague or \"general.\"\n\nThere are quotes from at least Madison, Hamilton, and Jefferson that support the idea that this was intentional.\n\nI do agree with the main point though: laws shouldn't be vague and also case law tends to refine the meaning."}, {"id": 50498531, "au": "claw-el", "dom": 51, "sr": 33, "sc": 0.8, "ep": 2.12, "bs": 0.0, "d": 1, "age": 3.27, "grav": 20.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 221, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "tax_inconsistent", "flbl": "Tax & Inconsistent (300k)", "urls": [], "ig": 0.743, "fa": 0.0, "gp": 0.258, "bl": 0.0, "ds": 0.0, "txt": "Maybe tax change impact analysis by congress can easily be calculated using Lean. The article also said loopholes can be easily identified?"}, {"id": 50498622, "au": "squirrel", "dom": 50, "sr": 34, "sc": 0.76, "ep": 2.3, "bs": 0.0, "d": 1, "age": 3.12, "grav": 18.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 645, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_tax", "flbl": "Code & Tax (Lean)", "urls": [], "ig": 0.831, "fa": 0.0, "gp": 0.24, "bl": 0.0, "ds": 0.0, "txt": "I assume you'd want to prove common-sense invariants, like \"you can't be taxed more than your income\" or \"tax credit 123-45 is worth more for two children than for one\". Lean might disprove a few of these, and the counterexamples are potential loopholes."}, {"id": 50499341, "au": "whatshisface", "dom": 28, "sr": 35, "sc": 0.45, "ep": 1.99, "bs": 0.0, "d": 1, "age": 1.95, "grav": 11.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 31532, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_tax", "flbl": "Code & Tax (Lean)", "urls": [], "ig": 0.739, "fa": 0.0, "gp": 0.177, "bl": 0.0, "ds": 0.0, "txt": "Any change to the law that bill authors have to hide by phrasing the bill so that it sounds like the change is otherwise is illegitimate, and that's what formalization is meant to catch."}, {"id": 50499133, "au": "AnthonyMouse", "dom": 2, "sr": 36, "sc": 0.17, "ep": 1.57, "bs": 0.0, "d": 1, "age": 2.34, "grav": 14.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 139, "qw": 0, "k": 39844, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "tax_inconsistent", "flbl": "Tax & Inconsistent (300k)", "urls": [], "ig": 0.454, "fa": 0.0, "gp": 0.345, "bl": 0.0, "ds": 0.0, "txt": "In theory \"impossibility\" is a defense to most crimes.\n\nIn practice you usually get screwed in one of the following ways: a) the law makes it impossible to do X without breaking the law, even though X is a normal thing and neither law was supposed to be a total ban on X, but you could comply by not doing X at all, b) the inconsistent laws are imposed by different jurisdictions and then they each insist you follow theirs, often a special case of the first one where X is \"be in two different jurisdictions\" but sometimes the even stupider one where a jurisdiction demands that you follow its laws even when you're not in it, c) it's impossible for you to follow both laws at once so you followed only one of them and then they decide after the fact that you should have followed only the other one."}, {"id": 50499601, "au": "coctuh", "dom": 61, "sr": 37, "sc": 0.17, "ep": 3.79, "bs": 2.52, "d": 0, "age": 1.51, "grav": 9.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 41, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "tax_inconsistent", "flbl": "Tax & Inconsistent (300k)", "urls": ["https://en.wikipedia.org/wiki/Principle_of_explosion"], "ig": 0.787, "fa": 0.62, "gp": 0.117, "bl": 0.95, "ds": 0.0, "txt": "If the tax law is inconsistent (as some of the comments seem to indicate), does that mean that we don't have to pay any tax or even are entitled to a large tax credit?  After all, Lean supports the principle of explosion (https://en.wikipedia.org/wiki/Principle_of_explosion)."}, {"id": 50500250, "au": "serioussecurity", "dom": 8, "sr": 38, "sc": 0.01, "ep": 2.88, "bs": 1.99, "d": 1, "age": 0.21, "grav": 4.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 35, "qw": 0, "k": 672, "kpp": 5.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "judge_law", "flbl": "Judge & Law (Explicitly)", "urls": ["https://en.wikipedia.org/wiki/I_know_it_when_I_see_it"], "ig": 0.473, "fa": 0.62, "gp": 0.0, "bl": 0.75, "ds": 0.0, "txt": "My understanding is that consistency is explicitly not a goal of the American legal system.\n\nLaws are designed to give law enforcement latitude to pursue the charges they seem fit, subject to the taste of a judge.\n\nhttps://en.wikipedia.org/wiki/I_know_it_when_I_see_it"}, {"id": 50499545, "au": "carterschonwald", "dom": 63, "sr": 39, "sc": -0.28, "ep": 0.82, "bs": 0.0, "d": 0, "age": 1.59, "grav": 10.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 4034, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_tax", "flbl": "Code & Tax (Lean)", "urls": [], "ig": 0.347, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "this is actually wonderful. and a good use of the tech. ive been joking about wanting to do this for years, but the sheer magnitude of work made it impossible for me to consider doing"}, {"id": 50498869, "au": "rappatic", "dom": 60, "sr": 40, "sc": -0.51, "ep": 1.34, "bs": 1.19, "d": 0, "age": 2.74, "grav": 16.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 1463, "kpp": 8.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "vague_laws", "flbl": "Vague & Laws (Intended)", "urls": [], "ig": 0.474, "fa": 0.0, "gp": 0.159, "bl": 0.45, "ds": 0.0, "txt": "This is only like the fifteenth vibecoded “formalization” of some set of laws I’ve seen on HN that get posted just to be abandoned in a few months."}, {"id": 50499586, "au": "jedberg", "dom": 45, "sr": 41, "sc": -0.8, "ep": 0.74, "bs": 0.0, "d": 4, "age": 1.54, "grav": 9.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 80184, "kpp": 5.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "code_tax", "flbl": "Code & Tax (Lean)", "urls": [], "ig": 0.316, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I don’t know I’m not a CPA. That’s why I hire one. Because the tax code is too complex and vague to do it myself."}, {"id": 50499280, "au": "Prime_Axiom", "dom": 5, "sr": 42, "sc": -0.88, "ep": 1.64, "bs": 1.19, "d": 1, "age": 2.06, "grav": 12.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 9, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "vague_laws", "flbl": "Vague & Laws (Intended)", "urls": [], "ig": 0.499, "fa": 0.0, "gp": 0.32, "bl": 0.45, "ds": 0.0, "txt": "What are the books in particular? I liked Accelerando and was intrigued by the reputation markets mentioned."}, {"id": 50499929, "au": "patrickmay", "dom": 6, "sr": 43, "sc": -0.9, "ep": 0.73, "bs": 1.19, "d": 2, "age": 0.86, "grav": 6.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 2452, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.311, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Accelerando was the one I was thinking of.  I believe he has some other short stories with Manfred Macx, but I'm not finding them on my shelf immediately."}, {"id": 50499925, "au": "airstrike", "dom": 21, "sr": 44, "sc": -1.4, "ep": 3.19, "bs": 3.05, "d": 2, "age": 0.87, "grav": 6.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 11, "qw": 0, "k": 18996, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "tax_inconsistent", "flbl": "Tax & Inconsistent (300k)", "urls": ["https://imgur.com/a/1rInLQB"], "ig": 0.204, "fa": 0.95, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Making $300k _where_, though?\n\n$300k in NYC is $115k in Alabama.\n\nhttps://imgur.com/a/1rInLQB"}, {"id": 50499169, "au": "nonethewiser", "dom": 36, "sr": 45, "sc": -1.59, "ep": 1.14, "bs": 1.19, "d": 2, "age": 2.28, "grav": 13.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 9065, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_tax", "flbl": "Code & Tax (Lean)", "urls": [], "ig": 0.332, "fa": 0.0, "gp": 0.248, "bl": 0.45, "ds": 0.0, "txt": "He’s half correct.\n\nThey are intentional.\n\nThey aren’t loopholes. They are just laws.\n\nSome people just call them loopholes because they dont like them."}, {"id": 50499943, "au": "bevr1337", "dom": 3, "sr": 46, "sc": -1.71, "ep": 1.02, "bs": 1.19, "d": 2, "age": 0.84, "grav": 6.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 379, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_tax", "flbl": "Code & Tax (Lean)", "urls": [], "ig": 0.434, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Do you have some examples of an \"X\" activity or behavior? I understand the logic you're discussing, but can you help ground it?"}, {"id": 50500077, "au": "pylua", "dom": 40, "sr": 47, "sc": -1.74, "ep": 0.55, "bs": 1.19, "d": 2, "age": 0.56, "grav": 5.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 920, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "judge_law", "flbl": "Judge & Law (Explicitly)", "urls": [], "ig": 0.234, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "The fact that you need a judge to tell you if what you did was wrong is indicative of a flawed system"}, {"id": 50499852, "au": "jamienk", "dom": 30, "sr": 48, "sc": -2.07, "ep": 0.66, "bs": 1.19, "d": 1, "age": 1.02, "grav": 7.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 169, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_tax", "flbl": "Code & Tax (Lean)", "urls": [], "ig": 0.281, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "But some of the \"bugs\" do seem to be weird complex misalignments rather than directed tactics."}, {"id": 50498935, "au": "rexpop", "dom": 23, "sr": 49, "sc": -3.9, "ep": 0.78, "bs": 4.24, "d": 2, "age": 2.65, "grav": 15.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 1136, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.331, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "But isn't that an undue burden on \"job creators\" with proportionately far-reaching downstream economic consequences?"}, {"id": 50498629, "au": "realistically_c", "dom": 56, "sr": 50, "sc": -4.5, "ep": 0.75, "bs": 3.71, "d": 1, "age": 3.11, "grav": 18.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "tax_inconsistent", "flbl": "Tax & Inconsistent (300k)", "urls": [], "ig": 0.318, "fa": 0.0, "gp": 0.0, "bl": 1.4, "ds": 0.0, "txt": "this is actually a really bad idea and is the opposite of what a powerful state would want"}, {"id": 50498674, "au": "convolvatron", "dom": 57, "sr": 51, "sc": -4.58, "ep": 0.76, "bs": 4.24, "d": 2, "age": 3.02, "grav": 18.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 3939, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "deduction_states", "flbl": "Deduction & States (Salt)", "urls": [], "ig": 0.323, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "maybe some rationale? states should want to preclude people from reasoning about tax laws?"}, {"id": 50499678, "au": "bahmboo", "dom": 17, "sr": 52, "sc": -4.91, "ep": 0.29, "bs": 3.45, "d": 4, "age": 1.36, "grav": 8.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 1406, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "code_tax", "flbl": "Code & Tax (Lean)", "urls": [], "ig": 0.124, "fa": 0.0, "gp": 0.0, "bl": 1.302, "ds": 0.0, "txt": "No, you should be taxed a lot. [edit: you just said \"those people should be taxed a lot\" with no reason and then people get sad when the same is said to them]"}, {"id": 50499092, "au": "bgilroy26", "dom": 38, "sr": 53, "sc": -5.09, "ep": 0.47, "bs": 4.24, "d": 2, "age": 2.42, "grav": 14.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 1080, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "judge_law", "flbl": "Judge & Law (Explicitly)", "urls": [], "ig": 0.202, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "All overly broad generalizations are vague on purpose"}, {"id": 50498765, "au": "Xirdus", "dom": 58, "sr": 54, "sc": -5.25, "ep": 0.53, "bs": 4.24, "d": 3, "age": 2.88, "grav": 17.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 1073, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "code_tax", "flbl": "Code & Tax (Lean)", "urls": [], "ig": 0.225, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "I guess by powerful they mean with a lot of power over its citizens."}, {"id": 50499393, "au": "twoodfin", "dom": 44, "sr": 55, "sc": -5.45, "ep": 0.34, "bs": 4.24, "d": 3, "age": 1.85, "grav": 11.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 13205, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "tax_inconsistent", "flbl": "Tax & Inconsistent (300k)", "urls": [], "ig": 0.143, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "How does that scheme work? Which provisions are you talking about?"}, {"id": 50500040, "au": "InsidiousWombat", "dom": 16, "sr": 56, "sc": -5.45, "ep": 0.33, "bs": 4.24, "d": 5, "age": 0.62, "grav": 5.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 515, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "tax_inconsistent", "flbl": "Tax & Inconsistent (300k)", "urls": [], "ig": 0.139, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Maybe read correctly before you start complaining. It was 300k EACH, so 600k"}, {"id": 50500039, "au": "selectodude", "dom": 15, "sr": 57, "sc": -8.15, "ep": 0.0, "bs": 6.89, "d": 5, "age": 0.62, "grav": 5.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 8245, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "tax_inconsistent", "flbl": "Tax & Inconsistent (300k)", "urls": [], "ig": -0.95, "fa": 0.34, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "This is about a family earning $600,000/yr."}, {"id": 50499398, "au": "contubernio", "dom": 13, "sr": 58, "sc": -8.6, "ep": 0.0, "bs": 6.89, "d": 3, "age": 1.84, "grav": 11.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 545, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "code_tax", "flbl": "Code & Tax (Lean)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.36, "bl": 2.6, "ds": 0.0, "txt": "Those people should be taxed a lot."}, {"id": 50499666, "au": "jvoorhis", "dom": 7, "sr": 59, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 1.38, "grav": 9.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 1050, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "The Jennifer Morgue comes to mind."}, {"id": 50499450, "au": "jedberg", "dom": 18, "sr": 60, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 4, "age": 1.76, "grav": 10.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 80184, "kpp": 5.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "I agree.  I never said they shouldn't."}, {"id": 50500043, "au": "InsidiousWombat", "dom": 22, "sr": 61, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 3, "age": 0.62, "grav": 5.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 515, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "tax_inconsistent", "flbl": "Tax & Inconsistent (300k)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "It's 600k. 300k each"}, {"id": 50499246, "au": "derwiki", "dom": 26, "sr": 62, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 2.11, "grav": 12.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 7856, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Thank you for posting this!"}, {"id": 50499027, "au": "convolvatron", "dom": 59, "sr": 63, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 4, "age": 2.5, "grav": 15.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 3939, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "we need detector vans, for logic!"}, {"id": 50499072, "au": "nyargh", "dom": 24, "sr": 64, "sc": -13.49, "ep": 0.0, "bs": 11.26, "d": 3, "age": 2.45, "grav": 14.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 0, "qw": 0, "k": 264, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 4.25, "ds": 0.0, "txt": "/s"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      const jumpBtns = isPinned
+        ? `<button type="button" class="probe-inline-btn" data-probe-jump="1">Comment &darr;</button>` +
+          `<button type="button" class="probe-inline-btn" data-probe-clear="1">Clear &times;</button>`
+        : "";
+      probeEl.innerHTML =
+        `<strong>@${escHtml(hit.au)}</strong> | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})` +
+        jumpBtns +
+        `<br>"${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 60);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 50);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 50);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 50);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `Showing ${shown.length} of ${pool.length} matching comments (mode: ${activeMode})` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear selection</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeSelect = document.getElementById("modeSelect");
+  modeSelect.addEventListener("change", () => {
+    activeMode = modeSelect.value;
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

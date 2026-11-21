@@ -1,0 +1,1363 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50522563 // Rust changed me as a developer — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .kpi-cell {
+      padding: 16px 16px 14px;
+    }
+    .kpi-label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 4px 0;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer > summary.hn-summary {
+      list-style: none;
+      cursor: pointer;
+      display: block;
+      padding: 2px 0;
+      margin: 0;
+      background: transparent;
+      border: 0;
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      user-select: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+    }
+    table.ablation th {
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: normal;
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    .mode-tabs {
+      gap: 6px;
+      padding: 0 8px;
+      margin-bottom: 8px;
+    }
+    button.mode-tab {
+      appearance: none;
+      border-width: 0px;
+      border-radius: 4px;
+      background: rgb(246, 246, 239);
+      color: rgb(130, 130, 130);
+      cursor: pointer;
+      padding: 6px 14px;
+      transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+    }
+    button.mode-tab:hover {
+      background: rgb(240, 240, 235);
+      color: rgb(13, 13, 13);
+    }
+    button.mode-tab.active {
+      background: rgb(246, 246, 239);
+      color: rgb(13, 13, 13);
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      padding: 14px;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .mode-tabs button.mode-tab {
+        flex: 1;
+        text-align: center;
+        padding: 7px 8px;
+      }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; }
+      .topbar-right { font-size: 8pt; padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+      </div>
+      <div class="topbar-right">&nbsp;</div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://blog.startifact.com/posts/how-rust-changed-me/">Rust changed me as a developer</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=blog.startifact.com"><span class="sitestr">blog.startifact.com</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">240 points</span> by <a href="https://news.ycombinator.com/user?id=speckx">speckx</a> <span class="age" title="2026-11-16T20:16:50.000Z"><a href="https://news.ycombinator.com/item?id=50522563">10 hours ago</a></span> | <a href="https://news.ycombinator.com/item?id=50522563">141&nbsp;comments</a> | 74.5% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">Evidence</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">141</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 104 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">25.5%</div>
+          <div class="kpi-sub">36 comments (4 Gold / 2.8%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">74.5%</div>
+          <div class="kpi-sub">63 chatter &bull; 42 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">6</div>
+        <div class="kpi-sub">10% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.875</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">67</div>
+          <div class="kpi-sub">HN POS 1..67 (47.5% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="color: rgb(90, 90, 88); margin-top: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">Explore</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 141-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 141)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (4)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (32)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (63)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (42)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..141) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 42)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (bryanlarsen, 8.6h); largest subtree (@bryanlarsen) occupies 67 slots (HN POS 1..67).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="mode-tabs" id="modeTabs" role="tablist" aria-label="Ranking view">
+        <button type="button" class="mode-tab active" data-mode="hn_top40" role="tab" aria-selected="true">HN Top 40</button>
+        <button type="button" class="mode-tab" data-mode="top_signal" role="tab" aria-selected="false">Epistemic Top 40</button>
+      </div>
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (141)</option>
+          <option value="enum_rust">Enum &amp; Rust (Tag) (34)</option>
+          <option value="languages_programming">Languages &amp; Programming (Sudoku) (33)</option>
+          <option value="language_major">Language &amp; Major (Projects) (32)</option>
+          <option value="null_value">Null &amp; Value (String) (17)</option>
+          <option value="type_payloads">Type &amp; Payloads (Fileop) (8)</option>
+          <option value="general_commentary">General Commentary (17)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, rust, makes, memory, code, human...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50522563 + BLOG.STARTIFACT.COM + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50522563, "story_title": "Rust changed me as a developer", "story_url": "https://blog.startifact.com/posts/how-rust-changed-me/", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50522563, "story_title": "Rust changed me as a developer", "story_url": "https://blog.startifact.com/posts/how-rust-changed-me/", "points": 240, "story_author": "speckx", "article_source": "fetched_url", "t1_ref_utc": "2026-11-17T05:50:09+00:00", "t2_ref_utc": "2026-11-17T05:50:09+00:00", "delta_minutes": 0.0, "story_anchors": ["rust", "makes", "memory", "code", "human", "changed", "types", "developer", "instead", "pattern", "python", "handle", "type", "compile", "understand", "compiler", "programming", "design", "macros", "cat", "value", "difficult", "language", "programmer", "languages"], "facet_labels": {"enum_rust": "Enum & Rust (Tag)", "languages_programming": "Languages & Programming (Sudoku)", "language_major": "Language & Major (Projects)", "null_value": "Null & Value (String)", "type_payloads": "Type & Payloads (Fileop)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "enum_rust", "label": "Enum & Rust (Tag)", "count": 34, "top_terms": ["enum", "rust", "tag", "type"]}, {"slug": "languages_programming", "label": "Languages & Programming (Sudoku)", "count": 33, "top_terms": ["languages", "programming", "sudoku", "code"]}, {"slug": "language_major", "label": "Language & Major (Projects)", "count": 32, "top_terms": ["language", "major", "projects", "lisp"]}, {"slug": "null_value", "label": "Null & Value (String)", "count": 17, "top_terms": ["null", "value", "string", "system"]}, {"slug": "type_payloads", "label": "Type & Payloads (Fileop)", "count": 8, "top_terms": ["type", "payloads", "fileop", "trait"]}], "counts": {"total_comments": 141, "live_t2_comments": 141, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 104, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "8d9917ec69439dfda19d6fe489cdf2ec56ab30938c233a65e991b15734ab42bd"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 4, "grounded_analysis": 32, "crowd_chatter": 63, "bullshit_or_flamewar": 42}, "facets": {"enum_rust": 34, "language_major": 32, "null_value": 17, "type_payloads": 8, "languages_programming": 33, "general_commentary": 17}, "facet_options": [{"slug": "enum_rust", "label": "Enum & Rust (Tag)", "count": 34}, {"slug": "languages_programming", "label": "Languages & Programming (Sudoku)", "count": 33}, {"slug": "language_major", "label": "Language & Major (Projects)", "count": 32}, {"slug": "null_value", "label": "Null & Value (String)", "count": 17}, {"slug": "type_payloads", "label": "Type & Payloads (Fileop)", "count": 8}, {"slug": "general_commentary", "label": "General Commentary", "count": 17}], "facet_diagnostics": [{"slug": "enum_rust", "label": "Enum & Rust (Tag)", "count": 34, "useful": 11, "useful_pct": 32.4, "terms": "enum, rust, tag, type"}, {"slug": "languages_programming", "label": "Languages & Programming (Sudoku)", "count": 33, "useful": 8, "useful_pct": 24.2, "terms": "languages, programming, sudoku, code"}, {"slug": "language_major", "label": "Language & Major (Projects)", "count": 32, "useful": 7, "useful_pct": 21.9, "terms": "language, major, projects, lisp"}, {"slug": "null_value", "label": "Null & Value (String)", "count": 17, "useful": 9, "useful_pct": 52.9, "terms": "null, value, string, system"}, {"slug": "type_payloads", "label": "Type & Payloads (Fileop)", "count": 8, "useful": 1, "useful_pct": 12.5, "terms": "type, payloads, fileop, trait"}, {"slug": "general_commentary", "label": "General Commentary", "count": 17, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 8}, {"category": "primary_technical_doc", "count": 5}, {"category": "code_repository", "count": 1}], "story_anchors": ["rust", "makes", "memory", "code", "human", "changed", "types", "developer", "instead", "pattern", "python", "handle", "type", "compile", "understand", "compiler", "programming", "design"], "largest_root": {"root_id": 50523358, "author": "bryanlarsen", "slots": 67, "start_dom": 1, "end_dom": 67, "share_pct": 47.5, "top_dom1_age": 8.6, "top_dom1_author": "bryanlarsen"}, "buried_cutoff": 42, "rescue_top_k": 28, "ablations": [], "tournament": [], "comments": [{"id": 50524094, "au": "ai_", "dom": 89, "sr": 1, "sc": 10.55, "ep": 10.55, "bs": 0.0, "d": 1, "age": 7.68, "grav": 59.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 32, "qw": 0, "k": 22, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": ["https://doc.rust-lang.org/std/mem/fn.discriminant.html"], "ig": 0.833, "fa": 2.35, "gp": 1.305, "bl": 0.0, "ds": 0.0, "txt": "The function you seek already exists before you:\nhttps://doc.rust-lang.org/std/mem/fn.discriminant.html\n\nIs there anything you can do with separate types for the tag and the union that std::mem::discriminant and pattern matching can't do?"}, {"id": 50524561, "au": "EdwardDiego", "dom": 137, "sr": 2, "sc": 8.92, "ep": 8.92, "bs": 0.0, "d": 1, "age": 7.08, "grav": 53.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 12, "qw": 0, "k": 11008, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": ["https://crates.io/crates/catgirl-engine"], "ig": 0.516, "fa": 2.35, "gp": 0.694, "bl": 0.0, "ds": 0.0, "txt": "I suspect it's a reference to catgirls, an old joke about Rust. In fact: https://crates.io/crates/catgirl-engine"}, {"id": 50525072, "au": "tcfhgj", "dom": 97, "sr": 3, "sc": 8.76, "ep": 8.91, "bs": 0.0, "d": 2, "age": 6.38, "grav": 45.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 24, "qw": 0, "k": 1621, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": ["https://docs.rs/strum/latest/strum/derive.EnumDiscriminants.html"], "ig": 0.45, "fa": 2.35, "gp": 0.794, "bl": 0.0, "ds": 0.0, "txt": "yeah, but fortunately strum exists.\n\nI have found it quite useful to be able to generate a dedicated SomeEnumDiscriminants enum for SomeEnum, using the following derive:\n\nhttps://docs.rs/strum/latest/strum/derive.EnumDiscriminants...."}, {"id": 50526811, "au": "shagie", "dom": 26, "sr": 4, "sc": 7.57, "ep": 7.57, "bs": 0.0, "d": 2, "age": 2.9, "grav": 17.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 91, "qw": 131, "k": 12521, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": ["https://www.ee.torontomu.ca/~elf/hack/real-programmers.html"], "ig": 1.579, "fa": 1.04, "gp": 0.617, "bl": 0.0, "ds": 0.0, "txt": "The AI (mid 90s) class I took in college was taught in lisp.  I recall that it was a program to identify the variables that would be needed in order to have it be a true statement (one of the functions named 'hamletp' that identified structures that were `(or twobe not (twobe))` and rapidly resolve it to true).\n\nWhen done with the assignment I asked the emacs fan in then lab to look at it and his comment was \"you write beautiful C in lisp.\"\n\nhttps://www.ee.torontomu.ca/~elf/hack/real-programmers.html\n\n    ... Besides, the determined Real Programmer can write FORTRAN programs in any language.\n\n---\n\nMy first revelation with functional programming was when I was dabbling with Clojure based on a Coding Horror question with giving a person being given an algorithim more difficult than Fizzbuzz (which has been memorized)... compute e or pi were the ones that I thought of.\n\npi / 4 = 1/1 - 1/3 + 1/5 - 1/7 ...\n\nI was trying to figure out if I could use cycle to handle that and then the lightbulb for first class functions hit him.\n\nThe solution I came up with was:\n\n    (defn pi\n      ([] (float (* 4 (pi 1 0.01 0 true))))\n      ([term tol accum pn]\n        (let\n          [t (/ 1 term)\n           a ((if pn + -) accum t)]\n          (if (< (* 4 t) tol)\n            a\n            (pi (+ term 2) tol a (not pn))\n          )\n        )\n      )\n    )\n\nThe lightbulb was the `((if pn + -) accum t)` b"}, {"id": 50526495, "au": "socalgal2", "dom": 25, "sr": 5, "sc": 7.19, "ep": 7.34, "bs": 0.0, "d": 1, "age": 3.7, "grav": 22.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 161, "qw": 0, "k": 3787, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": 1.579, "fa": 0.96, "gp": 0.614, "bl": 0.0, "ds": 0.0, "txt": "I think this is great advice but, my experience is most people don't really grok a language for long time. Maybe \"major project\" solves that but for example, A company I was at was a Java company a long time go and that team treated JavaScript as Java, completely ignoring all the strengths of JavaScript. They even had a Java to JavaScript compiler to ignore it.\n\nI made the same problem. I started JavaScript as a C++ programmer. I didn't get prototype based inheritance and kept trying to shovel my C++ style into JS. It took 2-3 years to stop trying to coerce JS into C++ and instead use it as JS.\n\nNow, for many projects I can't stand how I have to write 1000x more code in C++ to insert a debug wrapper around some native API that in JS I can do in a few lines in a few minutes.\n\nSimilarly, lisp is great, but it takes a while to really get out to take advantage of its strengths and not treat it like whatever language you're most comfortable in."}, {"id": 50524369, "au": "ratorx", "dom": 72, "sr": 6, "sc": 6.82, "ep": 6.82, "bs": 0.0, "d": 2, "age": 7.33, "grav": 55.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 105, "qw": 8, "k": 988, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "null_value", "flbl": "Null & Value (String)", "urls": [], "ig": 1.659, "fa": 0.42, "gp": 1.19, "bl": 0.0, "ds": 0.0, "txt": "> Optionals are an annoying workaround/hack to it\n\nSometimes you do want to represent the concept of “this whole datatype OR nothing”. How do you suggest this is modelled? I think optionality is pretty fundamental. What’s wrong about classical null is that it ascribes optionality to all types regardless of whether they need it.\n\nBeing forced to represent optionality with a “special” default is terrible design IMO - see the recent SSH RCE on Musl, largely due to the poor choice of indicating “crypt failed”. Default values can be quite dangerous. Sometimes the domain you are modelling supports such a value, but having “default value” be the default (and not a choice) is a similar evil to default null."}, {"id": 50523726, "au": "coldtea", "dom": 122, "sr": 7, "sc": 6.74, "ep": 6.74, "bs": 0.0, "d": 0, "age": 8.12, "grav": 64.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 92, "qw": 0, "k": 93922, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "type_payloads", "flbl": "Type & Payloads (Fileop)", "urls": [], "ig": 1.468, "fa": 0.68, "gp": 0.934, "bl": 0.0, "ds": 0.0, "txt": "Such enlightenment was a common read back in the glorious days of before 2023.\n\nBut reading this in 2026, when the entirety of the profession has changed (for better or worse) due to LLMs, seems strange.\n\nLike someone writing how some new preservation method for making food last longer revolutionized how they manage their pantry, shortly after the invention of the fridge.\n\nI like the post - it's just sad how many will not have these epifanies anymore, or they wont mean anything, and how many starting today would already just say \"how quaint\" and move on."}, {"id": 50524581, "au": "Jtsummers", "dom": 90, "sr": 8, "sc": 6.52, "ep": 6.81, "bs": 0.0, "d": 2, "age": 7.05, "grav": 52.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 122, "qw": 0, "k": 29784, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": ["https://learn.adacore.com/courses/intro-to-ada/chapters/more_about_records.html\u0023variant-records"], "ig": 1.447, "fa": 0.62, "gp": 1.134, "bl": 0.0, "ds": 0.0, "txt": "As someone who hasn't used Rust enough, and not knowing Zig but it appears Zig does something similar to Ada which I do know, how would you use the same discriminant across multiple Rust enums and guarantee that you implemented variants for each discriminant value?\n\nIn Ada, if I use an enum (carrying the example from a link I used in a cousin comment):\n\n  type Expr_Kind_Type is (Bin_Op_Plus,\n                           Bin_Op_Minus,\n                           Num);\n\nhttps://learn.adacore.com/courses/intro-to-ada/chapters/more...\n\nVariant records using this enum have to implement the variant for each element of the enum. If I, for some reason, have multiple records using the same discriminant I can know that each one implements it for each value of the discriminant. Does Rust have a way to synchronize your enums similar to that?"}, {"id": 50525126, "au": "alpaca128", "dom": 47, "sr": 9, "sc": 6.21, "ep": 6.51, "bs": 0.0, "d": 3, "age": 6.29, "grav": 45.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 164, "qw": 0, "k": 8736, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 1.927, "fa": 0.34, "gp": 0.697, "bl": 0.0, "ds": 0.0, "txt": "Just yesterday I finished my small sudoku \"game\" including generator in Odin and it was such a fun project. Not major by line count but optimizing it to generate a new puzzle in <100 ms was a fun exercise.\n\nFor anyone curious, I generate the sudokus by first randomly filling an empty grid in a way that follows the sudoku rules, then emptying random cells where doing so doesn't make the solution ambiguous (a sudoku has exactly one valid solution). The first step to fill the grid works almost exactly like a normal backtracking solver but going through the cells in random order, and for a major speed boost the backtracking is far more aggressive (always resetting half the progress so far instead of just going back one step). \nChecking if a sudoku has multiple solutions is again normal backtracking but only exiting at the second time it finishes or after going through all combinations. The rest is modern computers being fast and limiting the number of iterations to avoid the super slow worst cases."}, {"id": 50524986, "au": "rhdunn", "dom": 73, "sr": 10, "sc": 6.19, "ep": 6.34, "bs": 0.0, "d": 3, "age": 6.52, "grav": 47.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 78, "qw": 0, "k": 1410, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "null_value", "flbl": "Null & Value (String)", "urls": [], "ig": 1.595, "fa": 0.56, "gp": 0.688, "bl": 0.0, "ds": 0.0, "txt": "1. Have declared nullability (e.g. `String? foo` / `val foo: String?`)\n\n2. Use null coalescing (e.g. `foo?.bar?.baz`)\n\nLanguages such as Kotlin and C\u0023 support this style o programming.\n\nThe thing that I don't like about Optional types (in e.g. Scala or Java) is that they are too verbose. For example, instead of:\n\n    return foo?.bar?.baz ?? 0\n\nyou have something like:\n\n    return foo.flatMap(_.bar).flatMap(_.baz).getOrElse(0);\n\nThis is even harder to read if you have more complicated logic, requiring implicit lambdas and other machinery."}, {"id": 50523988, "au": "Jtsummers", "dom": 61, "sr": 11, "sc": 5.87, "ep": 6.31, "bs": 0.0, "d": 2, "age": 7.82, "grav": 61.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 90, "qw": 13, "k": 29784, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 1.671, "fa": 0.42, "gp": 0.818, "bl": 0.0, "ds": 0.0, "txt": "> It's like saying a novelist should write a major novel in every important spoken language.\n\nNo, it's not. It's more like saying a writer should try their hand at different styles and formats of writing. So a novelist who periodically writes non-fiction essays or journalistic content or poetry (whether intended for publication or as a writing experiment), and that practice can in turn inform their writing as a novelist.\n\nBesides, learning programming languages is much easier than learning natural languages. Most experienced programmers today know multiple languages, and most college grads in CS and Software Engineering graduate having used at least 5 or 6 languages if their school is halfway decent."}, {"id": 50525020, "au": "12_throw_away", "dom": 113, "sr": 12, "sc": 5.81, "ep": 6.47, "bs": 0.0, "d": 4, "age": 6.46, "grav": 46.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 89, "qw": 0, "k": 2715, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": ["https://lib.rs/crates/strum"], "ig": 1.356, "fa": 0.62, "gp": 1.044, "bl": 0.0, "ds": 0.0, "txt": "Because sometimes you just want to talk about the types of variants without having to construct a value. But, you probably don't want to manually maintain a separate enum just for the discriminants. Nor do you want to manually maintain the mappings between the original enum and the discriminant-only enum.\n\nI've had it come up when dealing with ASTs, although I don't recall the specifics. This is a problem that's certainly pretty easy to solve with macros. I'm pretty sure last time I ran into this I used `strum` [1] and its `EnumDiscriminants` macro to handle this.\n\n[1] https://lib.rs/crates/strum"}, {"id": 50527360, "au": "kator", "dom": 82, "sr": 13, "sc": 5.75, "ep": 5.75, "bs": 0.0, "d": 0, "age": 1.57, "grav": 9.9, "surf": 6.6, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 158, "qw": 0, "k": 2679, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": 1.48, "fa": 0.34, "gp": 0.896, "bl": 0.0, "ds": 0.0, "txt": "“Every computer language is an imperfect way of describing a potential solution to a poorly understood problem\"\n\nI wrote this on my website in like 2014. I raise it because I think poorly understood problem is usually the reality, and using many languages over time you find ways of describing solutions to those problems and then learning to hone your understanding of the problem.\n\nTo me learning new computer languages forces you to think differently about a problem, if you really try to learn the language. I often just write all my side projects in whatever I am trying to learn for as long as it takes from me to learn it. Sometimes I stay with them for very long times if I enjoy them.\n\nThat said I look at computer languages like tools. Focus on the right tool for the job. More than once that tool is what others on the project know, because it still solves problems and it’s better that we have a shared toolset to work from."}, {"id": 50524001, "au": "dabinat", "dom": 68, "sr": 14, "sc": 5.6, "ep": 5.89, "bs": 0.0, "d": 0, "age": 7.81, "grav": 60.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 148, "qw": 0, "k": 4500, "kpp": 5.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "null_value", "flbl": "Null & Value (String)", "urls": [], "ig": 1.434, "fa": 0.0, "gp": 1.741, "bl": 0.0, "ds": 0.0, "txt": "One of the things that I think makes Rust unique is that it acknowledges the possibility of human error. I think it’s also one of the most controversial too: there are certain people who get an ego hit at the insinuation that they ever could have written C code with mistakes.\n\nInstead of hoping you remember to check for NULL, Rust forces you to make a decision on how to handle the possibility of failure. Sure, you can still pick a bad decision (unwrap) but that is at least a specific decision and you can’t forget to do it.\n\nYou can take it even further with things like the newtype pattern. If you have lots of numeric IDs (project ID, user ID, etc) you can give them distinct types so you don’t mix them up.\n\nSo Rust taught me I can program defensively against my own brain, which sometimes gets tired or lazy or distracted."}, {"id": 50527084, "au": "zzzeek", "dom": 139, "sr": 15, "sc": 5.28, "ep": 5.28, "bs": 0.0, "d": 0, "age": 2.26, "grav": 13.6, "surf": 4.1, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 72, "qw": 59, "k": 12973, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 1.366, "fa": 0.42, "gp": 0.605, "bl": 0.0, "ds": 0.0, "txt": "> How does that work in Rust? Macros! Macros lets you write code that generates code during compile time. With serde, the macro generates a whole bunch of serialization code and deserialization code for the types annotated with it. This generated code gets compiled along with the rest of your code. The compiler can optimize it just like any other code.\n\nThis is happening in Python land as well.  now that type annotations are a normal everyday thing we are doing a lot of code generation.  Of course I'm sure how Rust does it is much better integrated and \"correct\" and all that but the Python thing of generating functions/classes/etc. on the fly is not quite the sole choice anymore for various reasons, and pep484 and related are making static code generation more feasible."}, {"id": 50524095, "au": "QuantumNomad_", "dom": 48, "sr": 16, "sc": 5.25, "ep": 5.7, "bs": 0.0, "d": 3, "age": 7.68, "grav": 59.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 587, "qw": 0, "k": 1459, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 1.695, "fa": 0.28, "gp": 0.63, "bl": 0.0, "ds": 0.0, "txt": "At the beginning of my university studies (second or third semester), one of the homework assignments was to write a Sudoku solver. I spent a lot of time on it, prototyping it with JS and HTML so that I could visualize step by step how to solve Sudoku in general, implementing the techniques in code that I had previously been doing by hand when doing Sudoku puzzles in the past.\n\nI am not sure if everyone else looked up techniques online or what for how to do it, or if they skipped that assignment, or made a very simplified solver that only handled some basic techniques. We hadn’t really learned much of anything yet in any of the classes of the course that would be useful for making a general solver. I thought I was supposed to figure it all out on my own, and that it should be able to handle any Sudoku puzzle that a person could solve. And in the end, despite many, many hours of working on it over many days it was still far from a complete solver. And I also didn’t have time to write it in the programming language we were using in the course. I was prototyping in JS and HTML because I wanted to see visually the sudoku puzzle and be able to switch between having the computer find next number and clicking on the number myself, to discover in detail how I was thinking when I was solving Sudoku puzzles, so that in turn I could implement those techniques in code.\n\nI lost a little bit"}, {"id": 50523588, "au": "kccqzy", "dom": 52, "sr": 17, "sc": 5.13, "ep": 5.57, "bs": 0.0, "d": 2, "age": 8.31, "grav": 66.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 67, "qw": 0, "k": 19940, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": 1.556, "fa": 0.28, "gp": 0.771, "bl": 0.0, "ds": 0.0, "txt": "Depending on what kind of concepts you want exposure to.\n\nIf you just want generic pure computation: write an interpreter for a toy language. If it’s too large, write a macro expander that can handle C style or TeX style macros.\n\nIf you want events and concurrency: write a tmux clone that can work with multiple terminals.\n\nIf you want IO but specifically networking: write a toy HTTP server that only supports 1.0."}, {"id": 50524356, "au": "setr", "dom": 78, "sr": 18, "sc": 4.99, "ep": 5.43, "bs": 0.0, "d": 2, "age": 7.34, "grav": 55.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 115, "qw": 0, "k": 5584, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "null_value", "flbl": "Null & Value (String)", "urls": [], "ig": 1.671, "fa": 0.0, "gp": 1.038, "bl": 0.0, "ds": 0.0, "txt": "I don't see how initial values solves for much, or how an Optional constitutes a workaround; if anything, I see initial/null values being a hack to get around Optional, which is an explicit declaration of what possibilities exist.\n\nInitial values, like null, is an attempt to smuggle the \"unset\" case into the type without declaring it. And like null, the defensively written logic should prefix every single usage with a check for validity.\n\nOptional is just a natural subset of the generalization that multiple possible states exist; in this case, just the two, and sum types to properly handle bigger sets.\n\nInitial/null never admit more than 2 possible states, and also believe everything is always in one of those 2 states."}, {"id": 50524969, "au": "Jtsummers", "dom": 95, "sr": 19, "sc": 4.94, "ep": 5.82, "bs": 0.0, "d": 4, "age": 6.54, "grav": 47.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 174, "qw": 0, "k": 29784, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": [], "ig": 1.644, "fa": 0.28, "gp": 0.797, "bl": 0.0, "ds": 0.0, "txt": "If I'm building up a type checker and an interpreter, I very well could (continuing that example) end up with different data structures using the same discriminant (but containing different data about the system). In Rust I'd have to do something like:\n\n  enum Parser {\n    bin_add(...),\n    bin_sub(...),\n    ...\n  }\n\n  enum Typer {\n     bin_add(...),\n     bin_sub(...),\n     ...\n  }\n\nAnd I'd have to hope they were both complete and match (at least according to what I know now, that's why I'm asking). If I go back in to the Parser enum and add a `un_minus`, then I have to also go into the Typer enum (apologies for the bad naming, I'm at work and commenting between my way too many meetings) and manually add it. I have no compile time guarantee that both are complete and synchronized. In Ada, I modify the existing enum and both will fail to compile until I add in the variant for `un_minus`. One edit, multiple failures distributed across the code base as a result telling me all the places where I have to add in a new code branch or new variant.\n\nEDIT: Run on sentence broken up."}, {"id": 50525626, "au": "bunderbunder", "dom": 118, "sr": 20, "sc": 4.92, "ep": 5.14, "bs": 0.0, "d": 1, "age": 5.49, "grav": 37.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 83, "qw": 0, "k": 18581, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 1.458, "fa": 0.28, "gp": 0.631, "bl": 0.0, "ds": 0.0, "txt": "Things have changed so much since then. In the 80s compilers didn’t optimize as well, and generally couldn’t because of resource constraints on the computer. The limited power of 1970s and 1980s computers is all over the design of C. Header files are meant to reduce the memory needed to compile programs, for example.\n\nThe last time I needed C’s power to fit something into memory and compute limitations, it was code running on a microcontroller and better systems languages like Zig and Rust weren’t a thing yet."}, {"id": 50523875, "au": "Jtsummers", "dom": 111, "sr": 21, "sc": 4.69, "ep": 6.04, "bs": 0.0, "d": 2, "age": 7.94, "grav": 62.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 49, "qw": 0, "k": 29784, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": ["https://zig.guide/language-basics/unions/", "https://learn.adacore.com/courses/intro-to-ada/chapters/more_about_records.html\u0023variant-records"], "ig": 1.094, "fa": 0.9, "gp": 0.627, "bl": 0.0, "ds": 0.0, "txt": "https://zig.guide/language-basics/unions/ - Seems like it's more similar to Ada's variant records: https://learn.adacore.com/courses/intro-to-ada/chapters/more...\n\nInstead of just getting one type that includes the discriminant and records, Zig and Ada have a tag of some type whose value determines which variant is being used, and then the union (Zig) or record (Ada) is its own type."}, {"id": 50526092, "au": "bunderbunder", "dom": 87, "sr": 22, "sc": 4.6, "ep": 5.04, "bs": 0.0, "d": 1, "age": 4.64, "grav": 30.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 98, "qw": 0, "k": 18581, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 1.425, "fa": 0.28, "gp": 0.619, "bl": 0.0, "ds": 0.0, "txt": "Agreed. And it made a much stronger case for Rust than I’m used to seeing. For most of us non C/C++ programmers memory safety is a problem that’s more easily (not necessarily better) handled with a garbage collector.\n\nBut there are times when I really want to come to Rust from the other direction, and almost think of it as a Haskell alternative that doesn’t bring all the headaches that come from being lazy. The examples the author chose beautifully illustrate some of Rust’s virtues that lend themselves to that perspective.\n\n(But no, we are not going to talk about higher programming. I did say “almost”.)"}, {"id": 50525998, "au": "bunderbunder", "dom": 134, "sr": 23, "sc": 4.28, "ep": 4.94, "bs": 0.0, "d": 1, "age": 4.81, "grav": 31.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 228, "qw": 0, "k": 18581, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 1.717, "fa": 0.0, "gp": 0.623, "bl": 0.0, "ds": 0.0, "txt": "As someone who speaks multiple languages and uses multiple programming languages, I would say it’s much more true of programming languages than it is of natural languages.\n\nSpoken languages have the odd idiom that doesn’t translate well, and certain languages express certain ideas more or less succinctly. But it’s not like Chinese’s lack of verb tense makes it harder to think about how things are happening in time. The concept still exists, it’s just expressed differently. But not so differently that I can’t translate decently well on the fly.\n\nProgramming languages have much more variability in what kinds of concepts they can easily express. In Smalltalk I’m going to use dynamic dispatch to express damn near everything because it’s just about the only sane way to do domain modeling. In Standard ML I’m going to lean instead on algebraic data types and pattern matching. Those tend to lead to very different ways of breaking down a problem. In Scheme I don’t have either built in but both are easy enough to implement as a library, so I’ll freely choose whichever option seems most appropriate to the problem at hand. In assembly language I’ll avoid any such abstraction altogether because, while I could probably implement versions of both, it would be a total PITA and probably result in incomprehensible code. And translating among any of them is likely to be the work of multiple hours"}, {"id": 50523861, "au": "MomsAVoxell", "dom": 19, "sr": 24, "sc": 4.18, "ep": 4.84, "bs": 0.0, "d": 1, "age": 7.96, "grav": 62.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 430, "qw": 0, "k": 1464, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": 1.712, "fa": 0.0, "gp": 0.564, "bl": 0.0, "ds": 0.0, "txt": "I have applied this for decades, with multiple languages under my belt, and multiple million-dollar projects on my CV, and meanwhile I have found another similar rule that I think also sharpens a developers mind:\n\nPut Lua in things.\n\nNow, before you anti-Lua types start jumping on that 0-indexed down-vote, let me explain.  Its not just about the language, its about the \"thing\" you're putting it in, its about using the VM effectively, its about planning and using the stack properly. It's about using one language to leverage the strengths - and discover the weaknesses - of other languages, runtimes, ABI's.\n\nPutting Lua in things is easy - and it is hard.  It teaches you how to treat other things with respect, and it teaches you how to disregard other things and \"Just Use Lua™\".\n\nYou can learn the language - multiple variants of it.  You can learn the 'things' you're putting it in.  You can learn how a VM works, what byte code is, how it can be used effectively - and how it can be used counter-productively, too.\n\nIt will teach you the limits of a language - Lua, and C - and it will teach you the strengths of both (as well as Rust, and all the other things you can get an FFI scaffolding built around).\n\nYou can use Lua to produce your own domain specific language.  You can use it to (almost, or indeed completely) replace whatever other language the \"thing\" is using.  You can use it "}, {"id": 50524189, "au": "ardit33", "dom": 71, "sr": 25, "sc": 4.11, "ep": 4.77, "bs": 0.0, "d": 1, "age": 7.56, "grav": 58.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 70, "qw": 0, "k": 9526, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "null_value", "flbl": "Null & Value (String)", "urls": [], "ig": 1.476, "fa": 0.0, "gp": 0.897, "bl": 0.0, "ds": 0.0, "txt": "Null should not exist, and Optionals are an anoying workaround/hack to it.  Old languages like Tcl eliminated it, (every object has an initial value, it is never null).\n\nIt creates an interesting problem, as sometimes you want to know the absence of value.  Usually done with the empty \"\" string.\n\nThe other way to handle is that every Object is initiated (pointing) to an starter initial value.  (prototype based languages)."}, {"id": 50525669, "au": "pastel8739", "dom": 3, "sr": 26, "sc": 3.98, "ep": 5.3, "bs": 0.0, "d": 2, "age": 5.43, "grav": 37.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 10, "k": 640, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 1.154, "fa": 0.7, "gp": 0.409, "bl": 0.0, "ds": 0.0, "txt": "> why you will never really find abstraction layers in hardware\n\nThis is interesting to me, in the very little HDL I’ve done there were abstractions: you set up modules with inputs and outputs that provided a consistent interface despite complexity inside the model. Is this not what you mean by abstraction layer?"}, {"id": 50525216, "au": "xeubie", "dom": 100, "sr": 27, "sc": 3.86, "ep": 5.18, "bs": 0.0, "d": 4, "age": 6.13, "grav": 43.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 69, "qw": 0, "k": 109, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": [], "ig": 1.452, "fa": 0.28, "gp": 0.671, "bl": 0.0, "ds": 0.0, "txt": "It's not at all minor. Sometimes the tag enum already exists. Rust can't build a data enum on top of it: a derive macro only sees its own enum, so it generates a new tag enum instead. Now you have two tag enums to keep in sync by hand. Proc macros are always used to resolve deficiencies in the rust language, and they always lead to greater complexity and longer compile times."}, {"id": 50524735, "au": "sedatk", "dom": 117, "sr": 28, "sc": 3.77, "ep": 4.36, "bs": 0.0, "d": 0, "age": 6.87, "grav": 50.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 78, "qw": 0, "k": 7747, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "null_value", "flbl": "Null & Value (String)", "urls": [], "ig": 1.307, "fa": 0.0, "gp": 0.889, "bl": 0.0, "ds": 0.0, "txt": "It's ironic that these are the times of safety, but when C was getting popular in the 80's, it was the times of power. I clearly remember C was touted as being \"so powerful that it lets you do anything without any checks\". You were responsible to wield that power properly unlike more strict languages like Pascal, COBOL, or Fortran at the time, yet way more expressive than Assembly of course. Now, the pendulum seems to have swung to the other end."}, {"id": 50523358, "au": "bryanlarsen", "dom": 1, "sr": 29, "sc": 3.74, "ep": 4.62, "bs": 0.0, "d": 0, "age": 8.62, "grav": 70.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 48, "qw": 0, "k": 43485, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": 0.989, "fa": 0.0, "gp": 1.582, "bl": 0.0, "ds": 0.0, "txt": "A standard piece of advice is that every developer should do a major project in every big language family.    A Lisp, an OO language, a functional language, Prolog, VHDL or Verilog, a Forth, et cetera.   They'll all make you think differently and teach you lessons you will use outside of the family."}, {"id": 50523679, "au": "xeubie", "dom": 88, "sr": 30, "sc": 3.55, "ep": 5.09, "bs": 0.0, "d": 0, "age": 8.18, "grav": 65.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 110, "qw": 0, "k": 109, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": [], "ig": 1.234, "fa": 0.0, "gp": 1.511, "bl": 0.0, "ds": 0.0, "txt": "Rust enums conflate the tag type with the union type that uses it. These should be separate things. In the example here, you can see that Rust gives no way to represent the tag type `{Human, Cat}`. In Zig there is an enum which is a set of tags, and a union which is backed by that enum and can have fields. It is obviously better to have these as separate concepts rather than conflating them. You often want the kind without the data, and Rust gives you no way to represent it. I'm not sure why I am bothering to rant about this but it's one of my biggest annoyances with the language."}, {"id": 50524641, "au": "taldo", "dom": 8, "sr": 31, "sc": 3.54, "ep": 4.64, "bs": 0.0, "d": 3, "age": 6.98, "grav": 52.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 113, "qw": 0, "k": 638, "kpp": 8.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "null_value", "flbl": "Null & Value (String)", "urls": [], "ig": 1.643, "fa": 0.0, "gp": 0.538, "bl": 0.0, "ds": 0.0, "txt": "I worked for a couple of years in a SystemVerilog compiler, and I couldn't agree more with your sentiment.\n\nFrom the compiler construction standpoint, it's grossly underspecified, to the point that our customers' designs were way more expressive than the spec.\n\nAnd from the users' perspective, it's confusing, quite limited, and you end up having to resort to hacks to achieve what should be part of the language... Fortunately I can't remember any particularly bad examples, it's been 15 or so years since I left for greener pastures.\n\nStill, I sometimes wonder, how much of HW design is influenced by the language decisions, these ugly hacks, and the emerging (System)Verilog design patterns? Could it be measurably better in a different world?"}, {"id": 50526489, "au": "JuniperMesos", "dom": 84, "sr": 32, "sc": 3.32, "ep": 4.42, "bs": 0.0, "d": 0, "age": 3.72, "grav": 23.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 10, "k": 1681, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": [], "ig": 0.997, "fa": 0.42, "gp": 0.608, "bl": 0.0, "ds": 0.0, "txt": "> Any language without sum types now feels impoverished to me.\n\nI wholeheartedly agree. I learned this lesson from learning Haskell, before I was even aware of Rust and before Rust had its 1.0 release. One of the reasons I was first excited about Rust in fact was precisely that it had a type system like that of Haskell."}, {"id": 50525541, "au": "bunderbunder", "dom": 77, "sr": 33, "sc": 3.17, "ep": 4.49, "bs": 0.0, "d": 2, "age": 5.61, "grav": 38.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 153, "qw": 0, "k": 18581, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "null_value", "flbl": "Null & Value (String)", "urls": [], "ig": 1.549, "fa": 0.0, "gp": 0.588, "bl": 0.0, "ds": 0.0, "txt": "Empty string is not a valid alternative to null because the empty string is still a string. There are valid cases where “this value is not set” and “this value is set to an empty string” mean two different things.\n\nThere are even more valid cases where “this integer is not set” and “this integer is set to 0” are different things.\n\nIt’s also a type safety concern. Using sentinel values is comparable to the “billion dollar mistake” version of  nulls because it creates a special value that implicitly exists and is not part of the variable’s type definition. This means the compiler can’t help you remember to check it. You have to just remember, and forgetting is a bug. With optionals (including opt-in nullability like in Kotlin), on the other hand, the compiler knows when you do and do not have to worry about a value not being present, and can raise a compile time type error when you forget."}, {"id": 50525893, "au": "jan_m_savage", "dom": 86, "sr": 34, "sc": 3.13, "ep": 3.93, "bs": 0.0, "d": 0, "age": 5.01, "grav": 33.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 0, "k": 149, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": 1.209, "fa": 0.0, "gp": 0.753, "bl": 0.0, "ds": 0.0, "txt": "this has got to be the most beautifully designed blog I've read in a while. Esp the choice for code snippets.\n\nalso, the author is a great communicator who genuinely wants to convey his points in clear prose, instead of showing off their intellect (which seems to be the case in some other blogs)"}, {"id": 50523788, "au": "nomel", "dom": 2, "sr": 35, "sc": 2.78, "ep": 4.1, "bs": 0.0, "d": 1, "age": 8.04, "grav": 63.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 63, "qw": 1, "k": 12248, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": 1.061, "fa": 0.0, "gp": 1.11, "bl": 0.0, "ds": 0.0, "txt": "> Verilog\n\nMy favorite side quest that I definitely recommend. Physical parallelism is so fun to reason about.\n\nI had the advantage of sitting next to a proper professional to bounces questions off of, so I was able to get an SPDIF decoder to work in about a week! It was a very interesting lesson in the costs of abstraction, and why you will never really find abstraction layers in hardware."}, {"id": 50524364, "au": "esikich", "dom": 130, "sr": 36, "sc": 2.69, "ep": 3.94, "bs": 0.0, "d": 1, "age": 7.34, "grav": 55.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 62, "qw": 0, "k": 463, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 1.577, "fa": 0.0, "gp": 0.159, "bl": 0.0, "ds": 0.0, "txt": "Ugh. Swap out LLMs for formal logic, mathematical proofs, the calculator or the printing press if you want.\n\nYou're just getting older and times change. Your adolescence wasn't any more pure than the kids today.\n\nOne could argue you've frittered away your life fiddling bits around instead of becoming a thespian, writer, or musician. Alas, the epiphanies you could have had."}, {"id": 50525611, "au": "glandium", "dom": 74, "sr": 37, "sc": 2.62, "ep": 4.16, "bs": 0.0, "d": 4, "age": 5.51, "grav": 37.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 36, "qw": 0, "k": 4857, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": ["https://rust.godbolt.org/z/5M6nr3dzs"], "ig": 0.997, "fa": 0.62, "gp": 0.036, "bl": 0.0, "ds": 0.0, "txt": "You can mostly write the former in rust:\nhttps://rust.godbolt.org/z/5M6nr3dzs\n\nThere are caveats, such the function using ? having to return an Option, which can be worked around by using a closure.\n\nI think try blocks will make this slightly easier."}, {"id": 50525447, "au": "bunderbunder", "dom": 70, "sr": 38, "sc": 2.59, "ep": 4.14, "bs": 0.0, "d": 2, "age": 5.76, "grav": 40.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 53, "qw": 0, "k": 18581, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "null_value", "flbl": "Null & Value (String)", "urls": [], "ig": 1.226, "fa": 0.34, "gp": 0.197, "bl": 0.0, "ds": 0.0, "txt": "I have always had a love/hate relationship with unit tests. I love them for all the obvious reasons. I hate them for all the times I read a test suite where 80% of the tests could have been eliminated by just improving the design of the system under test so that error condition wasn’t possible in the first place."}, {"id": 50523641, "au": "RussianCow", "dom": 46, "sr": 39, "sc": 2.33, "ep": 3.87, "bs": 0.0, "d": 2, "age": 8.23, "grav": 65.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 63, "qw": 0, "k": 4256, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 1.291, "fa": 0.0, "gp": 0.577, "bl": 0.0, "ds": 0.0, "txt": "I don't know if it counts as \"major\" to the OP, but early in my career, I wrote a Sudoku solver in several languages as part of learning them. It was just complex enough of a problem that I got a glimpse into the patterns that succeed or fail for different languages, especially when it comes to things like optimization, which is sometimes hard to observe in business applications."}, {"id": 50524170, "au": "flykespice", "dom": 66, "sr": 40, "sc": 2.27, "ep": 3.81, "bs": 0.0, "d": 2, "age": 7.58, "grav": 58.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 57, "qw": 0, "k": 2064, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 1.517, "fa": 0.0, "gp": 0.169, "bl": 0.0, "ds": 0.0, "txt": "At first glance this seems like a invalid analogy because spoken language didn't exist to suit a specific domain just like some programming languages (lua for scripting, Pascal for teaching, Rust for systems programming..).\n\nBut there are example of \"dead\" languages whose everyday usage have devolved to only lithurgical functions like: Latin (Catholicism), Pali Cannon (Buddhism) and Sanskrit (Hinduism)."}, {"id": 50525228, "au": "rowanG077", "dom": 12, "sr": 41, "sc": 2.17, "ep": 2.61, "bs": 0.0, "d": 4, "age": 6.12, "grav": 43.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 47, "qw": 0, "k": 3572, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "type_payloads", "flbl": "Type & Payloads (Fileop)", "urls": [], "ig": 1.111, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "As the maintainer of clash I would say yes definitely! Clash is at the same level of hardware specifications as VHDL and verilog. You lay down every wire and register. It's just that you get all the niceties of Haskell, the very powerful type system and abstraction capabilities."}, {"id": 50527687, "au": "DonaldPShimoda", "dom": 127, "sr": 42, "sc": 2.12, "ep": 3.52, "bs": 0.0, "d": 4, "age": 0.7, "grav": 6.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 57, "qw": 0, "k": 2971, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 1.395, "fa": 0.0, "gp": 0.165, "bl": 0.0, "ds": 0.0, "txt": "I actually think there's a meaningful distinction between my math example (calculus) and yours (square roots), which is that yours is purely numeric. I think learning to solve complex abstract problems is fundamentally useful, regardless of whether the specific problems you practice solving are themselves of any use: it's practice in problem-solving, which generalizes in often unexpected and nuanced ways."}, {"id": 50524640, "au": "kreyenborgi", "dom": 11, "sr": 43, "sc": 1.96, "ep": 3.5, "bs": 0.0, "d": 3, "age": 6.98, "grav": 52.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 20, "qw": 0, "k": 924, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": ["https://github.com/clash-lang/clash-compiler"], "ig": 0.582, "fa": 0.75, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Will I have the same learning effect if I use https://github.com/clash-lang/clash-compiler instead of straight verilog, or is the language a necessary part of it?"}, {"id": 50524257, "au": "xeubie", "dom": 98, "sr": 44, "sc": 1.89, "ep": 3.43, "bs": 0.0, "d": 2, "age": 7.47, "grav": 57.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 71, "qw": 0, "k": 109, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": [], "ig": 1.24, "fa": 0.0, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "Yes, there is something you can do with separate types. You can name a variant without having a value of it. `discriminant` only works on an existing value, so to refer to \"cats\" you'd have to build a dummy `Cat`, and the result is opaque. You can't match on it, iterate over it, or create one from a byte you parsed off the wire. This is so obviously worse, I can't believe you bothered to ask."}, {"id": 50523657, "au": "treyd", "dom": 50, "sr": 45, "sc": 1.85, "ep": 3.39, "bs": 0.0, "d": 2, "age": 8.21, "grav": 65.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 54, "qw": 0, "k": 2887, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 1.313, "fa": 0.0, "gp": 0.208, "bl": 0.0, "ds": 0.0, "txt": "Could be lots of things.\n\nA common example I give is a basic chat client/server, to learn how networking code feels, especially nonblocking IO.  Especially if you're implementing the same protocol in the different languages since it means you won't necessarily be as biased by what protocol patterns are easy to implement in one language."}, {"id": 50523738, "au": "brightball", "dom": 15, "sr": 46, "sc": 1.77, "ep": 3.32, "bs": 0.0, "d": 1, "age": 8.1, "grav": 64.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 17475, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": 0.668, "fa": 0.34, "gp": 0.535, "bl": 0.0, "ds": 0.0, "txt": "100% agree with this.\n\nElixir was somewhere between my 12th-14th language and nothing changed my perspective so much as understanding why the BEAM works the way it does."}, {"id": 50525136, "au": "slopinthebag", "dom": 81, "sr": 47, "sc": 1.77, "ep": 3.31, "bs": 0.0, "d": 1, "age": 6.28, "grav": 45.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 1372, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": [], "ig": 1.411, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "yes i love rust because i acknowledge my own limitations as a programmer. compare that to c/zig devs handwaving away vulnerabilities as \"skill issues\", any serious engineering discipline eliminates the possibility of human error wherever possible.\n\nfwiw john carmack agrees with me"}, {"id": 50525417, "au": "Jtsummers", "dom": 92, "sr": 48, "sc": 1.74, "ep": 2.18, "bs": 0.0, "d": 4, "age": 5.8, "grav": 40.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 64, "qw": 0, "k": 29784, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "type_payloads", "flbl": "Type & Payloads (Fileop)", "urls": [], "ig": 0.929, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "This looks like it would handle synchronizing multiple variant records/enums, and if you just wanted the \"plain\" enum without any payload, you'd need to do:\n\n  pub struct Bare;\n  impl Payloads for Bare {\n    type Read = ();\n    type Write = ();\n  }\n\n  pub type BareFileOp = FileOp<Bare>\n\nCorrect? So you'd need to create it with BareFileOp::Read(()), but at least it wouldn't carry any overhead of actually containing data."}, {"id": 50523536, "au": "pjmlp", "dom": 29, "sr": 49, "sc": 1.72, "ep": 3.27, "bs": 0.0, "d": 2, "age": 8.37, "grav": 67.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 43, "qw": 0, "k": 134000, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": [], "ig": 1.304, "fa": 0.0, "gp": 0.139, "bl": 0.0, "ds": 0.0, "txt": "Yes, especially since many of the type system features younger devs assign to Rust, are present in most Standard ML derived languages.\n\nIt is a scale, and there are other languages that go beyond Rust, with dependent types, effects, capabilities, linear types, formal profs,..."}, {"id": 50524138, "au": "PaulKeeble", "dom": 69, "sr": 50, "sc": 1.67, "ep": 3.21, "bs": 0.0, "d": 1, "age": 7.63, "grav": 58.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 95, "qw": 0, "k": 7354, "kpp": 5.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": [], "ig": 1.291, "fa": 0.0, "gp": 0.119, "bl": 0.0, "ds": 0.0, "txt": "This was always the same thing that Unit tests were trying to bring, defend against your own errors and try to get the most quality out of the tools as possible. A lot of language progress has been exactly this over the years, from removing goto and introduction of for/if/while to constraining types and everything since. As an industry we could do with more of this mindset in general, just use everything we can to try and catch bugs earlier when they are cheaper to find and fix and avoid them happening at all."}, {"id": 50523787, "au": "clownstrikelol", "dom": 105, "sr": 51, "sc": 1.64, "ep": 3.18, "bs": 0.0, "d": 1, "age": 8.05, "grav": 63.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 58, "qw": 0, "k": 360, "kpp": 13.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": [], "ig": 1.207, "fa": 0.0, "gp": 0.234, "bl": 0.0, "ds": 0.0, "txt": "Sure you can, bringing data along for the ride is optional in Rust. Nothing is forcing you to use it like a tagged union, it’s an optional (but useful) feature.\n\nIf you want specific values (integer or otherwise) associated with specific variants (i.e. Human = 1, Cat = 4) you can do that too. Use the \u0023[repr(T)] or impl the From / Into traits yourself."}, {"id": 50527891, "au": "wg0", "dom": 120, "sr": 52, "sc": 1.61, "ep": 2.71, "bs": 0.0, "d": 0, "age": 0.05, "grav": 3.6, "surf": 17.7, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 4940, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": [], "ig": 0.797, "fa": 0.28, "gp": 0.026, "bl": 0.0, "ds": 0.0, "txt": "At this point - people should stop taking pride in their ability to write Rust because pennies cheap Chinese models can do the same too.\n\nIt's just another tool not a philosophy of life or benchmark of intellect."}, {"id": 50525097, "au": "slopinthebag", "dom": 114, "sr": 53, "sc": 1.52, "ep": 1.96, "bs": 0.0, "d": 5, "age": 6.33, "grav": 45.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 1372, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "type_payloads", "flbl": "Type & Payloads (Fileop)", "urls": [], "ig": 0.835, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "ahh ok ive run into this before, yes either strum or i assumed i was doing something non-optimal if i had to talk about types like this"}, {"id": 50526398, "au": "clownstrikelol", "dom": 107, "sr": 54, "sc": 1.46, "ep": 3.85, "bs": 0.85, "d": 3, "age": 3.95, "grav": 24.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 160, "qw": 0, "k": 360, "kpp": 13.3, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": [], "ig": 1.64, "fa": 0.0, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "Ok from reading through your other comments on this thread and the links out to Ada and Zig docs, I think what is roughly equivalent would be aliases of unit.\n\ni.e. type Whatever = ()\n\nThat gets you a “tag” that is compile time enforced. You can explicitly match against these aliases and one alias will never == another alias (unless you explicitly write out a from / into impl, and a deref impl to make it happen implicitly).\n\nWhat you seem to be ultimately asking for is being able to use a tag that is freely floating around to determine the variant of a union. This would need to be explicitly handled inside an unsafe block though.\n\nThe “happy path” here explicitly ties them together. Letting them not be handcuffed together is not memory safe, and the compiler has no way to guarantee you’re reading a value correctly.\n\nYou can of course bypass all of that inside an unsafe block and pinky promise to the compiler you made no mistakes."}, {"id": 50527538, "au": "Rendello", "dom": 16, "sr": 55, "sc": 1.44, "ep": 2.98, "bs": 0.0, "d": 2, "age": 1.12, "grav": 7.7, "surf": 6.7, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 67, "qw": 0, "k": 2522, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 1.267, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Starting from Python, the languages that really changed how I saw the world were (in order of use) HolyC, then Erlang, then Rust. I'm glad I had the low-level (Holy)C and the functional Erlang before really getting into Rust, otherwise I don't think I would've appreciated or understood its concepts nearly as much.\n\n(I wanted Prolog to blow my mind too but I could never figure out what the hell was going on!)"}, {"id": 50526490, "au": "speed_spread", "dom": 109, "sr": 56, "sc": 1.44, "ep": 2.78, "bs": 0.0, "d": 1, "age": 3.72, "grav": 23.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 3336, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": [], "ig": 1.182, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Being a replacement for C, Zig is definitely lower level than Rust and readily exposes its own internal structures. Rust can get you there if you need it but you have to work for it. Having enums work as a black box makes them safer and enables the compiler to possibly optimize more."}, {"id": 50524714, "au": "rcxdude", "dom": 9, "sr": 57, "sc": 1.44, "ep": 2.73, "bs": 0.0, "d": 4, "age": 6.9, "grav": 51.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 58, "qw": 0, "k": 11598, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "null_value", "flbl": "Null & Value (String)", "urls": [], "ig": 1.163, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Yeah, using (system)verilog is essentially a process of \"think of the digital circuit you want, then figure out how to write it as a 'sequential' process so that the compiler can then generate the circuit you want\". The way it works feels quite clever when you first learn about it but the way it works in practice is bizarre."}, {"id": 50525589, "au": "democracy", "dom": 62, "sr": 58, "sc": 1.44, "ep": 2.73, "bs": 0.0, "d": 3, "age": 5.54, "grav": 37.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 47, "qw": 0, "k": 946, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": 1.162, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "\"language\" and its concepts can be learnt quickly - now to go from ~60 java keywords to being able to understand its landscape of libraries and frameworks and use it appropriately - one would always choose a java dev over someone with a knowledge of keywords and paradigms in dozens of languages"}, {"id": 50525630, "au": "whartung", "dom": 54, "sr": 59, "sc": 1.44, "ep": 2.7, "bs": 0.0, "d": 2, "age": 5.49, "grav": 37.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 55, "qw": 0, "k": 5188, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 1.116, "fa": 0.0, "gp": 0.053, "bl": 0.0, "ds": 0.0, "txt": "Something you can’t readily fit into your head.\n\nSomething that has a lifespan longer than a month.\n\nSomething developed under time pressure.\n\nSomething that is forced to change due to outside real world impacts.\n\nSomething that when you come back to it, you find some code that prompts you to say “What the heck was I thinking here?”."}, {"id": 50524717, "au": "kreyenborgi", "dom": 64, "sr": 60, "sc": 1.44, "ep": 2.68, "bs": 0.0, "d": 2, "age": 6.89, "grav": 51.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 924, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 1.014, "fa": 0.0, "gp": 0.208, "bl": 0.0, "ds": 0.0, "txt": "Actually, many of my favorite novelists have done a lot of translations, so that tracks. You probably become a better writer by extending your brain in that direction too. (But they tend to translate to their native language of course.)"}, {"id": 50525486, "au": "sagarm", "dom": 102, "sr": 61, "sc": 1.44, "ep": 2.67, "bs": 0.0, "d": 3, "age": 5.69, "grav": 39.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 1520, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": [], "ig": 0.798, "fa": 0.28, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "You design the enum. If you need kinds separate from the union itself, you have that power.\n\nThe union type always implies a kind, after all, so it's a generalization of the concept."}, {"id": 50526025, "au": "alpinisme", "dom": 38, "sr": 62, "sc": 1.44, "ep": 2.62, "bs": 0.0, "d": 3, "age": 4.78, "grav": 31.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 82, "qw": 0, "k": 526, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 1.113, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "While that may be true, it reopens the question of the value of the original comment’s point about learning other languages. If they won’t change how you write in your day job, is it all that significant that they taught you to think differently? And if they do change how you write in your day job, then why wouldn’t you feel frustrated that others on the team don’t see the things you do and continue to write from a more limited/parochial perspective?"}, {"id": 50527845, "au": "fork-bomber", "dom": 5, "sr": 63, "sc": 1.44, "ep": 2.58, "bs": 0.0, "d": 4, "age": 0.18, "grav": 4.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 3049, "kpp": 5.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": 1.099, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "There are some innovative solutions like Chisel which leverage a higher level language's composability (Scala) to enable the generation of Verilog in order to get a workable notion of abstraction."}, {"id": 50526990, "au": "Turskarama", "dom": 27, "sr": 64, "sc": 1.44, "ep": 2.58, "bs": 0.0, "d": 2, "age": 2.46, "grav": 14.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 33, "k": 1492, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 0.589, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> A company I was at was a Java company a long time go and that team treated JavaScript as Java, completely ignoring all the strengths of JavaScript. They even had a Java to JavaScript compiler to ignore it.\n\nThis happens if the developers don't _want_ to learn. If you're trying out a bunch of languages of your own volition then you won't have this problem."}, {"id": 50524294, "au": "Viliam1234", "dom": 126, "sr": 65, "sc": 1.44, "ep": 2.43, "bs": 0.0, "d": 3, "age": 7.42, "grav": 56.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 66, "qw": 0, "k": 2914, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 1.032, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I learned how to calculate the square root using pen and paper, and it was fun, but... I am not going to write blogs about how it made me a better person and why everyone should do this. There are so many cool things one could do, and people have different hobbies and preferences; what is fascinating for me is not necessarily so for someone else, and vice versa."}, {"id": 50524942, "au": "user20180120", "dom": 133, "sr": 66, "sc": 1.44, "ep": 2.41, "bs": 0.0, "d": 0, "age": 6.59, "grav": 48.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 449, "kpp": 6.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 0.809, "fa": 0.0, "gp": 0.352, "bl": 0.0, "ds": 0.0, "txt": "Someone told me once, the spoken language you think in limits your thinking.\n\nGuess it also applies to computer programming and hardware description languages."}, {"id": 50524345, "au": "forinti", "dom": 23, "sr": 67, "sc": 1.44, "ep": 2.41, "bs": 0.0, "d": 1, "age": 7.36, "grav": 56.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 6192, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": 0.725, "fa": 0.0, "gp": 0.488, "bl": 0.0, "ds": 0.0, "txt": "I had so much fun with Lisp and Scheme at uni that it makes me sad to have never coded professionally with them. On the other hand, I have written PostScript for money, which was completely unexpected."}, {"id": 50524895, "au": "afdbcreid", "dom": 94, "sr": 68, "sc": 1.44, "ep": 2.35, "bs": 0.0, "d": 3, "age": 6.67, "grav": 48.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 64, "qw": 0, "k": 1205, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": [], "ig": 1.001, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Why do you need to do that? You can't be generic over \"any enum using this tag\" anyway (in Rust, at least). If you just want to make sure you make no mistake, you can use a dead match from the tag to the enum, or automate it with a macro, and the compiler will enforce exhaustiveness (though not on both sides, unless you use a macro)."}, {"id": 50527164, "au": "CamperBob2", "dom": 49, "sr": 69, "sc": 1.44, "ep": 2.34, "bs": 0.0, "d": 4, "age": 2.09, "grav": 12.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 51, "qw": 0, "k": 14234, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 0.996, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Is it possible that you're a little too reluctant to ask for help?  That's one way to interpret your story about the Sudoku programming assignment (\"I thought I was supposed to figure it out on my own.\")\n\nIf so, that particular shortcoming might be easier to address than many of the other possibilities."}, {"id": 50526161, "au": "kingstnap", "dom": 4, "sr": 70, "sc": 1.44, "ep": 2.33, "bs": 0.0, "d": 3, "age": 4.5, "grav": 29.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 53, "qw": 0, "k": 1690, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 0.992, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The only real abstraction layer in Verilog is encapsulation.\n\nThe rest of synthesizable Verilog is a pretty thin abstraction over muxes, d flip flops, and adders, and other basic gates.\n\nThat being said registers is a pretty big abstraction on top of what actual circuits on chips look like so turtles all the way down right."}, {"id": 50523422, "au": "jghn", "dom": 28, "sr": 71, "sc": 1.44, "ep": 2.32, "bs": 0.0, "d": 1, "age": 8.54, "grav": 69.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 7860, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": 0.629, "fa": 0.0, "gp": 0.581, "bl": 0.0, "ds": 0.0, "txt": "This. It's not Rust in the author's case. It's being exposed to a language that's enough different from what they're used to that it affects their big picture."}, {"id": 50525080, "au": "agumonkey", "dom": 36, "sr": 72, "sc": 1.44, "ep": 2.31, "bs": 0.0, "d": 1, "age": 6.36, "grav": 45.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 31694, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": 0.705, "fa": 0.0, "gp": 0.454, "bl": 0.0, "ds": 0.0, "txt": "but then you suffer from working in places where people only knew one language, because they won't grasp your code or ideas and you will have to live in their limited conventions"}, {"id": 50526512, "au": "alexhans", "dom": 34, "sr": 73, "sc": 1.44, "ep": 2.27, "bs": 0.0, "d": 1, "age": 3.66, "grav": 22.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 151, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 0.808, "fa": 0.0, "gp": 0.256, "bl": 0.0, "ds": 0.0, "txt": "There was a book called seven languages in seven weeks that was quite fun for some exposure to different paradigms.\n\nFor prototypes it had Io, it had prolog, erlang for \"let it crash\" (like elixir)."}, {"id": 50524237, "au": "bryanlarsen", "dom": 58, "sr": 74, "sc": 1.44, "ep": 2.18, "bs": 0.0, "d": 2, "age": 7.49, "grav": 57.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 43485, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 0.514, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I've been programming for about 40 years now, so I've had time.   You will too, eventually.\n\nI should have made the list bigger, not smaller.   I missed assembly and Erlang."}, {"id": 50524412, "au": "IshKebab", "dom": 7, "sr": 75, "sc": 1.44, "ep": 2.16, "bs": 0.0, "d": 2, "age": 7.28, "grav": 55.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 20315, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "null_value", "flbl": "Null & Value (String)", "urls": [], "ig": 0.921, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It's just a shame that (System)Verilog is such an awful awful language. And we're basically stuck with it, at least for ASICs, despite the availability of alternative HDLs that compile to SV."}, {"id": 50523877, "au": "xeubie", "dom": 106, "sr": 76, "sc": 1.43, "ep": 2.16, "bs": 0.0, "d": 2, "age": 7.94, "grav": 62.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 78, "qw": 0, "k": 109, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": [], "ig": 0.918, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "No, you can't, because you're misunderstanding my point. You can make an enum in rust that doesn't contain data, but you can't make an enum that is explicitly backed by a tag type. `\u0023[repr(u8)]` lets the tag be a u8 with values like Human = 1, Cat = 4, but you can’t say \"Person's tag is my PersonKind enum.\" Zig lets you do exactly that with `union(PersonKind)`. In Rust, PersonKind would always be a separate type you keep in sync by hand."}, {"id": 50524361, "au": "fasterik", "dom": 51, "sr": 77, "sc": 1.43, "ep": 2.07, "bs": 0.0, "d": 2, "age": 7.34, "grav": 55.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 2850, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": 0.772, "fa": 0.0, "gp": 0.177, "bl": 0.0, "ds": 0.0, "txt": "I think the advice works well for projects that are on the order of 10k lines of code. \"Major\" is subjective, but that's big enough to be non-trivial yet small enough not to be a huge time investment."}, {"id": 50526240, "au": "jghn", "dom": 33, "sr": 78, "sc": 1.43, "ep": 1.93, "bs": 0.0, "d": 3, "age": 4.31, "grav": 27.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 7860, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "null_value", "flbl": "Null & Value (String)", "urls": [], "ig": 0.82, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Learning bad languages and weird paradigms can still help. You never know when you will pick up some technique or idea that you can apply elsewhere."}, {"id": 50525327, "au": "tialaramex", "dom": 10, "sr": 79, "sc": 1.43, "ep": 1.82, "bs": 0.0, "d": 3, "age": 5.96, "grav": 41.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 33106, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.305, "fa": 0.34, "gp": 0.094, "bl": 0.0, "ds": 0.0, "txt": "Could we fix that do you think?\n\nI think 25 years ago I would not have believed we would ever fix (La)TeX but here's Typst."}, {"id": 50525878, "au": "xeubie", "dom": 103, "sr": 80, "sc": 1.43, "ep": 1.79, "bs": 0.0, "d": 4, "age": 5.04, "grav": 33.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 109, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": [], "ig": 0.76, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "You missed the point as well. You can't define a union type in Rust that is backed by a custom enum type. In rust it's a single conflated type. I can't make a Person enum that is backed by a PersonKind. I don't know how else to describe this. I'm not sure how else to explain this."}, {"id": 50524418, "au": "packetlost", "dom": 24, "sr": 81, "sc": 1.43, "ep": 1.77, "bs": 0.0, "d": 2, "age": 7.28, "grav": 55.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 93, "qw": 0, "k": 5364, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": 0.752, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I've seen Lisps used by contractors for small-team sized projects, but it's pretty rare. Clojure is probably the most popular Lisp in common use, but I think its popularity has been fading (unfortunately).\n\nBoth Scheme and CL suffer really badly from a lack of modernization primarily in their stdlibs (or equivalent SRFIs) that tend to make them poor choices for most new professional projects IMO. Great for side projects though. I really wish the next generation of Scheme would take a page from Clojure's book and rework all the SRFIs and bake in immutability as a core requirement."}, {"id": 50526209, "au": "bombela", "dom": 93, "sr": 82, "sc": 1.43, "ep": 2.58, "bs": 0.85, "d": 5, "age": 4.4, "grav": 28.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 85, "qw": 0, "k": 1886, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "type_payloads", "flbl": "Type & Payloads (Fileop)", "urls": [], "ig": 1.1, "fa": 0.0, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "Yes, all correct. \"()\" the unit type, is a zero sized type (zst).\n\nAnd you don't have to have 1:1 type to enum discriminant:\n\n  trait Payloads {\n      type Read;\n      type Write;\n  }\n\n  enum FileOp<P: Payloads> {\n      Flush,\n      Read(P::Read),\n      Write { data: P::Write },\n  }\n\n  struct Inputs;\n\n  impl Payloads for Inputs {\n      type Read = ();\n      type Write = u8;\n  }\n\n  type Request = FileOp<Inputs>;\n\n  // enum item construction\n  Request::Flush;\n  Request::Read(());\n  Request::Write { data: 42 };\n\n\nYou can also make an item impossible to exist using the never type:\n\n  struct WriteOnly;\n\n  impl Payloads for WriteOnly {\n      type Read = !;\n      type Write = u8;\n  }"}, {"id": 50526067, "au": "Bratmon", "dom": 6, "sr": 83, "sc": 1.43, "ep": 2.8, "bs": 1.19, "d": 2, "age": 4.69, "grav": 30.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 21, "k": 1053, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "null_value", "flbl": "Null & Value (String)", "urls": [], "ig": 0.651, "fa": 0.42, "gp": 0.053, "bl": 0.45, "ds": 0.0, "txt": "> It was a very interesting lesson in the costs of abstraction, and why you will never really find abstraction layers in hardware.\n\nThat's literally the exact opposite of my experience with Verilog!  The experience of using it feels farther away from the actual hardware than Python does!"}, {"id": 50525296, "au": "bombela", "dom": 91, "sr": 84, "sc": 1.43, "ep": 1.48, "bs": 0.0, "d": 3, "age": 6.0, "grav": 42.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 65, "qw": 0, "k": 1886, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "type_payloads", "flbl": "Type & Payloads (Fileop)", "urls": [], "ig": 0.631, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "pub trait Payloads {\n      type Read;\n      type Write;\n  }\n\n  pub enum FileOp<P: Payloads> {\n      Read(P::Read),\n      Write(P::Write),\n  }\n\n  pub struct Inputs;\n\n  impl Payloads for Inputs {\n      type Read = ();\n      type Write = u8;\n  }\n\n  pub type Request = FileOp<Inputs>;\n\n  pub struct Outputs;\n\n  impl Payloads for Outputs {\n      type Read = u8;\n      type Write = ();\n  }\n\n  pub type Reply = FileOp<Outputs>;\n\n  pub fn execute(request: Request) -> Reply {\n      match request {\n          Request::Read(()) => Reply::Read(42),\n          Request::Write(_) => Reply::Write(()),\n      }\n  }"}, {"id": 50525234, "au": "Jtsummers", "dom": 115, "sr": 85, "sc": 1.31, "ep": 2.16, "bs": 0.85, "d": 4, "age": 6.1, "grav": 43.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 91, "qw": 0, "k": 29784, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": [], "ig": 0.918, "fa": 0.0, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "To use the discriminant type on its own without carrying the baggage of the entire record and all its data, or to use the discriminant type across multiple records rather than creating some mega-record or manually synchronizing them. In Ada (again, don't know Zig but from the docs it's similar to what Ada is doing), adding a new value to the discriminant enum would cause a compile time error in all the variant records using it and all the case statements (match, but Ada's version), as long as they didn't have a catchall branch."}, {"id": 50524900, "au": "rcxdude", "dom": 79, "sr": 86, "sc": 1.07, "ep": 2.27, "bs": 1.19, "d": 2, "age": 6.66, "grav": 48.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 11598, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "null_value", "flbl": "Null & Value (String)", "urls": [], "ig": 0.65, "fa": 0.0, "gp": 0.508, "bl": 0.45, "ds": 0.0, "txt": "\"Always has a value\" just creates an in-band signaling problem, where the \"absense of value\" overlaps with the valid values."}, {"id": 50524612, "au": "knorker", "dom": 116, "sr": 87, "sc": 1.05, "ep": 1.05, "bs": 0.0, "d": 3, "age": 7.02, "grav": 52.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 4198, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": [], "ig": 0.445, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I still don't get it. Is it like a Rust enum, but worse, because you can accidentally only detect the problem at runtime?"}, {"id": 50524118, "au": "DonaldPShimoda", "dom": 124, "sr": 88, "sc": 0.58, "ep": 1.77, "bs": 1.19, "d": 2, "age": 7.66, "grav": 59.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 2971, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "null_value", "flbl": "Null & Value (String)", "urls": [], "ig": 0.697, "fa": 0.0, "gp": 0.094, "bl": 0.45, "ds": 0.0, "txt": "As someone who enjoyed learning advanced derivation and integration by hand despite also owning a TI-84+ at the time: yes, it still matters."}, {"id": 50524865, "au": "afdbcreid", "dom": 99, "sr": 89, "sc": 0.55, "ep": 1.74, "bs": 1.19, "d": 3, "age": 6.71, "grav": 49.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 1205, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": 0.659, "fa": 0.0, "gp": 0.133, "bl": 0.45, "ds": 0.0, "txt": "This is a minor advantage (but is an advantage) and when needed (rarely) you can usually workaround with a different fieldless enum and potentially a proc-macro to autogenerate it."}, {"id": 50525463, "au": "sitzkrieg", "dom": 18, "sr": 90, "sc": 0.43, "ep": 1.62, "bs": 1.19, "d": 3, "age": 5.73, "grav": 39.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 1657, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 0.69, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "the whole erlang ecosystem is imo. its not exciting and works great in real systems. no bay buzz"}, {"id": 50525325, "au": "bombela", "dom": 96, "sr": 91, "sc": 0.22, "ep": 1.42, "bs": 1.19, "d": 5, "age": 5.96, "grav": 41.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 1886, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "type_payloads", "flbl": "Type & Payloads (Fileop)", "urls": [], "ig": 0.603, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "You can use one generic enum with a trait holding the payload type. I posted an example as response to your first comment."}, {"id": 50524743, "au": "Lramseyer", "dom": 13, "sr": 92, "sc": 0.08, "ep": 1.27, "bs": 1.19, "d": 3, "age": 6.85, "grav": 50.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 640, "kpp": 4.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "null_value", "flbl": "Null & Value (String)", "urls": [], "ig": 0.54, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "It's awful by design! Do you know how much Cadence, Synopsys, and Siemens profit off of the bloated LRM?"}, {"id": 50524929, "au": "archimedes237", "dom": 20, "sr": 93, "sc": 0.06, "ep": 1.25, "bs": 1.19, "d": 2, "age": 6.62, "grav": 48.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 16, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": [], "ig": 0.532, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Lua variant used in Roblox is a great example of how it can be used effectively and powerfully."}, {"id": 50525880, "au": "xiange", "dom": 121, "sr": 94, "sc": 0.01, "ep": 1.2, "bs": 1.19, "d": 0, "age": 5.04, "grav": 33.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 104, "kpp": 11.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": [], "ig": 0.36, "fa": 0.0, "gp": 0.244, "bl": 0.45, "ds": 0.0, "txt": "As a multilingual user, I think the best thing about Rust is that there aren’t as many hidden pitfalls."}, {"id": 50524436, "au": "Grimblewald", "dom": 14, "sr": 95, "sc": -0.02, "ep": 1.17, "bs": 1.19, "d": 2, "age": 7.25, "grav": 54.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 1508, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": 0.499, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "This sounds quite interesting to me, if you have the time, could you please elaborate a bit on the cost of abstraction?"}, {"id": 50523592, "au": "lnenad", "dom": 42, "sr": 96, "sc": -0.15, "ep": 2.9, "bs": 3.05, "d": 1, "age": 8.31, "grav": 66.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 981, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.462, "fa": 0.34, "gp": 0.584, "bl": 1.15, "ds": 0.0, "txt": "Agreed 100%. This is the single most useful thing I experienced in my career."}, {"id": 50525472, "au": "democracy", "dom": 132, "sr": 97, "sc": -0.16, "ep": 1.03, "bs": 1.19, "d": 1, "age": 5.71, "grav": 39.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 946, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 0.44, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Thank god llms/harnesses are smart enough to figure out and follow existing approaches rather than bringing \"new paradigms\""}, {"id": 50524375, "au": "raincole", "dom": 63, "sr": 98, "sc": -0.25, "ep": 0.94, "bs": 1.19, "d": 2, "age": 7.32, "grav": 55.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 14394, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": 0.266, "fa": 0.0, "gp": 0.219, "bl": 0.45, "ds": 0.0, "txt": "It's like saying a novelist should write a story (not necessarily a book) in every important genre, which is, excellent advice."}, {"id": 50526336, "au": "unrented7977", "dom": 65, "sr": 99, "sc": -0.3, "ep": 0.89, "bs": 1.19, "d": 2, "age": 4.08, "grav": 25.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 475, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.346, "fa": 0.0, "gp": 0.053, "bl": 0.45, "ds": 0.0, "txt": "Most of your favorite novelists have experimented with other styles of writing. I'd highly encourage you to go find and read them."}, {"id": 50523869, "au": "harveymadeunico", "dom": 57, "sr": 100, "sc": -0.31, "ep": 2.2, "bs": 2.52, "d": 1, "age": 7.95, "grav": 62.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 61, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": 0.938, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "If you could maybe reduce that down a bit that would be great. No one in their right mind has the time for major projects in all of those.\n\nAnother way to do it would be the standard low->high level and then one based on lambda calculus. Von Neumann and Church.\n\nAssembly, C, Java, Clojure.\n\nAssembly, C, C\u0023, F\u0023.\n\nAssembly, Fortran, Rust, Rust, Brainf*ck."}, {"id": 50524556, "au": "ivanjermakov", "dom": 22, "sr": 101, "sc": -0.66, "ep": 2.39, "bs": 3.05, "d": 1, "age": 7.08, "grav": 53.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 3078, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 0.708, "fa": 0.0, "gp": 0.499, "bl": 1.15, "ds": 0.0, "txt": "Advent of Code is coming in two weeks, I highly recommend completing 12 challenges in 12 different languages!"}, {"id": 50525432, "au": "democracy", "dom": 41, "sr": 102, "sc": -0.76, "ep": 0.43, "bs": 1.19, "d": 2, "age": 5.78, "grav": 40.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 946, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": 0.182, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "what kind of impact a minor project would have all of a sudden if you use different paradigms?"}, {"id": 50525098, "au": "harveymadeunico", "dom": 59, "sr": 103, "sc": -1.04, "ep": 2.32, "bs": 3.37, "d": 3, "age": 6.33, "grav": 45.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 73, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 0.988, "fa": 0.0, "gp": 0.0, "bl": 1.27, "ds": 0.0, "txt": "I suppose but I was thinking take a path that derives from one path or the other. Like start with Von Neumann derived ones or Alonzo Church. Since there’s so much overlap, that’s the start of the families right? Just trying to give more structure to what you’re suggesting.\n\nAt the heart of it all it’s just math and logic, and that’s where the different thought studies happen, regardless of which language quirks are navigated."}, {"id": 50524051, "au": "flykespice", "dom": 56, "sr": 104, "sc": -1.39, "ep": 1.66, "bs": 3.05, "d": 2, "age": 7.74, "grav": 60.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 2064, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 0.707, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "\"Show HN: I wrote my own kernel in [insert niche language here], here is what I learned\""}, {"id": 50527571, "au": "Rendello", "dom": 83, "sr": 105, "sc": -1.47, "ep": 0.52, "bs": 1.99, "d": 1, "age": 1.07, "grav": 7.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 17, "qw": 0, "k": 2522, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": ["https://en.wikipedia.org/wiki/All_models_are_wrong"], "ig": 0.22, "fa": 0.0, "gp": 0.0, "bl": 0.75, "ds": 0.0, "txt": "I think there's some overlap in sentiment with the aphorism \"All models are wrong, but some are useful.\"\n\nhttps://en.wikipedia.org/wiki/All_models_are_wrong"}, {"id": 50527901, "au": "abbefaria27", "dom": 85, "sr": 106, "sc": -1.68, "ep": 2.56, "bs": 4.24, "d": 0, "age": 0.05, "grav": 3.6, "surf": 17.9, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 0, "k": 65, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": [], "ig": 1.017, "fa": 0.0, "gp": 0.117, "bl": 1.6, "ds": 0.0, "txt": "It’s so refreshing to read an “old fashioned” dev blog post written by a human with a passion for the topic. This is what got me hooked onto HN back in the day, not the endless posts about AI written by AI. I’m only half joking when I say this was a balm for my nerd soul."}, {"id": 50527546, "au": "pamcake", "dom": 104, "sr": 107, "sc": -2.06, "ep": 0.98, "bs": 3.05, "d": 5, "age": 1.11, "grav": 7.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 436, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 0.418, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Code snippet you think should compile but doesn't, or vice versa."}, {"id": 50523793, "au": "slopinthebag", "dom": 110, "sr": 108, "sc": -2.09, "ep": 0.96, "bs": 3.05, "d": 1, "age": 8.04, "grav": 63.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 1372, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": [], "ig": 0.409, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "i dont understand what rust doesn't give you that zig does?"}, {"id": 50523817, "au": "begueradj", "dom": 60, "sr": 109, "sc": -2.69, "ep": 1.55, "bs": 4.24, "d": 1, "age": 8.01, "grav": 63.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 892, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": 0.329, "fa": 0.0, "gp": 0.54, "bl": 1.6, "ds": 0.0, "txt": "It's like saying a novelist should write a major novel in every important spoken language."}, {"id": 50524475, "au": "clench", "dom": 136, "sr": 110, "sc": -3.06, "ep": 2.5, "bs": 5.57, "d": 0, "age": 7.19, "grav": 54.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 0, "kpp": 0.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": [], "ig": 0.781, "fa": 0.0, "gp": 0.458, "bl": 2.1, "ds": 0.0, "txt": "\"A Person is either a human or a cat\" -- Good article, but please use examples that makes sense."}, {"id": 50524611, "au": "sedatk", "dom": 40, "sr": 111, "sc": -3.11, "ep": 1.13, "bs": 4.24, "d": 1, "age": 7.02, "grav": 52.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 7747, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": 0.192, "fa": 0.0, "gp": 0.468, "bl": 1.6, "ds": 0.0, "txt": "Even minor projects can have great impact when developed using different paradigms."}, {"id": 50525407, "au": "democracy", "dom": 44, "sr": 112, "sc": -3.27, "ep": 0.97, "bs": 4.24, "d": 1, "age": 5.82, "grav": 40.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 946, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": 0.365, "fa": 0.0, "gp": 0.076, "bl": 1.6, "ds": 0.0, "txt": "lisp, prolog, forth, etc - no such standard piece of advice"}, {"id": 50525339, "au": "kinfish", "dom": 138, "sr": 113, "sc": -3.35, "ep": 0.89, "bs": 4.24, "d": 0, "age": 5.94, "grav": 41.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 4, "kpp": 0.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.148, "fa": 0.0, "gp": 0.376, "bl": 1.6, "ds": 0.0, "txt": "i can say BEAM still the one that influeces me as developer."}, {"id": 50524921, "au": "slopinthebag", "dom": 112, "sr": 114, "sc": -3.51, "ep": 0.73, "bs": 4.24, "d": 3, "age": 6.63, "grav": 48.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 1372, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.087, "fa": 0.0, "gp": 0.36, "bl": 1.6, "ds": 0.0, "txt": "why would you ever need them to be seperate?"}, {"id": 50525421, "au": "democracy", "dom": 37, "sr": 115, "sc": -3.52, "ep": 0.72, "bs": 4.24, "d": 2, "age": 5.79, "grav": 40.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 946, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": 0.305, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "maybe it's because your idea doesn't belong in the specific language/environment?"}, {"id": 50527228, "au": "nine_k", "dom": 76, "sr": 116, "sc": -3.59, "ep": 0.65, "bs": 4.24, "d": 5, "age": 1.91, "grav": 11.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 40853, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.275, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "The second is twice as long as the fist. The difference matters."}, {"id": 50524430, "au": "IshKebab", "dom": 32, "sr": 117, "sc": -3.61, "ep": 0.63, "bs": 4.24, "d": 2, "age": 7.26, "grav": 55.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 20315, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 0.268, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Well, different in a good way. There are plenty of different and worse languages."}, {"id": 50523951, "au": "William_BB", "dom": 128, "sr": 118, "sc": -3.63, "ep": 0.61, "bs": 4.24, "d": 2, "age": 7.87, "grav": 61.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 150, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 0.259, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Yikes. I hope the second thought was more insightful.."}, {"id": 50526442, "au": "dralley", "dom": 108, "sr": 119, "sc": -3.68, "ep": 0.56, "bs": 4.24, "d": 3, "age": 3.84, "grav": 24.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 18406, "kpp": 4.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": [], "ig": 0.236, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "I doubt that would be too difficult to write a macro for."}, {"id": 50525877, "au": "jan_m_savage", "dom": 21, "sr": 120, "sc": -3.73, "ep": 0.51, "bs": 4.24, "d": 3, "age": 5.05, "grav": 33.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 149, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": 0.218, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "there is also moonscript which compiles to Lua and is clearer and terser."}, {"id": 50523770, "au": "win311fwg", "dom": 55, "sr": 121, "sc": -3.76, "ep": 0.48, "bs": 4.24, "d": 2, "age": 8.06, "grav": 63.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 186, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.203, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "One that has expanded enough to be able to read email."}, {"id": 50527276, "au": "oblio", "dom": 131, "sr": 122, "sc": -3.79, "ep": 0.45, "bs": 4.24, "d": 2, "age": 1.78, "grav": 11.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 4, "k": 28103, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.19, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "> a thespian, writer, or musician.\n\nEven in an ideal world, some people would just not want to become artists."}, {"id": 50527343, "au": "deterministic", "dom": 43, "sr": 123, "sc": -3.8, "ep": 1.27, "bs": 5.06, "d": 1, "age": 1.62, "grav": 10.1, "surf": 6.6, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 2854, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "languages_programming", "flbl": "Languages & Programming (Sudoku)", "urls": [], "ig": 0.526, "fa": 0.0, "gp": 0.022, "bl": 1.911, "ds": 0.0, "txt": "And LEAN! I have done all of the above but LEAN (and proving code correct) absolutely blew my mind."}, {"id": 50527449, "au": "vrmiguel", "dom": 80, "sr": 124, "sc": -3.82, "ep": 0.42, "bs": 4.24, "d": 2, "age": 1.33, "grav": 8.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 6, "k": 95, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "null_value", "flbl": "Null & Value (String)", "urls": [], "ig": 0.178, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "> Usually done with the empty \"\" string\n\nThat seems so much worse than a `Option<String>`"}, {"id": 50526212, "au": "jghn", "dom": 30, "sr": 125, "sc": -3.82, "ep": 0.42, "bs": 4.24, "d": 3, "age": 4.39, "grav": 28.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 7860, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": [], "ig": 0.177, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "This is an issue I have with Rust hype in general."}, {"id": 50525179, "au": "tcfhgj", "dom": 75, "sr": 126, "sc": -3.91, "ep": 0.33, "bs": 4.24, "d": 4, "age": 6.21, "grav": 44.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 1621, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "enum_rust", "flbl": "Enum & Rust (Tag)", "urls": [], "ig": 0.14, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Both variants are just different syntax for the same thing."}, {"id": 50523894, "au": "bingobongo84", "dom": 123, "sr": 127, "sc": -3.95, "ep": 1.61, "bs": 5.57, "d": 1, "age": 7.93, "grav": 62.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": -4, "kpp": -4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "type_payloads", "flbl": "Type & Payloads (Fileop)", "urls": [], "ig": 0.576, "fa": 0.0, "gp": 0.179, "bl": 2.1, "ds": 0.0, "txt": "Agreed. My first thought reading this was “does this really matter anymore?”"}, {"id": 50527012, "au": "metaltyphoon", "dom": 31, "sr": 128, "sc": -3.98, "ep": 0.26, "bs": 4.24, "d": 4, "age": 2.41, "grav": 14.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 881, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.111, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "So… what’s the issue again? Is the issue making it mainstream?"}, {"id": 50526524, "au": "rjzzleep", "dom": 35, "sr": 129, "sc": -4.05, "ep": 0.19, "bs": 4.24, "d": 2, "age": 3.63, "grav": 22.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 8602, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": 0.08, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "It was also the only exposure I ever had to prolog."}, {"id": 50523561, "au": "jahnu", "dom": 45, "sr": 130, "sc": -8.17, "ep": 0.0, "bs": 6.89, "d": 1, "age": 8.34, "grav": 67.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 5352, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.655, "bl": 2.6, "ds": 0.0, "txt": "What counts as a major project?"}, {"id": 50523710, "au": "senderista", "dom": 39, "sr": 131, "sc": -8.29, "ep": 0.0, "bs": 6.89, "d": 1, "age": 8.13, "grav": 64.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 0, "qw": 0, "k": 3257, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://webperso.info.ucl.ac.be/~pvr/VanRoyChapter.pdf"], "ig": -0.95, "fa": 0.0, "gp": 0.576, "bl": 2.6, "ds": 0.0, "txt": "https://webperso.info.ucl.ac.be/~pvr/VanRoyChapter.pdf"}, {"id": 50524330, "au": "atulvi", "dom": 140, "sr": 132, "sc": -8.8, "ep": 0.0, "bs": 6.89, "d": 0, "age": 7.38, "grav": 56.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 456, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.219, "bl": 2.6, "ds": 0.0, "txt": "Sapir-Whorf hypothesis"}, {"id": 50524111, "au": "neko_ranger", "dom": 53, "sr": 133, "sc": -8.83, "ep": 0.0, "bs": 6.89, "d": 2, "age": 7.67, "grav": 59.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 1299, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.199, "bl": 2.6, "ds": 0.0, "txt": "That is up to you to decide"}, {"id": 50524638, "au": "mitchm", "dom": 17, "sr": 134, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 6.99, "grav": 52.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 80, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "The BEAM is so underrated"}, {"id": 50523839, "au": "wizzwizz4", "dom": 67, "sr": 135, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 7.98, "grav": 62.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 7538, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "At the very least, a short story."}, {"id": 50525086, "au": "tcfhgj", "dom": 101, "sr": 136, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 4, "age": 6.35, "grav": 45.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 0, "qw": 4, "k": 1621, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://docs.rs/strum/latest/strum/derive.EnumDiscriminants.html"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "> proc-macro to autogenerate it.\n\nhttps://docs.rs/strum/latest/strum/derive.EnumDiscriminants...."}, {"id": 50524385, "au": "dominotw", "dom": 125, "sr": 137, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 3, "age": 7.31, "grav": 55.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 6912, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "This is not like that at all"}, {"id": 50524122, "au": "genxy", "dom": 129, "sr": 138, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 7.65, "grav": 59.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 1093, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Let them eat PHP."}, {"id": 50526289, "au": "Uptrenda", "dom": 141, "sr": 139, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 0, "age": 4.21, "grav": 26.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 3981, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "im literally shaking, reddit"}, {"id": 50525054, "au": "mdswanson", "dom": 135, "sr": 140, "sc": -11.11, "ep": 0.0, "bs": 8.88, "d": 1, "age": 6.41, "grav": 46.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 2, "qw": 0, "k": 634, "kpp": 5.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://en.wikipedia.org/wiki/Linguistic_relativity"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.35, "ds": 0.0, "txt": "Linguistic relativity: https://en.wikipedia.org/wiki/Linguistic_relativity"}, {"id": 50527467, "au": "mrblinky", "dom": 119, "sr": 141, "sc": -16.79, "ep": 0.0, "bs": 14.97, "d": 0, "age": 1.29, "grav": 8.5, "surf": 7.6, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 5, "qw": 0, "k": 2, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "language_major", "flbl": "Language & Major (Projects)", "urls": ["https://learnxinyminutes.com"], "ig": -0.95, "fa": 0.0, "gp": 0.289, "bl": 5.65, "ds": 0.0, "txt": "Rate https://learnxinyminutes.com for quick language exploration."}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 40);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 40);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 40);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `${shown.length} of ${pool.length} comments` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>
