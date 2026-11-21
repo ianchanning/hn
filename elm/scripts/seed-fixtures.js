@@ -43,6 +43,24 @@ const canvasIifeContent = readFileSync(canvasIifePath, "utf-8");
 writeFileSync(join(staticDir, "canvas-iife.js"), canvasIifeContent, "utf-8");
 console.log("✓ Copied elm/js/canvas-iife.js -> elm/static/canvas-iife.js");
 
+// Extract unescaped CSS from build_dashboard.py and build_pages_site.py
+const dashPy = readFileSync(join(rootDir, "build_dashboard.py"), "utf-8");
+const dashCssMatch = dashPy.match(/<style>(.*?)<\/style>/s);
+let combinedCss = "/* Consolidated styles for Elm dev display layer (single braces, zero-hash) */\n";
+
+if (dashCssMatch) {
+  combinedCss += dashCssMatch[1].replace(/\{\{/g, "{").replace(/\}\}/g, "}").trim() + "\n";
+}
+
+const pagesPy = readFileSync(join(rootDir, "build_pages_site.py"), "utf-8");
+const pagesCssMatches = pagesPy.matchAll(/<style>(.*?)<\/style>/gs);
+for (const m of pagesCssMatches) {
+  combinedCss += "\n" + m[1].replace(/\{\{/g, "{").replace(/\}\}/g, "}").trim() + "\n";
+}
+
+writeFileSync(join(staticDir, "style.css"), combinedCss, "utf-8");
+console.log(`✓ Generated elm/static/style.css (${(Buffer.byteLength(combinedCss) / 1024).toFixed(1)} KB, valid CSS syntax)`);
+
 // 2. Build sample catalog and router configs
 const catalog = {
   updated_utc: "2026-11-21 09:00 UTC",
