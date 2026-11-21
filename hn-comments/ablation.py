@@ -7,7 +7,8 @@ import sys
 from typing import Any
 
 HERE = Path(__file__).resolve().parent
-JUDGE_DIR = HERE / "judge"
+REPO_ROOT = HERE if (HERE / "judge").is_dir() else HERE.parent
+JUDGE_DIR = (HERE / "judge") if (HERE / "judge").is_dir() else (REPO_ROOT / "judge")
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(JUDGE_DIR))
 

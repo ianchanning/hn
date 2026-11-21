@@ -38,7 +38,9 @@ uv run --no-project python cli.py rank 50472038 --top 15
 uv run --no-project python cli.py 50472038 --offline
 
 # 5. Run the full unit, contract, and generalization test suite
-uv run --no-project python -m unittest discover -s tests -v
+uv run --no-project python -m unittest discover -s hn-comments/tests -v
+# (Or from the root via npm)
+npm test
 ```
 
 ---
@@ -135,46 +137,70 @@ Options:
 
 ---
 
-## Repository Layout
+## Monorepo Architecture
+
+This repository is organized as a unified monorepo coordinating the Python epistemic ingestion and ranking pipeline, Elm display layer, Cloudflare Workers scheduler, and external judge evaluation suite:
 
 ```text
 .
-├── cli.py                     # Story-agnostic CLI entry point (build / ingest / rank)
-├── ingest.py                  # ?p=1..N HTML crawler, Algolia client & readable article extractor
-├── parse_corpus.py            # DOM-order comment parser & cross-page tree reconstructor
-├── author_cache.py            # 7-day TTL SQLite WAL author reputation cache
-├── source_registry.py         # Cross-domain Tier 3 / 2 / 1 / -1 URL classifier
-├── corpus_science.py          # Information-theoretic features, drift & 5-cluster k-means++ facets
-├── ranker.py                  # Five-potential epistemic scorer + hinged submodular MMR
-├── build_dashboard.py         # Zero-hash (`rgb()`-only) interactive HTML observatory compiler
-├── build_pages_site.py        # Incremental GitHub Pages `/item?id=<id>` mirror builder
-├── ablation.py                # 8-stage controlled ablation harness on frozen HN 50467087
+├── pyproject.toml             # Python package configuration (PEP 621, ruff, mypy, pytest)
+├── package.json               # Root monorepo workspace orchestrating elm and scheduler
+├── cli.py                     # Root CLI forwarder delegating to hn-comments/cli.py
 ├── CONTRACT.md                # Ranker output schema & hard anti-Goodhart invariants
-├── benchmark/
-│   └── dev_sample.json        # Illustrative 24-item development sample
-├── judge/
+├── hn-comments/               # Python epistemic ranking & ingestion workspace
+│   ├── pyproject.toml         # Python package manifest (hn-observatory)
+│   ├── cli.py                 # Story-agnostic CLI entry point (build / ingest / rank / frontpage)
+│   ├── ranker.py              # Five-potential epistemic scorer + hinged submodular MMR
+│   ├── ingest.py              # ?p=1..N HTML crawler, Algolia client & article extractor
+│   ├── parse_corpus.py        # DOM-order comment parser & cross-page tree reconstructor
+│   ├── author_cache.py        # 7-day TTL SQLite WAL author reputation cache
+│   ├── source_registry.py     # Cross-domain Tier 3 / 2 / 1 / -1 URL classifier
+│   ├── corpus_science.py      # TF-IDF story anchors, drift & spherical k-means++ facets
+│   ├── ablation.py            # 8-stage controlled ablation harness
+│   ├── build_dashboard.py     # Zero-hash HTML observatory compiler (embeds Elm bundle)
+│   ├── build_pages_site.py    # Incremental GitHub Pages `/item?id=<id>` mirror builder
+│   ├── data/                  # Frozen corpus, SQLite cache, and ingested snapshots
+│   ├── benchmark/             # Illustrative development samples
+│   └── tests/                 # Automated Python test suite
+├── elm/                       # Elm 0.19.3 display layer (TEA architecture)
+│   ├── elm.json               # Elm project manifest
+│   ├── elm-watch.json         # Dev HMR target config
+│   ├── package.json           # npm scripts: dev, build, test, review, diff
+│   ├── src/                   # Elm source modules (Main, Observatory/*, Pages/*)
+│   ├── js/canvas-iife.js      # Canvas 2D port bridge (~130 lines)
+│   ├── tests/                 # elm-test suites (Decode, Weights, Tier, View, Pages)
+│   └── scripts/bundle.js      # Production bundle: elm.min.js + canvas + boot → observatory.js
+├── scheduler/                 # Cloudflare Workers cron schedule trigger
+│   ├── src/index.ts           # Worker script triggering twice-daily frontpage builds
+│   ├── wrangler.toml          # Cloudflare Worker configuration
+│   └── package.json           # Worker dependencies
+├── judge/                     # External Judge evaluation harness
 │   ├── epistemic_fixtures_v1.json
 │   ├── judge_v1.py            # Graded NDCG@20, pairwise concordance, trap & rescue metrics
 │   └── judge_v1_1.py          # Official External Judge v1.1.0 + hard invariant gate
-├── data/
-│   ├── corpus_v2.json         # Frozen 3,010-comment benchmark corpus (SHA-verified)
-│   ├── author_cache.db        # Local 7-day SQLite author cache (gitignored)
-│   └── items/<story_id>/      # Per-story ingested snapshots & provenance manifests
-├── elm/                       # Elm 0.19.3 display layer (see §Elm Rewrite below)
-│   ├── elm.json               # Elm project manifest
-│   ├── elm-watch.json         # Dev HMR target config
-│   ├── package.json           # npm scripts: dev, build, test, review
-│   ├── src/                   # Elm source modules (Main, Observatory/*, Pages/*)
-│   ├── js/canvas-iife.js      # Canvas 2D port bridge (~130 lines)
-│   ├── tests/                 # elm-test suites (Decode, Weights, Tier)
-│   └── scripts/bundle.js      # Production build: elm.min.js + canvas + boot → observatory.js
-├── wiki/                      # Machine-studying knowledge base
-│   ├── index.md               # Wiki page index
-│   └── TYPES.md               # Complete Elm type catalogue & build pipeline spec
-└── tests/
-    ├── test_ranker.py         # Contract & anti-Goodhart invariant tests
-    ├── test_generalization.py # Pagination, TTL cache, source registry & unsupervised gate tests
-    └── test_pages_site.py     # GitHub Pages `/item?id=` router & workflow security tests
+├── archive/                   # Preserved pre-Elm legacy display artifacts
+│   ├── legacy_html/           # Pre-Elm static HTML builds (50471731, 50472038, 50500963)
+│   └── legacy_display/        # Legacy monolithic Python f-string dashboard compiler
+└── wiki/                      # Machine-studying knowledge base
+    ├── index.md               # Wiki page index
+    ├── TYPES.md               # Complete Elm type catalogue & build pipeline spec
+    └── Monorepo-Architecture.md
+```
+
+### Monorepo Quick Commands
+
+```bash
+# Run full monorepo test suite (Elm test suite + Python unittest suite)
+npm test
+
+# Build all monorepo targets (Elm production bundle + Cloudflare Worker scheduler)
+npm run build
+
+# Validate Elm code (type check, tests, and elm-review) and Python tests
+npm run validate
+
+# Run automated Elm vs Python visual and structural parity differ
+npm run diff
 ```
 
 ---

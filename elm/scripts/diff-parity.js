@@ -11,7 +11,7 @@
  *  3. Invariants: Strict zero-hash assertion across all styles and markup
  */
 
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execSync } from "node:child_process";
@@ -31,7 +31,10 @@ console.log("===================================================================
 // ---------------------------------------------------------------------------
 console.log("--- 1. CSS DIFFERENCE & CASCADE ANALYSIS ---");
 
-const dashPy = readFileSync(join(rootDir, "build_dashboard.py"), "utf-8");
+const dashPyPath = existsSync(join(rootDir, "hn-comments", "build_dashboard.py"))
+  ? join(rootDir, "hn-comments", "build_dashboard.py")
+  : join(rootDir, "build_dashboard.py");
+const dashPy = readFileSync(dashPyPath, "utf-8");
 const pyStyleMatch = dashPy.match(/<style>(.*?)<\/style>/s);
 if (!pyStyleMatch) {
   console.error("FAIL: Could not locate <style> in build_dashboard.py");
@@ -273,7 +276,10 @@ const elmAppNode = root.childNodes[1] || root.childNodes[0];
 const elmHtml = elmAppNode.toHTML();
 
 // Read Python rendered HTML from show-me-hn-50467087.html
-const showMeHtml = readFileSync(join(rootDir, "show-me-hn-50467087.html"), "utf-8");
+const showMePath = existsSync(join(rootDir, "hn-comments", "show-me-hn-50467087.html"))
+  ? join(rootDir, "hn-comments", "show-me-hn-50467087.html")
+  : join(rootDir, "show-me-hn-50467087.html");
+const showMeHtml = readFileSync(showMePath, "utf-8");
 const pyRootMatch = showMeHtml.match(/<div id=["']elm-root["']>(.*?)<\/div>\s*<script/s);
 const pyHtml = pyRootMatch ? pyRootMatch[1].trim() : "";
 

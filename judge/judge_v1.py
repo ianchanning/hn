@@ -21,7 +21,11 @@ from typing import Any
 JUDGE_VERSION = "1.0.0"
 JUDGE_DIR = Path(__file__).resolve().parent
 FIXTURES_PATH = JUDGE_DIR / "epistemic_fixtures_v1.json"
-CANONICAL_CORPUS_PATH = JUDGE_DIR.parent / "data" / "corpus_v2.json"
+CANONICAL_CORPUS_PATH = (
+    (JUDGE_DIR.parent / "hn-comments" / "data" / "corpus_v2.json")
+    if (JUDGE_DIR.parent / "hn-comments" / "data" / "corpus_v2.json").is_file()
+    else (JUDGE_DIR.parent / "data" / "corpus_v2.json")
+)
 
 
 def compute_ndcg(ordered_ids: list[int], grade_map: dict[int, int], k: int = 25) -> float:

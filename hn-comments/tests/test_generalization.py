@@ -9,7 +9,8 @@ import tempfile
 import unittest
 
 HERE = Path(__file__).resolve().parents[1]
-JUDGE_DIR = HERE / "judge"
+REPO_ROOT = HERE if (HERE / "judge").is_dir() else HERE.parent
+JUDGE_DIR = (HERE / "judge") if (HERE / "judge").is_dir() else (REPO_ROOT / "judge")
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 if str(JUDGE_DIR) not in sys.path:

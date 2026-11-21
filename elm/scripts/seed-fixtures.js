@@ -8,7 +8,7 @@
  * Run via: npm run fixtures
  */
 
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -18,7 +18,9 @@ const rootDir = join(elmDir, "..");
 const staticDir = join(elmDir, "static");
 
 // 1. Extract payload from canonical observatory
-const showMeHtmlPath = join(rootDir, "show-me-hn-50467087.html");
+const showMeHtmlPath = existsSync(join(rootDir, "hn-comments", "show-me-hn-50467087.html"))
+  ? join(rootDir, "hn-comments", "show-me-hn-50467087.html")
+  : join(rootDir, "show-me-hn-50467087.html");
 const showMeHtml = readFileSync(showMeHtmlPath, "utf-8");
 
 const match = showMeHtml.match(
@@ -58,7 +60,10 @@ writeFileSync(join(staticDir, "canvas-iife.js"), canvasIifeContent, "utf-8");
 console.log("✓ Copied elm/js/canvas-iife.js -> elm/static/canvas-iife.js");
 
 // Extract unescaped CSS from build_dashboard.py and build_pages_site.py
-const dashPy = readFileSync(join(rootDir, "build_dashboard.py"), "utf-8");
+const dashPyPath = existsSync(join(rootDir, "hn-comments", "build_dashboard.py"))
+  ? join(rootDir, "hn-comments", "build_dashboard.py")
+  : join(rootDir, "build_dashboard.py");
+const dashPy = readFileSync(dashPyPath, "utf-8");
 const dashCssMatch = dashPy.match(/<style>(.*?)<\/style>/s);
 let combinedCss = "/* Consolidated styles for Elm dev display layer (single braces, zero-hash) */\n";
 
@@ -66,7 +71,10 @@ if (dashCssMatch) {
   combinedCss += dashCssMatch[1].replace(/\{\{/g, "{").replace(/\}\}/g, "}").trim() + "\n";
 }
 
-const pagesPy = readFileSync(join(rootDir, "build_pages_site.py"), "utf-8");
+const pagesPyPath = existsSync(join(rootDir, "hn-comments", "build_pages_site.py"))
+  ? join(rootDir, "hn-comments", "build_pages_site.py")
+  : join(rootDir, "build_pages_site.py");
+const pagesPy = readFileSync(pagesPyPath, "utf-8");
 const pagesCssMatches = pagesPy.matchAll(/<style>(.*?)<\/style>/gs);
 for (const m of pagesCssMatches) {
   combinedCss += "\n" + m[1].replace(/\{\{/g, "{").replace(/\}\}/g, "}").trim() + "\n";
