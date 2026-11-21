@@ -85,15 +85,58 @@ tierDotColour tier =
             Colour 110 118 128 0.45
 
 
+{-| Graduated fade ramp mapping bullshit load to news.css fade classes.
+Clean comments remain crisp black (comm-c00), while comments with increasing
+bullshit load fade to progressively lighter greys (comm-c5a .. comm-cdd).
+Epistemic gold and grounded analysis comments remain crisp black.
+-}
+bullshitFadeClass : Tier -> Float -> String
+bullshitFadeClass tier bl =
+    case tier of
+        EpistemicGold ->
+            "comm-c00"
+
+        GroundedAnalysis ->
+            "comm-c00"
+
+        _ ->
+            if bl >= 3.5 then
+                "comm-cdd"
+
+            else if bl >= 3.0 then
+                "comm-cce"
+
+            else if bl >= 2.5 then
+                "comm-cbe"
+
+            else if bl >= 2.1 then
+                "comm-cae"
+
+            else if bl >= 1.7 then
+                "comm-c9c"
+
+            else if bl >= 1.3 then
+                "comm-c88"
+
+            else if bl >= 0.9 then
+                "comm-c73"
+
+            else if bl >= 0.5 || tier == BullshitOrFlamewar then
+                "comm-c5a"
+
+            else
+                "comm-c00"
+
+
 {-| HN news.css downvote fade → text colour.
 -}
 fadeToColour : String -> Colour
 fadeToColour cls =
-    case cls of
+    case String.toLower cls of
         "c00" ->
             Colour 0 0 0 1.0
 
-        "c5A" ->
+        "c5a" ->
             Colour 90 90 90 1.0
 
         "c73" ->

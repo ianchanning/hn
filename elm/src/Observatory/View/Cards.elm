@@ -9,7 +9,7 @@ import Html.Events exposing (onClick, onInput)
 import Observatory.Model exposing (Model)
 import Observatory.Msg exposing (Msg(..))
 import Observatory.Types exposing (CompactComment, LiveComment, ObservatoryPayload, ViewMode(..))
-import Observatory.View.Style exposing (colourToCss, extractHost, formatFloat1, formatFloat2, formatThousands, tierBorderColour, tierToClass)
+import Observatory.View.Style exposing (bullshitFadeClass, colourToCss, extractHost, formatFloat1, formatFloat2, formatThousands, tierBorderColour, tierToClass)
 
 
 viewCards : Model -> ObservatoryPayload -> Html Msg
@@ -220,13 +220,7 @@ viewCommentCard model rescueJump demoteDrop lc =
                 c.flbl
 
         fadeClass =
-            "comm-"
-                ++ (if String.isEmpty c.fade then
-                        "c00"
-
-                    else
-                        String.toLower c.fade
-                   )
+            bullshitFadeClass c.tier c.bl
 
         cw =
             model.currentWeights
