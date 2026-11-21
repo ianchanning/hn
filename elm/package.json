@@ -5,7 +5,9 @@
   "type": "module",
   "description": "Elm front-end for the HN Epistemic Observatory display layer",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently -n elm,srv -c green,blue \"elm-watch hot\" \"npx serve static -l 3000 -s\"",
+    "dev:elm": "elm-watch hot",
+    "dev:serve": "npx serve static -l 3000 -s",
     "build": "npm run build:elm && npm run build:bundle",
     "build:elm": "elm make src/Main.elm --optimize --output=dist/elm.js",
     "build:bundle": "node scripts/bundle.js",
@@ -15,18 +17,19 @@
     "test:watch": "elm-test --watch",
     "review": "elm-review",
     "review:fix": "elm-review --fix",
-    "clean": "rm -rf dist elm-stuff node_modules/.vite",
+    "clean": "rm -rf dist elm-stuff",
     "format": "elm-format src/ tests/ --yes",
     "validate": "elm make src/Main.elm --output=/dev/null && npm test && npm run review",
     "postbuild": "npm run minify"
   },
   "devDependencies": {
+    "concurrently": "^9.1.0",
     "elm": "latest-0.19.3",
-    "elm-format": "^0.8.7",
-    "elm-review": "^2.13.0",
-    "elm-test": "^0.19.3-0",
-    "terser": "^5.37.0",
-    "vite": "^6.0.0",
-    "vite-plugin-elm": "^4.0.0"
+    "elm-format": "^0.8.8",
+    "elm-review": "^2.13.5",
+    "elm-test": "0.19.3-0",
+    "elm-watch": "^1.2.9",
+    "serve": "^14.2.0",
+    "terser": "^5.37.0"
   }
 }

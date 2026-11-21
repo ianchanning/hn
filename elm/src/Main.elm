@@ -9,7 +9,6 @@ and renders the full interactive display layer.
 
 import Browser
 import Json.Decode as Decode
-import Observatory.Decode as Decode
 import Observatory.Model exposing (Model, Flags, init)
 import Observatory.Msg exposing (Msg(..))
 import Observatory.Subscriptions exposing (subscriptions)

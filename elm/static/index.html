@@ -17,6 +17,26 @@
     null
   </script>
 
-  <script type="module" src="../js/index.js"></script>
+  <!-- elm-watch compiles to this file and injects HMR client automatically -->
+  <script src="elm.js"></script>
+
+  <!-- Canvas port bridge (plain <script>, no bundler) -->
+  <script src="../js/canvas-iife.js"></script>
+
+  <!-- Boot: wire Elm ports to canvas bridge -->
+  <script>
+    (function() {
+      var dataEl = document.getElementById("observatoryData");
+      var flags = null;
+      if (dataEl) {
+        try { flags = JSON.parse(dataEl.textContent); } catch(e) {}
+      }
+      var root = document.getElementById("elm-root");
+      var app = Elm.Main.init({ node: root, flags: flags });
+      if (typeof mountCanvasRenderer === "function") {
+        mountCanvasRenderer(app);
+      }
+    })();
+  </script>
 </body>
 </html>

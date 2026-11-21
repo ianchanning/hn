@@ -584,9 +584,9 @@ type alias CanvasProbeEvent =
 ```text
 elm/
 ├── elm.json                           # Elm 0.19.3 project manifest
+├── elm-watch.json                     # elm-watch target config (dev HMR)
 ├── package.json                       # npm scripts: dev, build, test, review, format
-├── vite.config.js                     # Vite + vite-plugin-elm dev server config
-├── .gitignore                         # elm-stuff/, node_modules/, dist/
+├── .gitignore                         # elm-stuff/, node_modules/, dist/, static/elm.js
 │
 ├── src/
 │   ├── Main.elm                       # Browser.element entry point (port module)
@@ -617,42 +617,64 @@ elm/
 │   └── TierTest.elm                   # Tier enum + colour mapping tests
 │
 ├── js/
-│   ├── index.js                       # Elm app bootstrap + port wiring
-│   └── canvas.js                      # Canvas 2D scatter-plot renderer (port bridge)
+│   └── canvas-iife.js                 # Canvas 2D scatter-plot renderer (IIFE, no bundler)
 │
 ├── scripts/
-│   └── bundle.js                      # Production build: compile + minify + concat
+│   └── bundle.js                      # Production concat: elm.min.js + canvas + boot
 │
 ├── static/
-│   └── index.html                     # Vite dev shell (loads observatoryData fixture)
+│   ├── index.html                     # Dev shell (elm-watch injects HMR into elm.js)
+│   └── elm.js                         # elm-watch output (gitignored)
 │
-└── dist/                              # Build output (gitignored)
+└── dist/                              # Production build output (gitignored)
     ├── elm.js                         # elm make --optimize output
     ├── elm.min.js                     # terser-minified
-    ├── canvas-bridge.js               # Canvas port bridge (copied)
-    ├── boot.js                        # Production bootstrap glue
     └── observatory.js                 # All-in-one for Python inlining
 ```
 
 ---
 
-## 17. npm Scripts Reference
+## 17. Toolchain (Pinned Versions — November 2026)
+
+| Tool | Version | Role |
+|---|---|---|
+| **Elm compiler** | `0.19.3` (Oct 2, 2026) via `npm:elm@latest-0.19.3` | Compiler. Identical language surface to 0.19.1. |
+| **elm-watch** | `^1.2.9` (Oct 13, 2026) | Dev: state-preserving HMR + error overlays. Outputs to `static/elm.js`. |
+| **elm-test** | `0.19.3-0` | Tests. **Must** match compiler version (throws `ELM VERSION MISMATCH` otherwise). |
+| **elm-review** | `^2.13.5` | Static analysis. Rock solid. |
+| **elm-format** | `^0.8.8` | Auto-formatter. |
+| **terser** | `^5.37.0` | Minify `elm make --optimize` output for production. |
+| **serve** | `^14.2.0` | Tiny static file server for dev shell (zero config). |
+| **concurrently** | `^9.1.0` | Run `elm-watch hot` + `serve` in parallel for `npm run dev`. |
+
+> **Why not Vite?** `vite-plugin-elm@latest` (`3.0.1`) targets Vite 5 + Elm 0.19.1.
+> Elm 0.19.3 + Vite 8 support only exists in `vite-plugin-elm@next` (`4.0.0-x`),
+> a prerelease with known HMR bugs. Since production uses `elm make --optimize`
+> directly (not Vite), dragging in an unstable bundler just for dev hot-reload
+> is unnecessary fragility. `elm-watch` gives true state-preserving Elm HMR
+> with zero plugin magic.
+
+---
+
+## 18. npm Scripts Reference
 
 | Script | Command | Purpose |
 |---|---|---|
-| `npm run dev` | `vite` | Hot-reloading dev server on `:3000` with Elm debug |
-| `npm run build` | `elm make --optimize` → `bundle.js` → `terser` | Production build → `dist/observatory.js` |
+| `npm run dev` | `elm-watch hot` + `serve static` | HMR dev server on `:3000` with Elm debug overlay |
+| `npm run dev:elm` | `elm-watch hot` | Just the Elm watcher (if serving separately) |
+| `npm run dev:serve` | `npx serve static` | Just the static file server |
+| `npm run build` | `elm make --optimize` → `terser` → `bundle.js` | Production build → `dist/observatory.js` |
 | `npm run build:debug` | `elm make --debug` | Dev build with Elm Debugger time-travel |
 | `npm test` | `elm-test` | Run all `tests/*.elm` suites |
 | `npm run test:watch` | `elm-test --watch` | Re-run tests on file change |
 | `npm run review` | `elm-review` | Static analysis (unused code, etc.) |
 | `npm run format` | `elm-format src/ tests/ --yes` | Auto-format all Elm sources |
 | `npm run validate` | compile + test + review | Full CI gate (all three must pass) |
-| `npm run clean` | `rm -rf dist elm-stuff ...` | Nuke build artifacts |
+| `npm run clean` | `rm -rf dist elm-stuff` | Nuke build artifacts |
 
 ---
 
-## 18. Build Pipeline — Python Integration
+## 19. Build Pipeline — Python Integration
 
 ```mermaid
 flowchart LR
@@ -661,9 +683,9 @@ flowchart LR
     C --> D["Reads dist/observatory.js"]
     D --> E["Inlines into<br/>show-me-hn-ID.html"]
 
-    subgraph "elm/ (npm run build)"
+    subgraph "elm/ — npm run build"
         F["elm make --optimize"] --> G["terser minify"]
-        G --> H["scripts/bundle.js"]
+        G --> H["scripts/bundle.js<br/>(concat elm.min.js + canvas-iife.js + boot)"]
         H --> I["dist/observatory.js"]
     end
 
@@ -677,7 +699,7 @@ flowchart LR
    where the current `<script>` block lives (lines 1450–1967)
 3. The JSON payload (`observatoryData`) is still serialised by Python as before
 4. The Elm app hydrates from `Browser.element { flags = payloadJson }` on load
-5. Canvas plots are driven via ports → `canvas.js` bridge (~120 lines)
+5. Canvas plots are driven via ports → `canvas-iife.js` bridge (~130 lines, plain IIFE)
 
 **Dev workflow:**
 
@@ -687,7 +709,7 @@ cd elm
 # First time
 npm install
 
-# Dev mode — open browser with hot reload
+# Dev mode — elm-watch hot-reloads, serve hosts static/ on :3000
 # Paste a real observatory JSON blob into static/index.html's
 # <script id="observatoryData"> tag for testing
 npm run dev
@@ -703,9 +725,19 @@ npm run build
 npm run validate
 ```
 
+**Dev architecture (zero bundler):**
+
+```text
+elm-watch hot ──── compiles ────► static/elm.js (with HMR client injected)
+                                        ▲
+serve static -l 3000 ──── serves ───────┤
+                                        │
+static/index.html ◄── loads ── elm.js + canvas-iife.js + inline boot <script>
+```
+
 ---
 
-## 19. Getting Started Checklist
+## 20. Getting Started Checklist
 
 - [ ] `cd elm && npm install`
 - [ ] Copy a real `observatoryData` JSON blob into `static/index.html` for dev fixtures
@@ -719,3 +751,4 @@ npm run validate
 - [ ] Modify `build_dashboard.py` to read `elm/dist/observatory.js` instead of inline `<script>`
 - [ ] Add `cd elm && npm run build` to GitHub Actions workflow
 - [ ] Run `npm run validate` in CI
+- [ ] Add regression test: `assert "#" not in observatory_js` for terser output
