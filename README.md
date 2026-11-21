@@ -77,6 +77,31 @@ gh workflow run hn-observatory-pages.yml -f target="https://news.ycombinator.com
 2. In **Settings → Pages**, set **Source** to **Deploy from a branch → `gh-pages` / `/ (root)`**.
 3. Trigger **HN Epistemic Observatory Pages** from the **Actions** tab (or via `gh workflow run`). Previously published `/item?id=<id>` pages are preserved across runs and indexed at `/` and `/catalog.json`.
 
+### Cloudflare Workers Cron Scheduler (`scheduler/`)
+
+To eliminate GitHub Actions native cron queue delays (which can lag 30–90 minutes) and prevent automatic 60-day inactivity disablement, scheduled runs are triggered deterministically by a Cloudflare Worker on a **minute 14 and 44 past every hour (`14,44 * * * *`)** cadence that dispatches `hn-observatory-pages.yml` via the GitHub API.
+
+```bash
+cd scheduler
+
+# 1. Set GitHub token secret (requires repo or actions:write permissions)
+gh auth token | npx wrangler secret put GITHUB_TOKEN
+
+# 2. Deploy Cloudflare Worker
+npx wrangler deploy
+# Or via deploy script:
+./deploy.sh
+
+# 3. Inspect worker health & status
+curl https://hn-observatory-scheduler.<your-subdomain>.workers.dev/status
+
+# 4. Test manual trigger
+curl -X POST https://hn-observatory-scheduler.<your-subdomain>.workers.dev/trigger
+
+# 5. Tail live cron execution logs
+npx wrangler tail
+```
+
 ---
 
 ## How the Epistemic Engine Works

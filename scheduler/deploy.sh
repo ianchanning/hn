@@ -2,15 +2,17 @@
 set -euo pipefail
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-WRANGLER="/home/ian/Projects/pinboard-reorg/node_modules/.bin/wrangler"
+WRANGLER="npx wrangler"
 
-if [ ! -x "$WRANGLER" ]; then
-  WRANGLER="npx wrangler"
+if command -v wrangler >/dev/null 2>&1; then
+  WRANGLER="wrangler"
+elif [ -x "/home/ian/Projects/pinboard-reorg/node_modules/.bin/wrangler" ]; then
+  WRANGLER="/home/ian/Projects/pinboard-reorg/node_modules/.bin/wrangler"
 fi
 
 cd "$DIR"
 
-echo "=== Deploying Cloudflare Hourly Scheduler ==="
+echo "=== Deploying Cloudflare Scheduler (14,44 * * * *) ==="
 "$WRANGLER" deploy
 
 echo ""
