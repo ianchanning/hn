@@ -293,6 +293,12 @@ def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -
       font-size: 10pt;
       text-decoration: none;
     }}
+    .topbar-right {{
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 9pt;
+      text-transform: none;
+    }}
     .shell {{
       max-width: 1240px;
       margin: 0 auto;
@@ -618,6 +624,7 @@ def render_index_html(
       padding-right: 4px;
       white-space: nowrap;
       font-size: 9pt;
+      text-transform: none;
     }}
     button.nav-btn {{
       appearance: none;
@@ -629,7 +636,7 @@ def render_index_html(
       color: rgb(0, 0, 0);
       cursor: pointer;
     }}
-    button.nav-btn:hover, .pagetop a:hover, .topbar-right a:hover {{
+    .pagetop a:hover, .topbar-right a:hover {{
       text-decoration: underline;
     }}
     .list-pad {{

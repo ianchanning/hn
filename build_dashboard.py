@@ -459,6 +459,11 @@ def build_html(
             }
         )
 
+    manifest["points"] = points
+    manifest["story_author"] = safe_story_author
+    manifest["story_title"] = story_title
+    manifest["story_url"] = story_url
+
     payload = {
         "story_id": story_id,
         "story_title": story_title,

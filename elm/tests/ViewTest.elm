@@ -191,12 +191,12 @@ suite =
                         |> Query.fromHtml
                         |> Query.find [ class "story-title" ]
                         |> Query.has [ text "Show HN: Epistemic Observatory" ]
-            , test "renders all 6 mode tabs" <|
+            , test "renders 2 mode tabs (Top 40 & HN Top 40)" <|
                 \_ ->
                     viewHeader mockModel mockPayload
                         |> Query.fromHtml
                         |> Query.findAll [ class "mode-tab" ]
-                        |> Query.count (Expect.equal 6)
+                        |> Query.count (Expect.equal 2)
             ]
         , describe "Observatory.View.Evidence"
             [ test "renders KPI strip in live mode" <|

@@ -232,7 +232,7 @@ viewCommentCard model rescueJump demoteDrop lc =
             model.currentWeights
 
         borderColourStyle =
-            style "border-left" ("3px solid " ++ colourToCss (tierBorderColour c.tier))
+            style "border-left" ("4px solid " ++ colourToCss (tierBorderColour c.tier))
     in
     article [ class ("c-card tier-" ++ tierToClass c.tier), borderColourStyle ]
         [ div [ class "hn-comhead" ]

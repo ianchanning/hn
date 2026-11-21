@@ -82,6 +82,14 @@ suite =
                         |> Query.findAll [ class "subtext" ]
                         |> Query.first
                         |> Query.has [ text "320 points by norvig" ]
+            , test "renders list-pad and topbar-right with Updated UTC" <|
+                \_ ->
+                    Index.view mockIndexModel
+                        |> Query.fromHtml
+                        |> Query.has
+                            [ class "list-pad"
+                            , text "Updated 2026-11-21 08:00 UTC"
+                            ]
             ]
         , describe "Pages.Router"
             [ test "renders resolving state" <|

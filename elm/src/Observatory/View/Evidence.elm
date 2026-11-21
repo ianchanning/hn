@@ -4,7 +4,7 @@ module Observatory.View.Evidence exposing (viewEvidence)
 or unsupervised facet diagnostics and source registry.
 -}
 
-import Html exposing (Html, code, details, div, h2, p, strong, table, tbody, td, text, th, thead, tr)
+import Html exposing (Html, code, details, div, h2, p, strong, summary, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (attribute, class, id, style)
 import Observatory.Model exposing (Model)
 import Observatory.Msg exposing (Msg)
@@ -30,7 +30,10 @@ viewEvidence model payload =
                 Nothing ->
                     viewLiveEvidence payload
     in
-    details (class "proof-drawer" :: id "proofDrawer" :: openAttr) [ content ]
+    details (class "proof-drawer" :: id "proofDrawer" :: openAttr)
+        [ summary [ class "hn-summary", style "display" "none" ] []
+        , content
+        ]
 
 
 viewBenchmarkEvidence : JudgeResult -> ObservatoryPayload -> Html Msg

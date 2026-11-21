@@ -64,14 +64,6 @@ viewHeader model payload =
             else
                 "recently"
 
-        judgeSnippet =
-            case payload.judge of
-                Just j ->
-                    text (" | JUDGE v" ++ j.judgeVersion ++ ": " ++ formatFloat2 j.score ++ " / 100")
-
-                Nothing ->
-                    text ""
-
         modes =
             [ ( TopSignal, "Top 40" )
             , ( HnTop40, "HN Top 40" )
@@ -193,7 +185,6 @@ viewHeader model payload =
                     , a [ href hnItemHref ] [ text (formatThousands totalComments ++ " comments") ]
                     , text " | "
                     , text (formatFloat1 noisePct ++ "% bullshit")
-                    , judgeSnippet
                     ]
                 ]
             ]

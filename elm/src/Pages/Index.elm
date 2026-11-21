@@ -3,10 +3,10 @@ module Pages.Index exposing (IndexModel, view)
 {-| Front-page HN-style item list (replaces render\_index\_html in build\_pages\_site.py).
 -}
 
-import Html exposing (Html, a, div, footer, span, table, tbody, td, text, tr)
-import Html.Attributes exposing (attribute, class, colspan, href, style)
+import Html exposing (Html, a, div, form, input, label, span, table, tbody, td, text, tr)
+import Html.Attributes exposing (attribute, class, colspan, for, href, id, placeholder, type_)
 import Observatory.Types exposing (IndexItem)
-import Observatory.View.Style exposing (extractHost, formatFloat1, formatThousands)
+import Observatory.View.Style exposing (extractHost, formatThousands)
 
 
 type alias IndexModel =
@@ -73,21 +73,36 @@ view model =
                     (if String.isEmpty model.updatedUtc then
                         "hourly updates"
 
-                     else
+                     else if String.startsWith "Updated " model.updatedUtc then
                         model.updatedUtc
+
+                     else
+                        "Updated " ++ model.updatedUtc
                     )
                 ]
             ]
-        , table [ class "itemlist", style "border" "0", style "padding" "10px 8px 8px 8px" ]
-            [ tbody [] itemRows ]
-        , footer [ class "sheet-foot" ]
-            [ span []
+        , div [ class "list-pad" ]
+            [ table [ class "itemlist", id "frontpageList" ]
+                [ tbody [] itemRows ]
+            ]
+        , div [ class "hn-footer" ]
+            [ div [ class "yclinks" ]
                 [ text "Hourly updates | "
                 , text (String.fromInt publishedCount ++ " published | ")
                 , a [ href "https://news.ycombinator.com/" ] [ text "news.ycombinator.com" ]
                 ]
-            , span []
-                [ text "ZERO-HASH DEFENSIVE ARTIFACT" ]
+            , form [ class "hn-search", id "jumpForm" ]
+                [ label [ for "hnInput" ] [ text "Open item:" ]
+                , text " "
+                , input
+                    [ type_ "text"
+                    , id "hnInput"
+                    , attribute "size" "28"
+                    , placeholder "ID or news.ycombinator.com/item?id=..."
+                    , attribute "required" ""
+                    ]
+                    []
+                ]
             ]
         ]
 
@@ -150,7 +165,7 @@ renderItemRow rank it =
                 [ text (formatThousands it.totalComments ++ " comments") ]
             , text " | "
             , a [ href itemHref ]
-                [ text (String.fromInt it.epistemicGold ++ " gold · " ++ formatFloat1 bsPct ++ "% bullshit") ]
+                [ text (String.fromInt it.epistemicGold ++ " gold · " ++ String.fromInt (round bsPct) ++ "% bullshit") ]
             , text " | "
             , a [ href ("https://news.ycombinator.com/item?id=" ++ String.fromInt it.storyId) ]
                 [ text "hn" ]

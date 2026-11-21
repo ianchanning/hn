@@ -33,9 +33,23 @@ if (!match) {
 const rawPayloadJson = match[1].trim();
 const payload = JSON.parse(rawPayloadJson);
 
+// Ensure manifest has points and story_author from header if not present
+if (payload.manifest) {
+  if (!payload.manifest.points) {
+    const pointsMatch = showMeHtml.match(/<span class=["']score["']>(\d+)\s+points<\/span>/);
+    if (pointsMatch) payload.manifest.points = parseInt(pointsMatch[1], 10);
+  }
+  if (!payload.manifest.story_author) {
+    const authorMatch = showMeHtml.match(/by\s+<a\s+href=["'][^"']*\/user\?id=([^"']+)["']/);
+    if (authorMatch) payload.manifest.story_author = authorMatch[1];
+  }
+}
+
+const serializedPayloadJson = JSON.stringify(payload).replace(/#/g, "\\u0023");
+
 // Write standalone fixture JSON
-writeFileSync(join(staticDir, "fixture.json"), rawPayloadJson, "utf-8");
-console.log(`✓ Wrote elm/static/fixture.json (${(Buffer.byteLength(rawPayloadJson) / 1024).toFixed(1)} KB)`);
+writeFileSync(join(staticDir, "fixture.json"), serializedPayloadJson, "utf-8");
+console.log(`✓ Wrote elm/static/fixture.json (${(Buffer.byteLength(serializedPayloadJson) / 1024).toFixed(1)} KB)`);
 
 // Copy canvas-iife.js into static/ so static file server serves it directly
 const canvasIifePath = join(elmDir, "js", "canvas-iife.js");
