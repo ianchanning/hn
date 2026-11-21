@@ -160,6 +160,17 @@ Options:
 │   ├── corpus_v2.json         # Frozen 3,010-comment benchmark corpus (SHA-verified)
 │   ├── author_cache.db        # Local 7-day SQLite author cache (gitignored)
 │   └── items/<story_id>/      # Per-story ingested snapshots & provenance manifests
+├── elm/                       # Elm 0.19.3 display layer (see §Elm Rewrite below)
+│   ├── elm.json               # Elm project manifest
+│   ├── elm-watch.json         # Dev HMR target config
+│   ├── package.json           # npm scripts: dev, build, test, review
+│   ├── src/                   # Elm source modules (Main, Observatory/*, Pages/*)
+│   ├── js/canvas-iife.js      # Canvas 2D port bridge (~130 lines)
+│   ├── tests/                 # elm-test suites (Decode, Weights, Tier)
+│   └── scripts/bundle.js      # Production build: elm.min.js + canvas + boot → observatory.js
+├── wiki/                      # Machine-studying knowledge base
+│   ├── index.md               # Wiki page index
+│   └── TYPES.md               # Complete Elm type catalogue & build pipeline spec
 └── tests/
     ├── test_ranker.py         # Contract & anti-Goodhart invariant tests
     ├── test_generalization.py # Pagination, TTL cache, source registry & unsupervised gate tests
@@ -197,4 +208,74 @@ Evaluated across `112` human-graded comments (`dev` + locked `holdout`), `23` ad
 # Run External Judge v1.1.0 & 8-stage ablation study directly
 uv run --no-project python judge/judge_v1_1.py .
 uv run --no-project python ablation.py
+```
+
+---
+
+## Elm Display Layer Rewrite (`elm/`)
+
+> **Branch:** `elm-display-layer` · **Status:** Scaffold complete, view implementation next
+
+The interactive HTML/CSS/JS display layer — currently generated inline by `build_dashboard.py` (~2,000 lines of Python f-string templates + embedded `<script>`) and `build_pages_site.py` (~1,100 lines) — is being rewritten in **Elm 0.19.3** for type safety, maintainability, and the Elm Architecture's clean separation of Model/Update/View.
+
+### Architecture
+
+The Python pipeline is **unchanged** — it still ingests, ranks, and serialises the JSON payload into `<script id="observatoryData">`. The Elm app replaces only the display layer:
+
+```text
+Python pipeline (unchanged)              Elm display layer (new)
+─────────────────────────                ────────────────────────
+ingest.py → corpus_science.py           elm make --optimize
+  → ranker.py                             → terser minify
+    → build_dashboard.py ─── reads ───►     → dist/observatory.js
+      (embeds JSON payload)                   (inlined into HTML)
+        → show-me-hn-<id>.html              Elm.Main.init({ flags: payload })
+                                              → ports → canvas-iife.js
+```
+
+### What's Done (Scaffold)
+
+- **Full type catalogue** in [`wiki/TYPES.md`](wiki/TYPES.md) — 20 sections covering every domain type, the `Msg` union, `Model`, JSON decoders, canvas port interop, colour palette, directory structure, and build pipeline
+- **14 Elm source modules** with working core logic:
+  - `Observatory.Types` — all domain types (`ObservatoryPayload`, `CompactComment`, `Tier`, `Weights`, etc.)
+  - `Observatory.Decode` — complete JSON decoders for the Python payload
+  - `Observatory.Model` — `init` + `recomputeLiveList` (slider weight reranking)
+  - `Observatory.Update` — all `Msg` state transitions
+  - `Observatory.Ports` — `drawPlot` / `onCanvasProbe` port declarations
+  - `Observatory.View.Style` — zero-hash `rgb()` colour constants and helpers
+- **Canvas port bridge** (`js/canvas-iife.js`) — scatter-plot renderer, replaces ~170 lines of inline `<script>`
+- **3 test suites** — decoder round-trips, weight recomputation ranking, tier enum coverage
+- **Pinned Nov 2026 toolchain** — `elm-watch` 1.2.9 for dev HMR (not Vite), `elm-test` 0.19.3-0, `elm-review` 2.13.5
+
+### What's Next (View Implementation)
+
+| Priority | Module | Replaces |
+| :---: | :--- | :--- |
+| 1 | `Observatory.View.Header` | HN topbar + story fatitem box + mode tabs |
+| 2 | `Observatory.View.Cards` | Comment card list with search, facet filter, and 6 view modes |
+| 3 | `Observatory.View.Evidence` | Collapsible drawer: ablation table, facet diagnostics, source registry |
+| 4 | `Observatory.View.Explore` | Collapsible drawer: 5 weight tuner sliders, phase plane + gravity canvas |
+| 5 | `Pages.Index` | Front-page HN-style item list (`render_index_html`) |
+| 6 | `Pages.Router` | `/item?id=<id>` SPA resolution (`render_item_router_html`) |
+| 7 | `build_dashboard.py` modification | Read `elm/dist/observatory.js` instead of inline `<script>` |
+| 8 | CI integration | Add `cd elm && npm run build && npm run validate` to GitHub Actions |
+
+### Dev Quickstart
+
+```bash
+cd elm
+npm install
+
+# Dev mode — elm-watch hot-reloads on save, serve hosts on :3000
+# Paste a real observatory JSON blob into static/index.html first
+npm run dev
+
+# Tests
+npm test
+
+# Production build → dist/observatory.js (for Python inlining)
+npm run build
+
+# Full CI gate (compile + test + review)
+npm run validate
 ```
