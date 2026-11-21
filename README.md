@@ -169,7 +169,7 @@ This repository is organized as a unified monorepo coordinating the Python epist
 ```text
 .
 ├── pyproject.toml             # Python package configuration (PEP 621, ruff, mypy, pytest)
-├── package.json               # Root monorepo workspace orchestrating elm and scheduler
+├── package.json               # Root monorepo script orchestrator (delegates to elm and scheduler)
 ├── cli.py                     # Root CLI forwarder delegating to hn-comments/cli.py
 ├── CONTRACT.md                # Ranker output schema & hard anti-Goodhart invariants
 ├── hn-comments/               # Python epistemic ranking & ingestion workspace
@@ -257,17 +257,17 @@ Evaluated across `112` human-graded comments (`dev` + locked `holdout`), `23` ad
 
 ```bash
 # Run External Judge v1.1.0 & 8-stage ablation study directly
-uv run --no-project python judge/judge_v1_1.py .
-uv run --no-project python ablation.py
+uv run --no-project python judge/judge_v1_1.py hn-comments
+uv run --no-project python hn-comments/ablation.py
 ```
 
 ---
 
-## Elm Display Layer Rewrite (`elm/`)
+## Elm Display Layer (`elm/`)
 
-> **Branch:** `elm-display-layer` · **Status:** Complete — All views implemented, build_dashboard wired, CI gate verified
+> **Status:** Production Display Layer in `main` — Pure Elm 0.19.3 TEA architecture, zero-hash certified, CI gate verified
 
-The interactive HTML/CSS/JS display layer — currently generated inline by `build_dashboard.py` (~2,000 lines of Python f-string templates + embedded `<script>`) and `build_pages_site.py` (~1,100 lines) — is being rewritten in **Elm 0.19.3** for type safety, maintainability, and the Elm Architecture's clean separation of Model/Update/View.
+The interactive HTML/CSS/JS display layer is implemented in **Elm 0.19.3** for complete type safety, maintainability, and the Elm Architecture's clean separation of Model/Update/View, with 100% DOM/CSS parity against the legacy f-string compiler.
 
 ### Architecture
 
@@ -303,7 +303,7 @@ ingest.py → corpus_science.py           elm make --optimize
   - `Pages.Index` — front-page HN-style item list (`render_index_html`)
   - `Pages.Router` — `/item?id=<id>` SPA resolution (`render_item_router_html`)
 - **Canvas port bridge** (`js/canvas-iife.js`) — scatter-plot renderer, replaces ~170 lines of inline `<script>`
-- **5 test suites (26 tests)** — decoder round-trips, weight recomputation ranking, tier enum coverage, view rendering, pages routing
+- **5 test suites (30 tests)** — decoder round-trips, weight recomputation ranking, tier enum coverage, view rendering, pages routing
 - **Automated zero-hash verification** — zero `#` characters in emitted HTML/CSS/JS
 - **Pinned Nov 2026 toolchain** — `elm-watch` 1.2.9 for dev HMR (not Vite), `elm-test` 0.19.3-0, `elm-review` 2.13.5
 
@@ -318,7 +318,7 @@ ingest.py → corpus_science.py           elm make --optimize
 | 5 | `Pages.Index` | Front-page HN-style item list (`render_index_html`) | Done |
 | 6 | `Pages.Router` | `/item?id=<id>` SPA resolution (`render_item_router_html`) | Done |
 | 7 | `build_dashboard.py` modification | Read `elm/dist/observatory.js` instead of inline `<script>` | Done |
-| 8 | CI integration | Add `cd elm && npm run build && npm run validate` to GitHub Actions | Done |
+| 8 | CI integration | Add `cd elm && npm ci && npm run build && npm run validate` to GitHub Actions | Done |
 
 ### Dev Quickstart
 
