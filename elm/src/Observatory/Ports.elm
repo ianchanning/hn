@@ -159,8 +159,8 @@ computePhasePlot model _ =
     , axisConfig =
         { maxX = maxX
         , maxY = maxY
-        , xLabel = "EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->"
-        , yLabel = "BULLSHIT / SINK LOAD ^"
+        , xLabel = "SIGNAL (INFO + FALSIFIABILITY) →"
+        , yLabel = "↑ BULLSHIT"
         }
     , largestRoot = Nothing
     }

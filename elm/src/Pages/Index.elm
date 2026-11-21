@@ -65,8 +65,8 @@ view model =
     div [ class "hnmain" ]
         [ div [ class "topbar" ]
             [ div [ class "topbar-left" ]
-                [ a [ class "hn-logo", href "./" ] [ text "E" ]
-                , a [ class "hnname", href "./" ] [ text "Epistemic News" ]
+                [ a [ class "hn-logo", href "./" ] [ text "BS" ]
+                , a [ class "hnname", href "./" ] [ text "Better Signal News" ]
                 ]
             , div [ class "topbar-right" ]
                 [ text

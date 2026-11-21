@@ -89,7 +89,7 @@ suite =
                     Router.view (ResolvingItem 50472038)
                         |> Query.fromHtml
                         |> Query.find [ id "statusTitle" ]
-                        |> Query.has [ text "Loading Hacker News Observatory..." ]
+                        |> Query.has [ text "Loading Better Signal News..." ]
             , test "renders item not built state with CLI command" <|
                 \_ ->
                     Router.view (ItemNotBuilt 99999999 mockRouterConfig)

@@ -544,7 +544,7 @@ def build_html(
     </summary>
     <div class="proof-body grid-12">
       <div class="col-7">
-        <div class="sec-tag">01A / CONTROLLED ABLATION MATRIX</div>
+        <div class="sec-tag">CONTROLLED ABLATION MATRIX</div>
         <h2>Marginal Gain of Each Epistemic Pillar</h2>
         <div style="overflow-x:auto">
           <table class="ablation" id="ablationTable">
@@ -565,7 +565,7 @@ def build_html(
         </div>
       </div>
       <div class="col-5">
-        <div class="sec-tag">01B / FORGET-TEAM 4-AGENT HERDR TOURNAMENT</div>
+        <div class="sec-tag">FORGET-TEAM 4-AGENT HERDR TOURNAMENT</div>
         <h2>Amnesia Reset &amp; Holdout Generalization</h2>
         <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
           <table class="ablation" id="tourneyTable">
@@ -636,7 +636,7 @@ def build_html(
     </div>
     <div class="proof-body grid-12">
       <div class="col-7">
-        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <div class="sec-tag">UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
         <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
         <div style="overflow-x:auto">
           <table class="ablation" id="facetDiagTable">
@@ -654,7 +654,7 @@ def build_html(
         </div>
       </div>
       <div class="col-5">
-        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <div class="sec-tag">SOURCE REGISTRY &amp; STORY ANCHORS</div>
         <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
         <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
           <table class="ablation" id="sourceCatTable">
@@ -686,7 +686,7 @@ def build_html(
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HN {story_id} // {safe_title} — Epistemic Observatory</title>
+  <title>{story_id} // {safe_title} - Better Signal News</title>
   <style>
     * {{ box-sizing: border-box; }}
     html {{
@@ -1302,7 +1302,7 @@ def build_html(
       body {{ margin: 0; }}
       .wrap {{ width: 100%; }}
       .topbar {{ padding: 4px 6px; flex-wrap: wrap; row-gap: 4px; }}
-      .topbar-right {{ font-size: 8pt; padding-right: 2px; }}
+      .topbar-right {{ padding-right: 2px; }}
       td.title {{ font-size: 11pt; line-height: 15pt; }}
       td.subtext {{ font-size: 8.5pt; line-height: 13pt; }}
       tr.spacer td {{ height: 7px; }}
@@ -1315,8 +1315,8 @@ def build_html(
   <header class="hn-header">
     <div class="topbar">
       <div class="topbar-left">
-        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
-        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+        <a href="https://news.ycombinator.com" class="hn-logo">BS</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Better Signal News</a>
         <span class="pagetop" id="modeTabs">
           <button type="button" class="nav-btn mode-tab active" data-mode="top_signal" role="tab" aria-selected="true">Top 40</button> | <button type="button" class="nav-btn mode-tab" data-mode="hn_top40" role="tab" aria-selected="false">HN Top 40</button>
         </span>
@@ -1351,8 +1351,8 @@ def build_html(
         <details class="graph-drawer" id="tunerDrawer">
           <summary class="graph-summary">
             <div class="graph-title-group">
-              <div class="sec-tag">02A / CALIBRATE</div>
-              <h2>Epistemic Tuner</h2>
+              <div class="sec-tag">CALIBRATE</div>
+              <h2>Signal Tuner</h2>
             </div>
             <span class="mob-graph-pill"></span>
           </summary>
@@ -1392,14 +1392,14 @@ def build_html(
           <details class="graph-drawer" id="phaseDrawer" open>
             <summary class="graph-summary">
               <div class="graph-title-group">
-                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <div class="sec-tag">EPISTEMIC PHASE PLANE</div>
                 <h2>Crowd Chatter vs. Grounded Signal</h2>
               </div>
               <span class="mob-graph-pill"></span>
             </summary>
             <div class="oled-bay">
               <div class="oled-head">
-                <span>Y: Bullshit // X: Epistemic</span>
+                <span>Bullshit (Y) // Signal (X) </span>
                 <span class="sig">TAP POINT (N = {total_cnt:,})</span>
               </div>
               <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
@@ -1417,14 +1417,14 @@ def build_html(
           <details class="graph-drawer" id="gravityDrawer">
             <summary class="graph-summary">
               <div class="graph-title-group">
-                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <div class="sec-tag">NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
                 <h2>Why Live HN Buried Primary Evidence</h2>
               </div>
               <span class="mob-graph-pill"></span>
             </summary>
             <div class="oled-bay">
               <div class="oled-head">
-                <span>Y: HN POS (1..{live_cnt:,}) // X: Age (Hours)</span>
+                <span>HN POS (1..{live_cnt:,}) (Y) // Age (Hours) (X)</span>
                 <span class="sig">(T + 2)^1.8</span>
               </div>
               <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
@@ -1455,7 +1455,7 @@ def build_html(
   </section>
 
   <footer class="sheet-foot">
-    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT</span>
     <span>SOURCE: HN {story_id} + {safe_host.upper()} + ALGOLIA + AUTHOR CACHE</span>
   </footer>
 </div>
@@ -1642,7 +1642,7 @@ def build_html(
     downvoted_sink: "rgba(110, 118, 128, 0.45)"
   }};
 
-  // Plot 1: 2D Epistemic Phase Plane
+  // Plot 1: 2D Signal Phase Plane
   const pCanvas = document.getElementById("phaseCanvas");
   const pCtx = pCanvas.getContext("2d");
   let phasePts = [];
@@ -1682,8 +1682,8 @@ def build_html(
     }});
     pCtx.fillStyle = "rgb(140, 150, 162)";
     pCtx.font = "10px ui-monospace, Menlo, monospace";
-    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
-    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+    pCtx.fillText("SIGNAL (INFO + FALSIFIABILITY) →", W - 295, H - 7);
+    pCtx.fillText("↑ BULLSHIT", 8, 14);
   }}
 
   // Plot 2: news.arc Age vs HN DOM Rank

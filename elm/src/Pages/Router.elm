@@ -13,8 +13,8 @@ view state =
     div [ class "hnmain" ]
         [ div [ class "topbar" ]
             [ div [ class "topbar-left" ]
-                [ a [ class "hn-logo", href "./" ] [ text "E" ]
-                , a [ class "hnname", href "./" ] [ text "Epistemic News" ]
+                [ a [ class "hn-logo", href "./" ] [ text "BS" ]
+                , a [ class "hnname", href "./" ] [ text "Better Signal News" ]
                 ]
             ]
         , div [ class "shell", id "routerStatus" ]
@@ -29,7 +29,7 @@ viewStateContent state =
     case state of
         ResolvingItem itemId ->
             div []
-                [ h1 [ id "statusTitle" ] [ text "Loading Hacker News Observatory..." ]
+                [ h1 [ id "statusTitle" ] [ text "Loading Better Signal News..." ]
                 , p [ id "statusBody" ]
                     [ text "Resolving "
                     , code [] [ text ("/item?id=" ++ String.fromInt itemId) ]

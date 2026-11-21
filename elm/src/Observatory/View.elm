@@ -56,6 +56,6 @@ viewFooter payload =
                 String.toUpper (extractHost payload.storyUrl)
     in
     footer [ class "sheet-foot" ]
-        [ span [] [ text "SILICON PIRATE × CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)" ]
+        [ span [] [ text "SILICON PIRATE × CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT" ]
         , span [] [ text ("SOURCE: HN " ++ String.fromInt payload.storyId ++ " + " ++ hostStr ++ " + ALGOLIA + AUTHOR CACHE") ]
         ]

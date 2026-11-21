@@ -128,8 +128,8 @@ viewHeader model payload =
     header [ class "hn-header" ]
         [ div [ class "topbar" ]
             [ div [ class "topbar-left" ]
-                [ a [ href "https://news.ycombinator.com", class "hn-logo" ] [ text "E" ]
-                , a [ href "https://ianchanning.com/hn", class "hnname" ] [ text "Epistemic News" ]
+                [ a [ href "https://news.ycombinator.com", class "hn-logo" ] [ text "BS" ]
+                , a [ href "https://ianchanning.com/hn", class "hnname" ] [ text "Better Signal News" ]
                 , span [ class "pagetop", id "modeTabs" ] renderedTabs
                 ]
             , div [ class "topbar-right" ]
