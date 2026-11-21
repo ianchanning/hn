@@ -1,6 +1,7 @@
 module Observatory.Subscriptions exposing (subscriptions)
 
-{-| App subscriptions: canvas port events, viewport media queries. -}
+{-| App subscriptions: canvas port events, viewport media queries.
+-}
 
 import Json.Decode as Decode
 import Observatory.Model exposing (Model)

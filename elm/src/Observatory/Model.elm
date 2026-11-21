@@ -1,10 +1,12 @@
-module Observatory.Model exposing (Model, Flags, init)
+module Observatory.Model exposing (Flags, Model, init, recomputeLiveList)
 
-{-| Application model and initialisation. -}
+{-| Application model and initialisation.
+-}
 
 import Json.Decode as Decode
 import Observatory.Decode as ObsDecode
 import Observatory.Msg exposing (Msg(..))
+import Observatory.Ports as Ports
 import Observatory.Types exposing (..)
 
 
@@ -38,22 +40,23 @@ init flags =
 
                 live =
                     recomputeLiveList cw payload.comments
+
+                m =
+                    { payload = Just payload
+                    , currentWeights = cw
+                    , activeMode = TopSignal
+                    , searchQuery = ""
+                    , selectedFacet = "all"
+                    , selectedCommentId = Nothing
+                    , liveList = live
+                    , proofDrawerOpen = False
+                    , labDrawerOpen = False
+                    , tunerDrawerOpen = True
+                    , viewport = Desktop
+                    , error = Nothing
+                    }
             in
-            ( { payload = Just payload
-              , currentWeights = cw
-              , activeMode = TopSignal
-              , searchQuery = ""
-              , selectedFacet = "all"
-              , selectedCommentId = Nothing
-              , liveList = live
-              , proofDrawerOpen = False
-              , labDrawerOpen = False
-              , tunerDrawerOpen = True
-              , viewport = Desktop
-              , error = Nothing
-              }
-            , Cmd.none
-            )
+            ( m, Ports.sendPlots m )
 
         Err err ->
             ( { payload = Nothing
@@ -73,7 +76,8 @@ init flags =
             )
 
 
-{-| Recompute live scores and ranks from current slider weights. -}
+{-| Recompute live scores and ranks from current slider weights.
+-}
 recomputeLiveList : CurrentWeights -> List CompactComment -> List LiveComment
 recomputeLiveList cw comments =
     comments

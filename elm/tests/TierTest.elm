@@ -1,6 +1,7 @@
 module TierTest exposing (..)
 
-{-| Tests for Tier enum helpers and colour mappings. -}
+{-| Tests for Tier enum helpers and colour mappings.
+-}
 
 import Expect
 import Observatory.Types exposing (Tier(..))

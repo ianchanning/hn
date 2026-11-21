@@ -333,3 +333,54 @@ type alias CanvasProbeEvent =
     { canvasId : String
     , commentId : Int
     }
+
+
+
+-- PAGES SITE TYPES (INDEX + ITEM ROUTER)
+
+
+{-| A single row on the front-page index (mirrors extract\_item\_summary).
+-}
+type alias IndexItem =
+    { storyId : Int
+    , storyTitle : String
+    , storyUrl : String
+    , points : Int
+    , storyAuthor : String
+    , totalComments : Int
+    , epistemicGold : Int
+    , groundedAnalysis : Int
+    , t2RefUtc : String
+    , sizeKb : Float
+    }
+
+
+{-| The catalog.json manifest consumed by the index page.
+-}
+type alias Catalog =
+    { updatedUtc : String
+    , totalPublished : Int
+    , totalSizeMb : Float
+    , frontpageSyncedUtc : String
+    , frontpageIds : List Int
+    , uriTemplate : String
+    , items : List IndexItem
+    }
+
+
+{-| Item router configuration (embedded in item.html / 404.html).
+-}
+type alias RouterConfig =
+    { repo : String
+    , actionsUrl : String
+    , workflowFile : String
+    }
+
+
+{-| Item router resolution state machine.
+-}
+type RouterState
+    = ResolvingItem Int
+    | ItemLoaded String
+    | ItemNotBuilt Int RouterConfig
+    | InvalidItemId

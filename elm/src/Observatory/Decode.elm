@@ -35,7 +35,8 @@ payloadDecoder =
         |> andMap (D.field "comments" (D.list commentDecoder))
 
 
-{-| Applicative-style pipeline helper (elm/json doesn't ship one). -}
+{-| Applicative-style pipeline helper (elm/json doesn't ship one).
+-}
 andMap : Decoder a -> Decoder (a -> b) -> Decoder b
 andMap =
     D.map2 (|>)
@@ -284,14 +285,8 @@ tournamentDecoder =
 -- HELPERS
 
 
-{-| Decode with a fallback default if the field is missing or wrong type. -}
+{-| Decode with a fallback default if the field is missing or wrong type.
+-}
 withDefault : a -> Decoder a -> Decoder a
 withDefault default decoder =
     D.oneOf [ decoder, D.succeed default ]
-
-
-{-| Decode a map of string -> int (used for facet counts). -}
-D.map6 : (a -> b -> c -> d -> e -> f -> g) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g
-D.map6 func da db dc dd de df =
-    D.map5 func da db dc dd de
-        |> andMap df

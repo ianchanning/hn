@@ -14,6 +14,18 @@ from urllib.parse import quote_plus, urlparse
 
 HERE = Path(__file__).resolve().parent
 JUDGE_SCRIPT = HERE / "judge" / "judge_v1_1.py"
+ELM_DIR = HERE / "elm"
+ELM_DIST_DIR = ELM_DIR / "dist"
+ELM_OBSERVATORY_JS = ELM_DIST_DIR / "observatory.js"
+
+
+def _get_observatory_js() -> str:
+    """Read compiled Elm bundle, building it if missing."""
+    if not ELM_OBSERVATORY_JS.is_file():
+        subprocess.run(["npm", "run", "build"], cwd=ELM_DIR, check=True)
+    return ELM_OBSERVATORY_JS.read_text(encoding="utf-8")
+
+
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 
@@ -137,6 +149,7 @@ def build_html(
     out_path: Path | None = None,
     data_dir: Path | None = None,
     offline: bool = False,
+    use_elm: bool = True,
 ) -> Path:
     """Generate `show-me-hn-<story_id>.html` and assert strict zero-hash compliance."""
     story_id = parse_hn_item_id(target)
@@ -668,7 +681,7 @@ def build_html(
         ]
     )
 
-    html_doc = f"""<!doctype html>
+    head_doc = f"""<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -1295,8 +1308,9 @@ def build_html(
       tr.spacer td {{ height: 7px; }}
     }}
   </style>
-</head>
-<body>
+</head>"""
+
+    body_wrap = f"""<div id="elm-root">
 <div class="wrap">
   <header class="hn-header">
     <div class="topbar">
@@ -1445,9 +1459,16 @@ def build_html(
     <span>SOURCE: HN {story_id} + {safe_host.upper()} + ALGOLIA + AUTHOR CACHE</span>
   </footer>
 </div>
+</div>
 
 <script id="observatoryData" type="application/json">{json_blob}</script>
-<script>
+"""
+
+    if use_elm:
+        observatory_js = _get_observatory_js()
+        script_block = f"<script>\n{observatory_js}\n</script>"
+    else:
+        script_block = f"""<script>
 (() => {{
   const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
   const DEFAULT_W = DATA.weights;
@@ -1964,10 +1985,9 @@ def build_html(
   syncSliders();
   recomputeAndRender();
 }})();
-</script>
-</body>
-</html>
-"""
+</script>"""
+
+    html_doc = head_doc + "\n<body>\n" + body_wrap + "\n" + script_block + "\n</body>\n</html>\n"
     assert "#" not in html_doc, (
         f"Zero-hash mandate violated at index {html_doc.find('#')}!"
     )

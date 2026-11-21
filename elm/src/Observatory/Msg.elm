@@ -1,9 +1,10 @@
-module Observatory.Msg exposing (Msg(..), WeightField(..), CanvasId(..))
+module Observatory.Msg exposing (CanvasId(..), Msg(..), WeightField(..))
 
-{-| All messages the Observatory app can process. -}
+{-| All messages the Observatory app can process.
+-}
 
-import Observatory.Types exposing (CanvasProbeEvent, ObservatoryPayload, ViewMode, Viewport)
 import Json.Decode as Decode
+import Observatory.Types exposing (CanvasProbeEvent, ObservatoryPayload, ViewMode, Viewport)
 
 
 type Msg

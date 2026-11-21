@@ -1,6 +1,7 @@
 module DecodeTest exposing (..)
 
-{-| Tests for JSON payload decoding — the most critical boundary. -}
+{-| Tests for JSON payload decoding — the most critical boundary.
+-}
 
 import Expect
 import Json.Decode as Decode

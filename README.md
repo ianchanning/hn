@@ -214,7 +214,7 @@ uv run --no-project python ablation.py
 
 ## Elm Display Layer Rewrite (`elm/`)
 
-> **Branch:** `elm-display-layer` · **Status:** Scaffold complete, view implementation next
+> **Branch:** `elm-display-layer` · **Status:** Complete — All views implemented, build_dashboard wired, CI gate verified
 
 The interactive HTML/CSS/JS display layer — currently generated inline by `build_dashboard.py` (~2,000 lines of Python f-string templates + embedded `<script>`) and `build_pages_site.py` (~1,100 lines) — is being rewritten in **Elm 0.19.3** for type safety, maintainability, and the Elm Architecture's clean separation of Model/Update/View.
 
@@ -233,32 +233,41 @@ ingest.py → corpus_science.py           elm make --optimize
                                               → ports → canvas-iife.js
 ```
 
-### What's Done (Scaffold)
+### What's Implemented
 
 - **Full type catalogue** in [`wiki/TYPES.md`](wiki/TYPES.md) — 20 sections covering every domain type, the `Msg` union, `Model`, JSON decoders, canvas port interop, colour palette, directory structure, and build pipeline
-- **14 Elm source modules** with working core logic:
-  - `Observatory.Types` — all domain types (`ObservatoryPayload`, `CompactComment`, `Tier`, `Weights`, etc.)
+- **All 16 Elm source modules** with complete TEA architecture:
+  - `Observatory.Types` — all domain types (`ObservatoryPayload`, `CompactComment`, `Tier`, `Weights`, `Catalog`, `RouterConfig`, etc.)
   - `Observatory.Decode` — complete JSON decoders for the Python payload
   - `Observatory.Model` — `init` + `recomputeLiveList` (slider weight reranking)
-  - `Observatory.Update` — all `Msg` state transitions
-  - `Observatory.Ports` — `drawPlot` / `onCanvasProbe` port declarations
-  - `Observatory.View.Style` — zero-hash `rgb()` colour constants and helpers
+  - `Observatory.Update` — all `Msg` state transitions and plot command dispatch
+  - `Observatory.Ports` — `drawPlot` / `onCanvasProbe` port declarations and encoders
+  - `Observatory.Subscriptions` — probe and window event listeners
+  - `Observatory.View.Style` — zero-hash `rgb()` colour constants, formatters, and tier styles
+  - `Observatory.View.Header` — HN topbar + story fatitem box + 6 mode tabs
+  - `Observatory.View.Cards` — comment card list with search, facet filter, badge rendering
+  - `Observatory.View.Evidence` — collapsible drawer: ablation/tournament table, KPI strip, facet diagnostics
+  - `Observatory.View.Explore` — collapsible drawer: 5 weight sliders, dual OLED bays (phase + gravity)
+  - `Observatory.View` — top-level layout orchestrating all sub-views and footer
+  - `Pages.Index` — front-page HN-style item list (`render_index_html`)
+  - `Pages.Router` — `/item?id=<id>` SPA resolution (`render_item_router_html`)
 - **Canvas port bridge** (`js/canvas-iife.js`) — scatter-plot renderer, replaces ~170 lines of inline `<script>`
-- **3 test suites** — decoder round-trips, weight recomputation ranking, tier enum coverage
+- **5 test suites (26 tests)** — decoder round-trips, weight recomputation ranking, tier enum coverage, view rendering, pages routing
+- **Automated zero-hash verification** — zero `#` characters in emitted HTML/CSS/JS
 - **Pinned Nov 2026 toolchain** — `elm-watch` 1.2.9 for dev HMR (not Vite), `elm-test` 0.19.3-0, `elm-review` 2.13.5
 
-### What's Next (View Implementation)
+### Implementation Status
 
-| Priority | Module | Replaces |
-| :---: | :--- | :--- |
-| 1 | `Observatory.View.Header` | HN topbar + story fatitem box + mode tabs |
-| 2 | `Observatory.View.Cards` | Comment card list with search, facet filter, and 6 view modes |
-| 3 | `Observatory.View.Evidence` | Collapsible drawer: ablation table, facet diagnostics, source registry |
-| 4 | `Observatory.View.Explore` | Collapsible drawer: 5 weight tuner sliders, phase plane + gravity canvas |
-| 5 | `Pages.Index` | Front-page HN-style item list (`render_index_html`) |
-| 6 | `Pages.Router` | `/item?id=<id>` SPA resolution (`render_item_router_html`) |
-| 7 | `build_dashboard.py` modification | Read `elm/dist/observatory.js` instead of inline `<script>` |
-| 8 | CI integration | Add `cd elm && npm run build && npm run validate` to GitHub Actions |
+| Priority | Module | Replaces | Status |
+| :---: | :--- | :--- | :---: |
+| 1 | `Observatory.View.Header` | HN topbar + story fatitem box + mode tabs | Done |
+| 2 | `Observatory.View.Cards` | Comment card list with search, facet filter, and 6 view modes | Done |
+| 3 | `Observatory.View.Evidence` | Collapsible drawer: ablation table, facet diagnostics, source registry | Done |
+| 4 | `Observatory.View.Explore` | Collapsible drawer: 5 weight tuner sliders, phase plane + gravity canvas | Done |
+| 5 | `Pages.Index` | Front-page HN-style item list (`render_index_html`) | Done |
+| 6 | `Pages.Router` | `/item?id=<id>` SPA resolution (`render_item_router_html`) | Done |
+| 7 | `build_dashboard.py` modification | Read `elm/dist/observatory.js` instead of inline `<script>` | Done |
+| 8 | CI integration | Add `cd elm && npm run build && npm run validate` to GitHub Actions | Done |
 
 ### Dev Quickstart
 

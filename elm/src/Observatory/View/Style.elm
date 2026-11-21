@@ -12,7 +12,8 @@ import Html.Attributes exposing (style)
 import Observatory.Types exposing (Colour, Tier(..))
 
 
-{-| Convert Colour to CSS rgba() string. -}
+{-| Convert Colour to CSS rgba() string.
+-}
 colourToCss : Colour -> String
 colourToCss c =
     if c.a >= 1.0 then
@@ -36,7 +37,8 @@ colourToCss c =
             ++ ")"
 
 
-{-| Tier → border-left colour for comment cards. -}
+{-| Tier → border-left colour for comment cards.
+-}
 tierBorderColour : Tier -> Colour
 tierBorderColour tier =
     case tier of
@@ -59,7 +61,8 @@ tierBorderColour tier =
             Colour 255 102 0 1.0
 
 
-{-| Tier → scatter plot dot colour. -}
+{-| Tier → scatter plot dot colour.
+-}
 tierDotColour : Tier -> Colour
 tierDotColour tier =
     case tier of
@@ -82,7 +85,8 @@ tierDotColour tier =
             Colour 110 118 128 0.45
 
 
-{-| HN news.css downvote fade → text colour. -}
+{-| HN news.css downvote fade → text colour.
+-}
 fadeToColour : String -> Colour
 fadeToColour cls =
     case cls of
@@ -134,3 +138,187 @@ bgCream =
 textGrey : Colour
 textGrey =
     Colour 130 130 130 1.0
+
+
+
+-- FORMATTERS & STRING HELPERS
+
+
+{-| Map Tier to class name matching Python HTML / CSS.
+-}
+tierToClass : Tier -> String
+tierToClass tier =
+    case tier of
+        EpistemicGold ->
+            "epistemic_gold"
+
+        GroundedAnalysis ->
+            "grounded_analysis"
+
+        CrowdChatter ->
+            "crowd_chatter"
+
+        MemeOrSnark ->
+            "meme_or_snark"
+
+        BullshitOrFlamewar ->
+            "bullshit_or_flamewar"
+
+        DownvotedSink ->
+            "downvoted_sink"
+
+
+{-| Map Tier to readable label.
+-}
+tierToLabel : Tier -> String
+tierToLabel tier =
+    case tier of
+        EpistemicGold ->
+            "Epistemic Gold"
+
+        GroundedAnalysis ->
+            "Grounded Analysis"
+
+        CrowdChatter ->
+            "Crowd Chatter"
+
+        MemeOrSnark ->
+            "Meme or Snark"
+
+        BullshitOrFlamewar ->
+            "Bullshit or Flamewar"
+
+        DownvotedSink ->
+            "Downvoted Sink"
+
+
+{-| Format a float to 1 decimal place.
+-}
+formatFloat1 : Float -> String
+formatFloat1 val =
+    let
+        rounded =
+            toFloat (round (val * 10)) / 10
+
+        parts =
+            String.split "." (String.fromFloat rounded)
+    in
+    case parts of
+        [ whole ] ->
+            whole ++ ".0"
+
+        [ whole, frac ] ->
+            whole ++ "." ++ String.left 1 frac
+
+        _ ->
+            String.fromFloat val
+
+
+{-| Format a float to 2 decimal places.
+-}
+formatFloat2 : Float -> String
+formatFloat2 val =
+    let
+        rounded =
+            toFloat (round (val * 100)) / 100
+
+        parts =
+            String.split "." (String.fromFloat rounded)
+    in
+    case parts of
+        [ whole ] ->
+            whole ++ ".00"
+
+        [ whole, frac ] ->
+            if String.length frac == 1 then
+                whole ++ "." ++ frac ++ "0"
+
+            else
+                whole ++ "." ++ String.left 2 frac
+
+        _ ->
+            String.fromFloat val
+
+
+{-| Format a float to 3 decimal places.
+-}
+formatFloat3 : Float -> String
+formatFloat3 val =
+    let
+        rounded =
+            toFloat (round (val * 1000)) / 1000
+
+        parts =
+            String.split "." (String.fromFloat rounded)
+    in
+    case parts of
+        [ whole ] ->
+            whole ++ ".000"
+
+        [ whole, frac ] ->
+            whole ++ "." ++ String.padRight 3 '0' (String.left 3 frac)
+
+        _ ->
+            String.fromFloat val
+
+
+{-| Format integer with comma thousands separators.
+-}
+formatThousands : Int -> String
+formatThousands n =
+    if n < 0 then
+        "-" ++ formatThousands (abs n)
+
+    else if n < 1000 then
+        String.fromInt n
+
+    else
+        let
+            remainder =
+                modBy 1000 n
+
+            quotient =
+                n // 1000
+
+            remStr =
+                String.padLeft 3 '0' (String.fromInt remainder)
+        in
+        formatThousands quotient ++ "," ++ remStr
+
+
+{-| Extract clean domain name from URL string.
+-}
+extractHost : String -> String
+extractHost raw =
+    let
+        withoutScheme =
+            if String.startsWith "https://" raw then
+                String.dropLeft 8 raw
+
+            else if String.startsWith "http://" raw then
+                String.dropLeft 7 raw
+
+            else
+                raw
+
+        hostOnly =
+            case String.split "/" withoutScheme of
+                h :: _ ->
+                    h
+
+                [] ->
+                    withoutScheme
+
+        withoutPort =
+            case String.split ":" hostOnly of
+                h :: _ ->
+                    h
+
+                [] ->
+                    hostOnly
+    in
+    if String.startsWith "www." withoutPort then
+        String.dropLeft 4 withoutPort
+
+    else
+        withoutPort

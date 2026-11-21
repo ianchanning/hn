@@ -1,9 +1,11 @@
 module Observatory.Update exposing (update)
 
-{-| State transitions for all Msg variants. -}
+{-| State transitions for all Msg variants.
+-}
 
 import Observatory.Model exposing (Model, recomputeLiveList)
-import Observatory.Msg exposing (Msg(..), WeightField(..))
+import Observatory.Msg exposing (CanvasId(..), Msg(..), WeightField(..))
+import Observatory.Ports as Ports
 import Observatory.Types exposing (..)
 
 
@@ -11,13 +13,15 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SetMode mode ->
-            ( { model
-                | activeMode = mode
-                , selectedCommentId = Nothing
-                , searchQuery = ""
-              }
-            , Cmd.none
-            )
+            let
+                newModel =
+                    { model
+                        | activeMode = mode
+                        , selectedCommentId = Nothing
+                        , searchQuery = ""
+                    }
+            in
+            ( newModel, Ports.sendPlots newModel )
 
         SearchInput q ->
             ( { model | searchQuery = q }, Cmd.none )
@@ -26,12 +30,14 @@ update msg model =
             ( { model | selectedFacet = slug }, Cmd.none )
 
         ClearFilter ->
-            ( { model
-                | searchQuery = ""
-                , selectedCommentId = Nothing
-              }
-            , Cmd.none
-            )
+            let
+                newModel =
+                    { model
+                        | searchQuery = ""
+                        , selectedCommentId = Nothing
+                    }
+            in
+            ( newModel, Ports.sendPlots newModel )
 
         SliderChanged field val ->
             let
@@ -62,8 +68,11 @@ update msg model =
 
                         Nothing ->
                             model.liveList
+
+                newModel =
+                    { model | currentWeights = newCw, liveList = newLive }
             in
-            ( { model | currentWeights = newCw, liveList = newLive }, Cmd.none )
+            ( newModel, Ports.sendPlots newModel )
 
         ResetWeights ->
             case model.payload of
@@ -74,17 +83,34 @@ update msg model =
 
                         live =
                             recomputeLiveList cw p.comments
+
+                        newModel =
+                            { model | currentWeights = cw, liveList = live }
                     in
-                    ( { model | currentWeights = cw, liveList = live }, Cmd.none )
+                    ( newModel, Ports.sendPlots newModel )
 
                 Nothing ->
                     ( model, Cmd.none )
 
         CanvasProbeReceived probe ->
-            ( { model | selectedCommentId = Just probe.commentId }, Cmd.none )
+            let
+                newModel =
+                    { model
+                        | selectedCommentId = Just probe.commentId
+                        , searchQuery = String.fromInt probe.commentId
+                    }
+            in
+            ( newModel, Ports.sendPlots newModel )
 
         ClearSelection ->
-            ( { model | selectedCommentId = Nothing, searchQuery = "" }, Cmd.none )
+            let
+                newModel =
+                    { model
+                        | selectedCommentId = Nothing
+                        , searchQuery = ""
+                    }
+            in
+            ( newModel, Ports.sendPlots newModel )
 
         ToggleProofDrawer ->
             ( { model | proofDrawerOpen = not model.proofDrawerOpen }, Cmd.none )
@@ -98,5 +124,14 @@ update msg model =
         ViewportChanged vp ->
             ( { model | viewport = vp }, Cmd.none )
 
-        _ ->
+        CanvasHover _ _ _ ->
+            ( model, Cmd.none )
+
+        CanvasClick _ _ _ ->
+            ( model, Cmd.none )
+
+        PayloadDecoded _ ->
+            ( model, Cmd.none )
+
+        NoOp ->
             ( model, Cmd.none )

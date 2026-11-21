@@ -23,6 +23,7 @@ on:
       - main
     paths:
       - "**.py"
+      - "elm/**"
       - ".github/workflows/hn-observatory-pages.yml"
 
 permissions:
@@ -50,6 +51,29 @@ jobs:
         uses: actions/setup-python@v7
         with:
           python-version: "3.12"
+
+      - name: Set up Node.js for Elm
+        uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: "elm/package-lock.json"
+
+      - name: Build & validate Elm display layer
+        run: |
+          cd elm
+          npm ci
+          npm run build
+          npm run validate
+          node -e '
+            const fs = require("fs");
+            const js = fs.readFileSync("dist/observatory.js", "utf8");
+            if (js.includes("#")) {
+              console.error("FATAL: zero-hash violation in dist/observatory.js");
+              process.exit(1);
+            }
+            console.log("✓ Zero-hash invariant verified in dist/observatory.js");
+          '
 
       - name: Restore 7-day SQLite author cache
         uses: actions/cache@v6

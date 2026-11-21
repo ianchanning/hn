@@ -1,6 +1,7 @@
 module WeightsTest exposing (..)
 
-{-| Tests for weight recomputation logic. -}
+{-| Tests for weight recomputation logic.
+-}
 
 import Expect
 import Observatory.Model exposing (recomputeLiveList)

@@ -1,4 +1,4 @@
-port module Main exposing (main)
+module Main exposing (main)
 
 {-| HN Epistemic Observatory — Elm entry point.
 
@@ -9,7 +9,7 @@ and renders the full interactive display layer.
 
 import Browser
 import Json.Decode as Decode
-import Observatory.Model exposing (Model, Flags, init)
+import Observatory.Model exposing (Flags, Model, init)
 import Observatory.Msg exposing (Msg(..))
 import Observatory.Subscriptions exposing (subscriptions)
 import Observatory.Update exposing (update)
