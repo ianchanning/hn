@@ -236,8 +236,8 @@ computeGravityPlot model payload =
     , axisConfig =
         { maxX = maxAgePlot
         , maxY = totalN
-        , xLabel = "COMMENT AGE IN HOURS (0h -> " ++ String.fromFloat maxAgePlot ++ "h) ->"
-        , yLabel = "HN POS 1 (TOP)"
+        , xLabel = "COMMENT AGE (0..." ++ String.fromFloat maxAgePlot ++ "h) →"
+        , yLabel = "↑ HN POS 1"
         }
     , largestRoot =
         if payload.largestRoot.slots > 1 then
