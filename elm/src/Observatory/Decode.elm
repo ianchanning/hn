@@ -1,4 +1,4 @@
-module Observatory.Decode exposing (payloadDecoder, tierDecoder)
+module Observatory.Decode exposing (catalogDecoder, indexItemDecoder, payloadDecoder, routerConfigDecoder, tierDecoder)
 
 {-| JSON decoders for the observatory payload embedded by Python.
 
@@ -279,6 +279,45 @@ tournamentDecoder =
         |> andMap (D.field "dev_score" D.float)
         |> andMap (D.field "holdout_score" D.float)
         |> andMap (D.field "disposition" D.string |> withDefault "")
+
+
+
+-- PAGES DECODERS
+
+
+indexItemDecoder : Decoder IndexItem
+indexItemDecoder =
+    D.succeed IndexItem
+        |> andMap (D.field "story_id" D.int)
+        |> andMap (D.field "story_title" D.string)
+        |> andMap (D.field "story_url" D.string |> withDefault "")
+        |> andMap (D.field "points" D.int |> withDefault 0)
+        |> andMap (D.field "story_author" D.string |> withDefault "")
+        |> andMap (D.field "total_comments" D.int |> withDefault 0)
+        |> andMap (D.field "epistemic_gold" D.int |> withDefault 0)
+        |> andMap (D.field "grounded_analysis" D.int |> withDefault 0)
+        |> andMap (D.field "t2_ref_utc" D.string |> withDefault "")
+        |> andMap (D.field "size_kb" D.float |> withDefault 0.0)
+
+
+catalogDecoder : Decoder Catalog
+catalogDecoder =
+    D.succeed Catalog
+        |> andMap (D.field "updated_utc" D.string |> withDefault "")
+        |> andMap (D.field "total_published" D.int |> withDefault 0)
+        |> andMap (D.field "total_size_mb" D.float |> withDefault 0.0)
+        |> andMap (D.field "frontpage_synced_utc" D.string |> withDefault "")
+        |> andMap (D.field "frontpage_ids" (D.list D.int) |> withDefault [])
+        |> andMap (D.field "uri_template" D.string |> withDefault "")
+        |> andMap (D.field "items" (D.list indexItemDecoder))
+
+
+routerConfigDecoder : Decoder RouterConfig
+routerConfigDecoder =
+    D.succeed RouterConfig
+        |> andMap (D.field "repo" D.string)
+        |> andMap (D.field "actions_url" D.string)
+        |> andMap (D.field "workflow_file" D.string)
 
 
 

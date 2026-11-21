@@ -49,7 +49,9 @@ const canvasBridge = readFileSync(join(root, "js", "canvas-iife.js"), "utf-8");
 // 4. Production boot glue (no ES modules, no bundler)
 const boot = `
 (function() {
-  var dataEl = document.getElementById("observatoryData");
+  var dataEl = document.getElementById("observatoryData") ||
+               document.getElementById("catalogData") ||
+               document.getElementById("routerConfig");
   var flags = null;
   if (dataEl) {
     try { flags = JSON.parse(dataEl.textContent); } catch(e) {}
