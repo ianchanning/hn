@@ -48,10 +48,10 @@ npx wrangler deploy
 ### 4. Test
 ```bash
 # Check status
-curl https://hn-observatory-scheduler.<your-subdomain>.workers.dev/status
+curl https://hn-observatory-scheduler.ian-pinboard-proxy.workers.dev/status
 
 # Manually trigger a run
-curl -X POST https://hn-observatory-scheduler.<your-subdomain>.workers.dev/trigger
+curl -X POST https://hn-observatory-scheduler.ian-pinboard-proxy.workers.dev/trigger
 
 # Watch live execution logs
 npx wrangler tail

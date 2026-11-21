@@ -93,10 +93,10 @@ npx wrangler deploy
 ./deploy.sh
 
 # 3. Inspect worker health & status
-curl https://hn-observatory-scheduler.<your-subdomain>.workers.dev/status
+curl https://hn-observatory-scheduler.ian-pinboard-proxy.workers.dev/status
 
 # 4. Test manual trigger
-curl -X POST https://hn-observatory-scheduler.<your-subdomain>.workers.dev/trigger
+curl -X POST https://hn-observatory-scheduler.ian-pinboard-proxy.workers.dev/trigger
 
 # 5. Tail live cron execution logs
 npx wrangler tail
