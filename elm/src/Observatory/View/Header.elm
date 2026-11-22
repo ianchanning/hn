@@ -9,7 +9,7 @@ import Html.Events exposing (onClick)
 import Observatory.Model exposing (Model)
 import Observatory.Msg exposing (Msg(..))
 import Observatory.Types exposing (ObservatoryPayload, ViewMode(..))
-import Observatory.View.Style exposing (extractHost, formatFloat1, formatFloat2, formatThousands)
+import Observatory.View.Style exposing (extractHost, formatFloat1, formatFloat2, formatThousands, role)
 
 
 viewHeader : Model -> ObservatoryPayload -> Html Msg
@@ -113,12 +113,12 @@ viewHeader model payload =
                     modes
                 )
     in
-    header [ class "hn-header" ]
+    header [ class "hn-header", role "banner" ]
         [ div [ class "topbar" ]
             [ div [ class "topbar-left" ]
                 [ a [ href "https://news.ycombinator.com", class "hn-logo" ] [ text "BS" ]
                 , a [ href "https://ianchanning.com/hn", class "hnname" ] [ text "Better Signal News" ]
-                , span [ class "pagetop", id "modeTabs" ] renderedTabs
+                , span [ class "pagetop", id "modeTabs", role "navigation" ] renderedTabs
                 ]
             , div [ class "topbar-right" ]
                 [ button
@@ -168,7 +168,7 @@ viewHeader model payload =
                     [ text "evidence" ]
                 ]
             ]
-        , div [ class "fatitem-box" ]
+        , div [ class "fatitem-box", role "main" ]
             [ div [ class "story-titleline" ]
                 [ a [ class "story-title", href storyHref ] [ text payload.storyTitle ]
                 , sitebitHtml

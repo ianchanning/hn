@@ -15,7 +15,7 @@ import Observatory.View.Cards exposing (viewCards)
 import Observatory.View.Evidence exposing (viewEvidence)
 import Observatory.View.Explore exposing (viewExplore)
 import Observatory.View.Header exposing (viewHeader)
-import Observatory.View.Style exposing (extractHost)
+import Observatory.View.Style exposing (extractHost, role)
 
 
 view : Model -> Html Msg
@@ -23,7 +23,7 @@ view model =
     case model.error of
         Just err ->
             div [ class "wrap" ]
-                [ div [ class "topbar" ]
+                [ div [ class "topbar", role "banner" ]
                     [ text "Better Signal News" ]
                 , div [ id "error" ]
                     [ text ("Payload decode error: " ++ err) ]
@@ -55,7 +55,7 @@ viewFooter payload =
             else
                 String.toUpper (extractHost payload.storyUrl)
     in
-    footer [ class "sheet-foot" ]
+    footer [ class "sheet-foot", role "contentinfo" ]
         [ span [] [ text "SILICON PIRATE × CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT" ]
         , span [] [ text ("SOURCE: HN " ++ String.fromInt payload.storyId ++ " + " ++ hostStr ++ " + ALGOLIA + AUTHOR CACHE") ]
         ]

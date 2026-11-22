@@ -6,7 +6,7 @@ module Pages.Index exposing (IndexModel, view)
 import Html exposing (Html, a, div, form, input, label, span, table, tbody, td, text, tr)
 import Html.Attributes exposing (attribute, class, colspan, for, href, id, placeholder, type_)
 import Observatory.Types exposing (IndexItem)
-import Observatory.View.Style exposing (extractHost, formatThousands)
+import Observatory.View.Style exposing (extractHost, formatThousands, role)
 
 
 type alias IndexModel =
@@ -17,7 +17,6 @@ type alias IndexModel =
     , actionsUrl : String
     , workflowFile : String
     }
-
 
 view : IndexModel -> Html msg
 view model =
@@ -63,7 +62,7 @@ view model =
             List.length model.items
     in
     div [ class "wrap" ]
-        [ div [ class "topbar" ]
+        [ div [ class "topbar", role "banner" ]
             [ div [ class "topbar-left" ]
                 [ a [ class "hn-logo", href "./" ] [ text "BS" ]
                 , a [ class "hnname", href "./" ] [ text "Better Signal News" ]
@@ -81,11 +80,11 @@ view model =
                     )
                 ]
             ]
-        , div [ class "list-pad" ]
+        , div [ class "list-pad", role "main" ]
             [ table [ class "itemlist", id "frontpageList" ]
                 [ tbody [] itemRows ]
             ]
-        , div [ class "hn-footer" ]
+        , div [ class "hn-footer", role "contentinfo" ]
             [ div [ class "yclinks" ]
                 [ text "Hourly updates | "
                 , text (String.fromInt publishedCount ++ " published | ")

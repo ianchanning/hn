@@ -9,7 +9,7 @@ import Html.Events exposing (onClick, onInput)
 import Observatory.Model exposing (Model)
 import Observatory.Msg exposing (Msg(..))
 import Observatory.Types exposing (CompactComment, LiveComment, ObservatoryPayload, ViewMode(..))
-import Observatory.View.Style exposing (bullshitFadeClass, colourToCss, extractHost, formatFloat1, formatFloat2, formatThousands, tierBorderColour, tierToClass)
+import Observatory.View.Style exposing (bullshitFadeClass, colourToCss, extractHost, formatFloat1, formatFloat2, formatThousands, tierBorderColour, tierToClass, role)
 
 
 viewCards : Model -> ObservatoryPayload -> Html Msg
@@ -126,7 +126,7 @@ viewCards model payload =
         hasFilter =
             not (String.isEmpty model.searchQuery) || model.selectedCommentId /= Nothing
     in
-    section [ class "band grid-12", id "explorerSection", style "padding-top" "16px" ]
+    section [ class "band grid-12", id "explorerSection", style "padding-top" "16px", role "main" ]
         [ div [ class "col-12" ]
             [ div [ class "filter-bar" ]
                 [ select

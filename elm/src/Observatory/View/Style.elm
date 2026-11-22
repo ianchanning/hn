@@ -8,9 +8,15 @@ the `assert "#" not in html_doc` invariant from the Python pipeline.
 -}
 
 import Html
-import Html.Attributes exposing (style)
+import Html.Attributes exposing (style, attribute)
 import Observatory.Types exposing (Colour, Tier(..))
 
+
+{-| ARIA role
+-}
+role : String -> Html.Attribute msg
+role value =
+    attribute "role" value
 
 {-| Convert Colour to CSS rgba() string.
 -}
