@@ -301,19 +301,26 @@ viewDevNav active =
                 isActive =
                     active == tab
 
+                bc =
+                    if isActive then
+                        "rgb(204, 204, 194)"
+
+                    else
+                        "transparent"
+
                 bg =
                     if isActive then
-                        "rgb(255, 102, 0)"
+                        "rgb(236, 236, 228)"
 
                     else
                         "transparent"
 
                 fg =
                     if isActive then
-                        "rgb(255, 255, 255)"
+                        "rgb(34, 34, 34)"
 
                     else
-                        "rgb(34, 34, 34)"
+                        "rgb(0, 0, 0)"
             in
             span
                 [ onClick (SwitchDevTab tab)
@@ -321,24 +328,26 @@ viewDevNav active =
                 , style "color" fg
                 , style "padding" "3px 8px"
                 , style "cursor" "pointer"
-                , style "font-weight" "bold"
-                , style "border-radius" "3px"
+                , style "border-radius" "4px"
+                , style "border-width" "1px"
+                , style "border-color" bc
+                , style "border-style" "solid"
                 , style "user-select" "none"
+                , style "text-transform" "lowercase"
                 ]
                 [ text label ]
     in
     div
         [ style "background" "rgb(246, 246, 239)"
         , style "border-bottom" "1px solid rgb(255, 102, 0)"
+        , style "margin-bottom" "8px"
         , style "padding" "6px 12px"
-        , style "font-family" "monospace"
-        , style "font-size" "12px"
         , style "display" "flex"
         , style "gap" "10px"
         , style "align-items" "center"
         ]
-        [ span [ style "font-weight" "bold", style "color" "rgb(255, 102, 0)" ] [ text "ELM DEV:" ]
-        , tabBtn TabObservatory "1. Comments Observatory"
-        , tabBtn TabIndex "2. Frontpage Index"
-        , tabBtn TabRouter "3. SPA Router (/item?id=)"
+        [ span [ style "color" "rgb(255, 102, 0)" ] [ text "ELM DEV:" ]
+        , tabBtn TabIndex "Frontpage"
+        , tabBtn TabObservatory "Item"
+        , tabBtn TabRouter "Router"
         ]
