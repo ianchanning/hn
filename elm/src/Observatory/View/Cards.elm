@@ -9,7 +9,7 @@ import Html.Events exposing (onClick, onInput)
 import Observatory.Model exposing (Model)
 import Observatory.Msg exposing (Msg(..))
 import Observatory.Types exposing (CompactComment, LiveComment, ObservatoryPayload, ViewMode(..))
-import Observatory.View.Style exposing (bullshitFadeClass, colourToCss, extractHost, formatFloat1, formatFloat2, formatThousands, tierBorderColour, tierToClass, role)
+import Observatory.View.Style exposing (bullshitFadeClass, extractHost, formatFloat1, formatFloat2, formatThousands, tierToClass, role)
 
 
 viewCards : Model -> ObservatoryPayload -> Html Msg
@@ -126,12 +126,11 @@ viewCards model payload =
         hasFilter =
             not (String.isEmpty model.searchQuery) || model.selectedCommentId /= Nothing
     in
-    section [ class "band grid-12", id "explorerSection", style "padding-top" "16px", role "main" ]
-        [ div [ class "col-12" ]
-            [ div [ class "filter-bar" ]
+    section [ id "explorerSection", role "main" ]
+        [ div []
+            [ div [ id "filterBar" ]
                 [ select
                     [ id "facetSelect"
-                    , class "sel-in"
                     , attribute "aria-label" "Topic facet"
                     , onInput FacetChanged
                     ]
@@ -139,7 +138,6 @@ viewCards model payload =
                 , input
                     [ type_ "search"
                     , id "searchInput"
-                    , class "search-in"
                     , placeholder ("Search " ++ formatThousands totalComments ++ " comments by text, author, or id...")
                     , value model.searchQuery
                     , onInput SearchInput
@@ -163,7 +161,7 @@ viewCards model payload =
                   else
                     text ""
                 ]
-            , div [ id "cardContainer", class "card-list" ]
+            , div [ id "cards" ]
                 (List.map (viewCommentCard model rescueJump demoteDrop) shown)
             ]
         ]
@@ -180,34 +178,34 @@ viewCommentCard model rescueJump demoteDrop lc =
 
         deltaBadge =
             if delta >= rescueJump then
-                span [ class "badge rescue" ] [ text ("RESCUED +" ++ String.fromInt delta ++ " SPOTS") ]
+                span [ attribute "data-b" "rescue" ] [ text ("RESCUED +" ++ String.fromInt delta ++ " SPOTS") ]
 
             else if delta <= demoteDrop then
-                span [ class "badge drop" ] [ text ("DEMOTED " ++ String.fromInt delta ++ " SPOTS") ]
+                span [ attribute "data-b" "drop" ] [ text ("DEMOTED " ++ String.fromInt delta ++ " SPOTS") ]
 
             else
                 text ""
 
         fadeBadge =
             if c.dt == 1 then
-                span [ class "badge c5a" ] [ text ("HN FADE: " ++ c.fade ++ " (RESCUED)") ]
+                span [ attribute "data-b" "c5a" ] [ text ("HN FADE: " ++ c.fade ++ " (RESCUED)") ]
 
             else if c.dt >= 2 then
-                span [ class "badge drop" ] [ text ("HN FADE: " ++ c.fade ++ " (TIER " ++ String.fromInt c.dt ++ ")") ]
+                span [ attribute "data-b" "drop" ] [ text ("HN FADE: " ++ c.fade ++ " (TIER " ++ String.fromInt c.dt ++ ")") ]
 
             else
                 text ""
 
         modBadge =
             if c.mod == 1 then
-                span [ class "badge drop" ] [ text "MOD REBUKED (dang/tomhow)" ]
+                span [ attribute "data-b" "drop" ] [ text "MOD REBUKED (dang/tomhow)" ]
 
             else
                 text ""
 
         surfBadge =
             if c.surf >= 4.0 then
-                span [ class "badge c5a" ] [ text ("SURF MIRAGE " ++ formatFloat1 c.surf ++ "x") ]
+                span [ attribute "data-b" "c5a" ] [ text ("SURF MIRAGE " ++ formatFloat1 c.surf ++ "x") ]
 
             else
                 text ""
@@ -224,12 +222,9 @@ viewCommentCard model rescueJump demoteDrop lc =
 
         cw =
             model.currentWeights
-
-        borderColourStyle =
-            style "border-left" ("4px solid " ++ colourToCss (tierBorderColour c.tier))
     in
-    article [ class ("c-card tier-" ++ tierToClass c.tier), borderColourStyle ]
-        [ div [ class "hn-comhead" ]
+    article [ class ("c-card tier-" ++ tierToClass c.tier) ]
+        [ div []
             [ a [ href ("https://news.ycombinator.com/user?id=" ++ c.au) ] [ text c.au ]
             , span [] [ text (" " ++ formatFloat1 c.age ++ " hours ago") ]
             , span [] [ text " | " ]
@@ -239,18 +234,18 @@ viewCommentCard model rescueJump demoteDrop lc =
             , span [] [ text " | " ]
             , a [ href ("https://news.ycombinator.com/item?id=" ++ String.fromInt c.id) ] [ text "link" ]
             ]
-        , div [ class "c-meta" ]
-            [ span [ class "badge rank-sig" ] [ text ("SIGNAL " ++ String.fromInt lc.liveRank) ]
-            , span [ class "badge" ] [ text ("HN POS " ++ String.fromInt c.dom) ]
+        , div []
+            [ span [] [ text ("SIGNAL " ++ String.fromInt lc.liveRank) ]
+            , span [] [ text ("HN POS " ++ String.fromInt c.dom) ]
             , deltaBadge
             , fadeBadge
             , modBadge
             , surfBadge
-            , span [ class "badge" ] [ text facetLabel ]
+            , span [] [ text facetLabel ]
             ]
         , div [ class ("c-body " ++ fadeClass) ]
             (renderCommentBody c.txt)
-        , div [ class "vec-bars" ]
+        , div []
             [ span [] [ text "SCORE: ", strong [] [ text (formatFloat2 lc.liveScore) ] ]
             , span [] [ text ("INFO: +" ++ formatFloat2 (cw.ig * c.ig)) ]
             , span [] [ text ("FALSIFIABILITY: +" ++ formatFloat2 (cw.fa * c.fa)) ]
@@ -273,11 +268,9 @@ renderUrlLink url =
             extractHost url
     in
     a
-        [ class "ext-link"
-        , href url
+        [ href url
         , attribute "target" "_blank"
         , attribute "rel" "noopener noreferrer"
-        , style "margin-right" "6px"
         ]
         [ text ("[" ++ host ++ "]") ]
 

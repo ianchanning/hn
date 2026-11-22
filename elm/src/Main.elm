@@ -10,7 +10,7 @@ Consumes:
 
 import Browser
 import Html exposing (Html, div, span, text)
-import Html.Attributes exposing (class, id, style)
+import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
 import Json.Decode as Decode
 import Observatory.Decode as ObsDecode
@@ -297,56 +297,21 @@ viewDevNav : ActiveTab -> Html RootMsg
 viewDevNav active =
     let
         tabBtn tab label =
-            let
-                isActive =
-                    active == tab
-
-                bc =
-                    if isActive then
-                        "rgb(204, 204, 194)"
-
-                    else
-                        "transparent"
-
-                bg =
-                    if isActive then
-                        "rgb(236, 236, 228)"
-
-                    else
-                        "transparent"
-
-                fg =
-                    if isActive then
-                        "rgb(34, 34, 34)"
-
-                    else
-                        "rgb(0, 0, 0)"
-            in
             span
                 [ onClick (SwitchDevTab tab)
-                , style "background" bg
-                , style "color" fg
-                , style "padding" "3px 8px"
-                , style "cursor" "pointer"
-                , style "border-radius" "4px"
-                , style "border-width" "1px"
-                , style "border-color" bc
-                , style "border-style" "solid"
-                , style "user-select" "none"
-                , style "text-transform" "lowercase"
+                , class
+                    ("devtab"
+                        ++ if active == tab then
+                            " act"
+
+                          else
+                            ""
+                    )
                 ]
                 [ text label ]
     in
-    div
-        [ style "background" "rgb(246, 246, 239)"
-        , style "border-bottom" "1px solid rgb(255, 102, 0)"
-        , style "margin-bottom" "8px"
-        , style "padding" "6px 12px"
-        , style "display" "flex"
-        , style "gap" "10px"
-        , style "align-items" "center"
-        ]
-        [ span [ style "color" "rgb(255, 102, 0)" ] [ text "ELM DEV:" ]
+    div [ id "devbar" ]
+        [ span [] [ text "ELM DEV:" ]
         , tabBtn TabIndex "Frontpage"
         , tabBtn TabObservatory "Item"
         , tabBtn TabRouter "Router"

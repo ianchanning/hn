@@ -9,7 +9,7 @@ import Html.Attributes exposing (attribute, class, id, style)
 import Observatory.Model exposing (Model)
 import Observatory.Msg exposing (Msg)
 import Observatory.Types exposing (AblationRow, FacetDiagnostic, JudgeResult, ObservatoryPayload, SourceCategory, TournamentRow)
-import Observatory.View.Style exposing (formatFloat1, formatFloat2, formatFloat3, formatThousands)
+import Observatory.View.Style exposing (classIf, formatFloat1, formatFloat2, formatFloat3, formatThousands)
 
 
 viewEvidence : Model -> ObservatoryPayload -> Html Msg
@@ -31,7 +31,7 @@ viewEvidence model payload =
                     viewLiveEvidence payload
     in
     details (class "proof-drawer" :: id "proofDrawer" :: openAttr)
-        [ summary [ class "hn-summary", style "display" "none" ] []
+        [ summary [] []
         , content
         ]
 
@@ -57,7 +57,7 @@ viewBenchmarkEvidence _ payload =
                     else
                         ""
             in
-            tr [ class rowClass ]
+            tr (classIf rowClass)
                 [ td [] [ text r.name ]
                 , td [] [ strong [] [ text (formatFloat2 r.score) ] ]
                 , td [] [ text (formatFloat3 r.ndcg20) ]
@@ -87,7 +87,7 @@ viewBenchmarkEvidence _ payload =
                     else
                         ""
             in
-            tr [ class rowClass ]
+            tr (classIf rowClass)
                 [ td [] [ text (t.stage ++ stageSuffix) ]
                 , td [] [ text t.sha ]
                 , td [] [ strong [] [ text (formatFloat2 t.score) ] ]
@@ -183,7 +183,7 @@ viewLiveEvidence payload =
                     else
                         ""
             in
-            tr [ class rowClass ]
+            tr (classIf rowClass)
                 [ td [] [ text f.label ]
                 , td [] [ text (String.fromInt f.count) ]
                 , td [] [ strong [] [ text (String.fromInt f.useful) ] ]
