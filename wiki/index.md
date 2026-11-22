@@ -13,3 +13,4 @@ Persistent knowledge base for the Elm rewrite of the HN Epistemic Observatory di
 - [[Elm-Tuples-Max-Three]] - Elm only supports 2- and 3-tuples; use records for 4+ items.
 - [[Elm-Details-Summary-And-CSS-Parity]] - Hidden summary requirement on details drawers, button hover rules, and automated parity differ.
 - [[Monorepo-Architecture]] - Elm UI, Python pipeline, and scheduler unified under a monorepo root.
+- [[Forget-Team-CSS-Reduction]] - 4-agent amnesia CSS tournament (-53%), zero-hash `[id=]`, and anti-Goodhart lessons.
