@@ -218,7 +218,7 @@ This repository is organized as a unified monorepo coordinating the Python epist
 # Run full monorepo test suite (Elm test suite + Python unittest suite)
 npm test
 
-# Build all monorepo targets (Elm production bundle + Cloudflare Worker scheduler)
+# Build all monorepo targets (Elm production bundle for Python inlining)
 npm run build
 
 # Validate Elm code (type check, tests, and elm-review) and Python tests
