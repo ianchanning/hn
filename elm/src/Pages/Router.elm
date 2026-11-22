@@ -61,15 +61,12 @@ viewStateContent state =
                         []
 
                      else
-                        [ a [ class "btn", href cfg.actionsUrl ] [ text "Run GitHub Workflow" ] ]
+                        [ a [ href cfg.actionsUrl ] [ text "github workflows" ] ]
                     )
-                        ++ [ a [ class "btn alt", href hnUrl ] [ text "View Original HN Thread" ]
-                           , a [ class "btn alt", href "./" ] [ text "Published Index" ]
-                           ]
             in
             div [ class "fatitem-box", id "routerStatus" ]
                 [ div [ class "story-titleline", id "statusTitle" ]
-                    [ text ("HN Item " ++ String.fromInt itemId ++ " Not Yet Built") ]
+                    [ a [ class "story-title", href hnUrl ] [ text ("HN Item " ++ String.fromInt itemId ++ " Not Yet Built") ] ]
                 , div [ class "subtext", id "statusBody" ]
                     [ text "No pre-built observatory was found at "
                     , code [] [ text ("/items/" ++ String.fromInt itemId ++ ".html") ]
@@ -80,7 +77,7 @@ viewStateContent state =
                     , text ":"
                     ]
                 , pre [] [ text cliCommand ]
-                , div [ class "actions" ] actionBtns
+                , div [ class "subtext" ] actionBtns
                 ]
 
         InvalidItemId ->
