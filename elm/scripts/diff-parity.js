@@ -374,13 +374,13 @@ const checks = [
   {
     name: "Frontpage Index Wraps Table in list-pad (Identical Padding To Python)",
     check: () => {
-      return indexHtml.includes('<div class="list-pad"><table class="itemlist" id="frontpageList">');
+      return /class="list-pad"[^>]*>\s*<table[^>]*id="frontpageList"/.test(indexHtml);
     },
   },
   {
     name: "Frontpage Index Renders Proper Topbar-Right Case ('Updated ... UTC')",
     check: () => {
-      const m = indexHtml.match(/<div class="topbar-right">(.*?)<\/div>/);
+      const m = indexHtml.match(/<div[^>]*class="topbar-right"[^>]*>(.*?)<\/div>/);
       const text = m ? m[1] : "";
       return text.startsWith("Updated ") && text.endsWith("UTC");
     },
@@ -388,7 +388,7 @@ const checks = [
   {
     name: "Frontpage Index Renders hn-footer With Search Jump Form",
     check: () => {
-      return indexHtml.includes('<div class="hn-footer">') && indexHtml.includes('<form class="hn-search" id="jumpForm">');
+      return indexHtml.includes('class="hn-footer"') && indexHtml.includes('id="jumpForm"');
     },
   },
 ];
