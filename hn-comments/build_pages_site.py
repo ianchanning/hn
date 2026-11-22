@@ -46,6 +46,23 @@ def _get_observatory_js() -> str:
     return ELM_OBSERVATORY_JS.read_text(encoding="utf-8")
 
 
+def _heal_mismatched_elm_css(pub_html: Path, style_css: str) -> bool:
+    """Refresh stale legacy `<style>` in archived items that already embed new Elm JS."""
+    if not style_css:
+        return False
+    raw = pub_html.read_text(encoding="utf-8")
+    if 'data-b' not in raw or '[id="cards"]' in raw:
+        return False
+    updated, count = STYLE_BLOCK_RE.subn(
+        lambda _m: f"<style>\n{style_css}\n  </style>", raw, count=1
+    )
+    if count != 1 or updated == raw:
+        return False
+    assert "#" not in updated, f"Zero-hash violated while healing {pub_html}"
+    pub_html.write_text(updated, encoding="utf-8")
+    return True
+
+
 def _get_style_css() -> str:
     """Read consolidated Elm styles, guaranteeing zero `#` characters."""
     if ELM_STYLE_CSS.is_file():
@@ -57,6 +74,7 @@ def _get_style_css() -> str:
 
 ITEM_FILE_RE = re.compile(r"^show-me-hn-(\d+)\.html$")
 PUBLISHED_ITEM_RE = re.compile(r"^(\d+)\.html$")
+STYLE_BLOCK_RE = re.compile(r"<style[^>]*>.*?</style>", re.S | re.I)
 OBS_JSON_RE = re.compile(
     r'<script\s+id=["\']observatoryData["\']\s+type=["\']application/json["\']>(.*?)</script>',
     flags=re.S,
@@ -655,6 +673,7 @@ def build_pages_site(
 
     # Scan all published `items/<id>.html` and enforce safe-under-1GB archive retention
     pinned_ids = {50467087} | forced | source_repo_ids | set(resolved_fp_ids)
+    current_style_css = _get_style_css()
     raw_entries: list[tuple[int, Path, dict[str, Any], int, datetime]] = []
     total_bytes = 0
     for pub_html in sorted(items_dir.glob("*.html")):
@@ -662,6 +681,7 @@ def build_pages_site(
         if not pm:
             continue
         sid = int(pm.group(1))
+        _heal_mismatched_elm_css(pub_html, current_style_css)
         meta = extract_item_summary(pub_html, sid)
         fsize = pub_html.stat().st_size
         total_bytes += fsize

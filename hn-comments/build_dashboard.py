@@ -18,6 +18,7 @@ JUDGE_SCRIPT = (HERE / "judge" / "judge_v1_1.py") if (HERE / "judge" / "judge_v1
 ELM_DIR = REPO_ROOT / "elm"
 ELM_DIST_DIR = ELM_DIR / "dist"
 ELM_OBSERVATORY_JS = ELM_DIST_DIR / "observatory.js"
+ELM_STYLE_CSS = ELM_DIR / "static" / "style.css"
 
 
 def _get_observatory_js() -> str:
@@ -25,6 +26,15 @@ def _get_observatory_js() -> str:
     if not ELM_OBSERVATORY_JS.is_file():
         subprocess.run(["npm", "run", "build"], cwd=ELM_DIR, check=True)
     return ELM_OBSERVATORY_JS.read_text(encoding="utf-8")
+
+
+def _get_style_css() -> str:
+    """Read consolidated Elm stylesheet, guaranteeing zero `#` characters."""
+    if not ELM_STYLE_CSS.is_file():
+        return ""
+    css = ELM_STYLE_CSS.read_text(encoding="utf-8")
+    assert "#" not in css, f"Zero-hash violated in {ELM_STYLE_CSS}"
+    return css
 
 
 if str(HERE) not in sys.path:
@@ -687,7 +697,20 @@ def build_html(
         ]
     )
 
-    head_doc = f"""<!doctype html>
+    elm_style_css = _get_style_css() if use_elm else ""
+    if elm_style_css:
+        head_doc = f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{story_id} // {safe_title} - Better Signal News</title>
+  <style>
+{elm_style_css}
+  </style>
+</head>"""
+    else:
+        head_doc = f"""<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
