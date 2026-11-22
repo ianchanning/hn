@@ -135,8 +135,8 @@ const catalogJson = JSON.stringify(catalog, null, 2).replace(/#/g, "\\u0023");
 writeFileSync(join(staticDir, "catalog.json"), catalogJson, "utf-8");
 
 const routerConfig = {
-  repo: "ian/hn",
-  actions_url: "https://github.com/ian/hn/actions",
+  repo: "ianchanning/hn",
+  actions_url: "https://github.com/ianchanning/hn/actions",
   workflow_file: "hn-observatory-pages.yml",
 };
 const routerConfigJson = JSON.stringify(routerConfig, null, 2).replace(/#/g, "\\u0023");

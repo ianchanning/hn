@@ -45,16 +45,16 @@ mockIndexModel =
     { items = mockItems
     , frontpageIds = [ 50472038, 50467087 ]
     , updatedUtc = "2026-11-21 08:00 UTC"
-    , repo = "ian/hn"
-    , actionsUrl = "https://github.com/ian/hn/actions"
+    , repo = "ianchanning/hn"
+    , actionsUrl = "https://github.com/ianchanning/hn/actions"
     , workflowFile = "observatory.yml"
     }
 
 
 mockRouterConfig : RouterConfig
 mockRouterConfig =
-    { repo = "ian/hn"
-    , actionsUrl = "https://github.com/ian/hn/actions"
+    { repo = "ianchanning/hn"
+    , actionsUrl = "https://github.com/ianchanning/hn/actions"
     , workflowFile = "observatory.yml"
     }
 

@@ -96,7 +96,7 @@ init flags =
                                         { items = cat.items
                                         , frontpageIds = cat.frontpageIds
                                         , updatedUtc = cat.updatedUtc
-                                        , repo = "ian/hn"
+                                        , repo = "ianchanning/hn"
                                         , actionsUrl = ""
                                         , workflowFile = "hn-observatory-pages.yml"
                                         }
@@ -167,7 +167,7 @@ initSinglePayload flags =
                                     { items = catalog.items
                                     , frontpageIds = catalog.frontpageIds
                                     , updatedUtc = catalog.updatedUtc
-                                    , repo = "ian/hn"
+                                    , repo = "ianchanning/hn"
                                     , actionsUrl = ""
                                     , workflowFile = "hn-observatory-pages.yml"
                                     }

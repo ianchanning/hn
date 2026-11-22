@@ -254,8 +254,8 @@ vm.runInContext(elmCode, ctx);
 const fixture = JSON.parse(readFileSync(join(staticDir, "fixture.json"), "utf-8"));
 const catalog = JSON.parse(readFileSync(join(staticDir, "catalog.json"), "utf-8"));
 const routerConfig = {
-  repo: "ian/hn",
-  actions_url: "https://github.com/ian/hn/actions",
+  repo: "ianchanning/hn",
+  actions_url: "https://github.com/ianchanning/hn/actions",
   workflow_file: "observatory.yml",
 };
 const bundle = {

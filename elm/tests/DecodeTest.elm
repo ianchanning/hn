@@ -72,11 +72,11 @@ suite =
                 \_ ->
                     let
                         raw =
-                            """{"repo": "ian/hn", "actions_url": "https://example.com", "workflow_file": "run.yml"}"""
+                            """{"repo": "ianchanning/hn", "actions_url": "https://example.com", "workflow_file": "run.yml"}"""
                     in
                     case Decode.decodeString routerConfigDecoder raw of
                         Ok cfg ->
-                            cfg.repo |> Expect.equal "ian/hn"
+                            cfg.repo |> Expect.equal "ianchanning/hn"
 
                         Err _ ->
                             Expect.fail "failed to decode router config"
