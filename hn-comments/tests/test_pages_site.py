@@ -295,12 +295,13 @@ class TestGitHubPagesMirror(unittest.TestCase):
 
             idx_html = (site_dir / "index.html").read_text(encoding="utf-8")
             self.assertNotIn("#", idx_html)
-            self.assertIn('class="wrap"', idx_html)
+            self.assertIn('<div id="elm-root">', idx_html)
+            self.assertIn('<script id="catalogData"', idx_html)
             self.assertIn("Better Signal News", idx_html)
-            self.assertIn('<div class="topbar-right">Updated 2026-11-14 16:00 UTC</div>', idx_html)
-            self.assertIn(">blog.rust-lang.org</a>)", idx_html)
-            self.assertIn("342 points by steveklabnik", idx_html)
-            self.assertIn("35% bullshit", idx_html)
+            self.assertIn("2026-11-14 16:00 UTC", idx_html)
+            self.assertIn("blog.rust-lang.org", idx_html)
+            self.assertIn("342", idx_html)
+            self.assertIn("steveklabnik", idx_html)
             # Rank 1 (`50400001`) appears before Rank 2 (`50499999`) despite smaller numeric ID
             self.assertLess(idx_html.index("50400001"), idx_html.index("50499999"))
 
@@ -320,7 +321,7 @@ class TestGitHubPagesMirror(unittest.TestCase):
             self.assertTrue((site_dir / "items" / "50511111.html").is_file())
             idx_html2 = (site_dir / "index.html").read_text(encoding="utf-8")
             self.assertNotIn("#", idx_html2)
-            self.assertIn('<div class="topbar-right">Updated 2026-11-14 17:05 UTC</div>', idx_html2)
+            self.assertIn("2026-11-14 17:05 UTC", idx_html2)
 
     def test_workflow_yaml_exists_and_avoids_shell_injection(self) -> None:
         """Ensure workflow_dispatch passes inputs strictly via env vars rather than inline run interpolation."""

@@ -25,11 +25,36 @@ import json
 from pathlib import Path
 import re
 import shutil
+import subprocess
 from typing import Any
 from urllib.parse import urlparse
 from zoneinfo import ZoneInfo
 
 HERE = Path(__file__).resolve().parent
+REPO_ROOT = HERE if (HERE / "elm").is_dir() else HERE.parent
+ELM_DIR = REPO_ROOT / "elm"
+ELM_DIST_DIR = ELM_DIR / "dist"
+ELM_OBSERVATORY_JS = ELM_DIST_DIR / "observatory.js"
+ELM_STATIC_DIR = ELM_DIR / "static"
+ELM_STYLE_CSS = ELM_STATIC_DIR / "style.css"
+
+
+def _get_observatory_js() -> str:
+    """Read compiled Elm bundle, building it if missing."""
+    if not ELM_OBSERVATORY_JS.is_file():
+        subprocess.run(["npm", "run", "build"], cwd=ELM_DIR, check=True)
+    return ELM_OBSERVATORY_JS.read_text(encoding="utf-8")
+
+
+def _get_style_css() -> str:
+    """Read consolidated Elm styles, guaranteeing zero `#` characters."""
+    if ELM_STYLE_CSS.is_file():
+        css = ELM_STYLE_CSS.read_text(encoding="utf-8")
+        assert "#" not in css, f"Zero-hash violated in {ELM_STYLE_CSS}"
+        return css
+    return ""
+
+
 ITEM_FILE_RE = re.compile(r"^show-me-hn-(\d+)\.html$")
 PUBLISHED_ITEM_RE = re.compile(r"^(\d+)\.html$")
 OBS_JSON_RE = re.compile(
@@ -198,8 +223,9 @@ def extract_item_summary(html_path: Path, item_id: int) -> dict[str, Any]:
     t2_utc = str(manifest.get("t2_ref_utc") or "")
     return {
         "story_id": item_id,
-        "story_title": str(title),
+        "story_title": _safe_no_hash(title),
         "story_url": story_url,
+        "item_href": f"./item?id={item_id}",
         "points": points,
         "story_author": story_author,
         "total_comments": int(len(comments)),
@@ -460,102 +486,46 @@ def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -
     return doc
 
 
-def _render_item_row_html(it: dict[str, Any], *, rank: int) -> str:
-    """Render a classic Hacker News 3-row item block (`athing`, `subtext`, `spacer`) with zero `#`."""
-    sid = int(it["story_id"])
-    title = _safe_no_hash(it["story_title"])
-    raw_url = str(it.get("story_url") or "")
-    sitebit = _format_hn_sitebit(raw_url)
-    ext_href = _safe_url_no_hash(raw_url) if sitebit else ""
-    item_href = f"./item?id={sid}"
-
-    if ext_href:
-        title_link = f'<a class="storylink" href="{ext_href}">{title}</a>'
-        sitebit_html = f' <span class="sitebit comhead">(<a href="{ext_href}">{sitebit}</a>)</span>'
-    else:
-        title_link = f'<a class="storylink" href="{item_href}">{title}</a>'
-        sitebit_html = ""
-
-    points = int(it.get("points") or 0)
-    author = _safe_no_hash(it["story_author"]) if it.get("story_author") else ""
-    total = int(it.get("total_comments") or 0)
-    gold = int(it.get("epistemic_gold") or 0)
-    grounded = int(it.get("grounded_analysis") or 0)
-    useful = gold + grounded
-    bs_pct = max(0.0, 100.0 - (100.0 * useful / max(1, total))) if total else 0.0
-
-    meta_bits: list[str] = []
-    if points > 0 and author:
-        pt_word = "point" if points == 1 else "points"
-        meta_bits.append(f"{points} {pt_word} by {author}")
-    elif points > 0:
-        pt_word = "point" if points == 1 else "points"
-        meta_bits.append(f"{points} {pt_word}")
-    elif author:
-        meta_bits.append(f"by {author}")
-
-    if total > 0:
-        c_word = "comment" if total == 1 else "comments"
-        meta_bits.append(f'<a href="{item_href}">{total:,} {c_word}</a>')
-        meta_bits.append(
-            f'<a href="{item_href}">{gold} gold &middot; {bs_pct:.0f}% bullshit</a>'
-        )
-    else:
-        meta_bits.append(f'<a href="{item_href}">discuss</a>')
-
-    meta_bits.append(f'<a href="https://news.ycombinator.com/item?id={sid}">hn</a>')
-    subtext_html = " | ".join(meta_bits)
-
-    return f"""<tr class="athing">
-            <td class="title rank">{rank}.</td>
-            <td class="title"><span class="titleline">{title_link}{sitebit_html}</span></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td class="subtext">{subtext_html}</td>
-          </tr>
-          <tr class="spacer"><td colspan="2"></td></tr>"""
-
-
 def render_index_html(
     items: list[dict[str, Any]],
     *,
-    repo: str,
-    server_url: str,
-    workflow_file: str,
+    repo: str = "",
+    server_url: str = "",
+    workflow_file: str = "",
     frontpage_ids: Sequence[int] = (),
     frontpage_synced_utc: str = "",
     updated_utc: str = "",
 ) -> str:
-    """Build zero-hash Hacker News style front-page index (`news.ycombinator.com` layout)."""
-    actions_url = (
-        f"{server_url.rstrip('/')}/{repo.strip('/')}/actions/workflows/{workflow_file}"
-        if repo
-        else ""
-    )
+    """Build zero-hash Hacker News front-page index mounting Elm observatory."""
     by_id = {int(it["story_id"]): it for it in items}
-    fp_ordered = [by_id[int(sid)] for sid in frontpage_ids if int(sid) in by_id]
+    fp_ordered = [sid for sid in frontpage_ids if int(sid) in by_id]
 
-    main_items = fp_ordered if fp_ordered else list(items)
+    formatted_updated = _format_utc_stamp(updated_utc or frontpage_synced_utc)
 
-    if main_items:
-        main_rows_html = "\n          ".join(
-            _render_item_row_html(it, rank=idx)
-            for idx, it in enumerate(main_items, start=1)
-        )
-    else:
-        main_rows_html = (
-            '<tr><td colspan="2" class="empty-msg">No stories built yet. '
-            "Run the GitHub Actions frontpage workflow or paste an item ID below.</td></tr>"
-        )
+    clean_items: list[dict[str, Any]] = []
+    for it in items:
+        clean_it = dict(it)
+        clean_it["story_title"] = _safe_no_hash(clean_it.get("story_title") or "")
+        clean_it["item_href"] = f"./item?id={clean_it['story_id']}"
+        clean_items.append(clean_it)
 
-    utc_stamp = _format_utc_stamp(updated_utc or frontpage_synced_utc)
-
-    footer_bits = ["Hourly updates", f"{len(items)} published"]
-    footer_bits.append(
-        '<a href="https://news.ycombinator.com/">news.ycombinator.com</a>'
+    catalog = {
+        "updated_utc": formatted_updated,
+        "total_published": len(clean_items),
+        "total_size_mb": round(
+            sum(float(it.get("size_kb") or 0.0) for it in clean_items) / 1024.0, 2
+        ),
+        "frontpage_synced_utc": frontpage_synced_utc,
+        "frontpage_ids": fp_ordered,
+        "uri_template": "./item?id={story_id}",
+        "items": clean_items,
+    }
+    catalog_json = (
+        json.dumps(catalog, ensure_ascii=False)
+        .replace("#", "\\u0023")
     )
-    footer_links_html = " | ".join(footer_bits)
+    observatory_js = _get_observatory_js()
+    style_css = _get_style_css()
 
     doc = f"""<!doctype html>
 <html lang="en">
@@ -564,238 +534,24 @@ def render_index_html(
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Better Signal News</title>
   <style>
-    * {{ box-sizing: border-box; }}
-    body {{
-      margin: 8px;
-      padding: 0;
-      background: rgb(255, 255, 255);
-      color: rgb(0, 0, 0);
-      font: 8pt/1.35 Verdana, Geneva, sans-serif;
-    }}
-    .wrap {{
-      width: 85%;
-      max-width: 1240px;
-      margin: 0 auto;
-      background: rgb(246, 246, 239);
-    }}
-    .topbar {{
-      background: rgb(255, 102, 0);
-      padding: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      min-height: 24px;
-    }}
-    .topbar-left {{
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 5px;
-      font-size: 10pt;
-      line-height: 12pt;
-      color: rgb(0, 0, 0);
-    }}
-    .hn-logo {{
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      line-height: 18px;
-      text-align: center;
-      border: 1px solid rgb(255, 255, 255);
-      color: rgb(255, 255, 255);
-      font-weight: 700;
-      font-size: 13px;
-      text-decoration: none;
-      flex-shrink: 0;
-    }}
-    a.hnname {{
-      color: rgb(0, 0, 0);
-      font-weight: 700;
-      text-decoration: none;
-      margin-right: 4px;
-    }}
-    .pagetop, .pagetop a, .topbar-right, .topbar-right a {{
-      color: rgb(0, 0, 0);
-      font-size: 10pt;
-      text-decoration: none;
-    }}
-    .topbar-right {{
-      padding-right: 4px;
-      white-space: nowrap;
-      font-size: 9pt;
-      text-transform: none;
-    }}
-    button.nav-btn {{
-      appearance: none;
-      border: 0;
-      background: transparent;
-      padding: 0;
-      margin: 0;
-      font: inherit;
-      color: rgb(0, 0, 0);
-      cursor: pointer;
-    }}
-    .pagetop a:hover, .topbar-right a:hover {{
-      text-decoration: underline;
-    }}
-    .list-pad {{
-      padding: 10px 8px 4px 4px;
-    }}
-    table.itemlist {{
-      border-collapse: collapse;
-      border: 0;
-      width: 100%;
-    }}
-    td.title {{
-      font-size: 10pt;
-      line-height: 14pt;
-      vertical-align: top;
-    }}
-    td.rank {{
-      color: rgb(130, 130, 130);
-      text-align: right;
-      padding-right: 4px;
-      white-space: nowrap;
-      width: 1%;
-      font-variant-numeric: tabular-nums;
-    }}
-    td.votelinks {{
-      vertical-align: top;
-      text-align: center;
-      width: 14px;
-      padding: 0 3px 0 1px;
-    }}
-    a.votearrow {{
-      color: rgb(153, 153, 153);
-      font-size: 9pt;
-      line-height: 14pt;
-      text-decoration: none;
-      display: inline-block;
-    }}
-    a.storylink {{
-      color: rgb(0, 0, 0);
-      text-decoration: none;
-    }}
-    a.storylink:visited {{
-      color: rgb(130, 130, 130);
-    }}
-    .comhead, .comhead a {{
-      font-size: 8pt;
-      color: rgb(130, 130, 130);
-      text-decoration: none;
-    }}
-    .comhead a:hover, td.subtext a:hover {{
-      text-decoration: underline;
-    }}
-    td.subtext {{
-      font-size: 7.5pt;
-      line-height: 11pt;
-      color: rgb(130, 130, 130);
-      padding-bottom: 1px;
-    }}
-    td.subtext a {{
-      color: rgb(130, 130, 130);
-      text-decoration: none;
-    }}
-    tr.spacer td {{
-      height: 5px;
-    }}
-    td.empty-msg {{
-      padding: 16px 12px;
-      color: rgb(130, 130, 130);
-      font-size: 9.5pt;
-    }}
-    details.past-drawer {{
-      margin: 6px 0 2px;
-    }}
-    summary.morelink {{
-      list-style: none;
-      cursor: pointer;
-      padding: 4px 0 6px 32px;
-      font-size: 10pt;
-      color: rgb(0, 0, 0);
-      user-select: none;
-    }}
-    summary.morelink::-webkit-details-marker {{ display: none; }}
-    summary.morelink:hover {{ text-decoration: underline; }}
-    table.pastlist {{
-      margin-top: 4px;
-      padding-top: 6px;
-      border-top: 1px solid rgb(226, 226, 218);
-    }}
-    .hn-footer {{
-      margin-top: 12px;
-      border-top: 2px solid rgb(255, 102, 0);
-      padding: 12px 10px 18px;
-      text-align: center;
-      font-size: 8pt;
-      color: rgb(130, 130, 130);
-    }}
-    .yclinks a {{
-      color: rgb(130, 130, 130);
-      text-decoration: none;
-    }}
-    .yclinks a:hover {{
-      text-decoration: underline;
-    }}
-    form.hn-search {{
-      margin-top: 10px;
-      color: rgb(130, 130, 130);
-      font-size: 8.5pt;
-    }}
-    form.hn-search input {{
-      font: 9pt/1.2 Verdana, Geneva, sans-serif;
-      padding: 2px 5px;
-      border: 1px solid rgb(130, 130, 130);
-      background: rgb(255, 255, 255);
-      color: rgb(0, 0, 0);
-      max-width: 86vw;
-    }}
-    @media (max-width: 750px) {{
-      body {{ margin: 0; }}
-      .wrap {{ width: 100%; }}
-      .topbar {{ padding: 4px 6px; flex-wrap: wrap; }}
-      .topbar-right {{ font-size: 8pt; padding-right: 2px; }}
-      td.title {{ font-size: 11pt; line-height: 15pt; }}
-      td.subtext {{ font-size: 8.5pt; line-height: 13pt; }}
-      tr.spacer td {{ height: 7px; }}
-    }}
+{style_css}
   </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="topbar">
-    <div class="topbar-left">
-      <a class="hn-logo" href="./">BS</a>
-      <a class="hnname" href="./">Better Signal News</a>
-    </div>
-    <div class="topbar-right">Updated {utc_stamp}</div>
-  </div>
-
-  <div class="list-pad">
-    <table class="itemlist" id="frontpageList">
-      <tbody>
-        {main_rows_html}
-      </tbody>
-    </table>
-  </div>
-
-  <div class="hn-footer">
-    <div class="yclinks">{footer_links_html}</div>
-    <form class="hn-search" id="jumpForm">
-      <label for="hnInput">Open item:</label>
-      <input type="text" id="hnInput" size="28" placeholder="ID or news.ycombinator.com/item?id=..." required>
-    </form>
-  </div>
-</div>
+<div id="elm-root"></div>
+<script id="catalogData" type="application/json">{catalog_json}</script>
 <script>
-document.getElementById("jumpForm").addEventListener("submit", (ev) => {{
-  ev.preventDefault();
-  const raw = document.getElementById("hnInput").value.trim();
-  const m = raw.match(/[?&]id=(\\d+)/) || raw.match(/^(\\d+)$/) || raw.match(/(\\d{{5,}})/);
-  if (m) {{
-    window.location.href = `./item?id=${{encodeURIComponent(m[1])}}`;
+{observatory_js}
+</script>
+<script>
+document.addEventListener("submit", (ev) => {{
+  if (ev.target && ev.target.id === "jumpForm") {{
+    ev.preventDefault();
+    const raw = (document.getElementById("hnInput")?.value || "").trim();
+    const m = raw.match(/[?&]id=(\\d+)/) || raw.match(/^(\\d+)$/) || raw.match(/(\\d{{5,}})/);
+    if (m) {{
+      window.location.href = `./item?id=${{encodeURIComponent(m[1])}}`;
+    }}
   }}
 }});
 </script>

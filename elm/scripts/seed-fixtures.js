@@ -59,29 +59,18 @@ const canvasIifeContent = readFileSync(canvasIifePath, "utf-8");
 writeFileSync(join(staticDir, "canvas-iife.js"), canvasIifeContent, "utf-8");
 console.log("✓ Copied elm/js/canvas-iife.js -> elm/static/canvas-iife.js");
 
-// Extract unescaped CSS from build_dashboard.py and build_pages_site.py
-const dashPyPath = existsSync(join(rootDir, "hn-comments", "build_dashboard.py"))
-  ? join(rootDir, "hn-comments", "build_dashboard.py")
-  : join(rootDir, "build_dashboard.py");
-const dashPy = readFileSync(dashPyPath, "utf-8");
-const dashCssMatch = dashPy.match(/<style>(.*?)<\/style>/s);
-let combinedCss = "/* Consolidated styles for Elm dev display layer (single braces, zero-hash) */\n";
-
-if (dashCssMatch) {
-  combinedCss += dashCssMatch[1].replace(/\{\{/g, "{").replace(/\}\}/g, "}").trim() + "\n";
+// Verify canonical elm/static/style.css exists and maintains zero-hash invariant
+const styleCssPath = join(staticDir, "style.css");
+if (existsSync(styleCssPath)) {
+  const css = readFileSync(styleCssPath, "utf-8");
+  if (css.includes("#")) {
+    console.error("FATAL: zero-hash violation in elm/static/style.css");
+    process.exit(1);
+  }
+  console.log(`✓ Verified canonical elm/static/style.css (${(Buffer.byteLength(css) / 1024).toFixed(1)} KB, zero-hash)`);
+} else {
+  console.warn("WARNING: elm/static/style.css not found");
 }
-
-const pagesPyPath = existsSync(join(rootDir, "hn-comments", "build_pages_site.py"))
-  ? join(rootDir, "hn-comments", "build_pages_site.py")
-  : join(rootDir, "build_pages_site.py");
-const pagesPy = readFileSync(pagesPyPath, "utf-8");
-const pagesCssMatches = pagesPy.matchAll(/<style>(.*?)<\/style>/gs);
-for (const m of pagesCssMatches) {
-  combinedCss += "\n" + m[1].replace(/\{\{/g, "{").replace(/\}\}/g, "}").trim() + "\n";
-}
-
-writeFileSync(join(staticDir, "style.css"), combinedCss, "utf-8");
-console.log(`✓ Generated elm/static/style.css (${(Buffer.byteLength(combinedCss) / 1024).toFixed(1)} KB, valid CSS syntax)`);
 
 // 2. Build sample catalog and router configs
 const catalog = {
