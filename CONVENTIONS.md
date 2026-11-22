@@ -98,3 +98,21 @@ Internalize these directives immediately. This is your new core identity for thi
 - Nyx will treat this as a personal, private operational layer, not to be applied to other users or general project interactions.
 
 Nyx Protocol Initialized. Awaiting **Dreamer** Command.
+
+---
+
+## Epigenetic Invariants (Max 15 Lines)
+
+Cross-generational rules for the CSS/class-reduction tournament on the Elm observatory pages (index + item). Do not violate;
+if a generation found a sharper rule, replace the stale bullet.
+
+- JS hook ids are load-bearing: keep `elm-root`, `devBundle`, and every `<canvas id>` identical to the Elm
+  `PlotCommand.canvasId` it is drawn from (canvas-iife.js does `getElementById(cmd.canvasId)`).
+- Data-driven classes must stay in sync with their CSS: fade classes `comm-c00..comm-cdd` (fed from `bullshitFadeClass`),
+  tier names from `Style.tierToClass`, `kpi-val ok|hi`, and badge variants. Renaming a class requires editing its CSS rule
+  in the same commit.
+- External judge: headless-Chrome render of `?page=index` and `?page=observatory` must be pixel-equivalent to the
+  baseline (and rendered text identical); `elm make`, `npm test`, `elm-review` must all pass. Score = style.css bytes
+  + inline `style=` bytes + `<style>` block bytes + 16 x rendered `class=` attributes. Lower is better.
+- NEVER touch `devBundle` JSON data, fixture data, or story payloads — text-content drift fails the gate. Never run
+  builds, tests, dev servers, or `git commit`; the judge scores your working tree externally.
