@@ -24,7 +24,7 @@ view model =
         Just err ->
             div [ class "wrap" ]
                 [ div [ class "topbar" ]
-                    [ text "HN Epistemic Observatory — Elm" ]
+                    [ text "Better Signal News" ]
                 , div [ id "error" ]
                     [ text ("Payload decode error: " ++ err) ]
                 ]

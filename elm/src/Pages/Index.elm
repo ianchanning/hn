@@ -161,14 +161,14 @@ renderItemRow rank it =
                     )
                 ]
             , text " | "
-            , a [ href itemHref ]
-                [ text (formatThousands it.totalComments ++ " comments") ]
+            , a [ href ("https://news.ycombinator.com/item?id=" ++ String.fromInt it.storyId) ]
+                [ text "hn" ]
             , text " | "
             , a [ href itemHref ]
                 [ text (String.fromInt it.epistemicGold ++ " gold · " ++ String.fromInt (round bsPct) ++ "% bullshit") ]
             , text " | "
-            , a [ href ("https://news.ycombinator.com/item?id=" ++ String.fromInt it.storyId) ]
-                [ text "hn" ]
+            , a [ href itemHref ]
+                [ text (formatThousands it.totalComments ++ " comments") ]
             ]
     in
     [ tr [ class "athing" ]
