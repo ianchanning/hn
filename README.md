@@ -1,4 +1,4 @@
-# HN Epistemic Observatory
+# Better Signal News
 
 **Replace Hacker News's recency-and-snark sorting with information-theoretic, citation-grounded epistemic ranking — for any HN thread.**
 
@@ -6,7 +6,7 @@ Zero-dependency Python (`>= 3.11`, stdlib only) ingestion pipeline, five-potenti
 
 ---
 
-## Why Live Hacker News Buries Primary Signal
+## Hacker News buries the primary signal
 
 Auditing full Hacker News comment trees exposes four structural failure modes in production `news.arc` ranking:
 
