@@ -38,7 +38,7 @@ viewExplore model payload =
                     )
     in
     details (class "proof-drawer" :: id "labDrawer" :: openAttr)
-        [ summary [ class "hn-summary", style "display" "none" ] []
+        [ summary [] []
         , div [ class "proof-body grid-12" ]
             [ div [ class "col-3" ]
                 [ viewTunerDrawer model payload totalComments cw ]

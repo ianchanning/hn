@@ -8,7 +8,7 @@ the `assert "#" not in html_doc` invariant from the Python pipeline.
 -}
 
 import Html
-import Html.Attributes exposing (style, attribute)
+import Html.Attributes exposing (class, style, attribute)
 import Observatory.Types exposing (Colour, Tier(..))
 
 
@@ -17,6 +17,18 @@ import Observatory.Types exposing (Colour, Tier(..))
 role : String -> Html.Attribute msg
 role value =
     attribute "role" value
+
+
+{-| Single `class` attribute, omitted entirely when the name is empty
+    (avoids emitting a useless `class=""` in the rendered DOM).
+-}
+classIf : String -> List (Html.Attribute msg)
+classIf name =
+    if String.isEmpty name then
+        []
+
+    else
+        [ class name ]
 
 {-| Convert Colour to CSS rgba() string.
 -}
