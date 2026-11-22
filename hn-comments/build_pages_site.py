@@ -245,7 +245,7 @@ def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -
       color: rgb(0, 0, 0);
       font: 8pt/1.35 Verdana, Geneva, sans-serif;
     }}
-    .hnmain {{
+    .wrap {{
       width: 85%;
       max-width: 1240px;
       margin: 0 auto;
@@ -353,7 +353,7 @@ def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -
     }}
     @media (max-width: 750px) {{
       body {{ margin: 0; }}
-      .hnmain {{ width: 100%; }}
+      .wrap {{ width: 100%; }}
       .topbar {{ padding: 4px 6px; flex-wrap: wrap; }}
       .topbar-right {{ font-size: 8pt; padding-right: 2px; }}
       td.title {{ font-size: 11pt; line-height: 15pt; }}
@@ -363,7 +363,7 @@ def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -
   </style>
 </head>
 <body>
-<div class="hnmain">
+<div class="wrap">
   <div class="topbar">
     <div class="topbar-left">
       <a class="hn-logo" href="./">BS</a>
@@ -572,7 +572,7 @@ def render_index_html(
       color: rgb(0, 0, 0);
       font: 8pt/1.35 Verdana, Geneva, sans-serif;
     }}
-    .hnmain {{
+    .wrap {{
       width: 85%;
       max-width: 1240px;
       margin: 0 auto;
@@ -754,7 +754,7 @@ def render_index_html(
     }}
     @media (max-width: 750px) {{
       body {{ margin: 0; }}
-      .hnmain {{ width: 100%; }}
+      .wrap {{ width: 100%; }}
       .topbar {{ padding: 4px 6px; flex-wrap: wrap; }}
       .topbar-right {{ font-size: 8pt; padding-right: 2px; }}
       td.title {{ font-size: 11pt; line-height: 15pt; }}
@@ -764,7 +764,7 @@ def render_index_html(
   </style>
 </head>
 <body>
-<div class="hnmain">
+<div class="wrap">
   <div class="topbar">
     <div class="topbar-left">
       <a class="hn-logo" href="./">BS</a>

@@ -62,7 +62,7 @@ view model =
         publishedCount =
             List.length model.items
     in
-    div [ class "hnmain" ]
+    div [ class "wrap" ]
         [ div [ class "topbar" ]
             [ div [ class "topbar-left" ]
                 [ a [ class "hn-logo", href "./" ] [ text "BS" ]

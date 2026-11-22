@@ -295,7 +295,7 @@ class TestGitHubPagesMirror(unittest.TestCase):
 
             idx_html = (site_dir / "index.html").read_text(encoding="utf-8")
             self.assertNotIn("#", idx_html)
-            self.assertIn('class="hnmain"', idx_html)
+            self.assertIn('class="wrap"', idx_html)
             self.assertIn("Better Signal News", idx_html)
             self.assertIn('<div class="topbar-right">Updated 2026-11-14 16:00 UTC</div>', idx_html)
             self.assertIn(">blog.rust-lang.org</a>)", idx_html)

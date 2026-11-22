@@ -3,22 +3,22 @@ module Pages.Router exposing (view)
 {-| /item?id=<id> SPA router (replaces render\_item\_router\_html in build\_pages\_site.py).
 -}
 
-import Html exposing (Html, a, code, div, h1, p, pre, text)
+import Html exposing (Html, a, code, div, header, p, pre, text)
 import Html.Attributes exposing (class, href, id)
 import Observatory.Types exposing (RouterConfig, RouterState(..))
 
 
 view : RouterState -> Html msg
 view state =
-    div [ class "hnmain" ]
-        [ div [ class "topbar" ]
-            [ div [ class "topbar-left" ]
-                [ a [ class "hn-logo", href "./" ] [ text "BS" ]
-                , a [ class "hnname", href "./" ] [ text "Better Signal News" ]
+    div [ class "wrap" ]
+        [ header [ class "hn-header" ]
+            [ div [ class "topbar" ]
+                [ div [ class "topbar-left" ]
+                    [ a [ class "hn-logo", href "./" ] [ text "BS" ]
+                    , a [ class "hnname", href "./" ] [ text "Better Signal News" ]
+                    ]
+                , div [ class "topbar-right" ] [ text "NYX OBSERVATORY // HN URI MIRROR" ]
                 ]
-            ]
-        , div [ class "shell", id "routerStatus" ]
-            [ div [ class "eyebrow" ] [ text "NYX OBSERVATORY // HN URI MIRROR" ]
             , viewStateContent state
             ]
         ]
@@ -28,9 +28,9 @@ viewStateContent : RouterState -> Html msg
 viewStateContent state =
     case state of
         ResolvingItem itemId ->
-            div []
-                [ h1 [ id "statusTitle" ] [ text "Loading Better Signal News..." ]
-                , p [ id "statusBody" ]
+            div [ class "fatitem-box", id "routerStatus" ]
+                [ div [ class "story-titleline", id "statusTitle" ] [ text "Loading Better Signal News..." ]
+                , div [ class "subtext", id "statusBody" ]
                     [ text "Resolving "
                     , code [] [ text ("/item?id=" ++ String.fromInt itemId) ]
                     , text " from static observatory archive."
@@ -38,8 +38,8 @@ viewStateContent state =
                 ]
 
         ItemLoaded _ ->
-            div []
-                [ h1 [ id "statusTitle" ] [ text "Observatory Loaded" ]
+            div [ class "fatitem-box", id "routerStatus" ]
+                [ div [ class "story-titleline", id "statusTitle" ] [ text "Observatory Loaded" ]
                 ]
 
         ItemNotBuilt itemId cfg ->
@@ -67,10 +67,10 @@ viewStateContent state =
                            , a [ class "btn alt", href "./" ] [ text "Published Index" ]
                            ]
             in
-            div []
-                [ h1 [ id "statusTitle" ]
+            div [ class "fatitem-box", id "routerStatus" ]
+                [ div [ class "story-titleline", id "statusTitle" ]
                     [ text ("HN Item " ++ String.fromInt itemId ++ " Not Yet Built") ]
-                , p [ id "statusBody" ]
+                , div [ class "subtext", id "statusBody" ]
                     [ text "No pre-built observatory was found at "
                     , code [] [ text ("/items/" ++ String.fromInt itemId ++ ".html") ]
                     , text ". Trigger the GitHub Actions workflow with item ID "
@@ -84,9 +84,11 @@ viewStateContent state =
                 ]
 
         InvalidItemId ->
-            div []
-                [ h1 [ id "statusTitle" ] [ text "Missing or Invalid Hacker News Item ID" ]
-                , p [ id "statusBody" ]
+            div [ class "fatitem-box", id "routerStatus" ]
+                [ div [ class "story-titleline", id "statusTitle" ]
+                    [ text "Missing or Invalid Hacker News Item ID" ]
+
+                , div [ class "subtext", id "statusBody" ]
                     [ text "Append "
                     , code [] [ text "?id=50472038" ]
                     , text " just like Hacker News ("
