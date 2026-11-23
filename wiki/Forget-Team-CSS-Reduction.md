@@ -15,12 +15,12 @@ When running a multi-agent `forget-team` tournament, the External Judge must enf
 - **Score formula (lower is better):** `style.css bytes + <style> bytes + rendered inline style= bytes + 16 × rendered class= attrs` (across `?page=index` and `?page=observatory`).
 - **Trajectory:**
 
-| Milestone | Commit | Score | `style.css` | Inline `style=` | `class=` attrs | Diff px |
-|---|---|---:|---:|---:|---:|---:|
-| Baseline | `8b9a6e4` | 34,115 | 19,990 B | 5,069 B | 566 | 0 |
-| Round 1 Best (`w4`) | `717518c` | 24,319 | 17,098 B | 2,725 B | 281 | 0 |
-| Round 2 Best (`w4`) | `6f1c91f` | 15,773 | 11,194 B | 1,027 B | 222 | 0 |
-| **Shipped (PR #2 + audit)** | `7293b80` | **16,001** | **11,422 B** | **1,027 B** | **222** | **0** |
+| Milestone                   | Commit    |      Score |  `style.css` | Inline `style=` | `class=` attrs | Diff px |
+| --------------------------- | --------- | ---------: | -----------: | --------------: | -------------: | ------: |
+| Baseline                    | `8b9a6e4` |     34,115 |     19,990 B |         5,069 B |            566 |       0 |
+| Round 1 Best (`w4`)         | `717518c` |     24,319 |     17,098 B |         2,725 B |            281 |       0 |
+| Round 2 Best (`w4`)         | `6f1c91f` |     15,773 |     11,194 B |         1,027 B |            222 |       0 |
+| **Shipped (PR #2 + audit)** | `7293b80` | **16,001** | **11,422 B** |     **1,027 B** |        **222** |   **0** |
 
 - **Net gain:** **−18,114 pts (−53.1%)**, `style.css` −42.9%, inline styles −79.7%, rendered `class=` attrs −60.8%, **0 differing pixels** on both pages, 37/37 `elm-test`, 0 `elm-review` errors, 16/16 Python tests.
 
