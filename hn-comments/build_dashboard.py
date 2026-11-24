@@ -58,7 +58,7 @@ LEGACY_FACET_LABELS: dict[str, str] = {
 def _safe_html_no_hash(text: str) -> str:
     """Escape HTML special characters and guarantee zero literal `#` characters without mangling quotes."""
     clean = html.unescape(str(text or "")).replace("#", "No. ")
-    return html.escape(clean, quote=False).replace('"', "&quot;")
+    return html.escape(clean, quote=False)
 
 
 def _safe_url_no_hash(url: str) -> str:
@@ -471,7 +471,7 @@ def build_html(
         )
 
     manifest["points"] = points
-    manifest["story_author"] = safe_story_author
+    manifest["story_author"] = str(story_author or "")
     manifest["story_title"] = story_title
     manifest["story_url"] = story_url
 
