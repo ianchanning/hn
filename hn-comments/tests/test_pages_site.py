@@ -78,6 +78,8 @@ class TestGitHubPagesMirror(unittest.TestCase):
             self.assertEqual(res["copied_ids"], [50472038])
             self.assertEqual(res["published_ids"], [50472038, 50000001])
             self.assertTrue((site_dir / ".nojekyll").is_file())
+            self.assertTrue((site_dir / "favicon-32x32.png").is_file())
+            self.assertTrue((site_dir / "site.webmanifest").is_file())
 
             for name in ("index.html", "item.html", "404.html", "items/50472038.html", "items/50000001.html"):
                 content = (site_dir / name).read_text(encoding="utf-8")
@@ -88,6 +90,8 @@ class TestGitHubPagesMirror(unittest.TestCase):
             self.assertEqual(catalog["total_published"], 2)
 
             index_txt = (site_dir / "index.html").read_text(encoding="utf-8")
+            self.assertIn('<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">', index_txt)
+            self.assertIn('<link rel="manifest" href="/site.webmanifest">', index_txt)
             self.assertIn("./item?id=50472038", index_txt)
             self.assertIn("./item?id=50000001", index_txt)
             self.assertIn("Don't Miss \\\"Wendy's\\\" \\u00231 Launch", index_txt)

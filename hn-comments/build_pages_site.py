@@ -242,6 +242,10 @@ def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Item Router // Better Signal News</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
   <style>
     * {{ box-sizing: border-box; }}
     body {{
@@ -513,6 +517,10 @@ def render_index_html(
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Better Signal News</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
   <style>
 {style_css}
   </style>
@@ -571,6 +579,19 @@ def build_pages_site(
     items_dir = site_dir / "items"
     items_dir.mkdir(parents=True, exist_ok=True)
     forced = set(force_ids or set())
+
+    # Copy favicon assets and PWA manifest to site root if present in elm/static/
+    for fname in (
+        "apple-touch-icon.png",
+        "favicon-32x32.png",
+        "favicon-16x16.png",
+        "favicon.ico",
+        "site.webmanifest",
+        "android-chrome-192x192.png",
+    ):
+        src_fav = ELM_STATIC_DIR / fname
+        if src_fav.is_file():
+            shutil.copyfile(src_fav, site_dir / fname)
 
     # Copy `show-me-hn-<id>.html` observatories without regressing fresher gh-pages builds
     copied_ids: list[int] = []
