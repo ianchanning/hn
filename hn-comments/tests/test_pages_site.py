@@ -90,9 +90,9 @@ class TestGitHubPagesMirror(unittest.TestCase):
             index_txt = (site_dir / "index.html").read_text(encoding="utf-8")
             self.assertIn("./item?id=50472038", index_txt)
             self.assertIn("./item?id=50000001", index_txt)
-            self.assertIn("Don't Miss \\\"Wendy's\\\" No. 1 Launch", index_txt)
+            self.assertIn("Don't Miss \\\"Wendy's\\\" \\u00231 Launch", index_txt)
             self.assertNotIn("&quot;", (site_dir / "catalog.json").read_text(encoding="utf-8"))
-            self.assertEqual(catalog["items"][1]["story_title"], 'Don\'t Miss "Wendy\'s" No. 1 Launch')
+            self.assertEqual(catalog["items"][1]["story_title"], 'Don\'t Miss "Wendy\'s" #1 Launch')
             self.assertNotIn("&No. x27;", index_txt)
             self.assertNotIn("&#x27;", index_txt)
 

@@ -20,14 +20,12 @@ Layout emitted into `--site-dir`:
 import argparse
 from collections.abc import Sequence
 from datetime import UTC, datetime, timedelta
-import html
 import json
 from pathlib import Path
 import re
 import shutil
 import subprocess
 from typing import Any
-from urllib.parse import urlparse
 from zoneinfo import ZoneInfo
 
 HERE = Path(__file__).resolve().parent
@@ -81,13 +79,8 @@ OBS_JSON_RE = re.compile(
 )
 
 
-def _safe_no_hash(text: str) -> str:
-    """Sanitize text and ensure zero literal `#` characters without mangling quotes or injecting HTML entities."""
-    return html.unescape(str(text or "")).replace("#", "No. ")
-
-
 def _format_utc_stamp(raw_utc: str) -> str:
-    """Format an ISO timestamp as `YYYY-MM-DD HH:MM UTC` (zero `#` characters)."""
+    """Format an ISO timestamp as `YYYY-MM-DD HH:MM UTC`."""
     cleaned = str(raw_utc or "").strip()
     if cleaned:
         try:
@@ -95,38 +88,8 @@ def _format_utc_stamp(raw_utc: str) -> str:
             dt_utc = dt.astimezone(UTC) if dt.tzinfo else dt.replace(tzinfo=UTC)
             return dt_utc.strftime("%Y-%m-%d %H:%M UTC")
         except ValueError:
-            return f"{_safe_no_hash(cleaned[:16].replace('T', ' '))} UTC"
+            return f"{cleaned[:16].replace('T', ' ')} UTC"
     return datetime.now(tz=UTC).strftime("%Y-%m-%d %H:%M UTC")
-
-
-def _safe_url_no_hash(url: str) -> str:
-    """Sanitize an external http(s) URL and strip `#fragment` for zero-hash HTML."""
-    raw = str(url or "").split("#", 1)[0].strip()
-    if not raw:
-        return ""
-    parsed = urlparse(raw)
-    if parsed.scheme not in ("http", "https") or not parsed.netloc:
-        return ""
-    clean = html.unescape(raw).replace("#", "")
-    return html.escape(clean, quote=False).replace('"', "&quot;")
-
-
-def _format_hn_sitebit(url: str) -> str:
-    """Format an HN-style `(domain)` comhead label, or empty string for internal/empty URLs."""
-    raw = str(url or "").split("#", 1)[0].strip()
-    if not raw:
-        return ""
-    parsed = urlparse(raw)
-    if parsed.scheme not in ("http", "https") or not parsed.hostname:
-        return ""
-    host = parsed.hostname.lower().removeprefix("www.")
-    if host == "news.ycombinator.com":
-        return ""
-    if host in ("github.com", "gitlab.com"):
-        parts = [seg for seg in parsed.path.split("/") if seg]
-        if parts:
-            return _safe_no_hash(f"{host}/{parts[0].lower()}")
-    return _safe_no_hash(host)
 
 
 def evaluate_schedule_window(
@@ -240,7 +203,7 @@ def extract_item_summary(html_path: Path, item_id: int) -> dict[str, Any]:
     t2_utc = str(manifest.get("t2_ref_utc") or "")
     return {
         "story_id": item_id,
-        "story_title": _safe_no_hash(title),
+        "story_title": str(title),
         "story_url": story_url,
         "item_href": f"./item?id={item_id}",
         "points": points,
@@ -522,7 +485,7 @@ def render_index_html(
     clean_items: list[dict[str, Any]] = []
     for it in items:
         clean_it = dict(it)
-        clean_it["story_title"] = _safe_no_hash(clean_it.get("story_title") or "")
+        clean_it["story_title"] = str(clean_it.get("story_title") or "")
         clean_it["item_href"] = f"./item?id={clean_it['story_id']}"
         clean_items.append(clean_it)
 
