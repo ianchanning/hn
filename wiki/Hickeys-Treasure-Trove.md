@@ -60,6 +60,44 @@ Upgrade the static 2-screenshot judge into a fast (~5s) headless-Chrome **6-Stat
 ### 9. Agentic Meta-Experiments (Using `hn` as the Benchmark)
 - **Wiki A/B Ablation (Testing Karpathy's LLM-Wiki Hypothesis):** Measure tokens, compile retries, and Goodhart escape rate across 3 arms on an identical Elm+Python task: (A) raw repo + tests only, (B) capped 15-line `AGENTS.md` epigenetic invariants only, (C) full `wiki/index.md` progressive disclosure.
 - **Asymmetric `forget-team` (3 Builders + 1 Goodhart Hunter):** Dedicate worker `w4` solely to red-teaming `w1..w3` diffs and writing failing invariant tests to expose judge blind spots automatically.
+### 10. Dreamer's dream
+- Purity I guess
+- The experiment is to continue the HTML/CSS simplicity experiment
+- Perhaps we want to get the remaining CSS tags to match the bootstrap tags
+	- we use 'rescued' instead of 'success'
+	- we could use the nav styles instead of the hard-coded '|' separator
+	- we can also work some of the vibe coded styles to get them consistent
+		- the tables could probably match what we have in the mofo forms better
+		- the orange uppercase headings should be corrected
+- I keep wondering if some of those cool mobile UX AI skills could be used, but kind of goes against the HN minimalism?
+- What modern CSS can we use
+	- Its the fight between magic and minimalist simplicity
+	- Something so smooth, but so simple
+- Boring shit like removing that in-between page load flash
+	- I think we have a separate tournament for that
+- Obviously we can get the offline, web app going, pingolin style
+- What else can we do with Elm?
+	- Can we improve on the JSON testing that gets loaded?
+- Can we do something to bring these cool new styles back to mofoforms?
+	- Can we unlock some more power there?
+	- Does it fit nicely with Elm CSS somehow?
+	- Like if you can minimise the CSS, you have maximal control over the type surface
+	- Make a beautiful site for the mofobootstrap
+	- Maybe steal the tailwind styles for a classless CSS
+	- Or maybe just make every site more beautiful
+	- Find a better base for the internet
+	- Make Edward Tufte happy
+	- Bring LaTeX to everyone
+- What can we do with the types?
+	- Can we simplify those?
+	- Can we make them more expressive?
+	- Can we get more powerful tests from them?
+	- Do we know what the test coverage is?
+- Oooh... testing we need the Page Object Model tests
+	- Bring in the learnings from pingolin to this
+	- Apply this CSS tournament to pingolin
+	- Need a mofobootstrap for pingolin
+
 
 ---
 
