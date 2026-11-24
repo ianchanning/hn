@@ -505,6 +505,31 @@ def build_html(
         .replace("#", "\\u0023")
     )
 
+    if use_elm:
+        elm_style_css = _get_style_css()
+        head_doc = f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{story_id} // {safe_title} - Better Signal News</title>
+  <style>
+{elm_style_css}
+  </style>
+</head>"""
+        body_wrap = f"""<div id="elm-root"></div>
+<script id="observatoryData" type="application/json">{json_blob}</script>
+"""
+        observatory_js = _get_observatory_js()
+        script_block = f"<script>\n{observatory_js}\n</script>"
+        html_doc = head_doc + "\n<body>\n" + body_wrap + "\n" + script_block + "\n</body>\n</html>\n"
+        assert "#" not in html_doc, (
+            f"Zero-hash mandate violated at index {html_doc.find('#')}!"
+        )
+        resolved_out = out_path or (HERE / f"show-me-hn-{story_id}.html")
+        resolved_out.write_text(html_doc, encoding="utf-8")
+        return resolved_out
+
     useful_cnt = tiers.get("epistemic_gold", 0) + tiers.get("grounded_analysis", 0)
     useful_pct = 100.0 * useful_cnt / max(1, total_cnt)
     gold_pct = 100.0 * tiers.get("epistemic_gold", 0) / max(1, total_cnt)

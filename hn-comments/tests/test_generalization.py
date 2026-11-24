@@ -282,11 +282,11 @@ class TestGeneralizationPipeline(unittest.TestCase):
             self.assertIn("Fielding's", html_text)
             self.assertNotIn("&No. x27;", html_text)
             self.assertNotIn("&#x27;", html_text)
-            self.assertIn('id="modeTabs"', html_text)
-            self.assertNotIn('id="presetBar"', html_text)
-            self.assertIn('<details class="proof-drawer" id="proofDrawer">', html_text)
-            self.assertIn('<details class="proof-drawer" id="labDrawer">', html_text)
-            self.assertIn('<details class="graph-drawer" id="tunerDrawer">', html_text)
+            self.assertIn('<div id="elm-root"></div>', html_text)
+            self.assertIn('id="observatoryData"', html_text)
+            self.assertIn("modeTabs", html_text)
+            self.assertIn("proofDrawer", html_text)
+            self.assertNotIn("presetBar", html_text)
             self.assertEqual(res["top"][0]["id"], 777010)
 
 
