@@ -1,4 +1,4 @@
-module Pages.Index exposing (IndexModel, view)
+module Pages.Index exposing (IndexModel, unescapeHtml, view)
 
 {-| Front-page HN-style item list (replaces render\_index\_html in build\_pages\_site.py).
 -}
@@ -6,7 +6,12 @@ module Pages.Index exposing (IndexModel, view)
 import Html exposing (Html, a, div, form, input, label, span, table, tbody, td, text, tr)
 import Html.Attributes exposing (attribute, class, colspan, for, href, id, placeholder, type_)
 import Observatory.Types exposing (IndexItem)
-import Observatory.View.Style exposing (extractHost, formatThousands, role)
+import Observatory.View.Style as Style exposing (extractHost, formatThousands, role)
+
+
+unescapeHtml : String -> String
+unescapeHtml =
+    Style.unescapeHtml
 
 
 type alias IndexModel =
@@ -121,9 +126,12 @@ renderItemRow rank it =
         siteHost =
             extractHost it.storyUrl
 
+        cleanTitle =
+            unescapeHtml it.storyTitle
+
         ( titleLink, sitebitHtml ) =
             if hasExtUrl then
-                ( a [ class "storylink", href extHref ] [ text it.storyTitle ]
+                ( a [ class "storylink", href extHref ] [ text cleanTitle ]
                 , span [ class "sitebit comhead" ]
                     [ text " ("
                     , a [ href extHref ] [ text siteHost ]
@@ -132,7 +140,7 @@ renderItemRow rank it =
                 )
 
             else
-                ( a [ class "storylink", href itemHref ] [ text it.storyTitle ]
+                ( a [ class "storylink", href itemHref ] [ text cleanTitle ]
                 , text ""
                 )
 

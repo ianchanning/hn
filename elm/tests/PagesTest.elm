@@ -90,6 +90,35 @@ suite =
                             [ class "list-pad"
                             , text "Updated 2026-11-21 08:00 UTC"
                             ]
+            , test "unescapes &quot; and HTML entities in story titles" <|
+                \_ ->
+                    Index.unescapeHtml "Ask HN: &quot;Show HN&quot; vs &#39;Launch&#39; &amp; &lt;Code&gt;"
+                        |> Expect.equal "Ask HN: \"Show HN\" vs 'Launch' & <Code>"
+            , test "renders unescaped double quotes in view" <|
+                \_ ->
+                    let
+                        modelWithQuotes =
+                            { mockIndexModel
+                                | items =
+                                    [ { storyId = 50999999
+                                      , storyTitle = "Ask HN: &quot;Show HN&quot; Guidelines"
+                                      , storyUrl = ""
+                                      , points = 100
+                                      , storyAuthor = "pg"
+                                      , totalComments = 10
+                                      , epistemicGold = 5
+                                      , groundedAnalysis = 5
+                                      , t2RefUtc = "2026-11-21T06:00:00Z"
+                                      , sizeKb = 10.0
+                                      }
+                                    ]
+                                , frontpageIds = [ 50999999 ]
+                            }
+                    in
+                    Index.view modelWithQuotes
+                        |> Query.fromHtml
+                        |> Query.find [ class "storylink" ]
+                        |> Query.has [ text "Ask HN: \"Show HN\" Guidelines" ]
             ]
         , describe "Pages.Router"
             [ test "renders resolving state" <|

@@ -82,9 +82,8 @@ OBS_JSON_RE = re.compile(
 
 
 def _safe_no_hash(text: str) -> str:
-    """Escape HTML entities and ensure zero literal `#` characters without mangling quotes."""
-    clean = html.unescape(str(text or "")).replace("#", "No. ")
-    return html.escape(clean, quote=False).replace('"', "&quot;")
+    """Sanitize text and ensure zero literal `#` characters without mangling quotes or injecting HTML entities."""
+    return html.unescape(str(text or "")).replace("#", "No. ")
 
 
 def _format_utc_stamp(raw_utc: str) -> str:

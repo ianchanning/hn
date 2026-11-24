@@ -9,7 +9,7 @@ import Html.Events exposing (onClick)
 import Observatory.Model exposing (Model)
 import Observatory.Msg exposing (Msg(..))
 import Observatory.Types exposing (ObservatoryPayload, ViewMode(..))
-import Observatory.View.Style exposing (extractHost, formatFloat1, formatFloat2, formatThousands, role)
+import Observatory.View.Style exposing (extractHost, formatFloat1, formatFloat2, formatThousands, role, unescapeHtml)
 
 
 viewHeader : Model -> ObservatoryPayload -> Html Msg
@@ -170,7 +170,7 @@ viewHeader model payload =
             ]
         , div [ class "fatitem-box", role "main" ]
             [ div [ class "story-titleline" ]
-                [ a [ class "story-title", href storyHref ] [ text payload.storyTitle ]
+                [ a [ class "story-title", href storyHref ] [ text (unescapeHtml payload.storyTitle) ]
                 , sitebitHtml
                 ]
             , div [ class "subtext" ]

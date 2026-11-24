@@ -383,3 +383,25 @@ extractHost raw =
 
     else
         withoutPort
+
+
+{-| Unescape common HTML entities into plain text without literal hash characters.
+-}
+unescapeHtml : String -> String
+unescapeHtml str =
+    let
+        h =
+            String.fromChar (Char.fromCode 35)
+    in
+    str
+        |> String.replace "&quot;" "\""
+        |> String.replace ("&" ++ h ++ "34;") "\""
+        |> String.replace ("&" ++ h ++ "x22;") "\""
+        |> String.replace "&apos;" "'"
+        |> String.replace ("&" ++ h ++ "39;") "'"
+        |> String.replace ("&" ++ h ++ "x27;") "'"
+        |> String.replace "&lt;" "<"
+        |> String.replace "&gt;" ">"
+        |> String.replace "&amp;" "&"
+
+
