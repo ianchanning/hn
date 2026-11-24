@@ -1344,8 +1344,8 @@ def build_html(
   <header class="hn-header">
     <div class="topbar">
       <div class="topbar-left">
-        <a href="https://news.ycombinator.com" class="hn-logo">BS</a>
-        <a href="https://ianchanning.com/hn" class="hnname">Better Signal News</a>
+        <span class="hn-logo">BS</span>
+        <a href="https://news.ianchanning.com" class="hnname">Better Signal News</a>
         <span class="pagetop" id="modeTabs">
           <button type="button" class="nav-btn mode-tab active" data-mode="top_signal" role="tab" aria-selected="true">Top 40</button> | <button type="button" class="nav-btn mode-tab" data-mode="hn_top40" role="tab" aria-selected="false">HN Top 40</button>
         </span>
