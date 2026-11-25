@@ -98,6 +98,16 @@ Upgrade the static 2-screenshot judge into a fast (~5s) headless-Chrome **6-Stat
 	- Apply this CSS tournament to pingolin
 	- Need a mofobootstrap for pingolin
 
+### 11. Purging the Python HTML Masticator (Untangling Data from Static Shells)
+- **Untangles:** Python complected as both epistemic data pipeline AND ad-hoc HTML template compiler / static site generator / regex DOM surgeon (`py_html_lines: 1,800+ → 0`).
+- **The Core Nugget (Hickey's Razor):**
+  - **Data is Data:** Python's sole sovereign responsibility is ingesting HN, calculating epistemic rank, and emitting immutable JSON (`items/<id>.json`, `catalog.json`). Python should have *zero* knowledge of `<head>`, `<meta>`, `<script>`, CSS stylesheets, or DOM tags.
+  - **The Shell is Static:** Instead of Python string-interpolating HTML shells, injecting JS bundles, and regex-healing stale `<style>` and `<script>` tags across hundreds of archived HTML files:
+    - **Option A (Pure Client-Hydrated Static Shell):** A single static `index.html` (and `404.html`) SPA shell boots Elm 0.19.3. Elm natively parses the URL (`/`, `/item?id=...`), fetches the lightweight `items/<id>.json` on demand, and renders with 100% TEA fidelity.
+    - **Option B (Deterministic Zero-Indirection Stamping):** For standalone offline artifacts (`show-me-hn-<id>.html`), a single immutable `shell.html` contains the compiled Elm runtime; building an artifact is a simple token injection (`<!-- PAYLOAD -->`), eliminating 1,500 lines of legacy Python HTML templates and all post-build regex repair functions (`_heal_mismatched_elm_css`, `_heal_item_url_sync`).
+- **Score / Metric:** Python HTML generation lines (`build_dashboard.py` + `build_pages_site.py` lines emitting HTML/CSS/JS strings: `~1,800 → 0`) + Zero regex file patching + Zero drift between Elm templates and Python shells.
+- **Gate:** 6-State UX Matrix + 100% test pass (`pytest`, `elm-test`, `elm-review`, DOM parity differ) + zero-hash invariant + identical visual output across all 660+ published stories.
+
 
 ---
 
