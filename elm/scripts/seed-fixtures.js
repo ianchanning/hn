@@ -11,29 +11,70 @@
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { execSync } from "node:child_process";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const elmDir = join(__dirname, "..");
 const rootDir = join(elmDir, "..");
 const staticDir = join(elmDir, "static");
 
-// 1. Extract payload from canonical observatory
-const showMeHtmlPath = existsSync(join(rootDir, "hn-comments", "show-me-hn-50467087.html"))
-  ? join(rootDir, "hn-comments", "show-me-hn-50467087.html")
-  : join(rootDir, "show-me-hn-50467087.html");
-const showMeHtml = readFileSync(showMeHtmlPath, "utf-8");
+// 1. Extract payload from canonical observatory or fallback to existing fixture.json
+const fixtureJsonPath = join(staticDir, "fixture.json");
+const candidateHtmlPaths = [
+  join(rootDir, "hn-comments", "test-observatory-50467087.html"),
+  join(rootDir, "hn-comments", "show-me-hn-50467087.html"),
+  join(rootDir, "show-me-hn-50467087.html"),
+];
 
-const match = showMeHtml.match(
-  /<script\s+id=["']observatoryData["']\s+type=["']application\/json["']>(.*?)<\/script>/s
-);
+let payload = null;
+let showMeHtml = "";
+const existingHtmlPath = candidateHtmlPaths.find(p => existsSync(p));
 
-if (!match) {
-  console.error("Could not find <script id=\"observatoryData\"> in show-me-hn-50467087.html");
-  process.exit(1);
+if (existingHtmlPath) {
+  showMeHtml = readFileSync(existingHtmlPath, "utf-8");
+  const match = showMeHtml.match(
+    /<script\s+id=["']observatoryData["']\s+type=["']application\/json["']>(.*?)<\/script>/s
+  );
+  if (match) {
+    try {
+      payload = JSON.parse(match[1].trim());
+      console.log(`✓ Extracted payload from ${existingHtmlPath}`);
+    } catch (e) {
+      console.warn(`Could not parse JSON from ${existingHtmlPath}:`, e.message);
+    }
+  }
 }
 
-const rawPayloadJson = match[1].trim();
-const payload = JSON.parse(rawPayloadJson);
+if (!payload && existsSync(fixtureJsonPath)) {
+  try {
+    payload = JSON.parse(readFileSync(fixtureJsonPath, "utf-8"));
+    console.log(`✓ Loaded existing payload from ${fixtureJsonPath}`);
+  } catch (e) {
+    console.warn(`Could not parse ${fixtureJsonPath}:`, e.message);
+  }
+}
+
+if (!payload) {
+  console.log("No fixture or HTML found — generating via build_dashboard.py 50467087...");
+  try {
+    execSync(`python3 hn-comments/build_dashboard.py 50467087 "${candidateHtmlPaths[0]}"`, { cwd: rootDir, stdio: "inherit" });
+    if (existsSync(candidateHtmlPaths[0])) {
+      showMeHtml = readFileSync(candidateHtmlPaths[0], "utf-8");
+      const match = showMeHtml.match(
+        /<script\s+id=["']observatoryData["']\s+type=["']application\/json["']>(.*?)<\/script>/s
+      );
+      if (match) payload = JSON.parse(match[1].trim());
+    }
+  } catch (err) {
+    console.error("Failed to build dashboard fixture:", err.message);
+    process.exit(1);
+  }
+}
+
+if (!payload) {
+  console.error("Could not obtain observatory payload for 50467087.");
+  process.exit(1);
+}
 
 // Ensure manifest has points and story_author from header if not present
 if (payload.manifest) {
@@ -147,6 +188,10 @@ function makeHtml(title, defaultPage) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${title}</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>

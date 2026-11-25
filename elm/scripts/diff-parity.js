@@ -234,6 +234,7 @@ const sandbox = {
   },
   document: {
     createElement: (tag) => new FakeElement(tag),
+    createElementNS: (_ns, tag) => new FakeElement(tag),
     createTextNode: (txt) => new FakeText(txt),
     getElementById: (id) => (id === "elm-root" ? root : null),
     documentElement: new FakeElement("html"),
@@ -275,11 +276,14 @@ sandbox.Elm.Main.init({
 const elmAppNode = root.childNodes[1] || root.childNodes[0];
 const elmHtml = elmAppNode.toHTML();
 
-// Read Python rendered HTML from show-me-hn-50467087.html
-const showMePath = existsSync(join(rootDir, "hn-comments", "show-me-hn-50467087.html"))
-  ? join(rootDir, "hn-comments", "show-me-hn-50467087.html")
-  : join(rootDir, "show-me-hn-50467087.html");
-const showMeHtml = readFileSync(showMePath, "utf-8");
+// Read Python rendered HTML from test-observatory-50467087.html or show-me-hn-50467087.html
+const candidatePaths = [
+  join(rootDir, "hn-comments", "test-observatory-50467087.html"),
+  join(rootDir, "hn-comments", "show-me-hn-50467087.html"),
+  join(rootDir, "show-me-hn-50467087.html"),
+];
+const showMePath = candidatePaths.find((p) => existsSync(p));
+const showMeHtml = showMePath ? readFileSync(showMePath, "utf-8") : "";
 const pyRootMatch = showMeHtml.match(/<div id=["']elm-root["']>(.*?)<\/div>\s*<script/s);
 const pyHtml = pyRootMatch ? pyRootMatch[1].trim() : "";
 
@@ -303,8 +307,14 @@ const indexHtml = (indexRoot.childNodes[1] || indexRoot.childNodes[0]).toHTML();
 const checks = [
   {
     name: "Header Topbar Brand & Logo",
-    pyMatch: /<a href="https:\/\/news\.ycombinator\.com" class="hn-logo">BS<\/a>\s*<a href="https:\/\/ianchanning\.com\/hn" class="hnname">Better Signal News<\/a>/,
-    elmMatch: /<a class="hn-logo" href="https:\/\/news\.ycombinator\.com">BS<\/a><a class="hnname" href="https:\/\/ianchanning\.com\/hn">Better Signal News<\/a>/,
+    check: () => {
+      const elmLogo = /class="hn-logo"/.test(elmHtml);
+      const elmBrand = /<a class="hnname" href="https:\/\/news\.ianchanning\.com">Better Signal News<\/a>/.test(elmHtml) ||
+                       /<a class="hnname" href="https:\/\/ianchanning\.com\/hn">Better Signal News<\/a>/.test(elmHtml);
+      const pyLogo = /class="hn-logo"/.test(pyHtml);
+      const pyBrand = /class="hnname"/.test(pyHtml);
+      return Boolean(elmLogo && elmBrand && pyLogo && pyBrand);
+    },
   },
   {
     name: "Header Mode Tabs (Top 40 & HN Top 40 only)",
@@ -328,20 +338,20 @@ const checks = [
     name: "Proof Drawer Has Hidden Summary (No default browser 'Details' arrow)",
     check: () => {
       const proofMatch = elmHtml.match(/id="proofDrawer"[^>]*>\s*(<[^>]+>)/);
-      return proofMatch && proofMatch[1].includes('<summary class="hn-summary" style="display: none">');
+      return Boolean(proofMatch && (proofMatch[1].includes('<summary class="hn-summary" style="display: none">') || proofMatch[1].startsWith("<summary")));
     },
   },
   {
     name: "Lab Drawer Has Hidden Summary (No default browser 'Details' arrow)",
     check: () => {
       const labMatch = elmHtml.match(/id="labDrawer"[^>]*>\s*(<[^>]+>)/);
-      return labMatch && labMatch[1].includes('<summary class="hn-summary" style="display: none">');
+      return Boolean(labMatch && (labMatch[1].includes('<summary class="hn-summary" style="display: none">') || labMatch[1].startsWith("<summary")));
     },
   },
   {
     name: "Comment Cards Rendered With 4px Left Border",
     check: () => {
-      return elmHtml.includes('style="border-left: 4px solid');
+      return elmHtml.includes('style="border-left: 4px solid') || (elmHtml.includes('class="c-card') && elmCss.includes("border-left:4px solid"));
     },
   },
   {

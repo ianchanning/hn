@@ -431,12 +431,12 @@ viewLogo =
             []
         , Svg.text_
             [ SvgAttr.x "10"
-            , SvgAttr.y "10.5"
+            , SvgAttr.y "10"
             , SvgAttr.textAnchor "middle"
             , SvgAttr.dominantBaseline "central"
             , SvgAttr.fill "rgb(255, 255, 255)"
             , SvgAttr.fontFamily "Verdana, Geneva, sans-serif"
-            , SvgAttr.fontSize "11"
+            , SvgAttr.fontSize "12"
             , SvgAttr.fontWeight "bold"
             ]
             [ Svg.text "BS" ]

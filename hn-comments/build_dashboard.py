@@ -2064,5 +2064,6 @@ def build_html(
 
 if __name__ == "__main__":
     arg_target: str | int = sys.argv[1] if len(sys.argv) > 1 else 50467087
-    out = build_html(arg_target)
+    arg_out = Path(sys.argv[2]) if len(sys.argv) > 2 else None
+    out = build_html(arg_target, out_path=arg_out)
     print(f"Built zero-hash observatory: {out} ({out.stat().st_size / 1024:.1f} KB)")
