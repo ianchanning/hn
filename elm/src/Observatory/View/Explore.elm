@@ -171,7 +171,7 @@ viewTunerDrawer model payload totalComments cw =
                 [ text
                     ("Drag any weight to watch the "
                         ++ formatThousands totalComments
-                        ++ "-point phase plane and comment ranking re-solve instantaneously."
+                        ++ "-point comment ranking re-solve."
                     )
                 , br [] []
                 , text "• "
@@ -193,7 +193,7 @@ viewPhaseDrawer payload totalComments selectedComment =
     details [ class "graph-drawer", id "phaseDrawer", attribute "open" "" ]
         [ summary [ class "graph-summary" ]
             [ div [ class "graph-title-group" ]
-                [ div [ class "sec-tag" ] [ text "EPISTEMIC PHASE PLANE" ]
+                [ div [ class "sec-tag" ] [ text "BULLSHIT VS SIGNAL" ]
                 , h2 [] [ text "Crowd Chatter vs. Grounded Signal" ]
                 ]
             , span [ class "mob-graph-pill" ] []
@@ -249,14 +249,14 @@ viewGravityDrawer payload totalComments selectedComment =
     details [ class "graph-drawer", id "gravityDrawer", attribute "open" "" ]
         [ summary [ class "graph-summary" ]
             [ div [ class "graph-title-group" ]
-                [ div [ class "sec-tag" ] [ text "NEWS.ARC GRAVITY & TREE-LOCK" ]
+                [ div [ class "sec-tag" ] [ text "HN POS vs AGE" ]
                 , h2 [] [ text "Why Live HN Buried Primary Evidence" ]
                 ]
             , span [ class "mob-graph-pill" ] []
             ]
         , div [ class "oled-bay" ]
             [ div [ class "oled-head" ]
-                [ span [] [ text ("HN POS (1.." ++ formatThousands totalComments ++ ") (Y) // Age (Hours) (X)") ]
+                [ span [] [ text ("HN POS (1.." ++ formatThousands totalComments ++ ") (Y) // AGE (HOURS) (X)") ]
                 , span [ class "sig" ] [ text "(T + 2)^1.8" ]
                 ]
             , canvas [ id "gravityCanvas", class "plot", width 540, height 300 ] []
