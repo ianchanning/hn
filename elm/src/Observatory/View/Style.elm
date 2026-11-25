@@ -8,8 +8,10 @@ the `assert "#" not in html_doc` invariant from the Python pipeline.
 -}
 
 import Html
-import Html.Attributes exposing (class, style, attribute)
+import Html.Attributes exposing (attribute, class, style)
 import Observatory.Types exposing (Colour, Tier(..))
+import Svg
+import Svg.Attributes as SvgAttr
 
 
 {-| ARIA role
@@ -403,5 +405,42 @@ unescapeHtml str =
         |> String.replace "&lt;" "<"
         |> String.replace "&gt;" ">"
         |> String.replace "&amp;" "&"
+
+
+{-| 20x20 transparent square logo with 1px white border and "BS" in Verdana bold.
+-}
+viewLogo : Html.Html msg
+viewLogo =
+    Svg.svg
+        [ SvgAttr.class "hn-logo"
+        , SvgAttr.width "20"
+        , SvgAttr.height "20"
+        , SvgAttr.viewBox "0 0 20 20"
+        , role "img"
+        , attribute "aria-label" "Better Signal News Logo"
+        ]
+        [ Svg.rect
+            [ SvgAttr.x "0.5"
+            , SvgAttr.y "0.5"
+            , SvgAttr.width "19"
+            , SvgAttr.height "19"
+            , SvgAttr.fill "none"
+            , SvgAttr.stroke "rgb(255, 255, 255)"
+            , SvgAttr.strokeWidth "1"
+            ]
+            []
+        , Svg.text_
+            [ SvgAttr.x "10"
+            , SvgAttr.y "10.5"
+            , SvgAttr.textAnchor "middle"
+            , SvgAttr.dominantBaseline "central"
+            , SvgAttr.fill "rgb(255, 255, 255)"
+            , SvgAttr.fontFamily "Verdana, Geneva, sans-serif"
+            , SvgAttr.fontSize "11"
+            , SvgAttr.fontWeight "bold"
+            ]
+            [ Svg.text "BS" ]
+        ]
+
 
 

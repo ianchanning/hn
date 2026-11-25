@@ -9,7 +9,7 @@ import Html.Events exposing (onClick)
 import Observatory.Model exposing (Model)
 import Observatory.Msg exposing (Msg(..))
 import Observatory.Types exposing (ObservatoryPayload, ViewMode(..))
-import Observatory.View.Style exposing (extractHost, formatFloat1, formatFloat2, formatThousands, role, unescapeHtml)
+import Observatory.View.Style exposing (extractHost, formatFloat1, formatFloat2, formatThousands, role, unescapeHtml, viewLogo)
 
 
 viewHeader : Model -> ObservatoryPayload -> Html Msg
@@ -116,7 +116,7 @@ viewHeader model payload =
     header [ class "hn-header", role "banner" ]
         [ div [ class "topbar" ]
             [ div [ class "topbar-left" ]
-                [ span [ class "hn-logo" ] [ text "BS" ]
+                [ viewLogo
                 , a [ href "https://news.ianchanning.com", class "hnname" ] [ text "Better Signal News" ]
                 , span [ class "pagetop", id "modeTabs", role "navigation" ] renderedTabs
                 ]

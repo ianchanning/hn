@@ -588,6 +588,7 @@ def build_pages_site(
         "favicon.ico",
         "site.webmanifest",
         "android-chrome-192x192.png",
+        "bs.svg",
     ):
         src_fav = ELM_STATIC_DIR / fname
         if src_fav.is_file():

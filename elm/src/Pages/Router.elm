@@ -6,6 +6,7 @@ module Pages.Router exposing (view)
 import Html exposing (Html, a, code, div, header, p, pre, text)
 import Html.Attributes exposing (class, href, id)
 import Observatory.Types exposing (RouterConfig, RouterState(..))
+import Observatory.View.Style exposing (viewLogo)
 
 
 view : RouterState -> Html msg
@@ -14,7 +15,7 @@ view state =
         [ header [ class "hn-header" ]
             [ div [ class "topbar" ]
                 [ div [ class "topbar-left" ]
-                    [ a [ class "hn-logo", href "./" ] [ text "BS" ]
+                    [ a [ href "./" ] [ viewLogo ]
                     , a [ class "hnname", href "./" ] [ text "Better Signal News" ]
                     ]
                 , div [ class "topbar-right" ] [ text "NYX OBSERVATORY // HN URI MIRROR" ]

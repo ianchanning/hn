@@ -6,7 +6,7 @@ module Pages.Index exposing (IndexModel, unescapeHtml, view)
 import Html exposing (Html, a, div, form, input, label, span, table, tbody, td, text, tr)
 import Html.Attributes exposing (attribute, class, colspan, for, href, id, placeholder, type_)
 import Observatory.Types exposing (IndexItem)
-import Observatory.View.Style as Style exposing (extractHost, formatThousands, role)
+import Observatory.View.Style as Style exposing (extractHost, formatThousands, role, unescapeHtml, viewLogo)
 
 
 unescapeHtml : String -> String
@@ -69,7 +69,7 @@ view model =
     div [ class "wrap" ]
         [ div [ class "topbar", role "banner" ]
             [ div [ class "topbar-left" ]
-                [ a [ class "hn-logo", href "./" ] [ text "BS" ]
+                [ a [ href "./" ] [ viewLogo ]
                 , a [ class "hnname", href "./" ] [ text "Better Signal News" ]
                 ]
             , div [ class "topbar-right" ]
