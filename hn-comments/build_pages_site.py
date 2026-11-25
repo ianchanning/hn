@@ -246,14 +246,28 @@ def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="manifest" href="/site.webmanifest">
+  <script>
+    (function() {{
+      var m = window.location.search.match(/[?&]id=(\\d+)/);
+      if (m && m[1]) {{
+        var base = window.location.pathname.replace(/\\/item(?:\\.html|\\/)?$/, "").replace(/\\/404\\.html$/, "").replace(/\\/$/, "");
+        window.location.replace((base || ".") + "/items/" + encodeURIComponent(m[1]) + ".html");
+      }}
+    }})();
+  </script>
   <style>
     * {{ box-sizing: border-box; }}
+    html {{
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }}
     body {{
       margin: 8px;
       padding: 0;
-      background: rgb(255, 255, 255);
+      background: rgb(246, 246, 239);
       color: rgb(0, 0, 0);
       font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
     }}
     .wrap {{
       width: 85%;
@@ -283,14 +297,8 @@ def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -
       display: inline-block;
       width: 20px;
       height: 20px;
-      line-height: 18px;
-      text-align: center;
-      border: 1px solid rgb(255, 255, 255);
-      color: rgb(255, 255, 255);
-      font-weight: 700;
-      font-size: 13px;
-      text-decoration: none;
       flex-shrink: 0;
+      vertical-align: middle;
     }}
     a.hnname {{
       color: rgb(0, 0, 0);
@@ -376,16 +384,16 @@ def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -
 <div class="wrap">
   <div class="topbar">
     <div class="topbar-left">
-      <a class="hn-logo" href="./">BS</a>
+      <a class="hn-logo" href="./" aria-label="Better Signal News Logo"><svg class="hn-logo" width="20" height="20" viewBox="0 0 20 20" role="img" aria-label="Better Signal News Logo"><rect x="0.5" y="0.5" width="19" height="19" fill="none" stroke="rgb(255, 255, 255)" stroke-width="1"></rect><text x="10" y="10" text-anchor="middle" dominant-baseline="central" fill="rgb(255, 255, 255)" font-family="Verdana, Geneva, sans-serif" font-size="12" font-weight="bold">BS</text></svg></a>
       <a class="hnname" href="./">Better Signal News</a>
     </div>
   </div>
 </div>
-<!--<div class="shell" id="routerStatus">
+<div class="shell" id="routerStatus" style="display: none;">
   <div class="eyebrow">NYX OBSERVATORY // HN URI MIRROR</div>
   <h1 id="statusTitle">Loading Better Signal News...</h1>
   <p id="statusBody">Resolving <code>/item?id=...</code> from static observatory archive.</p>
-</div>-->
+</div>
 <script id="routerConfig" type="application/json">{cfg_json}</script>
 <script>
 (async () => {{
@@ -414,7 +422,12 @@ def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -
   const bodyEl = document.getElementById("statusBody");
   const shellEl = document.getElementById("routerStatus");
 
+  function showStatus() {{
+    if (shellEl) shellEl.style.display = "block";
+  }}
+
   if (!rawId || !/^\\d+$/.test(rawId)) {{
+    showStatus();
     titleEl.textContent = "Missing or Invalid Hacker News Item ID";
     bodyEl.innerHTML =
       "Append <code>?id=50472038</code> just like Hacker News (<code>/item?id=50472038</code>), or browse the published index.";
@@ -427,18 +440,16 @@ def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -
 
   const artifactUrl = `${{siteBase}}/items/${{encodeURIComponent(rawId)}}.html`;
   try {{
-    const resp = await fetch(artifactUrl, {{ cache: "no-cache" }});
+    const resp = await fetch(artifactUrl);
     if (resp.ok) {{
-      const htmlText = await resp.text();
-      document.open();
-      document.write(htmlText);
-      document.close();
+      window.location.replace(artifactUrl);
       return;
     }}
   }} catch (_err) {{
     // Fall through to helpful not-yet-built view
   }}
 
+  showStatus();
   const hnUrl = `https://news.ycombinator.com/item?id=${{encodeURIComponent(rawId)}}`;
   titleEl.textContent = `HN Item ${{rawId}} Not Yet Built`;
   bodyEl.innerHTML =
@@ -532,13 +543,22 @@ def render_index_html(
 {observatory_js}
 </script>
 <script>
+document.addEventListener("click", (ev) => {{
+  const a = ev.target.closest("a");
+  if (!a || !a.href || ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.altKey || a.target === "_blank") return;
+  const m = a.href.match(/[?&]id=(\\d+)/);
+  if (m) {{
+    ev.preventDefault();
+    window.location.href = `./items/${{encodeURIComponent(m[1])}}.html`;
+  }}
+}});
 document.addEventListener("submit", (ev) => {{
   if (ev.target && ev.target.id === "jumpForm") {{
     ev.preventDefault();
     const raw = (document.getElementById("hnInput")?.value || "").trim();
     const m = raw.match(/[?&]id=(\\d+)/) || raw.match(/^(\\d+)$/) || raw.match(/(\\d{{5,}})/);
     if (m) {{
-      window.location.href = `./item?id=${{encodeURIComponent(m[1])}}`;
+      window.location.href = `./items/${{encodeURIComponent(m[1])}}.html`;
     }}
   }}
 }});

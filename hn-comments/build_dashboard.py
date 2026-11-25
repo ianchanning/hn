@@ -525,7 +525,20 @@ def build_html(
 <script id="observatoryData" type="application/json">{json_blob}</script>
 """
         observatory_js = _get_observatory_js()
-        script_block = f"<script>\n{observatory_js}\n</script>"
+        sync_script = """<script>
+(function() {
+  if (window.location.pathname.includes("/items/")) {
+    var m = window.location.pathname.match(/\\/items\\/(\\d+)\\.html/);
+    if (m) {
+      var base = window.location.pathname.replace(/\\/items\\/\\d+\\.html$/, "");
+      try {
+        history.replaceState(null, "", (base || ".") + "/item?id=" + m[1]);
+      } catch(e) {}
+    }
+  }
+})();
+</script>"""
+        script_block = f"<script>\n{observatory_js}\n</script>\n{sync_script}"
         html_doc = head_doc + "\n<body>\n" + body_wrap + "\n" + script_block + "\n</body>\n</html>\n"
         assert "#" not in html_doc, (
             f"Zero-hash mandate violated at index {html_doc.find('#')}!"
@@ -800,14 +813,8 @@ def build_html(
       display: inline-block;
       width: 20px;
       height: 20px;
-      line-height: 18px;
-      text-align: center;
-      border: 1px solid rgb(255, 255, 255);
-      color: rgb(255, 255, 255);
-      font-weight: 700;
-      font-size: 13px;
-      text-decoration: none;
       flex-shrink: 0;
+      vertical-align: middle;
     }}
     .hnname, .hnname a {{
       color: rgb(0, 0, 0);
@@ -1381,7 +1388,7 @@ def build_html(
   <header class="hn-header">
     <div class="topbar">
       <div class="topbar-left">
-        <span class="hn-logo">BS</span>
+        <span class="hn-logo"><svg class="hn-logo" width="20" height="20" viewBox="0 0 20 20" role="img" aria-label="Better Signal News Logo"><rect x="0.5" y="0.5" width="19" height="19" fill="none" stroke="rgb(255, 255, 255)" stroke-width="1"></rect><text x="10" y="10" text-anchor="middle" dominant-baseline="central" fill="rgb(255, 255, 255)" font-family="Verdana, Geneva, sans-serif" font-size="12" font-weight="bold">BS</text></svg></span>
         <a href="https://news.ianchanning.com" class="hnname">Better Signal News</a>
         <span class="pagetop" id="modeTabs">
           <button type="button" class="nav-btn mode-tab active" data-mode="top_signal" role="tab" aria-selected="true">Top 40</button> | <button type="button" class="nav-btn mode-tab" data-mode="hn_top40" role="tab" aria-selected="false">HN Top 40</button>
