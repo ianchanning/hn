@@ -61,6 +61,46 @@ def _heal_mismatched_elm_css(pub_html: Path, style_css: str) -> bool:
     return True
 
 
+def _heal_item_url_sync(pub_html: Path) -> bool:
+    """Ensure every published observatory contains the zero-hash URL synchronizer in `<head>`."""
+    raw = pub_html.read_text(encoding="utf-8")
+    if "</head>" not in raw:
+        return False
+    if 'history.replaceState' in raw and 'target = (base || "") + "/item?id="' in raw:
+        return False
+
+    sync_snippet = """  <script>
+    (function() {
+      if (window.location.pathname.includes("/items/")) {
+        var m = window.location.pathname.match(/\\/items\\/(\\d+)\\.html/);
+        if (m) {
+          var base = window.location.pathname.replace(/\\/items\\/\\d+\\.html$/, "");
+          var target = (base || "") + "/item?id=" + m[1];
+          try {
+            history.replaceState(null, "", target);
+          } catch(e) {}
+        }
+      }
+    })();
+  </script>"""
+    assert "#" not in sync_snippet, "Zero-hash violated in sync_snippet"
+
+    # If it has an older sync snippet, remove it before re-injecting into <head>
+    if "history.replaceState" in raw:
+        raw = re.sub(
+            r"<script>\s*\(function\(\)\s*\{\s*if\s*\(window\.location\.pathname\.includes\(\"/items/\"\)\).*?</script>\s*",
+            "",
+            raw,
+            flags=re.S,
+        )
+
+    updated = raw.replace("</head>", f"{sync_snippet}\n</head>", 1)
+    if "#" not in raw:
+        assert "#" not in updated, f"Zero-hash violated while healing URL sync in {pub_html}"
+    pub_html.write_text(updated, encoding="utf-8")
+    return True
+
+
 def _get_style_css() -> str:
     """Read consolidated Elm styles, guaranteeing zero `#` characters."""
     if ELM_STYLE_CSS.is_file():
@@ -251,7 +291,7 @@ def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -
       var m = window.location.search.match(/[?&]id=(\\d+)/);
       if (m && m[1]) {{
         var base = window.location.pathname.replace(/\\/item(?:\\.html|\\/)?$/, "").replace(/\\/404\\.html$/, "").replace(/\\/$/, "");
-        window.location.replace((base || ".") + "/items/" + encodeURIComponent(m[1]) + ".html");
+        window.location.replace((base || "") + "/items/" + encodeURIComponent(m[1]) + ".html");
       }}
     }})();
   </script>
@@ -546,10 +586,13 @@ def render_index_html(
 document.addEventListener("click", (ev) => {{
   const a = ev.target.closest("a");
   if (!a || !a.href || ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.altKey || a.target === "_blank") return;
-  const m = a.href.match(/[?&]id=(\\d+)/);
-  if (m) {{
-    ev.preventDefault();
-    window.location.href = `./items/${{encodeURIComponent(m[1])}}.html`;
+  const hrefAttr = a.getAttribute("href") || "";
+  if (hrefAttr.startsWith("./item?id=") || hrefAttr.startsWith("/item?id=") || hrefAttr.startsWith("item?id=")) {{
+    const m = hrefAttr.match(/[?&]id=(\\d+)/);
+    if (m) {{
+      ev.preventDefault();
+      window.location.href = `./items/${{encodeURIComponent(m[1])}}.html`;
+    }}
   }}
 }});
 document.addEventListener("submit", (ev) => {{
@@ -686,6 +729,7 @@ def build_pages_site(
             continue
         sid = int(pm.group(1))
         _heal_mismatched_elm_css(pub_html, current_style_css)
+        _heal_item_url_sync(pub_html)
         meta = extract_item_summary(pub_html, sid)
         fsize = pub_html.stat().st_size
         total_bytes += fsize

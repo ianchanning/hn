@@ -505,6 +505,21 @@ def build_html(
         .replace("#", "\\u0023")
     )
 
+    sync_script = """  <script>
+    (function() {
+      if (window.location.pathname.includes("/items/")) {
+        var m = window.location.pathname.match(/\\/items\\/(\\d+)\\.html/);
+        if (m) {
+          var base = window.location.pathname.replace(/\\/items\\/\\d+\\.html$/, "");
+          var target = (base || "") + "/item?id=" + m[1];
+          try {
+            history.replaceState(null, "", target);
+          } catch(e) {}
+        }
+      }
+    })();
+  </script>"""
+
     if use_elm:
         elm_style_css = _get_style_css()
         head_doc = f"""<!doctype html>
@@ -517,6 +532,7 @@ def build_html(
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="manifest" href="/site.webmanifest">
+{sync_script}
   <style>
 {elm_style_css}
   </style>
@@ -525,20 +541,7 @@ def build_html(
 <script id="observatoryData" type="application/json">{json_blob}</script>
 """
         observatory_js = _get_observatory_js()
-        sync_script = """<script>
-(function() {
-  if (window.location.pathname.includes("/items/")) {
-    var m = window.location.pathname.match(/\\/items\\/(\\d+)\\.html/);
-    if (m) {
-      var base = window.location.pathname.replace(/\\/items\\/\\d+\\.html$/, "");
-      try {
-        history.replaceState(null, "", (base || ".") + "/item?id=" + m[1]);
-      } catch(e) {}
-    }
-  }
-})();
-</script>"""
-        script_block = f"<script>\n{observatory_js}\n</script>\n{sync_script}"
+        script_block = f"<script>\n{observatory_js}\n</script>"
         html_doc = head_doc + "\n<body>\n" + body_wrap + "\n" + script_block + "\n</body>\n</html>\n"
         assert "#" not in html_doc, (
             f"Zero-hash mandate violated at index {html_doc.find('#')}!"
@@ -751,6 +754,7 @@ def build_html(
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="manifest" href="/site.webmanifest">
+{sync_script}
   <style>
 {elm_style_css}
   </style>
@@ -766,6 +770,7 @@ def build_html(
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="manifest" href="/site.webmanifest">
+{sync_script}
   <style>
     * {{ box-sizing: border-box; }}
     html {{
