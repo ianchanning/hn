@@ -1,105 +1,13 @@
-port module Observatory.Ports exposing
+module Observatory.Ports exposing
     ( computeGravityPlot
     , computePhasePlot
-    , drawPlot
-    , encodePlotCommand
-    , onCanvasProbe
-    , sendPlot
-    , sendPlots
     )
 
-{-| Port declarations for canvas interop.
-
-Outgoing: Elm sends PlotCommand to JS canvas renderer.
-Incoming: JS sends CanvasProbeEvent when user clicks/hovers a point.
-
+{-| Plot coordinate computation for inline SVG scatter plots.
 -}
 
-import Json.Decode as Decode
-import Json.Encode as Encode
 import Observatory.Types exposing (..)
 import Observatory.View.Style exposing (tierDotColour)
-
-
-port drawPlot : Encode.Value -> Cmd msg
-
-
-port onCanvasProbe : (Decode.Value -> msg) -> Sub msg
-
-
-encodePlotCommand : PlotCommand -> Encode.Value
-encodePlotCommand cmd =
-    Encode.object
-        [ ( "canvasId", Encode.string cmd.canvasId )
-        , ( "points", Encode.list encodePlotPoint cmd.points )
-        , ( "selectedId"
-          , case cmd.selectedId of
-                Just id ->
-                    Encode.int id
-
-                Nothing ->
-                    Encode.null
-          )
-        , ( "axisConfig", encodeAxisConfig cmd.axisConfig )
-        , ( "largestRoot"
-          , case cmd.largestRoot of
-                Just lr ->
-                    encodeLargestRoot lr
-
-                Nothing ->
-                    Encode.null
-          )
-        ]
-
-
-encodePlotPoint : PlotPoint -> Encode.Value
-encodePlotPoint pt =
-    Encode.object
-        [ ( "x", Encode.float pt.x )
-        , ( "y", Encode.float pt.y )
-        , ( "radius", Encode.float pt.radius )
-        , ( "colour", encodeColour pt.colour )
-        , ( "commentId", Encode.int pt.commentId )
-        ]
-
-
-encodeColour : Colour -> Encode.Value
-encodeColour c =
-    Encode.object
-        [ ( "r", Encode.int c.r )
-        , ( "g", Encode.int c.g )
-        , ( "b", Encode.int c.b )
-        , ( "a", Encode.float c.a )
-        ]
-
-
-encodeAxisConfig : AxisConfig -> Encode.Value
-encodeAxisConfig cfg =
-    Encode.object
-        [ ( "maxX", Encode.float cfg.maxX )
-        , ( "maxY", Encode.float cfg.maxY )
-        , ( "xLabel", Encode.string cfg.xLabel )
-        , ( "yLabel", Encode.string cfg.yLabel )
-        ]
-
-
-encodeLargestRoot : LargestRoot -> Encode.Value
-encodeLargestRoot lr =
-    Encode.object
-        [ ( "rootId", Encode.int lr.rootId )
-        , ( "author", Encode.string lr.author )
-        , ( "slots", Encode.int lr.slots )
-        , ( "startDom", Encode.int lr.startDom )
-        , ( "endDom", Encode.int lr.endDom )
-        , ( "sharePct", Encode.float lr.sharePct )
-        , ( "topDom1Age", Encode.float lr.topDom1Age )
-        , ( "topDom1Author", Encode.string lr.topDom1Author )
-        ]
-
-
-sendPlot : PlotCommand -> Cmd msg
-sendPlot cmd =
-    drawPlot (encodePlotCommand cmd)
 
 
 computePhasePlot : { a | liveList : List LiveComment, selectedCommentId : Maybe Int } -> ObservatoryPayload -> PlotCommand
@@ -246,16 +154,3 @@ computeGravityPlot model payload =
         else
             Nothing
     }
-
-
-sendPlots : { a | liveList : List LiveComment, selectedCommentId : Maybe Int, payload : Maybe ObservatoryPayload } -> Cmd msg
-sendPlots model =
-    case model.payload of
-        Just p ->
-            Cmd.batch
-                [ sendPlot (computePhasePlot model p)
-                , sendPlot (computeGravityPlot model p)
-                ]
-
-        Nothing ->
-            Cmd.none

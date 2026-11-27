@@ -211,7 +211,7 @@ update msg rootModel =
                     if tab == TabObservatory then
                         case bundle.obsModel of
                             Just om ->
-                                Cmd.map ObservatoryMsg (Ports.sendPlots om)
+                                Cmd.none
 
                             Nothing ->
                                 Cmd.none

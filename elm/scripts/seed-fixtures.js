@@ -94,12 +94,6 @@ const serializedPayloadJson = JSON.stringify(payload).replace(/#/g, "\\u0023");
 writeFileSync(join(staticDir, "fixture.json"), serializedPayloadJson, "utf-8");
 console.log(`✓ Wrote elm/static/fixture.json (${(Buffer.byteLength(serializedPayloadJson) / 1024).toFixed(1)} KB)`);
 
-// Copy canvas-iife.js into static/ so static file server serves it directly
-const canvasIifePath = join(elmDir, "js", "canvas-iife.js");
-const canvasIifeContent = readFileSync(canvasIifePath, "utf-8");
-writeFileSync(join(staticDir, "canvas-iife.js"), canvasIifeContent, "utf-8");
-console.log("✓ Copied elm/js/canvas-iife.js -> elm/static/canvas-iife.js");
-
 // Verify canonical elm/static/style.css exists and maintains zero-hash invariant
 const styleCssPath = join(staticDir, "style.css");
 if (existsSync(styleCssPath)) {
@@ -202,7 +196,6 @@ ${makeDevBundle(defaultPage)}
   </script>
 
   <script src="elm.js"></script>
-  <script src="canvas-iife.js"></script>
   <script>
     (function() {
       var bundleEl = document.getElementById("devBundle");
@@ -220,10 +213,7 @@ ${makeDevBundle(defaultPage)}
         }
       }
       var root = document.getElementById("elm-root");
-      var app = Elm.Main.init({ node: root, flags: flags });
-      if (typeof mountCanvasRenderer === "function") {
-        mountCanvasRenderer(app);
-      }
+      Elm.Main.init({ node: root, flags: flags });
     })();
   </script>
 </body>

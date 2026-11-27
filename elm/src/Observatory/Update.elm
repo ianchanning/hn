@@ -21,7 +21,7 @@ update msg model =
                         , searchQuery = ""
                     }
             in
-            ( newModel, Ports.sendPlots newModel )
+            ( newModel, Cmd.none )
 
         SearchInput q ->
             ( { model | searchQuery = q }, Cmd.none )
@@ -37,7 +37,7 @@ update msg model =
                         , selectedCommentId = Nothing
                     }
             in
-            ( newModel, Ports.sendPlots newModel )
+            ( newModel, Cmd.none )
 
         SliderChanged field val ->
             let
@@ -72,7 +72,7 @@ update msg model =
                 newModel =
                     { model | currentWeights = newCw, liveList = newLive }
             in
-            ( newModel, Ports.sendPlots newModel )
+            ( newModel, Cmd.none )
 
         ResetWeights ->
             case model.payload of
@@ -87,7 +87,7 @@ update msg model =
                         newModel =
                             { model | currentWeights = cw, liveList = live }
                     in
-                    ( newModel, Ports.sendPlots newModel )
+                    ( newModel, Cmd.none )
 
                 Nothing ->
                     ( model, Cmd.none )
@@ -100,7 +100,7 @@ update msg model =
                         , searchQuery = String.fromInt probe.commentId
                     }
             in
-            ( newModel, Ports.sendPlots newModel )
+            ( newModel, Cmd.none )
 
         ClearSelection ->
             let
@@ -110,7 +110,7 @@ update msg model =
                         , searchQuery = ""
                     }
             in
-            ( newModel, Ports.sendPlots newModel )
+            ( newModel, Cmd.none )
 
         ToggleProofDrawer ->
             ( { model | proofDrawerOpen = not model.proofDrawerOpen }, Cmd.none )

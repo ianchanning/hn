@@ -44,7 +44,6 @@ try {
 
 // 3. Read components
 const elmMin = readFileSync(join(dist, "elm.min.js"), "utf-8");
-const canvasBridge = readFileSync(join(root, "js", "canvas-iife.js"), "utf-8");
 
 // 4. Production boot glue (no ES modules, no bundler)
 const boot = `
@@ -57,10 +56,7 @@ const boot = `
     try { flags = JSON.parse(dataEl.textContent); } catch(e) {}
   }
   var root = document.getElementById("elm-root");
-  var app = Elm.Main.init({ node: root, flags: flags });
-  if (typeof mountCanvasRenderer === "function") {
-    mountCanvasRenderer(app);
-  }
+  Elm.Main.init({ node: root, flags: flags });
 })();
 `.trim();
 
@@ -68,7 +64,6 @@ const boot = `
 const combined = [
   "/* HN Epistemic Observatory — Elm Display Layer */",
   elmMin,
-  canvasBridge,
   boot,
 ].join("\n");
 

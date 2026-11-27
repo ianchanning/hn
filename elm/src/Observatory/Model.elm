@@ -80,7 +80,7 @@ initFromPayload payload =
             , error = Nothing
             }
     in
-    ( m, Ports.sendPlots m )
+    ( m, Cmd.none )
 
 
 {-| Recompute live scores and ranks from current slider weights.
