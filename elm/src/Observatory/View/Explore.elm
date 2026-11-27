@@ -442,7 +442,7 @@ viewSvgPlot cmd =
     in
     Svg.svg
         [ SvgAttr.id cmd.canvasId
-        , Attr.class "plot"
+        , SvgAttr.class "plot"
         , SvgAttr.viewBox "0 0 540 300"
         , SvgAttr.width "540"
         , SvgAttr.height "300"

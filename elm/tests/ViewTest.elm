@@ -227,7 +227,7 @@ suite =
                                 |> Query.fromHtml
                     in
                     q
-                        |> Query.findAll [ class "plot" ]
+                        |> Query.findAll [ tag "svg" ]
                         |> Query.count (Expect.equal 2)
             ]
         , describe "Observatory.View.Cards"
