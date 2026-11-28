@@ -115,7 +115,7 @@ viewCards model payload =
 
         facetOptionsHtml =
             option [ value "all", selected (model.selectedFacet == "all") ]
-                [ text ("All Facets (" ++ formatThousands totalComments ++ ")") ]
+                [ text ("All Clusters (" ++ formatThousands totalComments ++ ")") ]
                 :: List.map
                     (\opt ->
                         option [ value opt.slug, selected (model.selectedFacet == opt.slug) ]
