@@ -44,62 +44,6 @@ def _get_observatory_js() -> str:
     return ELM_OBSERVATORY_JS.read_text(encoding="utf-8")
 
 
-def _heal_mismatched_elm_css(pub_html: Path, style_css: str) -> bool:
-    """Refresh stale legacy `<style>` in archived items that already embed new Elm JS."""
-    if not style_css:
-        return False
-    raw = pub_html.read_text(encoding="utf-8")
-    if 'data-b' not in raw or '[id="cards"]' in raw:
-        return False
-    updated, count = STYLE_BLOCK_RE.subn(
-        lambda _m: f"<style>\n{style_css}\n  </style>", raw, count=1
-    )
-    if count != 1 or updated == raw:
-        return False
-    assert "#" not in updated, f"Zero-hash violated while healing {pub_html}"
-    pub_html.write_text(updated, encoding="utf-8")
-    return True
-
-
-def _heal_item_url_sync(pub_html: Path) -> bool:
-    """Ensure every published observatory contains the zero-hash URL synchronizer in `<head>`."""
-    raw = pub_html.read_text(encoding="utf-8")
-    if "</head>" not in raw:
-        return False
-    if 'history.replaceState' in raw and 'target = (base || "") + "/item?id="' in raw:
-        return False
-
-    sync_snippet = """  <script>
-    (function() {
-      if (window.location.pathname.includes("/items/")) {
-        var m = window.location.pathname.match(/\\/items\\/(\\d+)\\.html/);
-        if (m) {
-          var base = window.location.pathname.replace(/\\/items\\/\\d+\\.html$/, "");
-          var target = (base || "") + "/item?id=" + m[1];
-          try {
-            history.replaceState(null, "", target);
-          } catch(e) {}
-        }
-      }
-    })();
-  </script>"""
-    assert "#" not in sync_snippet, "Zero-hash violated in sync_snippet"
-
-    # If it has an older sync snippet, remove it before re-injecting into <head>
-    if "history.replaceState" in raw:
-        raw = re.sub(
-            r"<script>\s*\(function\(\)\s*\{\s*if\s*\(window\.location\.pathname\.includes\(\"/items/\"\)\).*?</script>\s*",
-            "",
-            raw,
-            flags=re.S,
-        )
-
-    updated = raw.replace("</head>", f"{sync_snippet}\n</head>", 1)
-    if "#" not in raw:
-        assert "#" not in updated, f"Zero-hash violated while healing URL sync in {pub_html}"
-    pub_html.write_text(updated, encoding="utf-8")
-    return True
-
 
 def _get_style_css() -> str:
     """Read consolidated Elm styles, guaranteeing zero `#` characters."""
@@ -112,7 +56,6 @@ def _get_style_css() -> str:
 
 ITEM_FILE_RE = re.compile(r"^show-me-hn-(\d+)\.html$")
 PUBLISHED_ITEM_RE = re.compile(r"^(\d+)\.html$")
-STYLE_BLOCK_RE = re.compile(r"<style[^>]*>.*?</style>", re.S | re.I)
 OBS_JSON_RE = re.compile(
     r'<script\s+id=["\']observatoryData["\']\s+type=["\']application/json["\']>(.*?)</script>',
     flags=re.S,
@@ -728,8 +671,6 @@ def build_pages_site(
         if not pm:
             continue
         sid = int(pm.group(1))
-        _heal_mismatched_elm_css(pub_html, current_style_css)
-        _heal_item_url_sync(pub_html)
         meta = extract_item_summary(pub_html, sid)
         fsize = pub_html.stat().st_size
         total_bytes += fsize
