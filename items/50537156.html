@@ -1,0 +1,1401 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50537156 // jQuery 4.1.0 — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+      text-transform: lowercase;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      text-transform: lowercase;
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .kpi-cell {
+      padding: 8px 0;
+    }
+    .kpi-label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 4px 0;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer:not([open]) {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary,
+    details.proof-drawer > summary {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+    }
+    table.ablation th {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: normal;
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    button.nav-btn,
+    button.mode-tab,
+    button.topbar-toggle {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: rgb(0, 0, 0);
+      cursor: pointer;
+      text-decoration: none;
+      line-height: inherit;
+      vertical-align: baseline;
+      transition: color 0.12s ease;
+      text-transform: lowercase;
+    }
+    button.nav-btn:hover,
+    button.nav-btn.active,
+    button.mode-tab:hover,
+    button.mode-tab.active,
+    button.topbar-toggle:hover,
+    button.topbar-toggle.active {
+      color: rgb(255, 255, 255);
+      text-decoration: none;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      padding: 14px;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; row-gap: 4px; }
+      .topbar-right { font-size: 8pt; padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+  <script>
+    (function() {
+      if (window.location.pathname.includes("/items/")) {
+        var m = window.location.pathname.match(/\/items\/(\d+)\.html/);
+        if (m) {
+          var base = window.location.pathname.replace(/\/items\/\d+\.html$/, "");
+          var target = (base || "") + "/item?id=" + m[1];
+          try {
+            history.replaceState(null, "", target);
+          } catch(e) {}
+        }
+      }
+    })();
+  </script>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+        <span class="pagetop" id="modeTabs">
+          <button type="button" class="nav-btn mode-tab active" data-mode="top_signal" role="tab" aria-selected="true">Top 40</button> | <button type="button" class="nav-btn mode-tab" data-mode="hn_top40" role="tab" aria-selected="false">HN Top 40</button>
+        </span>
+      </div>
+      <div class="topbar-right">
+        <button type="button" class="nav-btn topbar-toggle" id="exploreToggleBtn" aria-expanded="false">explore</button> | <button type="button" class="nav-btn topbar-toggle" id="evidenceToggleBtn" aria-expanded="false">evidence</button>
+      </div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://github.com/jquery/jquery/releases/tag/4.1.0">jQuery 4.1.0</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=github.com"><span class="sitestr">github.com</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">361 points</span> by <a href="https://news.ycombinator.com/user?id=petecooper">petecooper</a> <span class="age" title="2026-11-17T19:50:40.000Z"><a href="https://news.ycombinator.com/item?id=50537156">20 hours ago</a></span> | <a href="https://news.ycombinator.com/item?id=50537156">189&nbsp;comments</a> | 84.1% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Evidence</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">189</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 135 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">15.9%</div>
+          <div class="kpi-sub">30 comments (9 Gold / 4.8%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">84.1%</div>
+          <div class="kpi-sub">81 chatter &bull; 66 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">6</div>
+        <div class="kpi-sub">20% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.934</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">50</div>
+          <div class="kpi-sub">HN POS 42..91 (26.5% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="color: rgb(90, 90, 88); margin-top: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Explore</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 189-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 189)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (9)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (21)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (81)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (12)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (66)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..189) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 57)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (noduerme, 12.2h); largest subtree (@CM30) occupies 50 slots (HN POS 42..91).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (189)</option>
+          <option value="vanilla_modern">Vanilla &amp; Modern (Whole) (41)</option>
+          <option value="support_browser">Support &amp; Browser (Internet) (39)</option>
+          <option value="document_add">Document &amp; Add (Dom) (37)</option>
+          <option value="today_web">Today &amp; Web (React) (29)</option>
+          <option value="method_chaining">Method &amp; Chaining (Interface) (21)</option>
+          <option value="general_commentary">General Commentary (22)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, add, error, page, data, support...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50537156 + GITHUB.COM + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50537156, "story_title": "jQuery 4.1.0", "story_url": "https://github.com/jquery/jquery/releases/tag/4.1.0", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50537156, "story_title": "jQuery 4.1.0", "story_url": "https://github.com/jquery/jquery/releases/tag/4.1.0", "points": 361, "story_author": "petecooper", "article_source": "fetched_url", "t1_ref_utc": "2026-11-18T15:51:57+00:00", "t2_ref_utc": "2026-11-18T15:51:57+00:00", "delta_minutes": 0.0, "story_anchors": ["add", "error", "page", "data", "support", "release", "custom", "jquery", "development", "javascript", "github", "library", "version", "bug", "everywhere", "code", "alternative", "api", "end", "dom", "everything", "today", "little", "maintained", "project"], "facet_labels": {"method_chaining": "Method & Chaining (Interface)", "document_add": "Document & Add (Dom)", "today_web": "Today & Web (React)", "vanilla_modern": "Vanilla & Modern (Whole)", "support_browser": "Support & Browser (Internet)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "method_chaining", "label": "Method & Chaining (Interface)", "count": 21, "top_terms": ["method", "chaining", "interface", "fluent"]}, {"slug": "document_add", "label": "Document & Add (Dom)", "count": 37, "top_terms": ["document", "add", "dom", "queryselector"]}, {"slug": "today_web", "label": "Today & Web (React)", "count": 29, "top_terms": ["today", "web", "react", "log"]}, {"slug": "vanilla_modern", "label": "Vanilla & Modern (Whole)", "count": 41, "top_terms": ["vanilla", "modern", "whole", "nice"]}, {"slug": "support_browser", "label": "Support & Browser (Internet)", "count": 39, "top_terms": ["support", "browser", "internet", "end"]}], "counts": {"total_comments": 189, "live_t2_comments": 189, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 135, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 1, "pages_fetched": 1}, "sha256": {"corpus.json": "afaa43f8ad4999495a27db095dfd24dd6375168e678890976eb0e9fc057e6c81"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 9, "grounded_analysis": 21, "crowd_chatter": 81, "bullshit_or_flamewar": 66, "meme_or_snark": 12}, "facets": {"method_chaining": 21, "support_browser": 39, "document_add": 37, "today_web": 29, "vanilla_modern": 41, "general_commentary": 22}, "facet_options": [{"slug": "vanilla_modern", "label": "Vanilla & Modern (Whole)", "count": 41}, {"slug": "support_browser", "label": "Support & Browser (Internet)", "count": 39}, {"slug": "document_add", "label": "Document & Add (Dom)", "count": 37}, {"slug": "today_web", "label": "Today & Web (React)", "count": 29}, {"slug": "method_chaining", "label": "Method & Chaining (Interface)", "count": 21}, {"slug": "general_commentary", "label": "General Commentary", "count": 22}], "facet_diagnostics": [{"slug": "vanilla_modern", "label": "Vanilla & Modern (Whole)", "count": 41, "useful": 11, "useful_pct": 26.8, "terms": "vanilla, modern, whole, nice"}, {"slug": "support_browser", "label": "Support & Browser (Internet)", "count": 39, "useful": 7, "useful_pct": 17.9, "terms": "support, browser, internet, end"}, {"slug": "document_add", "label": "Document & Add (Dom)", "count": 37, "useful": 5, "useful_pct": 13.5, "terms": "document, add, dom, queryselector"}, {"slug": "today_web", "label": "Today & Web (React)", "count": 29, "useful": 5, "useful_pct": 17.2, "terms": "today, web, react, log"}, {"slug": "method_chaining", "label": "Method & Chaining (Interface)", "count": 21, "useful": 2, "useful_pct": 9.5, "terms": "method, chaining, interface, fluent"}, {"slug": "general_commentary", "label": "General Commentary", "count": 22, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 11}, {"category": "github_artifact", "count": 3}, {"category": "code_repository", "count": 3}], "story_anchors": ["add", "error", "page", "data", "support", "release", "custom", "jquery", "development", "javascript", "github", "library", "version", "bug", "everywhere", "code", "alternative", "api"], "largest_root": {"root_id": 50538146, "author": "CM30", "slots": 50, "start_dom": 42, "end_dom": 91, "share_pct": 26.5, "top_dom1_age": 12.2, "top_dom1_author": "noduerme"}, "buried_cutoff": 57, "rescue_top_k": 38, "ablations": [], "tournament": [], "comments": [{"id": 50538194, "au": "btown", "dom": 6, "sr": 1, "sc": 12.46, "ep": 12.46, "bs": 0.0, "d": 1, "age": 18.75, "grav": 234.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 90, "qw": 0, "k": 20103, "kpp": 5.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "method_chaining", "flbl": "Method & Chaining (Interface)", "urls": ["https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/jquery/JQuery.d.ts"], "ig": 1.559, "fa": 2.69, "gp": 0.78, "bl": 0.0, "ds": 0.0, "txt": "To that point, there was a conscious choice that the return type of most method invocations (except in specific \"read a value\" modes) should be a standardized container type.\n\nThat was, and still is, rare! And in a time without type checking and bundling, it was vital. Match your parentheses and quotes, and your jquery code might not find what you want, but it would (likely) not throw exceptions.\n\nFor those unfamiliar, I recommend looking at https://github.com/DefinitelyTyped/DefinitelyTyped/blob/mast... and searching for the 201 instances of\n\n    : this\n\nin that file. A remarkably fluent API. We could all be so elegant."}, {"id": 50540440, "au": "marticode", "dom": 116, "sr": 2, "sc": 10.52, "ep": 10.52, "bs": 0.0, "d": 1, "age": 15.0, "grav": 164.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 62, "qw": 0, "k": 617, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": ["https://github.com/fabiospampinato/cash"], "ig": 1.254, "fa": 2.08, "gp": 1.132, "bl": 0.0, "ds": 0.0, "txt": "I do because every time I try to use vanilla JS, I end up reinventing the $ function and adding a few basic utilities, at which point it feels like I might just use jQuery and make my code more compact and legible.\n\nThat being said it's no longer that useful for dealing with browser incompatibilities or for remote calls. I end up using a stripped version or something like https://github.com/fabiospampinato/cash"}, {"id": 50538544, "au": "vrubleg", "dom": 152, "sr": 3, "sc": 10.21, "ep": 10.21, "bs": 0.0, "d": 0, "age": 18.24, "grav": 224.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 10, "qw": 0, "k": 2, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": ["https://github.com/jquery/jquery/pull/5077"], "ig": 0.548, "fa": 2.69, "gp": 0.867, "bl": 0.0, "ds": 0.0, "txt": "It's a 2026 release, and jQuery still didn't drop 13-years-old IE11 :)\nhttps://github.com/jquery/jquery/pull/5077"}, {"id": 50547342, "au": "RunSet", "dom": 104, "sr": 4, "sc": 8.97, "ep": 8.97, "bs": 0.0, "d": 1, "age": 0.56, "grav": 5.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 9, "qw": 0, "k": 1614, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": ["https://bugzilla.mozilla.org/show_bug.cgi?id=505521"], "ig": 0.564, "fa": 2.35, "gp": 0.655, "bl": 0.0, "ds": 0.0, "txt": "I swear jQuery pays Firefox not to fix this bug.\n\nhttps://bugzilla.mozilla.org/show_bug.cgi?id=505521"}, {"id": 50538767, "au": "troupo", "dom": 138, "sr": 5, "sc": 8.64, "ep": 9.49, "bs": 0.85, "d": 5, "age": 17.96, "grav": 218.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 41, "qw": 0, "k": 5897, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "epistemic_gold", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": ["https://caniuse.com/?search=nodelist"], "ig": 1.426, "fa": 1.57, "gp": 1.15, "bl": 0.32, "ds": 0.0, "txt": "NodeList exposes exactly 5 methods: item, entries, forEach, keys, and values.\n\nVery beautiful.\n\nBTW, browsers didn't even add forEach to it until several years after they added document.querySelectorAll lol\n\nEdit. https://caniuse.com/?search=nodelist\n\nNodeList appeared in 2006(Firefox) - 2008 (Safari) - 2010 (Chrome)\n\nforEach on it appeared in... 2016."}, {"id": 50539245, "au": "starkparker", "dom": 68, "sr": 6, "sc": 8.35, "ep": 8.35, "bs": 0.0, "d": 5, "age": 17.28, "grav": 205.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 51, "qw": 0, "k": 4820, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": ["https://blog.jquery.com/2026/11/17/jquery-4-1-0-and-3-8-0-released-passing-the-torch/"], "ig": 1.543, "fa": 0.96, "gp": 1.371, "bl": 0.0, "ds": 0.0, "txt": "jQuery 3.8.0 was also part of this release (if \"as a send-off, not a comeback\" per the announcement[1]), and it supports IE 9-10, legacy Edge, iOS 7+, and Android 4.0+.\n\nWe just had a T1 line blow up the entire US air control infrastructure, so I'll happily assume people are still using old garbage in critical workflows.\n\n1: https://blog.jquery.com/2026/11/17/jquery-4-1-0-and-3-8-0-re..."}, {"id": 50537526, "au": "ddalcino", "dom": 165, "sr": 7, "sc": 7.94, "ep": 7.94, "bs": 0.0, "d": 1, "age": 19.62, "grav": 252.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 34, "qw": 0, "k": 102, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": ["https://w3techs.com/technologies/details/js-jquery"], "ig": 1.282, "fa": 1.24, "gp": 0.959, "bl": 0.0, "ds": 0.0, "txt": "Yes, about 63% of all websites: https://w3techs.com/technologies/details/js-jquery\n\nThere's a list of large legacy sites that use jquery behind that link, including:\n\n* Microsoft.com\n* Pinterest.com\n* Adobe.com\n* Yahoo.com\n* Wordpress.org\n* Digicert.com\n* Samsung.com\n* Archive.org"}, {"id": 50539653, "au": "pwdisswordfishq", "dom": 37, "sr": 8, "sc": 7.92, "ep": 8.07, "bs": 0.0, "d": 1, "age": 16.47, "grav": 190.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 70, "qw": 0, "k": 306, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "today_web", "flbl": "Today & Web (React)", "urls": ["https://github.com/tc39/proposal-pipeline-operator", "https://github.com/tc39/proposal-do-expressions"], "ig": 0.935, "fa": 2.06, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Meh, other than being easier to type, it's nothing to sing praises about.  It is harder to reason about, both for the interpreter (which does not immediately know that the return value is the same object as the receiver and therefore cannot optimize based on that assumption) and for the programmer (which has to look up documentation to learn the same).\n\nI hope https://github.com/tc39/proposal-pipeline-operator and perhaps also https://github.com/tc39/proposal-do-expressions will put it to rest."}, {"id": 50538404, "au": "ksec", "dom": 113, "sr": 9, "sc": 7.83, "ep": 7.98, "bs": 0.0, "d": 2, "age": 18.44, "grav": 228.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 59, "qw": 0, "k": 57860, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 1.639, "fa": 0.95, "gp": 0.979, "bl": 0.0, "ds": 0.0, "txt": "I had to check wiki, IE 11 came out 13 years ago! Internet Explorer 11 support ended on June 15, 2022, and it was permanently disabled on February 14, 2023. ( must have missed the memo or I have forgotten about it )\n\nW3Counter shows Around 0.07% of market share.\n\nI wonder why IE11 is still being used or even a requirement?  Especially in today's world where security could be a very serious issue."}, {"id": 50539073, "au": "DamnInteresting", "dom": 110, "sr": 10, "sc": 6.58, "ep": 6.87, "bs": 0.0, "d": 1, "age": 17.52, "grav": 210.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 76, "qw": 9, "k": 10297, "kpp": 11.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 1.637, "fa": 0.42, "gp": 1.261, "bl": 0.0, "ds": 0.0, "txt": "> I wonder if people use jQuery on their new projects.\n\nI do frequently, partially because I tend to branch new projects from old ones, and the old ones often used jQuery. Updating everything to vanilla would be a lot of effort for little gain.\n\nI wonder how it feels for the original jQuery developers. They solved some big problems, then their ideas were just copied into Javascript itself, and their pioneering library became decried as old and irrelevant--even though it works just fine, and still solves some niche problems."}, {"id": 50538569, "au": "paulddraper", "dom": 23, "sr": 11, "sc": 6.13, "ep": 6.42, "bs": 0.0, "d": 1, "age": 18.21, "grav": 223.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 28, "qw": 0, "k": 18142, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "method_chaining", "flbl": "Method & Chaining (Interface)", "urls": ["https://en.wikipedia.org/wiki/Fluent_interface", "https://github.com/tc39/proposal-pipeline-operator"], "ig": 0.488, "fa": 1.78, "gp": 0.139, "bl": 0.0, "ds": 0.0, "txt": "This is called a fluent interface. [1] C++ streams are perhaps the most common example of this pattern.\n\nA TC39 Stage 2 proposal adds this into the language itself with the pipeline `|>` operator. [2]\n\n[1] https://en.wikipedia.org/wiki/Fluent_interface\n\n[2] https://github.com/tc39/proposal-pipeline-operator"}, {"id": 50541590, "au": "noduerme", "dom": 1, "sr": 12, "sc": 5.91, "ep": 5.91, "bs": 0.0, "d": 0, "age": 12.15, "grav": 117.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 219, "qw": 0, "k": 15382, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 1.999, "fa": 0.0, "gp": 0.839, "bl": 0.0, "ds": 0.0, "txt": "The composability of jQuery has been an inspiration for the way I design my own frameworks and tools.\n\nOne thing I still regularly use jQuery for, though, that's rarely mentioned, is its event model. You can put a listener on any object, not just things in the DOM. Any data object can trigger an event. This is incredibly powerful for isolating logic from DOM elements and events. A frequent use case is for DOM elements to contain a reference to a data object that may be replicated elsewhere on the page. The data object sets up and tears down visual elements, listening for interaction, then dispatches a custom event. Your core logic listens for events on the data object instead of on every individual element that might refer to it. I usually delegate the draw routine for e.g. html snippets of a card or an interactive element to the data object itself in a draw() function that returns a string which incidentally jQuery handles quite nicely inserting into the DOM without needing to explicitly call createElement.\n\nI wrote my own implementation of this a long time ago, but in the end, that feature plus the other ergonomics of jQuery still make it my go-to today over vanilla js. And pretty much everything I write is without any reactive framework (other than my own vanilla component/templating/remoting system), so the overhead is barely noticeable."}, {"id": 50543646, "au": "noduerme", "dom": 89, "sr": 13, "sc": 5.68, "ep": 6.67, "bs": 0.85, "d": 6, "age": 7.05, "grav": 52.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 153, "qw": 0, "k": 15382, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "grounded_analysis", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 1.818, "fa": 0.34, "gp": 0.986, "bl": 0.32, "ds": 0.0, "txt": "Yeah. And also, 2015 was the same time when Promises became part of the spec. That was the justification for fetch in the first place. Now that we have this ability to do asynchronous stuff, and everyone is writing these hairy XHMLHttpRequests listening for 200s and 400s, let's just make this a standard thing. It was a good idea. So, $().ajax still handled its results with callbacks, it wasn't async, didn't need a shim for that, although it was easy enough to wrap. You wouldn't necessarily replace it until you were ready to rewrite a whole bunch of other stuff in your code with async functions. For me, a bigger question for older code was transitioning the bulk of the code to promise patterns, even though I would've otherwise wanted to swap fetch for ().ajax much sooner.\n\n[edit] I just checked, and I still have one major production site whose backend calls still run:\n\n`let req:XMLHttpRequest = new XMLHttpRequest();\n            req.onreadystatechange = ()=> {`"}, {"id": 50537376, "au": "hinkley", "dom": 170, "sr": 14, "sc": 5.66, "ep": 5.66, "bs": 0.0, "d": 1, "age": 19.76, "grav": 255.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 119, "qw": 0, "k": 48058, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": 1.757, "fa": 0.28, "gp": 0.508, "bl": 0.0, "ds": 0.0, "txt": "I was there, Gandalf, I was there the day the strength of Men failed.\n\nThe three biggest problems with JQuery UI:\n\n1) The quality wasn't anywhere near as good as jquery, so many times I had to correct people whose opinion of jquery encompassed jquery UI\n\n2) They declared bankruptcy on managing the call tree spaghetti and decided to rewrite the entire thing one component at a time, which meant that simultaneously some things were changing a lot and everything else they refused to entertain bug reports on the parts that were still in the queue.\n\n3) It took them three times as long to do the work as they expected, and the original ask was already a bit much.\n\nAngular became a thing before they finished the work."}, {"id": 50537539, "au": "hinkley", "dom": 125, "sr": 15, "sc": 5.54, "ep": 5.76, "bs": 0.0, "d": 0, "age": 19.61, "grav": 252.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 284, "qw": 0, "k": 48058, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 1.977, "fa": 0.0, "gp": 0.769, "bl": 0.0, "ds": 0.0, "txt": "I don't want jQuery back, but I want something that works like it except in the opposite way on corner cases.\n\nNow that ES and CSS5 are everywhere, the biggest feature of jQuery is list comprehensions on components. Data is also still good IMO but mostly the comprehensions.\n\njQuery decided that calling a function on an empty list should be a no-op, but my experience using it for a very interactive application was that nearly every time we wanted something to definitely happen or it was a bug, and the handful of times where an empty list was expected were easy to anticipate.\n\nBecause the general problem was that making a selector that continued to work correctly as features were added was a black art. Two of us wrote selectors that almost always worked, the rest of the team wrote ones that almost always broke and only very slowly onboarded our advice (also all of the stuff they already wrote was a ticking time bomb).\n\nNew features and especially tweaking the DOM tree to stay compatible with old corporate browsers would break existing functionality about a quarter of the time someone had to change the DOM structure to close a ticket and it was infuriating.\n\nSo what I want is that if .hide() is a no-op, throw an exception. And if I'm implementing the 'select all/unselect all' feature I know that the list might be empty, I can add a flag or wrap a conditional around it so I ignore "}, {"id": 50538163, "au": "renegade-otter", "dom": 131, "sr": 16, "sc": 5.32, "ep": 5.47, "bs": 0.0, "d": 2, "age": 18.79, "grav": 235.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 90, "qw": 0, "k": 2970, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 1.498, "fa": 0.34, "gp": 0.677, "bl": 0.0, "ds": 0.0, "txt": "Bootstrap has been effectively replaced by Grid/Flex. There is no need for it.\n\nThere is a ton of stuff you can do now with JS directly that JQuery had to compensate for, that's why GitHub spent the effort to move off of JQ years ago.\n\nCSS and JS has come a long way. I will even venture out to say that UI development does not suck these days, it's even a little enjoyable. You no longer have to spend 3 hours vertically aligning text in a div and then test it in four different browsers."}, {"id": 50546293, "au": "etatester", "dom": 109, "sr": 17, "sc": 5.26, "ep": 5.7, "bs": 0.0, "d": 2, "age": 2.04, "grav": 12.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 56, "qw": 0, "k": 244, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 1.257, "fa": 0.68, "gp": 0.557, "bl": 0.0, "ds": 0.0, "txt": "The problem with jQuery is that it swallows all errors. Dead code remains and you're none the wiser. That's only ok if you ship 2 KB of JS, at which point You Might Not Need jQuery either.\n\n$('.mispell').hide()\n\nNo error. Just silent. This is why jQuery is not a good library other than for 2010 cross-browser development."}, {"id": 50540160, "au": "dwoldrich", "dom": 100, "sr": 18, "sc": 5.12, "ep": 5.26, "bs": 0.0, "d": 1, "age": 15.61, "grav": 174.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 108, "qw": 0, "k": 210, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": 1.531, "fa": 0.0, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "Those original AJAX API's were pretty slick, but not well understood at the time.  Surprisingly they could stream characters!  The response is partially available each time onprogress fires:\n\n  const xhr = new XMLHttpRequest();\n  let lastLength = 0;\n\n  xhr.addEventListener(\"progress\", () => {\n    const chunk = xhr.responseText.substring(lastLength);\n    \n    lastLength = xhr.responseText.length;\n\n    console.log(\"New data:\", chunk);\n  });\n\n  xhr.open(\"GET\", \"/stream\");\n  xhr.send();\n\n-------------------\n\nThe modern fetch API is better though because it's a Promises API and it can stream as raw bytes, not characters:\n\n  const response = await fetch(\"/stream\");\n  const reader = response.body.getReader();\n\n  while (true) {\n    const { value, done } = await reader.read(); \n\n    if (done) {    \n        console.log(\"Finished\");\n        break;\n    }\n\n    console.log(\"Received\", value.length, \"bytes\");\n  }"}, {"id": 50538146, "au": "CM30", "dom": 42, "sr": 19, "sc": 5.0, "ep": 5.51, "bs": 0.0, "d": 0, "age": 18.81, "grav": 235.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 122, "qw": 0, "k": 12669, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 1.636, "fa": 0.0, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "I'm a tad surprised jQuery still exists, though it's kinda neat it does. Always interesting to see historical projects with less and less modern day relevance get continued like this.\n\nAnd while most of the use cases for jQuery have long since died out with things like classList, querySelector, etc, I do feel there's probably value in a framework that focuses on minor enhancements to a site rather than being the backbone of the whole thing. Like if you want a React or Angular or Vue equivalent, something like jQuery would be a terrible choice, but a lot of sites are static ones where the only scripting needed would be for minor things like dropdown menus or slideshows, and I can see a modern, lean library like this being a decent choice there."}, {"id": 50538075, "au": "sloped", "dom": 154, "sr": 20, "sc": 4.9, "ep": 4.9, "bs": 0.0, "d": 0, "age": 18.91, "grav": 238.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 103, "qw": 0, "k": 40, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": 1.664, "fa": 0.0, "gp": 0.679, "bl": 0.0, "ds": 0.0, "txt": "Back around the time React was maybe in it's pre 1.0 stage, I basically built a \"React\" system with jQuery as it's backbone. Div elements that declared what they were then were initialized at \"Boot\" to give them interactivity. It was disgusting and it ran in IE7.\n\njQuery really changed the game by letting an average developer actually use Javascript to enhance a web page. Granted I want to go back to the days when no one used Javascript and the Internet was a giant mess of terrible 8bit graphics and anonymous friends, but thank you jQuery for everything you did. It is not your fault humans are terrible."}, {"id": 50544697, "au": "nchmy", "dom": 62, "sr": 21, "sc": 4.81, "ep": 5.47, "bs": 0.0, "d": 6, "age": 4.91, "grav": 32.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 2101, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 0.78, "fa": 0.95, "gp": 0.645, "bl": 0.0, "ds": 0.0, "txt": "But you don't need the latest and greatest phone to have the latest browser. Android 10 (released in 2019) supports the latest chromium versions and android 8 (2017) and 9 (2018) support up to v138."}, {"id": 50541803, "au": "devsda", "dom": 2, "sr": 22, "sc": 4.61, "ep": 5.19, "bs": 0.0, "d": 1, "age": 11.58, "grav": 109.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 64, "qw": 17, "k": 2476, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 1.2, "fa": 0.42, "gp": 0.811, "bl": 0.0, "ds": 0.0, "txt": "> The composability of jQuery has been an inspiration for the way I design my own frameworks and tools\n\nNot just as a framework but its documentation is also probably an inspiration for later libs. It was the first site for me where you could see the code and  result together on the same page at the same place. And the discoverability of  widgets was also great and exciting in a way.\n\nJust open the firebug console, and try the examples for selectors, callbacks etc."}, {"id": 50539750, "au": "leptons", "dom": 32, "sr": 23, "sc": 4.44, "ep": 5.11, "bs": 0.0, "d": 1, "age": 16.31, "grav": 187.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 51, "qw": 0, "k": 2161, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": 0.952, "fa": 0.95, "gp": 0.111, "bl": 0.0, "ds": 0.0, "txt": "Not very relevant? It's still powering 64% of the websites in the world in 2026. React is only powering about 6% of the websites in the world today.\n\nJquery is only not relevant if you're living in a tech bubble that demands that \"new, shiny\" is the only thing that could possibly be relevant."}, {"id": 50539124, "au": "abanana", "dom": 44, "sr": 24, "sc": 4.32, "ep": 5.42, "bs": 0.0, "d": 2, "age": 17.45, "grav": 208.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 60, "qw": 8, "k": 572, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 1.452, "fa": 0.42, "gp": 0.561, "bl": 0.0, "ds": 0.0, "txt": "> set states on every element matching a jQuery selector\n\nVery much so. jQuery had 2 major selling points - (1) browser polyfills and (2) conciseness, as per their slogan, \"Write less, do more\". It seems (2) has been largely forgotten since (1) has been rendered obsolete. Its idea of running functions on a collection often made scripts end up at one-third to one-half of the equivalent vanilla JS, which needs loops to do the same thing."}, {"id": 50539072, "au": "saidinesh5", "dom": 53, "sr": 25, "sc": 4.09, "ep": 5.41, "bs": 0.0, "d": 4, "age": 17.52, "grav": 210.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 13, "k": 1622, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 1.348, "fa": 0.42, "gp": 0.719, "bl": 0.0, "ds": 0.0, "txt": "Not sure about \"modern hardware\" but I think the comparison is between jQuery vs. Vanilla JS on \"modern browsers\".\n\nMy only data point was my Blog felt significantly snappier on my 5 year old phone - especially on bad 4G connections - when i simply ditched jQuery and used Vanilla JS.\n\n> The latest version of jQuery (v4.0.0) is 76.8 kB minified and 27.0 kB minified + gzipped."}, {"id": 50539590, "au": "scottchiefbaker", "dom": 102, "sr": 26, "sc": 3.83, "ep": 4.56, "bs": 0.0, "d": 1, "age": 16.59, "grav": 192.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 24, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 0.819, "fa": 0.34, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "JQuery 4.1 is 78k minified, and 25k after Brotli compression. I'd venture a guess that 90% of the images on any given site are larger than all of JQuery. I wouldn't consider it bloated."}, {"id": 50539116, "au": "xp84", "dom": 121, "sr": 27, "sc": 3.76, "ep": 5.3, "bs": 0.0, "d": 2, "age": 17.46, "grav": 209.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 121, "qw": 0, "k": 9789, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 1.585, "fa": 0.28, "gp": 0.537, "bl": 0.0, "ds": 0.0, "txt": "There's a purpose for everything. Jquery is quite nice to write and works great. For a whole site, I'd these days be interested in building with HTMX, but JQ is fine and has the advantage that there are millions of people out there who know it well.\n\nWhat vanilla is obviously unbeatable for is, you're writing a snippet of JS that you can hand anyone[1] to run with no dependency requirements. Some codebases may be explicitly incompatible with JQ, so knowing how to do all the JQ basics \"vanilla\" is an important skill so you don't have to bring in a \"big\" (relatively, I mean) library to support a 7-line function.\n\n[1] for example, an embed code, an analytics tag, or a script to customize the markup on a page."}, {"id": 50541704, "au": "franciscop", "dom": 14, "sr": 28, "sc": 3.42, "ep": 3.86, "bs": 0.0, "d": 1, "age": 11.89, "grav": 114.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 101, "qw": 0, "k": 12650, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "method_chaining", "flbl": "Method & Chaining (Interface)", "urls": [], "ig": 1.433, "fa": 0.0, "gp": 0.341, "bl": 0.0, "ds": 0.0, "txt": "This is one of the first things I learned in programming. A friend back in University showed me a bit of his code (neither of us were in CS), and I was like why are you returning `this`? Then he showed me this chaining. I only found it a \"cool trick\" at the moment, who'd told me that I'd end up loving it the more I learned programming. I've made two of my main libraries, `umbrellajs` and a plumbing one called `swear` (chaining but for promises, some chaining syntax sugar on top of promises basically), based on this. I stopped doing it too much in recent years, but still it's amazing."}, {"id": 50537754, "au": "Devasta", "dom": 185, "sr": 29, "sc": 3.41, "ep": 4.07, "bs": 0.0, "d": 0, "age": 19.33, "grav": 246.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 37, "qw": 0, "k": 1649, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": ["https://youmightnotneedjquery.com/"], "ig": 0.843, "fa": 0.62, "gp": 0.225, "bl": 0.0, "ds": 0.0, "txt": "If it weren't for the chrome team fucking up autocomplete in their browser I'd probably still be using jQuery today. Even now I look at sites like https://youmightnotneedjquery.com/ and I see much nicer code to work with than the JS suggested."}, {"id": 50539061, "au": "xp84", "dom": 94, "sr": 30, "sc": 3.3, "ep": 3.74, "bs": 0.0, "d": 2, "age": 17.54, "grav": 210.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 9789, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 1.178, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Sure, Netscape was dead (besides the name) before then. But in 2006 we were dealing with Gecko (mainly in the form of Firefox), IE6, IE7 which was brand new and most notable for being different than both IE6 and standards-compliant browsers, and Safari."}, {"id": 50539157, "au": "thrownaway561", "dom": 143, "sr": 31, "sc": 3.1, "ep": 3.54, "bs": 0.0, "d": 0, "age": 17.41, "grav": 208.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 22, "kpp": 0.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": 0.892, "fa": 0.34, "gp": 0.33, "bl": 0.0, "ds": 0.0, "txt": "If it wasn't for jQuery, I would bet 90% of the web development wouldn't have progressed. There were SOOO many inconstancies between browsers back then. jQuery made javascript fun and easy. There was a time where EVERYTHING was a jQuery plugin."}, {"id": 50539008, "au": "xp84", "dom": 86, "sr": 32, "sc": 3.09, "ep": 4.63, "bs": 0.0, "d": 3, "age": 17.62, "grav": 212.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 58, "qw": 0, "k": 9789, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 1.203, "fa": 0.34, "gp": 0.574, "bl": 0.0, "ds": 0.0, "txt": "yup. we still had it on every page at my last job, even though it was a 100% React frontend (literally - even things like error pages were done with JSX for some reason!) merely because when the first parts of the site were written, they used $.ajax instead of fetch for some reason, and they never wanted to refactor anything."}, {"id": 50538464, "au": "chuckadams", "dom": 43, "sr": 33, "sc": 2.87, "ep": 3.97, "bs": 0.0, "d": 1, "age": 18.36, "grav": 226.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 72, "qw": 0, "k": 5093, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 1.323, "fa": 0.0, "gp": 0.596, "bl": 0.0, "ds": 0.0, "txt": "jQuery collections are much much nicer than the incredibly anemic NodeList you get from querySelector, which doesn't even implement a full JS Array.  You can set states on every element matching a jQuery selector as if it were a single element.  I don't personally use jQuery very often since I prefer declarative components, but if I'm whipping up something imperative like a user script, it's hard to beat jQuery's \"lenses for the DOM\", as one Haskell programmer put it."}, {"id": 50539479, "au": "dday9", "dom": 99, "sr": 34, "sc": 2.85, "ep": 6.69, "bs": 2.52, "d": 0, "age": 16.83, "grav": 197.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 156, "qw": 0, "k": 3, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 1.617, "fa": 0.34, "gp": 1.326, "bl": 0.95, "ds": 0.0, "txt": "jQuery was a godsend during the 2000s, those were some nasty times for cross-browser capability. Man, do you remember the old way to make asynchronous requests before you could just use the $.ajax method?!\n\nThat's why I'm surprised to see still being maintained... ever since Chromium basically won the browser wars and pretty much everything's standardized now, it almost feels like it's lived out its usefulness.\n\nI also want to say I remember it being a bit bloated too. I did work for a client who had several users live in very remote areas where every bit of bandwidth was precious, and I wanted to say that one of the issues was with jQuery. For some reason the \"slim\" version didn't work for the use case either. This is going off of memory and was probably 15 years ago, so I could be entirely wrong.\n\nThere's no denying it's prevalence though. Heck, datatables.net only recently phased out the jQuery dependency in April... of this year!"}, {"id": 50538571, "au": "burningChrome", "dom": 167, "sr": 35, "sc": 2.65, "ep": 3.68, "bs": 0.0, "d": 2, "age": 18.21, "grav": 223.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 56, "qw": 0, "k": 2247, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 1.46, "fa": 0.0, "gp": 0.168, "bl": 0.0, "ds": 0.0, "txt": "Seeing Wordpress isn't a shock since JQuery comes bundled directly with it by default. You have to remove it manually if you don't want it. Add in a  majority of themes, page builders and themes rely on JQuery for interactivity and DOM manipulation.\n\nUntil people stop making sites with Wordpress, JQuery will continue to live on for a while."}, {"id": 50539473, "au": "smt88", "dom": 59, "sr": 36, "sc": 2.61, "ep": 4.15, "bs": 0.0, "d": 4, "age": 16.84, "grav": 197.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 22347, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 1.159, "fa": 0.0, "gp": 0.985, "bl": 0.0, "ds": 0.0, "txt": "This is absolutely not a reason to use jQuery. This reason is 15+ years old.\n\nFirst, modern vanilla JS APIs have been available for more than ten years. A browser without them is absolutely ancient.\n\nAnd for the browsers that are truly that old, you can use nearly-weightless polyfills instead of jQuery."}, {"id": 50542659, "au": "faramarz", "dom": 124, "sr": 37, "sc": 2.52, "ep": 3.62, "bs": 0.0, "d": 0, "age": 9.18, "grav": 77.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 43, "qw": 0, "k": 2926, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 1.361, "fa": 0.0, "gp": 0.292, "bl": 0.0, "ds": 0.0, "txt": "Man, just seeing the name jQuery took me back to the days I was using MooTools for its fantastic animation engine and was always annoyed how simpler jQuery was to implement while mootools was superior for front end design. Thanks for the memory lane."}, {"id": 50540209, "au": "Velocifyer", "dom": 139, "sr": 38, "sc": 2.51, "ep": 3.61, "bs": 0.0, "d": 0, "age": 15.52, "grav": 173.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 736, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 0.969, "fa": 0.34, "gp": 0.252, "bl": 0.0, "ds": 0.0, "txt": "I still wish jQuery kept at least 2 years of browser support, rather than last 3 versions of iOS, or 2 of Firefox. Many people are stuck on old iOS."}, {"id": 50540390, "au": "bastawhiz", "dom": 98, "sr": 39, "sc": 2.31, "ep": 3.41, "bs": 0.0, "d": 0, "age": 15.1, "grav": 165.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 43, "qw": 0, "k": 13294, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 1.149, "fa": 0.0, "gp": 0.489, "bl": 0.0, "ds": 0.0, "txt": "I don't think I'd reach for jQuery ever again, but I'd used it extensively fifteen years ago. I'm glad it's still alive and kicking. When it's already in a project that I'm making changes to, it's a cute way to do stuff easily that would be a pain with vanilla dom."}, {"id": 50541427, "au": "skrtskrt", "dom": 77, "sr": 40, "sc": 2.29, "ep": 3.83, "bs": 0.0, "d": 1, "age": 12.58, "grav": 124.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 57, "qw": 0, "k": 3608, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 1.53, "fa": 0.0, "gp": 0.16, "bl": 0.0, "ds": 0.0, "txt": "I think Datastar probably fits that idea the best in terms of \"mild interactive enhancements\".\n\nIt's sort of the same sort of less-is-more mindset of jQuery but for the modern reactive-component model - intentionally small, allows SSR swapping when possible (like HTMX), and adds the layers of reactivity that can still only be reasonably done with frontend scripting."}, {"id": 50541781, "au": "xp84", "dom": 88, "sr": 41, "sc": 2.29, "ep": 3.83, "bs": 0.0, "d": 5, "age": 11.65, "grav": 110.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 9789, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 0.803, "fa": 0.68, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "That’s gotta be it. I think the older parts of the codebase definitely either predated 2015 or straddled the time where you couldn’t assume fetch was there. And I agree, XHR was actually pretty absurd, having used it in about 2006 before discovering JQ."}, {"id": 50539208, "au": "noduerme", "dom": 87, "sr": 42, "sc": 2.27, "ep": 3.81, "bs": 0.0, "d": 4, "age": 17.33, "grav": 206.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 15382, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 1.171, "fa": 0.34, "gp": 0.06, "bl": 0.0, "ds": 0.0, "txt": "fetch only became available in 2015 and it was awhile before it was commonly supported. At the time, jQuery's ajax was much nicer than handling the XMLHttpRequest yourself.  I have sites that have gone through all three, finally replacing $().ajax with fetch only in the last couple years."}, {"id": 50540702, "au": "everforward", "dom": 30, "sr": 43, "sc": 2.27, "ep": 3.81, "bs": 0.0, "d": 4, "age": 14.42, "grav": 154.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 90, "qw": 0, "k": 3014, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 1.62, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It can, but the typical usage I’m used to is far less structured and need not involve the value having the same type at every point. Eg something like\n\n|> docker.listContainers()\n   filter(x => x.name == “something”)\n   first\n   getNetwork\n   getIpAddress\n   toString\n   ping\n\n(ignore that some of these should be chained and some should be arguments, I haven’t read the proposal fully)\n\nThey’re doubly nice in Clojure because of the lazy evaluation. You can map a pipeline over a list and it will evaluate one at a time rather than pre-evaluating and allocating memory for the whole thing."}, {"id": 50547810, "au": "egeozcan", "dom": 11, "sr": 44, "sc": 2.2, "ep": 3.3, "bs": 0.0, "d": 3, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 57, "qw": 0, "k": 6786, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": 1.357, "fa": 0.0, "gp": 0.075, "bl": 0.0, "ds": 0.0, "txt": "Well, jQuery is how I got introduced to the concept of monads. After that I picked up Haskell, then Elm and Purescript, which allowed me to use the monads the way functional gods intended to... Web scale!\n\nThat'd be an interesting alternative reality!\n\nWhat ended up happening is that I'm writing (having it written by agents) react like everybody else."}, {"id": 50541391, "au": "skrtskrt", "dom": 19, "sr": 45, "sc": 2.2, "ep": 3.74, "bs": 0.0, "d": 2, "age": 12.68, "grav": 126.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 54, "qw": 0, "k": 3608, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 1.376, "fa": 0.0, "gp": 0.348, "bl": 0.0, "ds": 0.0, "txt": "Things like Alpine, HTMX, and Datastar seem to be more in favor these days.\n\nThey have the small surface area of jQuery, but still aim for component-based reactivity and SSR-when-possible which just aligns more with the mental model and development preferences that have developed from the whole world of React/Next and similar."}, {"id": 50541174, "au": "lofaszvanitt", "dom": 111, "sr": 46, "sc": 2.18, "ep": 3.73, "bs": 0.0, "d": 2, "age": 13.19, "grav": 133.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 56, "qw": 0, "k": 239, "kpp": 0.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 1.586, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "John Resig et al scattered some corn and they ate them like chickens. They stole the ideas and couldn't copy the features adequately. They had one job. They failed. They should've brought a black suitcase full of money to them and ask nicely to implement the whole thing to replace the abhorrent JS browser side implementation."}, {"id": 50537823, "au": "FartinMowler", "dom": 126, "sr": 47, "sc": 2.14, "ep": 3.38, "bs": 0.0, "d": 1, "age": 19.24, "grav": 244.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 166, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 1.005, "fa": 0.0, "gp": 0.705, "bl": 0.0, "ds": 0.0, "txt": "Add your own `.notEmpty()` custom plugin / $.fn method to throw that exception. The rest of the world can stay as-is."}, {"id": 50539273, "au": "abanana", "dom": 25, "sr": 48, "sc": 1.96, "ep": 2.4, "bs": 0.0, "d": 3, "age": 17.24, "grav": 205.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 77, "qw": 0, "k": 572, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "method_chaining", "flbl": "Method & Chaining (Interface)", "urls": [], "ig": 0.893, "fa": 0.0, "gp": 0.206, "bl": 0.0, "ds": 0.0, "txt": "As I understand it, it's a different method to create something that matches the whole idea of a fluent interface, without having to build every method to support chaining, isn't it? And in a way that works for all language features rather than just your custom methods?\n\nMaybe not precisely the same from a technical point of view but is it just pendantry to argue against someone referring to it as a fluent interface? Happy to learn and to be corrected if required."}, {"id": 50537292, "au": "frabjoused", "dom": 148, "sr": 49, "sc": 1.86, "ep": 2.96, "bs": 0.0, "d": 0, "age": 19.84, "grav": 257.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 634, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 1.033, "fa": 0.0, "gp": 0.365, "bl": 0.0, "ds": 0.0, "txt": "Since it's easy now to maintain and this is still happening, why not bring back MooTools? I'd love to hear that AI chose MooTools as default and it's running the entire Internet."}, {"id": 50537385, "au": "whalesalad", "dom": 189, "sr": 50, "sc": 1.81, "ep": 2.91, "bs": 0.0, "d": 0, "age": 19.75, "grav": 255.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 27927, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 1.24, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "FAA ground stop: initiated\n    Microsoft 365: down\n    United Airlines: down\n    Github actions: down\n    Apple: down\n    Nvidia CEO: owned\n    Clandestine NSA network: down\n\n    jQuery: 4.1.0 released :)"}, {"id": 50538975, "au": "xp84", "dom": 52, "sr": 51, "sc": 1.79, "ep": 3.33, "bs": 0.0, "d": 3, "age": 17.67, "grav": 213.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 9789, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 1.348, "fa": 0.0, "gp": 0.114, "bl": 0.0, "ds": 0.0, "txt": "Serious question: On modern hardware how much performance is jQuery actually taking away from you? Compared to the ridiculous overkill factor of using React for simple static pages, a practice I see everywhere now, the time it takes jQuery to parse seems inconsequential."}, {"id": 50540658, "au": "hax0ron3", "dom": 35, "sr": 52, "sc": 1.78, "ep": 3.32, "bs": 0.0, "d": 2, "age": 14.52, "grav": 155.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 58, "qw": 0, "k": 588, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 1.412, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "True. I am living in such a tech bubble. It has been a very long time since I've worked with jQuery. Which is separate from my personal feelings about jQuery, since I'm a jQuery fan - although these days I wouldn't use it, since changes in Web APIs, changes partly inspired by jQuery, have made it possible to write jQuery-esque code without actually loading jQuery."}, {"id": 50539120, "au": "sigzero", "dom": 84, "sr": 53, "sc": 1.73, "ep": 3.05, "bs": 0.0, "d": 2, "age": 17.45, "grav": 208.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 4239, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": 0.884, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "If you believe a google query:\n\nApproximately 64% of all websites—or roughly 67 million live domains—currently use jQuery."}, {"id": 50537816, "au": "jgalt212", "dom": 163, "sr": 54, "sc": 1.72, "ep": 2.82, "bs": 0.0, "d": 0, "age": 19.26, "grav": 245.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 17, "qw": 0, "k": 3474, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": ["https://datatables.net/blog/2026/datatables-3"], "ig": 0.555, "fa": 0.34, "gp": 0.376, "bl": 0.0, "ds": 0.0, "txt": "I was about to say, but datatables.net!  But version 3, as of July 2026, has dropped the jQuery dependency.\n\nhttps://datatables.net/blog/2026/datatables-3"}, {"id": 50537770, "au": "buildwrangler", "dom": 166, "sr": 55, "sc": 1.68, "ep": 3.07, "bs": 0.0, "d": 2, "age": 19.31, "grav": 246.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 13, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 1.309, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Frontend legacy is especially difficult to refactor away from. So many edge case visual regressions and browser compatibility issues make end to end verification really hard. It makes sense jQuery is still so popular in legacy monoliths"}, {"id": 50537381, "au": "Gualdrapo", "dom": 107, "sr": 56, "sc": 1.68, "ep": 2.98, "bs": 0.0, "d": 0, "age": 19.75, "grav": 255.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 1916, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 0.511, "fa": 0.0, "gp": 1.228, "bl": 0.0, "ds": 0.0, "txt": "I wonder if people use jQuery on their new projects. Vanilla JS has come a long way since jQuery was king."}, {"id": 50538800, "au": "reassess_blind", "dom": 70, "sr": 57, "sc": 1.68, "ep": 2.97, "bs": 0.0, "d": 3, "age": 17.92, "grav": 218.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 45, "qw": 0, "k": 482, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 1.191, "fa": 0.0, "gp": 0.119, "bl": 0.0, "ds": 0.0, "txt": "Valid questions. In jQuery's case it's still so widely used by older codebases that it makes sense to improve and keep maintained. I think it's important to have alternatives in any case. Some people still prefer to write code by hand, and some people prefer jQuery."}, {"id": 50546218, "au": "goertzen", "dom": 4, "sr": 58, "sc": 1.68, "ep": 2.83, "bs": 0.0, "d": 1, "age": 2.15, "grav": 13.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 52, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": 0.864, "fa": 0.28, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "gotta say i really appreciate comments like this* on hn.\n\n* brief snapshots on what’s interesting, valuable and good about some random thing\n\nthx for sharing and taking the time to write it noduerme"}, {"id": 50542157, "au": "hax0ron3", "dom": 20, "sr": 59, "sc": 1.68, "ep": 2.8, "bs": 0.0, "d": 3, "age": 10.58, "grav": 95.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 588, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 1.191, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Given how good AI is at coding, I'd be tempted to just have it write vanilla Typescript that uses direct DOM manipulations unless I really wanted to leverage a framework's ecosystem of components."}, {"id": 50538423, "au": "wouldbecouldbe", "dom": 90, "sr": 60, "sc": 1.68, "ep": 2.78, "bs": 0.0, "d": 3, "age": 18.42, "grav": 228.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 1844, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": 0.819, "fa": 0.0, "gp": 0.59, "bl": 0.0, "ds": 0.0, "txt": "well its actually ship by wordpress, although not turned on my default, most themes and plugins do. So that already makes up for a huge part of the internet."}, {"id": 50537322, "au": "maxpert", "dom": 144, "sr": 61, "sc": 1.68, "ep": 2.75, "bs": 0.0, "d": 0, "age": 19.81, "grav": 256.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 2004, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 0.947, "fa": 0.0, "gp": 0.359, "bl": 0.0, "ds": 0.0, "txt": "In the age of AIs and Reacts, people would never realize the pleasure and the ease jQuery provided with shitty browsers like IE6!"}, {"id": 50542533, "au": "jmathai", "dom": 16, "sr": 62, "sc": 1.68, "ep": 2.72, "bs": 0.0, "d": 1, "age": 9.46, "grav": 80.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 5646, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 1.122, "fa": 0.0, "gp": 0.06, "bl": 0.0, "ds": 0.0, "txt": "jQuery's API is the most elegant I've ever used. I haven't written jQuery in over a decade but I'm pretty sure this works.\n\n$('\u0023selector').html('new <strong>text<\/strong>').attr('foo', 'bar');"}, {"id": 50545321, "au": "hinkley", "dom": 128, "sr": 63, "sc": 1.68, "ep": 2.7, "bs": 0.0, "d": 2, "age": 3.7, "grav": 23.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 95, "qw": 0, "k": 48058, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 1.149, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The two replies I've gotten remind me of the sentiment of C developers who panned Java as being ridiculous because you could just do garbage collection in C if you wanted to.\n\nThere's a lot of things you can do when you're a sole proprietor on a project. But other developers have opinions and they expect them to be respected as much as you expect them to respect yours.\n\nCan you think of the last project where you got everything your way? I can't, and I have a reputation of being pretty insistent about people trying my suggestions before they say no."}, {"id": 50537772, "au": "bryanlarsen", "dom": 112, "sr": 64, "sc": 1.68, "ep": 2.65, "bs": 0.0, "d": 1, "age": 19.31, "grav": 246.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 43485, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 0.946, "fa": 0.0, "gp": 0.291, "bl": 0.0, "ds": 0.0, "txt": "I'd use jQuery if IE11 support was a requirement.   It's been a long time since I've seen that as a requirement, but IE11 was the last Internet Explorer before it got replaced by Edge.  I wouldn't be surprised if there were hold-outs out there still using it..."}, {"id": 50538253, "au": "ramesh31", "dom": 85, "sr": 65, "sc": 1.68, "ep": 2.64, "bs": 0.0, "d": 2, "age": 18.66, "grav": 232.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 11, "k": 3952, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": 0.391, "fa": 0.42, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": ">I wonder how many websites on the web still use jquery today\n\nProbably more than use React, by total domains alone. It's a bit like WordPress; so ubiquitous you forget it's even there, and with a long tail that will outlive many people reading this."}, {"id": 50537429, "au": "elondaits", "dom": 108, "sr": 66, "sc": 1.68, "ep": 2.62, "bs": 0.0, "d": 1, "age": 19.71, "grav": 254.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 826, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 0.927, "fa": 0.0, "gp": 0.301, "bl": 0.0, "ds": 0.0, "txt": "Yes. I did not so long ago. Vanilla JS is fine in term of features, but if you consider jQuery code idiomatic, then it's much more compact and readable for some development patterns."}, {"id": 50538919, "au": "OuterVale", "dom": 114, "sr": 67, "sc": 1.68, "ep": 2.6, "bs": 0.0, "d": 3, "age": 17.75, "grav": 214.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 45, "qw": 0, "k": 5272, "kpp": 10.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 1.106, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "IE 11 isn't fully out of support for a few more years yet. There are so many enterprises using it with so many custom tools built just for the browser. Most is tight lipped under NDAs but some of the details and remaining usage figures are staggering."}, {"id": 50537857, "au": "coredev_", "dom": 129, "sr": 68, "sc": 1.68, "ep": 2.5, "bs": 0.0, "d": 0, "age": 19.2, "grav": 244.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 158, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": 0.843, "fa": 0.0, "gp": 0.359, "bl": 0.0, "ds": 0.0, "txt": "JQuery is not a good way to compose and handle complex ui:s. There are so much better ways today. I have fine memories of bootstrap and jQuery - just don't use them today if you are composing a somewhat complex ui."}, {"id": 50543269, "au": "dawnerd", "dom": 13, "sr": 69, "sc": 1.68, "ep": 2.48, "bs": 0.0, "d": 2, "age": 7.71, "grav": 59.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 9709, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 1.054, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It’s still probably the most distributed library. Every Wordpress site includes it.\n\nI had to use it on a legacy site recently and forgot how nice it was and it all just came back to me too. Didn’t need docs either. That’s a sign of a very well designed lib"}, {"id": 50539194, "au": "nixpulvis", "dom": 45, "sr": 70, "sc": 1.68, "ep": 2.46, "bs": 0.0, "d": 3, "age": 17.35, "grav": 207.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 4681, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": 1.046, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Love me some jQuery. I honestly think the web would be in a better place if we hadn't stopped using HS for things like little jQuery scripts and kept the servers doing the controllers and handling the models."}, {"id": 50539224, "au": "wvbdmp", "dom": 46, "sr": 71, "sc": 1.68, "ep": 2.33, "bs": 0.0, "d": 2, "age": 17.32, "grav": 206.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 592, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 0.991, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The inconsistent collection APIs are such an unhinged part of JS. You’re telling me Map doesn’t implement map()? I bet habitually using jQuery feels divine."}, {"id": 50537310, "au": "gosen", "dom": 97, "sr": 72, "sc": 1.68, "ep": 2.32, "bs": 0.0, "d": 0, "age": 19.82, "grav": 256.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 158, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 0.556, "fa": 0.0, "gp": 0.701, "bl": 0.0, "ds": 0.0, "txt": "I'm actually surprised (in a good way) that it's still maintained, and it still helps half of the internet to function"}, {"id": 50544924, "au": "grugdev42", "dom": 157, "sr": 73, "sc": 1.68, "ep": 2.19, "bs": 0.0, "d": 1, "age": 4.5, "grav": 29.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 147, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 0.931, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "In the age of build steps TS, jQuery (loaded from a CDN) is certainly a breath of fresh air. :)"}, {"id": 50544518, "au": "abanana", "dom": 27, "sr": 74, "sc": 1.68, "ep": 3.01, "bs": 0.85, "d": 5, "age": 5.26, "grav": 35.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 73, "qw": 0, "k": 572, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "method_chaining", "flbl": "Method & Chaining (Interface)", "urls": [], "ig": 1.279, "fa": 0.0, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "paulddraper has phrased it perfectly in answer to your previous post - chaining everything so that the process flow reads fluently from left to right. (I'm replying just to avoid leaving your question hanging.)\n\nTo suggest the pipeline proposal must not be referred to as a \"fluent interface\" would seem to me to be arguing semantics, ignoring the point behind the words, or the facts that they can have implied meanings or subtle changes over time."}, {"id": 50546542, "au": "anamexis", "dom": 28, "sr": 75, "sc": 1.68, "ep": 3.84, "bs": 1.7, "d": 6, "age": 1.66, "grav": 10.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 61, "qw": 0, "k": 4981, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 5, "meme": 0, "tier": "crowd_chatter", "facet": "method_chaining", "flbl": "Method & Chaining (Interface)", "urls": [], "ig": 1.4, "fa": 0.0, "gp": 0.382, "bl": 0.64, "ds": 0.0, "txt": "I think the point behind the words is that it is a specific design pattern based on building DSLs using method chaining. I don't think pipelines, broadly, are an implementation of that design pattern. It's a way to string together function calls in a way that they read left-to-right, yes, but the spirit of \"fluent interface\" is not just \"reads left-to-right.\" It's a specific pattern."}, {"id": 50538516, "au": "Kuyawa", "dom": 186, "sr": 76, "sc": 1.68, "ep": 2.14, "bs": 0.0, "d": 0, "age": 18.29, "grav": 225.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 689, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 0.909, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Some people hasn't awaken to the new AI dawn\n\nYou just don't need this. No jquery, no react, no tailwind, no fowntawesome, no external libs, no malware attack vectors, no waiting for a new update that never comes. It is all poison, just don't drink it and you'll be fine"}, {"id": 50540054, "au": "thallavajhula", "dom": 15, "sr": 77, "sc": 1.68, "ep": 2.13, "bs": 0.0, "d": 1, "age": 15.81, "grav": 178.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 1010, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "method_chaining", "flbl": "Method & Chaining (Interface)", "urls": [], "ig": 0.754, "fa": 0.0, "gp": 0.246, "bl": 0.0, "ds": 0.0, "txt": "If you pick a pure OOP language like Ruby, you'll have the same experience. You can pick a literal and call a method on it and chain the method calls. It's lovely."}, {"id": 50538692, "au": "troupo", "dom": 133, "sr": 78, "sc": 1.68, "ep": 2.09, "bs": 0.0, "d": 3, "age": 18.06, "grav": 220.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 5897, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "method_chaining", "flbl": "Method & Chaining (Interface)", "urls": [], "ig": 0.888, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "No, you're not.\n\njQuery returned useful collections. DOM methods return an anemic NodeList which doesn't even implement Array interface."}, {"id": 50537756, "au": "flykespice", "dom": 160, "sr": 79, "sc": 1.68, "ep": 2.08, "bs": 0.0, "d": 2, "age": 19.33, "grav": 246.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 2064, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 0.886, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Ah yes, the ultimate vibecoding experience. Ask the AI to write your code in a write-only language."}, {"id": 50539882, "au": "recursive", "dom": 49, "sr": 80, "sc": 1.68, "ep": 2.92, "bs": 0.85, "d": 4, "age": 16.1, "grav": 183.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 55, "qw": 0, "k": 13282, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 1.245, "fa": 0.0, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "jQuery had a lot of reasons for existing. And now it has less than it used to.  I believe that was the point.\n\nYou'd probably usually chain that inside the callback.  Instead of addClass('foo').hide(), you'd do el.classList.add('foo'); el.hidden = true; or something.  It's not 1:1, but also it's not really that big a deal."}, {"id": 50545148, "au": "williamdclt", "dom": 127, "sr": 81, "sc": 1.68, "ep": 1.94, "bs": 0.0, "d": 1, "age": 4.04, "grav": 25.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 4089, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 0.824, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I don't feel like it should be a feature of `hide`, sounds like it should be a feature of the element-finding methods (`$`, `find`...). If instead of `find` you had `maybeFind` and `findOrThrow`, you wouldn't have these issues.\n\nYou can \"just\" add these methods and ban raw `find` with linting?"}, {"id": 50537288, "au": "kyleee", "dom": 169, "sr": 82, "sc": 1.68, "ep": 1.91, "bs": 0.0, "d": 0, "age": 19.84, "grav": 257.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 1127, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": 0.572, "fa": 0.0, "gp": 0.391, "bl": 0.0, "ds": 0.0, "txt": "Do they still build jquery ui? I kind of liked it and maybe will demand my agents start using it again for fun"}, {"id": 50543134, "au": "sgt", "dom": 21, "sr": 83, "sc": 1.68, "ep": 1.86, "bs": 0.0, "d": 4, "age": 7.95, "grav": 62.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 8603, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 0.791, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Correct, vanilla JS is widely accepted as a robust way of achieving the same. And LLMs are really good at it.\n\nI'd still recommend keeping it at a minimum though. Rather rely on tools like htmx."}, {"id": 50540444, "au": "bastawhiz", "dom": 101, "sr": 84, "sc": 1.68, "ep": 1.77, "bs": 0.0, "d": 2, "age": 14.99, "grav": 163.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 13294, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": 0.753, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It's actually a little easier these days:\n\n  const response = await fetch(\"/stream\");\n  for await (const value of response.body) {\n    console.log(\"Received\", value.length, \"bytes\");\n  }\n  console.log(\"Finished\")"}, {"id": 50543192, "au": "azangru", "dom": 22, "sr": 85, "sc": 1.68, "ep": 1.7, "bs": 0.0, "d": 2, "age": 7.86, "grav": 61.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 5045, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 0.723, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Why would a site that does not need a bloated js framework need jQuery? What is it that jQuery brings to the table that is worth paying for in terms of making it a dependency?"}, {"id": 50537319, "au": "squidsoup", "dom": 164, "sr": 86, "sc": 1.67, "ep": 1.67, "bs": 0.0, "d": 0, "age": 19.81, "grav": 256.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 1654, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 0.483, "fa": 0.0, "gp": 0.366, "bl": 0.0, "ds": 0.0, "txt": "Out of curiosity, are there still large projects using jQuery? Interesting that it is still maintained."}, {"id": 50538157, "au": "petre", "dom": 120, "sr": 87, "sc": 1.63, "ep": 1.63, "bs": 0.0, "d": 1, "age": 18.8, "grav": 235.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 3479, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 0.694, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Go ahead, use document.querySelector. Why? Because chaining and a bunch of other stuff and not bothering to check if querySelector actually got anything every single time. Vanilla JS is like bringing a knife to a gun fight."}, {"id": 50539077, "au": "edflsafoiewq", "dom": 136, "sr": 88, "sc": 1.63, "ep": 1.63, "bs": 0.0, "d": 5, "age": 17.51, "grav": 210.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 5036, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "method_chaining", "flbl": "Method & Chaining (Interface)", "urls": [], "ig": 0.694, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "There are small libraries like umbrellajs that just provide a jquery-like DOM interface if that's all you want."}, {"id": 50537905, "au": "__abc", "dom": 130, "sr": 89, "sc": 1.53, "ep": 1.53, "bs": 0.0, "d": 1, "age": 19.15, "grav": 242.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 456, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": 0.651, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "would you define \"complex ui\" and what tools you would recommend \"today\" as an alternative to BS/JQ."}, {"id": 50547020, "au": "dday9", "dom": 103, "sr": 90, "sc": 1.49, "ep": 4.0, "bs": 2.52, "d": 2, "age": 0.98, "grav": 7.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 69, "qw": 0, "k": 3, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 1.291, "fa": 0.34, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "I think you misunderstood or read past what I was saying.\n\nI wasn't talking about version 4.1, this would have been version 1.x (maybe 1.5... it was ~15 years ago), and the issue was bandwidth usage for uber remote users. There were all sorts of tricks I remember implementing to get that project over the finish line, but one of them was definitely yoinking jQuery out of the project, despite me being a big advocate for the library."}, {"id": 50538947, "au": "kuschku", "dom": 135, "sr": 91, "sc": 1.48, "ep": 1.48, "bs": 0.0, "d": 4, "age": 17.72, "grav": 214.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 12625, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 0.631, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "That's why I do\n\n  $ = (selector) => Array.from(document.querySelectorAll(selector))\n\nStill not as good as the original, but somewhat usable at least :/"}, {"id": 50541106, "au": "hax0ron3", "dom": 8, "sr": 92, "sc": 1.19, "ep": 2.38, "bs": 1.19, "d": 3, "age": 13.37, "grav": 136.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 588, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": 0.303, "fa": 0.0, "gp": 1.15, "bl": 0.45, "ds": 0.0, "txt": "I considered doing it in my top-level comment but I decided not to, since I don't actually know enough about monads to be sure that I know what I'm talking about, lol."}, {"id": 50537503, "au": "hirvi74", "dom": 119, "sr": 93, "sc": 1.17, "ep": 1.17, "bs": 0.0, "d": 1, "age": 19.65, "grav": 253.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 1989, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 0.497, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I do when absolutely necessary, which is becoming rarer as Vanilla JS improves, like you stated. One of my coworkers is still using it on all new projects though. My employer has avoided the whole SPA scene for better or worse."}, {"id": 50538857, "au": "joel2oliver", "dom": 92, "sr": 94, "sc": 1.0, "ep": 3.51, "bs": 2.52, "d": 0, "age": 17.84, "grav": 216.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 1.105, "fa": 0.0, "gp": 0.634, "bl": 0.95, "ds": 0.0, "txt": "I remember how painful it was to deal with IE/Netscape. Event handlers, etc... jQuery made so many lives easier. It’s quite an achievement, and I can stretch to say that JavaScript development might not be here today without it!"}, {"id": 50538759, "au": "umvi", "dom": 123, "sr": 95, "sc": 0.96, "ep": 2.16, "bs": 1.19, "d": 0, "age": 17.97, "grav": 219.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 18974, "kpp": 4.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 0.725, "fa": 0.0, "gp": 0.313, "bl": 0.45, "ds": 0.0, "txt": "Moved to vanilla JS/TS years ago. In the age of AI CVEs, it's nice to have as few 3rd party dependencies as possible."}, {"id": 50538530, "au": "dmix", "dom": 106, "sr": 96, "sc": 0.91, "ep": 2.1, "bs": 1.19, "d": 0, "age": 18.27, "grav": 225.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 44038, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 0.518, "fa": 0.0, "gp": 0.609, "bl": 0.45, "ds": 0.0, "txt": "One of the nice things about LLMs is you can port 10+ year old apps using jQuery to vanilla js pretty easily."}, {"id": 50542336, "au": "benatkin", "dom": 79, "sr": 97, "sc": 0.64, "ep": 1.84, "bs": 1.19, "d": 2, "age": 10.06, "grav": 88.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 8120, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 0.781, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "It's effectively closed source. They put essentials in the pro version. Imagine charging for scroll into view."}, {"id": 50539029, "au": "kevin_thibedeau", "dom": 82, "sr": 98, "sc": 0.56, "ep": 1.75, "bs": 1.19, "d": 2, "age": 17.59, "grav": 211.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 23589, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 0.666, "fa": 0.0, "gp": 0.125, "bl": 0.45, "ds": 0.0, "txt": "StackOverflow still does. Delivered via Google for no good reason other than to give them tracking data on SO users."}, {"id": 50538823, "au": "mathgeek", "dom": 71, "sr": 99, "sc": 0.48, "ep": 1.67, "bs": 1.19, "d": 3, "age": 17.89, "grav": 217.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 3942, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 0.711, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "I wouldn't say there are _many_ use cases, but \"LLM is writing code in a legacy codebase without heavy refactors\" fits your question."}, {"id": 50538250, "au": "dalemhurley", "dom": 50, "sr": 100, "sc": 0.41, "ep": 1.6, "bs": 1.19, "d": 1, "age": 18.66, "grav": 232.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 658, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": 0.535, "fa": 0.0, "gp": 0.236, "bl": 0.45, "ds": 0.0, "txt": "There is a heap of indie devs that swear by jQuery and avoid the frameworks like react. Each has their use cases."}, {"id": 50539490, "au": "smt88", "dom": 55, "sr": 101, "sc": 0.35, "ep": 1.54, "bs": 1.19, "d": 4, "age": 16.82, "grav": 196.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 22347, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 0.656, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "jQuery feels much snappier than React, and vanilla JS feels much snappier than jQuery. There is genuinely a noticeable different even in fairly simple UIs."}, {"id": 50542392, "au": "pknerd", "dom": 12, "sr": 102, "sc": -0.01, "ep": 1.19, "bs": 1.19, "d": 1, "age": 9.91, "grav": 86.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 1742, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "method_chaining", "flbl": "Method & Chaining (Interface)", "urls": [], "ig": 0.425, "fa": 0.0, "gp": 0.13, "bl": 0.45, "ds": 0.0, "txt": "Who said it is not relevant? Many like me who abhor so called modern JS frameworks still use it along with bootstrap CSS"}, {"id": 50547649, "au": "thaumasiotes", "dom": 29, "sr": 103, "sc": -0.05, "ep": 1.14, "bs": 1.19, "d": 6, "age": 0.19, "grav": 4.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 13, "k": 24735, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 0.485, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "> chaining everything so that the process flow reads fluently from left to right\n\nNote that the language with the best support for this concept is Perl, with its $_ variable."}, {"id": 50539478, "au": "smt88", "dom": 63, "sr": 104, "sc": -0.08, "ep": 1.11, "bs": 1.19, "d": 6, "age": 16.84, "grav": 197.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 22347, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 0.474, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Why use jQuery instead of situational, atomic polyfills that just provide the functionality you’re actually using?"}, {"id": 50540707, "au": "Prathamdeshmukh", "dom": 141, "sr": 105, "sc": -0.08, "ep": 2.43, "bs": 2.52, "d": 0, "age": 14.41, "grav": 153.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 0.469, "fa": 0.34, "gp": 0.252, "bl": 0.95, "ds": 0.0, "txt": "Used it extensively 15 years ago, at the start of my career.\n\nDid not know this library is still being maintained"}, {"id": 50540119, "au": "proxyscore", "dom": 56, "sr": 106, "sc": -0.1, "ep": 1.09, "bs": 1.19, "d": 5, "age": 15.7, "grav": 176.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": -1, "kpp": -0.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.465, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Yes and reading resigs book on how he made jquery, well I can't say anything but the guy was a genius way ahead of it's time."}, {"id": 50540716, "au": "hajile", "dom": 134, "sr": 107, "sc": -0.17, "ep": 1.82, "bs": 1.99, "d": 4, "age": 14.38, "grav": 153.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 20, "qw": 0, "k": 7563, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": ["https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Iterator"], "ig": 0.726, "fa": 0.0, "gp": 0.076, "bl": 0.75, "ds": 0.0, "txt": "NodeList has .values() that returns an iterator.\n\n    var $$ = q => document.querySelectorall(q).values()\n\nThen you have access to a bunch of iterator methods\n\nhttps://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe..."}, {"id": 50537378, "au": "coffeefirst", "dom": 145, "sr": 108, "sc": -0.17, "ep": 1.02, "bs": 1.19, "d": 1, "age": 19.76, "grav": 255.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 4605, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 0.434, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Also just much better JS builtins. document.queryselector and map/filter were many, many years away."}, {"id": 50538574, "au": "simlevesque", "dom": 173, "sr": 109, "sc": -0.2, "ep": 0.99, "bs": 1.19, "d": 4, "age": 18.21, "grav": 223.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 4080, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 0.42, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "It's never said in the movies, they kind of imply he's like the king of elvens."}, {"id": 50537763, "au": "hax0ron3", "dom": 5, "sr": 110, "sc": -0.3, "ep": 4.07, "bs": 4.37, "d": 0, "age": 19.32, "grav": 246.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 588, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "method_chaining", "flbl": "Method & Chaining (Interface)", "urls": [], "ig": 0.97, "fa": 0.0, "gp": 1.234, "bl": 1.65, "ds": 0.0, "txt": "Although jQuery isn't very relevant these days, I still find its pattern of chaining a sequence of methods on a set chosen by a selector to be a beautiful example of going with a language's features."}, {"id": 50547245, "au": "hylaride", "dom": 34, "sr": 111, "sc": -0.34, "ep": 0.85, "bs": 1.19, "d": 3, "age": 0.7, "grav": 6.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 2958, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": 0.363, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "All it needs to be still \"heavily used\" is to be pulled in from a long-used Wordpress plugin.\n\nSoftware has a way of sticking around."}, {"id": 50547050, "au": "dday9", "dom": 3, "sr": 112, "sc": -0.54, "ep": 1.98, "bs": 2.52, "d": 2, "age": 0.93, "grav": 6.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 3, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": 0.842, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "Dude, that's so true. I sort of take it for granted today, but I forgot how good jQuery's documentation was compared to just about everything else."}, {"id": 50540874, "au": "addedlovely", "dom": 33, "sr": 113, "sc": -0.54, "ep": 2.51, "bs": 3.05, "d": 2, "age": 14.03, "grav": 147.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 14, "qw": 0, "k": 390, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "today_web", "flbl": "Today & Web (React)", "urls": ["https://theweb.report/\u0023front-end"], "ig": 0.184, "fa": 0.68, "gp": 0.094, "bl": 1.15, "ds": 0.0, "txt": "Where are those numbers from, I make it about 53% and 10% for react. https://theweb.report/\u0023front-end\n\nBut still everywhere!"}, {"id": 50537631, "au": "hinkley", "dom": 174, "sr": 114, "sc": -0.62, "ep": 0.58, "bs": 1.19, "d": 3, "age": 19.5, "grav": 250.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 48058, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 0.245, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "I don't know if that was his Hitler dig or just a common trope, of people hating their own ancestry."}, {"id": 50546492, "au": "olmo23", "dom": 69, "sr": 115, "sc": -0.63, "ep": 0.57, "bs": 1.19, "d": 4, "age": 1.75, "grav": 10.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 5, "k": 224, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.241, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "> old garbage people never updated\n\nhot take: we should not be supporting them.\n\n(i get that this is a hard sell if you use your website to make money)"}, {"id": 50542398, "au": "pknerd", "dom": 118, "sr": 116, "sc": -0.68, "ep": 0.51, "bs": 1.19, "d": 1, "age": 9.9, "grav": 86.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 1742, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "method_chaining", "flbl": "Method & Chaining (Interface)", "urls": [], "ig": 0.196, "fa": 0.0, "gp": 0.032, "bl": 0.45, "ds": 0.0, "txt": "Many backend programmers like me who don't know or dont want to know modern JS frameworks still use it"}, {"id": 50539144, "au": "sigzero", "dom": 95, "sr": 117, "sc": -0.83, "ep": 0.36, "bs": 1.19, "d": 2, "age": 17.43, "grav": 208.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 4239, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 0.154, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "I don't think he was equating the two. Just saying how bad it was to deal with them. I could be wrong."}, {"id": 50539529, "au": "Exoristos", "dom": 75, "sr": 118, "sc": -0.84, "ep": 2.2, "bs": 3.05, "d": 2, "age": 16.73, "grav": 195.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 1116, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 0.525, "fa": 0.34, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Good luck getting your boss to commit that $40 million project to a meme language."}, {"id": 50537509, "au": "booty", "dom": 172, "sr": 119, "sc": -1.33, "ep": 1.71, "bs": 3.05, "d": 3, "age": 19.64, "grav": 253.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 474, "kpp": 4.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": 0.73, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "I either somehow missed that, or forgot. So... today is the day I learned"}, {"id": 50537812, "au": "pjmlp", "dom": 117, "sr": 120, "sc": -1.37, "ep": 1.68, "bs": 3.05, "d": 1, "age": 19.26, "grav": 245.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 134000, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 0.52, "fa": 0.0, "gp": 0.315, "bl": 1.15, "ds": 0.0, "txt": "It is still less verbose than the DOM navigation APIs that landed on the browsers."}, {"id": 50538335, "au": "bluepeter", "dom": 168, "sr": 121, "sc": -1.47, "ep": 1.58, "bs": 3.05, "d": 1, "age": 18.54, "grav": 230.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 14, "qw": 0, "k": 399, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://api.docs.cpanel.net/guides/guide-to-cpanel-interface-customization-and-branding/guide-to-cpanel-interface-customization-jquery"], "ig": 0.671, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Surely, I thought, cPanel/WHM no longer use jQuery, right? But it seems they might?? https://api.docs.cpanel.net/guides/guide-to-cpanel-interface..."}, {"id": 50538560, "au": "djfobbz", "dom": 150, "sr": 122, "sc": -1.66, "ep": 1.38, "bs": 3.05, "d": 2, "age": 18.22, "grav": 224.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 318, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 0.589, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "add script.aculo.us to the list as well!"}, {"id": 50539092, "au": "saidinesh5", "dom": 60, "sr": 123, "sc": -1.9, "ep": 2.34, "bs": 4.24, "d": 4, "age": 17.5, "grav": 209.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 1622, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 0.169, "fa": 0.0, "gp": 1.339, "bl": 1.6, "ds": 0.0, "txt": "But what old garbage browsers are still in use?"}, {"id": 50542853, "au": "lgas", "dom": 10, "sr": 124, "sc": -1.98, "ep": 2.26, "bs": 4.24, "d": 3, "age": 8.71, "grav": 71.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 1909, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.326, "fa": 0.0, "gp": 1.028, "bl": 1.6, "ds": 0.0, "txt": "Looks like you beat them to it.  Good job."}, {"id": 50538217, "au": "proneb1rd", "dom": 81, "sr": 125, "sc": -2.11, "ep": 0.94, "bs": 3.05, "d": 1, "age": 18.72, "grav": 234.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 59, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": 0.4, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "I wonder how many websites on the web still use jquery today"}, {"id": 50538442, "au": "smt88", "dom": 51, "sr": 126, "sc": -2.31, "ep": 2.07, "bs": 4.37, "d": 2, "age": 18.4, "grav": 227.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 22347, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 0.546, "fa": 0.0, "gp": 0.54, "bl": 1.65, "ds": 0.0, "txt": "What’s a use case for jQuery over vanilla JS?\n\nWhen most code is and will be written by AI, why would I sacrifice performance for syntactic sugar?"}, {"id": 50538087, "au": "tyre", "dom": 39, "sr": 127, "sc": -2.44, "ep": 1.93, "bs": 4.37, "d": 2, "age": 18.9, "grav": 237.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 12806, "kpp": 6.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "method_chaining", "flbl": "Method & Chaining (Interface)", "urls": [], "ig": 0.762, "fa": 0.0, "gp": 0.097, "bl": 1.65, "ds": 0.0, "txt": "Method chaining is library-specific, a function of methods returning `this`/`self`.\n\njQuery made the decision to do this, not JavaScript."}, {"id": 50538029, "au": "masklinn", "dom": 147, "sr": 128, "sc": -2.64, "ep": 1.73, "bs": 4.37, "d": 3, "age": 18.98, "grav": 239.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 69187, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 0.737, "fa": 0.0, "gp": 0.0, "bl": 1.65, "ds": 0.0, "txt": "It's the same syntax tho? jQuery uses CSS selectors (with a few extensions), querySelector uses CSS selectors."}, {"id": 50541125, "au": "lofaszvanitt", "dom": 18, "sr": 129, "sc": -3.02, "ep": 1.22, "bs": 4.24, "d": 1, "age": 13.33, "grav": 136.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 239, "kpp": 0.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 0.248, "fa": 0.0, "gp": 0.439, "bl": 1.6, "ds": 0.0, "txt": "Why? It's still the sanest choice for a site that doesnt need a bloated js \"framework\"."}, {"id": 50539898, "au": "skydhash", "dom": 67, "sr": 130, "sc": -3.05, "ep": 0.0, "bs": 3.05, "d": 9, "age": 16.08, "grav": 183.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 6709, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.0, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "You can. And that's how you get jQuery"}, {"id": 50538043, "au": "embedding-shape", "dom": 38, "sr": 131, "sc": -3.06, "ep": 1.32, "bs": 4.37, "d": 1, "age": 18.96, "grav": 239.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 21365, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "method_chaining", "flbl": "Method & Chaining (Interface)", "urls": [], "ig": 0.56, "fa": 0.0, "gp": 0.0, "bl": 1.65, "ds": 0.0, "txt": "Are you talking about method chaining, something that comes from JavaScript (technically the DOM I suppose), not jQuery?"}, {"id": 50537583, "au": "squidsoup", "dom": 159, "sr": 132, "sc": -3.09, "ep": 1.15, "bs": 4.24, "d": 1, "age": 19.55, "grav": 251.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 1654, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 0.489, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "my coworker's claude decided to write a bunch of perl the other day, so who knows?"}, {"id": 50538480, "au": "bpiroman", "dom": 156, "sr": 133, "sc": -3.16, "ep": 1.08, "bs": 4.24, "d": 0, "age": 18.34, "grav": 226.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 24, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 0.242, "fa": 0.0, "gp": 0.352, "bl": 1.6, "ds": 0.0, "txt": "I'm tempted to go back to writing jQuery now!"}, {"id": 50541102, "au": "submain", "dom": 7, "sr": 134, "sc": -3.17, "ep": 1.07, "bs": 4.24, "d": 2, "age": 13.39, "grav": 137.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 191, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": 0.235, "fa": 0.0, "gp": 0.36, "bl": 1.6, "ds": 0.0, "txt": "I'm just sitting and waiting until someone mentions \"monads\"..."}, {"id": 50537912, "au": "wuhhh", "dom": 151, "sr": 135, "sc": -3.19, "ep": 1.05, "bs": 4.24, "d": 2, "age": 19.14, "grav": 242.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 108, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 0.448, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "I came here to reminisce about MooTools, the discerning dev’s jQuery ;)"}, {"id": 50538890, "au": "nilamo", "dom": 58, "sr": 136, "sc": -3.19, "ep": 1.05, "bs": 4.24, "d": 3, "age": 17.8, "grav": 215.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 969, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 0.375, "fa": 0.0, "gp": 0.117, "bl": 1.6, "ds": 0.0, "txt": "Vanilla JS only works with a recent browser. JQuery works with old garbage people never updated."}, {"id": 50538125, "au": "tyre", "dom": 155, "sr": 137, "sc": -3.22, "ep": 1.02, "bs": 4.24, "d": 1, "age": 18.84, "grav": 236.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 8, "k": 12806, "kpp": 6.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 0.436, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "> It was disgusting and it ran in IE7.\n\nSo often was the case that the two ran together, especially with IE6."}, {"id": 50540508, "au": "Timon3", "dom": 65, "sr": 138, "sc": -3.31, "ep": 0.93, "bs": 4.24, "d": 8, "age": 14.87, "grav": 161.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 3011, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 0.396, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Is \"modern\" jQuery tree-shakeable? If not, individual polyfills will be way smaller."}, {"id": 50540049, "au": "hk1337", "dom": 17, "sr": 139, "sc": -3.35, "ep": 0.89, "bs": 4.24, "d": 1, "age": 15.81, "grav": 178.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 1255, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 0.284, "fa": 0.0, "gp": 0.152, "bl": 1.6, "ds": 0.0, "txt": "Mootools was way better but never got the attention jquery got."}, {"id": 50537476, "au": "simlevesque", "dom": 171, "sr": 140, "sc": -3.52, "ep": 0.72, "bs": 4.24, "d": 2, "age": 19.67, "grav": 253.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 12, "k": 4080, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.308, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "> I was there, Gandalf, I was there the day the strength of Men failed.\n\nUnrelated, but it blew my mind when I learned that Elrond is half-man."}, {"id": 50539693, "au": "skydhash", "dom": 64, "sr": 141, "sc": -3.54, "ep": 0.69, "bs": 4.24, "d": 7, "age": 16.39, "grav": 189.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 6709, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 0.296, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Single download is better than multiple small downloads."}, {"id": 50539894, "au": "LVB", "dom": 183, "sr": 142, "sc": -3.57, "ep": 0.67, "bs": 4.24, "d": 3, "age": 16.09, "grav": 183.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 3523, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": 0.286, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "kylee asked, \"Do they still build jquery ui\""}, {"id": 50538550, "au": "Kuyawa", "dom": 132, "sr": 143, "sc": -3.57, "ep": 0.67, "bs": 4.24, "d": 2, "age": 18.23, "grav": 224.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 689, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 0.285, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "replace jquery with\n\n  $ = (q) => document.querySelector(q)\n\nand\n\n  $$ = (q) => document.querySelectorAll(q)\n\nand you're good to go"}, {"id": 50539831, "au": "majewsky", "dom": 66, "sr": 144, "sc": -3.6, "ep": 0.64, "bs": 4.24, "d": 8, "age": 16.18, "grav": 185.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 15746, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 0.271, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Ain't no law saying that you can't bundle multiple polyfills."}, {"id": 50538740, "au": "Kuyawa", "dom": 137, "sr": 145, "sc": -3.63, "ep": 0.61, "bs": 4.24, "d": 4, "age": 18.0, "grav": 219.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 689, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": 0.26, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "$('body').childNodes.forEach(console.log)\n\nI see a beautiful collection there"}, {"id": 50539390, "au": "abanana", "dom": 115, "sr": 146, "sc": -3.73, "ep": 0.51, "bs": 4.24, "d": 3, "age": 17.01, "grav": 200.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 2, "k": 572, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.217, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "> permanently disabled\n\nOnly on Windows 10 and 11. It still runs as it always did on previous Windowses."}, {"id": 50537788, "au": "squidsoup", "dom": 161, "sr": 147, "sc": -3.77, "ep": 0.47, "bs": 4.24, "d": 3, "age": 19.29, "grav": 245.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 1654, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 0.2, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "hah no, he was writing python, it decided to write perl on its own."}, {"id": 50540907, "au": "treve", "dom": 54, "sr": 148, "sc": -3.85, "ep": 1.71, "bs": 5.57, "d": 5, "age": 13.96, "grav": 146.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 5316, "kpp": 4.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "method_chaining", "flbl": "Method & Chaining (Interface)", "urls": [], "ig": 0.729, "fa": 0.0, "gp": 0.0, "bl": 2.1, "ds": 0.0, "txt": "Typically when someone switches frameworks, libraries, languages they get a performance boost even if the source and target is comparable."}, {"id": 50538079, "au": "kiliancs", "dom": 41, "sr": 149, "sc": -3.85, "ep": 0.39, "bs": 4.24, "d": 2, "age": 18.91, "grav": 237.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 652, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 0.165, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "It was not commonplace at the time jQuery was released."}, {"id": 50540411, "au": "bastawhiz", "dom": 140, "sr": 150, "sc": -3.86, "ep": 0.38, "bs": 4.24, "d": 1, "age": 15.05, "grav": 164.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 13294, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 0.161, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Does it actually not work on browsers from two years ago?"}, {"id": 50541917, "au": "paulddraper", "dom": 31, "sr": 151, "sc": -3.87, "ep": 1.29, "bs": 5.17, "d": 3, "age": 11.29, "grav": 105.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 18142, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "method_chaining", "flbl": "Method & Chaining (Interface)", "urls": [], "ig": 0.551, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "The pipeline operator makes it possible to chain any functions.\n\nWhich true is not per se fluent interfaces, but it reads similarly.\n\nAnd \"fluent\" -- as the name suggests -- has a lot to do with how it reads, left-to-right with no intermediate variables."}, {"id": 50538999, "au": "alehlopeh", "dom": 93, "sr": 152, "sc": -3.89, "ep": 0.35, "bs": 4.24, "d": 1, "age": 17.63, "grav": 212.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 634, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.149, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Netscape was not the same era as jQuery."}, {"id": 50539229, "au": "TonyTrapp", "dom": 61, "sr": 153, "sc": -3.96, "ep": 1.21, "bs": 5.17, "d": 5, "age": 17.3, "grav": 206.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 3947, "kpp": 4.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 0.514, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "More than you'd think if you start looking outside of the western tech bubble. Not everyone across the whole globe can afford the latest and greatest phones or laptops."}, {"id": 50539235, "au": "gnabgib", "dom": 181, "sr": 154, "sc": -4.02, "ep": 0.22, "bs": 4.24, "d": 4, "age": 17.3, "grav": 206.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 25940, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": 0.095, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "This thread is about jQuery 4.1.  jQuery UI is only up to 1.14"}, {"id": 50539454, "au": "smt88", "dom": 73, "sr": 155, "sc": -4.02, "ep": 0.22, "bs": 4.24, "d": 4, "age": 16.88, "grav": 198.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 22347, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 0.094, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Why would AI have a harder time with vanilla JS?"}, {"id": 50538176, "au": "eszed", "dom": 175, "sr": 156, "sc": -4.18, "ep": 0.99, "bs": 5.17, "d": 4, "age": 18.77, "grav": 235.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 2247, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 0.42, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "I never got the sense that Elrond hated his own ancestry. Certainly not as Tolkien wrote it, though maybe the movies inserted it? He chose to follow the elven path; his brother chose the other. There was sadness between them, but no animosity - same for his daughter."}, {"id": 50538214, "au": "liendolucas", "dom": 74, "sr": 157, "sc": -4.45, "ep": 0.59, "bs": 5.04, "d": 1, "age": 18.72, "grav": 234.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 8, "qw": 0, "k": 2200, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://hyperscript.org/"], "ig": 0.12, "fa": 0.0, "gp": 0.21, "bl": 1.9, "ds": 0.0, "txt": "I would probably use Hyperscript for that use case: https://hyperscript.org/"}, {"id": 50538998, "au": "anamexis", "dom": 24, "sr": 158, "sc": -4.46, "ep": 1.1, "bs": 5.57, "d": 2, "age": 17.63, "grav": 212.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 4981, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "method_chaining", "flbl": "Method & Chaining (Interface)", "urls": [], "ig": 0.247, "fa": 0.0, "gp": 0.36, "bl": 2.1, "ds": 0.0, "txt": "Fluent interface is method chaining, and it's already obviously in JS. The proposed pipeline operator is neither method chaining nor fluent interface."}, {"id": 50537407, "au": "LVB", "dom": 178, "sr": 159, "sc": -4.51, "ep": 0.52, "bs": 5.04, "d": 1, "age": 19.73, "grav": 255.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 9, "qw": 0, "k": 3523, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://blog.jqueryui.com/2021/10/jquery-maintainers-update-and-transition-jquery-ui-as-part-of-overall-modernization-efforts/"], "ig": 0.223, "fa": 0.0, "gp": 0.0, "bl": 1.9, "ds": 0.0, "txt": "Maintenance mode, but there have been some updates. Announcement: https://blog.jqueryui.com/2021/10/jquery-maintainers-update-..."}, {"id": 50537481, "au": "gsoff", "dom": 158, "sr": 160, "sc": -5.56, "ep": 1.19, "bs": 6.76, "d": 0, "age": 19.66, "grav": 253.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 2, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 0.27, "fa": 0.0, "gp": 0.386, "bl": 2.55, "ds": 0.0, "txt": "have you ever seen an ai suggest jQuery?"}, {"id": 50540153, "au": "hinkley", "dom": 177, "sr": 161, "sc": -5.69, "ep": 1.06, "bs": 6.76, "d": 5, "age": 15.62, "grav": 175.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 48058, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 0.453, "fa": 0.0, "gp": 0.0, "bl": 2.55, "ds": 0.0, "txt": "He seems to be awfully done with humans. Not round them up done, but stay the fuck over there and leave us alone done for sure. Oh you're all dying? That sucks for you."}, {"id": 50537911, "au": "W3cUYxYwmXb5c", "dom": 146, "sr": 162, "sc": -6.32, "ep": 1.1, "bs": 7.42, "d": 2, "age": 19.14, "grav": 242.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 20, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": 0.47, "fa": 0.0, "gp": 0.0, "bl": 2.8, "ds": 0.0, "txt": "The selector syntax is still more readable and less verbose in jquery too, IMO"}, {"id": 50539272, "au": "chuckadams", "dom": 48, "sr": 163, "sc": -6.51, "ep": 0.91, "bs": 7.42, "d": 3, "age": 17.25, "grav": 205.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 5093, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 1, "tier": "meme_or_snark", "facet": "method_chaining", "flbl": "Method & Chaining (Interface)", "urls": [], "ig": 0.388, "fa": 0.0, "gp": 0.0, "bl": 2.8, "ds": 0.0, "txt": "jQuery predates that syntax, but have fun chaining that even now."}, {"id": 50539630, "au": "anamexis", "dom": 26, "sr": 164, "sc": -6.72, "ep": 0.7, "bs": 7.42, "d": 4, "age": 16.52, "grav": 191.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 4981, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 1, "tier": "meme_or_snark", "facet": "method_chaining", "flbl": "Method & Chaining (Interface)", "urls": [], "ig": 0.221, "fa": 0.0, "gp": 0.125, "bl": 2.8, "ds": 0.0, "txt": "What is the \"whole idea\" of a fluent interface if not specifically method chaining?"}, {"id": 50540250, "au": "dasil003", "dom": 182, "sr": 165, "sc": -6.98, "ep": 0.37, "bs": 7.35, "d": 5, "age": 15.45, "grav": 171.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 27689, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": 0.159, "fa": 0.0, "gp": 0.0, "bl": 2.774, "ds": 0.0, "txt": "The post is about jQuery 4.1.  The thread is about jQuery UI."}, {"id": 50547072, "au": "classified", "dom": 9, "sr": 166, "sc": -7.71, "ep": 0.77, "bs": 8.48, "d": 3, "age": 0.91, "grav": 6.8, "surf": 10.5, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 1312, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": 0.196, "fa": 0.0, "gp": 0.21, "bl": 3.2, "ds": 0.0, "txt": "No need. Many understand the concept intuitively, even if the don't know this name."}, {"id": 50538952, "au": "blinkbat", "dom": 162, "sr": 167, "sc": -8.63, "ep": 0.0, "bs": 6.89, "d": 0, "age": 17.71, "grav": 214.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 1, "qw": 0, "k": 119, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.337, "bl": 2.6, "ds": 0.0, "txt": "LFG"}, {"id": 50538871, "au": "SoftTalker", "dom": 72, "sr": 168, "sc": -8.69, "ep": 0.85, "bs": 9.54, "d": 3, "age": 17.82, "grav": 216.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 26686, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": 0.36, "fa": 0.0, "gp": 0.0, "bl": 3.6, "ds": 0.0, "txt": "Same reason we've always sacrificed performance for syntactic sugar. Readability and maintainability are the big ones. If you trust your AI to get it right, sure I guess that doesn't matter."}, {"id": 50539760, "au": "pluc", "dom": 153, "sr": 169, "sc": -8.74, "ep": 0.0, "bs": 6.89, "d": 0, "age": 16.3, "grav": 187.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 7028, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.267, "bl": 2.6, "ds": 0.0, "txt": "The little library that took on $."}, {"id": 50537987, "au": "dasil003", "dom": 180, "sr": 170, "sc": -8.94, "ep": 0.0, "bs": 6.89, "d": 3, "age": 19.04, "grav": 240.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 27689, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.128, "bl": 2.6, "ds": 0.0, "txt": "Yes. That's what this thread is about."}, {"id": 50539702, "au": "cantalopes", "dom": 83, "sr": 171, "sc": -8.97, "ep": 0.0, "bs": 6.89, "d": 2, "age": 16.38, "grav": 188.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 216, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.103, "bl": 2.6, "ds": 0.0, "txt": "A lot actually"}, {"id": 50544913, "au": "grugdev42", "dom": 122, "sr": 172, "sc": -9.06, "ep": 0.0, "bs": 6.89, "d": 0, "age": 4.53, "grav": 29.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 147, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.043, "bl": 2.6, "ds": 0.0, "txt": "Thank you jQuery! I still use you regularly."}, {"id": 50542465, "au": "zhisme", "dom": 184, "sr": 173, "sc": -9.08, "ep": 0.0, "bs": 6.89, "d": 0, "age": 9.67, "grav": 83.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 271, "kpp": 5.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.029, "bl": 2.6, "ds": 0.0, "txt": "long live the king!"}, {"id": 50540181, "au": "greenchair", "dom": 36, "sr": 174, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 15.56, "grav": 173.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 1, "qw": 0, "k": 403, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "amen"}, {"id": 50539137, "au": "recursive", "dom": 47, "sr": 175, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 17.44, "grav": 208.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 13282, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "That's a lot of stuff just for [...nodeList]."}, {"id": 50544667, "au": "nchmy", "dom": 57, "sr": 176, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 6, "age": 4.97, "grav": 33.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 2101, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Have a link to this book?"}, {"id": 50544496, "au": "liendolucas", "dom": 76, "sr": 177, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 3, "age": 5.32, "grav": 36.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 2200, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "method_chaining", "flbl": "Method & Chaining (Interface)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Why a meme language? Have you actually tried?"}, {"id": 50544726, "au": "nchmy", "dom": 78, "sr": 178, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 4.87, "grav": 32.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 2101, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Datastar is a thing of beauty and genius"}, {"id": 50544716, "au": "nchmy", "dom": 80, "sr": 179, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 3, "age": 4.88, "grav": 32.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 2101, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "This is just willfully false"}, {"id": 50544742, "au": "nchmy", "dom": 91, "sr": 180, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 3, "age": 4.85, "grav": 31.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 2101, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Every wp site uses jquery"}, {"id": 50537332, "au": "maxpert", "dom": 149, "sr": 181, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 19.8, "grav": 256.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 2004, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "support_browser", "flbl": "Support & Browser (Internet)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Both Prototype JS and MooTools!"}, {"id": 50539191, "au": "sigzero", "dom": 176, "sr": 182, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 4, "age": 17.36, "grav": 207.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 4239, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "document_add", "flbl": "Document & Add (Dom)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Elrond never hated his ancestry."}, {"id": 50537803, "au": "askbjoernhansen", "dom": 179, "sr": 183, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 19.28, "grav": 245.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 90, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "today_web", "flbl": "Today & Web (React)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "That was about \"jQuery UI\", a separate project."}, {"id": 50545417, "au": "theandrewbailey", "dom": 187, "sr": 184, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 3.55, "grav": 21.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 4, "k": 13382, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "vanilla_modern", "flbl": "Vanilla & Modern (Whole)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "> It is all poison\n\nSo is AI."}, {"id": 50539773, "au": "rico735", "dom": 188, "sr": 185, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 16.27, "grav": 186.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 160, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Sounds maintainable."}, {"id": 50547725, "au": "dday9", "dom": 105, "sr": 186, "sc": -10.67, "ep": 0.0, "bs": 9.41, "d": 2, "age": 0.1, "grav": 3.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 3, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.34, "gp": 0.0, "bl": 3.55, "ds": 0.0, "txt": "Chaw, mais that's 17 years old."}, {"id": 50539667, "au": "tkslucas", "dom": 142, "sr": 187, "sc": -11.2, "ep": 0.0, "bs": 9.41, "d": 0, "age": 16.44, "grav": 189.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 3, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.305, "bl": 3.55, "ds": 0.0, "txt": "Legendary drop, so many great memories"}, {"id": 50541064, "au": "joel2oliver", "dom": 96, "sr": 188, "sc": -11.64, "ep": 0.0, "bs": 9.41, "d": 3, "age": 13.52, "grav": 139.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 1, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.55, "ds": 0.0, "txt": "Precisely!!"}, {"id": 50538546, "au": "hax0ron3", "dom": 40, "sr": 189, "sc": -12.46, "ep": 0.52, "bs": 12.98, "d": 2, "age": 18.24, "grav": 224.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 588, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 2, "tier": "meme_or_snark", "facet": "method_chaining", "flbl": "Method & Chaining (Interface)", "urls": [], "ig": 0.223, "fa": 0.0, "gp": 0.0, "bl": 4.9, "ds": 0.0, "txt": "Yes, I'm talking about using JS' method chaining. That's what I mean by \"going with a language's features\"."}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "top_signal";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 40);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 40);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 40);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `${shown.length} of ${pool.length} comments` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const proofDrawer = document.getElementById("proofDrawer");
+  const expBtn = document.getElementById("exploreToggleBtn");
+  const eviBtn = document.getElementById("evidenceToggleBtn");
+
+  if (expBtn && labDrawer) {
+    expBtn.addEventListener("click", () => {
+      labDrawer.open = !labDrawer.open;
+    });
+    labDrawer.addEventListener("toggle", () => {
+      const isOpen = labDrawer.open;
+      expBtn.classList.toggle("active", isOpen);
+      expBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  if (eviBtn && proofDrawer) {
+    eviBtn.addEventListener("click", () => {
+      proofDrawer.open = !proofDrawer.open;
+    });
+    proofDrawer.addEventListener("toggle", () => {
+      const isOpen = proofDrawer.open;
+      eviBtn.classList.toggle("active", isOpen);
+      eviBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

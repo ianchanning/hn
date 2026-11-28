@@ -1,0 +1,1397 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50478701 // Memory Safety Bugs in Rust Standard Library — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+      background: rgb(255, 102, 0);
+      margin-right: 2px;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      font: 700 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 16px;
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+    }
+    .kpi-cell {
+      padding: 16px 16px 14px;
+      border-right: 1px solid rgb(205, 205, 200);
+    }
+    .kpi-cell:last-child { border-right: 0; }
+    .kpi-label {
+      font: 600 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 8px 0 4px;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      font-size: 12px;
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      background: rgb(13, 15, 17);
+      color: rgb(228, 232, 236);
+      border: 2px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 6px;
+      corner-shape: bevel;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(156, 166, 176);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      background: rgb(9, 11, 13);
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(180, 188, 196);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 58px;
+      background: rgb(20, 24, 28);
+      border-left: 3px solid rgb(0, 230, 118);
+      font: 12px/19px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(220, 226, 232);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 38px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      border-bottom: 1px solid rgb(216, 216, 206);
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer > summary.hn-summary {
+      list-style: none;
+      cursor: pointer;
+      display: block;
+      padding: 2px 0;
+      margin: 0;
+      background: transparent;
+      border: 0;
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      user-select: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font-size: 8pt;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer > summary:hover .toggle-pill {
+      text-decoration: underline;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: rgb(255, 255, 253);
+      border: 1px solid rgb(13, 13, 13);
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+    }
+    table.ablation th {
+      background: rgb(236, 236, 231);
+      font: 700 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgb(60, 60, 58);
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-decoration: ;
+      text-transform: lowercase;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      border-width: 1px;
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      background: rgb(255, 255, 253);
+      font: 600 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { flex: 1; min-width: 220px; font-weight: 400; }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border: 1px solid rgb(216, 216, 206);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      border-top: 3px solid rgb(13, 13, 13);
+      padding-top: 14px;
+      margin-top: 36px;
+      font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        background: rgb(239, 239, 234);
+        border: 1px solid rgb(13, 13, 13);
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        font-size: 17px;
+        margin: 0;
+        white-space: normal;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        background: rgb(13, 13, 13);
+        color: rgb(247, 247, 245);
+        font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-] HIDE"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+] SHOW"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpi-cell { border-bottom: 1px solid rgb(205, 205, 200); }
+      .filter-bar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in {
+        width: 100%;
+        font-size: 16px;
+        padding: 8px 9px;
+      }
+      .filter-bar input.search-in {
+        grid-column: span 2;
+        width: 100%;
+        min-width: 0;
+        font-size: 16px;
+      }
+    }
+  </style>
+  <script>
+    (function() {
+      if (window.location.pathname.includes("/items/")) {
+        var m = window.location.pathname.match(/\/items\/(\d+)\.html/);
+        if (m) {
+          var base = window.location.pathname.replace(/\/items\/\d+\.html$/, "");
+          var target = (base || "") + "/item?id=" + m[1];
+          try {
+            history.replaceState(null, "", target);
+          } catch(e) {}
+        }
+      }
+    })();
+  </script>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <b class="hnname"><a href="https://news.ycombinator.com">Epistemic News</a></b>
+        <span class="pagetop">
+          <a href="https://news.ycombinator.com/newest">new</a> |
+          <a href="https://news.ycombinator.com/threads">threads</a> |
+          <a href="https://news.ycombinator.com/front">past</a> |
+          <a href="https://news.ycombinator.com/newcomments">comments</a> |
+          <a href="https://news.ycombinator.com/ask">ask</a> |
+          <a href="https://news.ycombinator.com/show">show</a> |
+          <a href="https://news.ycombinator.com/jobs">jobs</a> |
+          <a href="https://news.ycombinator.com/submit">submit</a>
+        </span>
+      </div>
+      <div class="topbar-right">
+        <span class="pagetop"><a href="https://news.ycombinator.com/user?id=icc97">icc97</a> (2859) | <a href="https://news.ycombinator.com">logout</a></span>
+      </div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://forge-blog.github.io/posts/rust-std-memory-safety/">Memory Safety Bugs in Rust Standard Library</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=forge-blog.github.io"><span class="sitestr">forge-blog.github.io</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">161 points</span> by <a href="https://news.ycombinator.com/user?id=pjmlp">pjmlp</a> <span class="age" title="2026-11-13T05:22:08.000Z"><a href="https://news.ycombinator.com/item?id=50478701">2 days ago</a></span> | <a href="https://news.ycombinator.com/flag?id=50478701">flag</a> | <a href="https://news.ycombinator.com/hide?id=50478701">hide</a> | <a href="https://hn.algolia.com/?query=Memory+Safety+Bugs+in+Rust+Standard+Library&sort=byDate&dateRange=all&type=story" class="hnpast">past</a> | <a href="https://news.ycombinator.com/fave?id=50478701">favorite</a> | <a href="https://news.ycombinator.com/item?id=50478701">122&nbsp;comments</a>
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">observatory</span>
+        <span class="age">2 days ago</span>
+        <span class="com-pipe">|</span>
+        <span class="sec-headline">01 // EVIDENCE &bull; 122 comments audited (19.7% useful signal, 80.3% noise)</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">122</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 62 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">19.7%</div>
+          <div class="kpi-sub">24 comments (4 Gold / 3.3%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">80.3%</div>
+          <div class="kpi-sub">63 chatter &bull; 35 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">3</div>
+        <div class="kpi-sub">10% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.817</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">58</div>
+          <div class="kpi-sub">HN POS 1..58 (47.5% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="margin-top:10px;font:600 11px/1.5 ui-monospace,Menlo,monospace;color:rgb(70,70,68)"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">observatory</span>
+        <span class="age">2 days ago</span>
+        <span class="com-pipe">|</span>
+        <span class="sec-headline">02 // EXPLORE &bull; epistemic tuner &amp; dual phase-plane / gravity plots</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / INTERACTIVE EQUATION</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p style="font-size:11.5px;line-height:1.42;color:rgb(85,85,82);margin:12px 0 0">
+              Drag any weight to watch the 122-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 122)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (4)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (20)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (63)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (35)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..122) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 37)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (@simonask, 4.2h); largest subtree (@simonask) occupies 58 slots (HN POS 1..58).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="modeSelect" class="sel-in" aria-label="Ranking view">
+          <option value="hn_top40">HN Top 40</option>
+          <option value="top_signal">Epistemic Top 50</option>
+          <option value="buried_gems">Buried Gems (HN POS &gt; 37)</option>
+          <option value="bullshit_traps">High-Karma / URL Traps Caught</option>
+          <option value="mod_morgue">Mod Rebukes &amp; Downvoted Morgue</option>
+          <option value="c5a_rescues">c5A Heterodox Rescues</option>
+        </select>
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (122)</option>
+          <option value="safety_memory">Safety &amp; Memory (Software) (28)</option>
+          <option value="panics_cas">Panics &amp; Cas (Loop) (26)</option>
+          <option value="code_implementation">Code &amp; Implementation (Unsafe) (24)</option>
+          <option value="language_bugs">Language &amp; Bugs (Project) (24)</option>
+          <option value="spec_array">Spec &amp; Array (Via) (10)</option>
+          <option value="general_commentary">General Commentary (10)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, unsafe, library, panic, code, safe...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50478701 + FORGE-BLOG.GITHUB.IO + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50478701, "story_title": "Memory Safety Bugs in Rust Standard Library", "story_url": "https://forge-blog.github.io/posts/rust-std-memory-safety/", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50478701, "story_title": "Memory Safety Bugs in Rust Standard Library", "story_url": "https://forge-blog.github.io/posts/rust-std-memory-safety/", "points": 161, "story_author": "pjmlp", "article_source": "fetched_url", "t1_ref_utc": "2026-11-15T12:01:25+00:00", "t2_ref_utc": "2026-11-15T12:01:25+00:00", "delta_minutes": 0.0, "story_anchors": ["unsafe", "library", "panic", "code", "safe", "safety", "instead", "standard", "process", "system", "inside", "return", "memory", "bugs", "trait", "program", "stack", "returns", "fix", "check", "end", "trigger", "error", "std", "behavior"], "facet_labels": {"safety_memory": "Safety & Memory (Software)", "panics_cas": "Panics & Cas (Loop)", "language_bugs": "Language & Bugs (Project)", "spec_array": "Spec & Array (Via)", "code_implementation": "Code & Implementation (Unsafe)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "safety_memory", "label": "Safety & Memory (Software)", "count": 28, "top_terms": ["safety", "memory", "software", "claim"]}, {"slug": "panics_cas", "label": "Panics & Cas (Loop)", "count": 26, "top_terms": ["panics", "cas", "loop", "result"]}, {"slug": "language_bugs", "label": "Language & Bugs (Project)", "count": 24, "top_terms": ["language", "bugs", "project", "understanding"]}, {"slug": "spec_array", "label": "Spec & Array (Via)", "count": 10, "top_terms": ["spec", "array", "via", "pointer"]}, {"slug": "code_implementation", "label": "Code & Implementation (Unsafe)", "count": 24, "top_terms": ["code", "implementation", "unsafe", "safe"]}], "counts": {"total_comments": 122, "live_t2_comments": 122, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 62, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 1, "pages_fetched": 1}, "sha256": {"corpus.json": "9c49a1e70a6a1cba93ec7af364183faa60e22d34ff3ad5d095bb6f4b83470bb9"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 4, "grounded_analysis": 20, "crowd_chatter": 63, "bullshit_or_flamewar": 35}, "facets": {"safety_memory": 28, "code_implementation": 24, "panics_cas": 26, "language_bugs": 24, "general_commentary": 10, "spec_array": 10}, "facet_options": [{"slug": "safety_memory", "label": "Safety & Memory (Software)", "count": 28}, {"slug": "panics_cas", "label": "Panics & Cas (Loop)", "count": 26}, {"slug": "code_implementation", "label": "Code & Implementation (Unsafe)", "count": 24}, {"slug": "language_bugs", "label": "Language & Bugs (Project)", "count": 24}, {"slug": "spec_array", "label": "Spec & Array (Via)", "count": 10}, {"slug": "general_commentary", "label": "General Commentary", "count": 10}], "facet_diagnostics": [{"slug": "safety_memory", "label": "Safety & Memory (Software)", "count": 28, "useful": 5, "useful_pct": 17.9, "terms": "safety, memory, software, claim"}, {"slug": "panics_cas", "label": "Panics & Cas (Loop)", "count": 26, "useful": 7, "useful_pct": 26.9, "terms": "panics, cas, loop, result"}, {"slug": "code_implementation", "label": "Code & Implementation (Unsafe)", "count": 24, "useful": 6, "useful_pct": 25.0, "terms": "code, implementation, unsafe, safe"}, {"slug": "language_bugs", "label": "Language & Bugs (Project)", "count": 24, "useful": 5, "useful_pct": 20.8, "terms": "language, bugs, project, understanding"}, {"slug": "spec_array", "label": "Spec & Array (Via)", "count": 10, "useful": 0, "useful_pct": 0.0, "terms": "spec, array, via, pointer"}, {"slug": "general_commentary", "label": "General Commentary", "count": 10, "useful": 1, "useful_pct": 10.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 5}, {"category": "github_artifact", "count": 1}, {"category": "primary_technical_doc", "count": 1}, {"category": "code_repository", "count": 1}], "story_anchors": ["unsafe", "library", "panic", "code", "safe", "safety", "instead", "standard", "process", "system", "inside", "return", "memory", "bugs", "trait", "program", "stack", "returns"], "largest_root": {"root_id": 50504923, "author": "simonask", "slots": 58, "start_dom": 1, "end_dom": 58, "share_pct": 47.5, "top_dom1_age": 4.2, "top_dom1_author": "simonask"}, "buried_cutoff": 37, "rescue_top_k": 24, "ablations": [], "tournament": [], "comments": [{"id": 50504923, "au": "simonask", "dom": 1, "sr": 1, "sc": 12.32, "ep": 12.32, "bs": 0.0, "d": 0, "age": 4.21, "grav": 26.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 71, "qw": 0, "k": 2402, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": ["https://github.com/rust-lang/rust/issues?q=is%3Aissue+state%3Aopen+label%3AI-unsound"], "ig": 1.302, "fa": 2.69, "gp": 1.096, "bl": 0.0, "ds": 0.0, "txt": "Just because emotions seem to be always boiling whenever Rust is mentioned, I want to clarify for people who only follow casually that there is nothing unusual or scandalous about these finds.\n\nThe Rust project as a whole currently has 178 open issues with the tag I-unsound[1]. Many of these describe issues that only exist in the nightly compiler, of course, but it does happen that bugs are not caught before shipping. That's software.\n\n[1]: https://github.com/rust-lang/rust/issues?q=is%3Aissue+state%..."}, {"id": 50505338, "au": "namjh", "dom": 72, "sr": 2, "sc": 12.08, "ep": 12.08, "bs": 0.0, "d": 1, "age": 2.71, "grav": 16.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 78, "qw": 0, "k": 61, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "code_implementation", "flbl": "Code & Implementation (Unsafe)", "urls": ["https://doc.rust-lang.org/stable/std/primitive.slice.html\u0023method.get"], "ig": 1.52, "fa": 2.63, "gp": 0.701, "bl": 0.0, "ds": 0.0, "txt": "That's just a design decision orthogonal to memory safety:\n\nFor \"fallible\" variant indexing, you have `the_slice.get(index)`: https://doc.rust-lang.org/stable/std/primitive.slice.html\u0023me...\n\nAlthough its method signature is kind of cursed due to generics, it matches your requirement that allows graceful OOB handling.\n\nIf the default indexing behavior were like `.get()` it would be too cumbersome to express repeated use of indexing, or multi-dimensional array indexing, etc.\n\nAlso there is get_unchecked which is unsafe. Trivially you'll trigger OOB access when misused."}, {"id": 50505771, "au": "tialaramex", "dom": 99, "sr": 3, "sc": 11.08, "ep": 11.08, "bs": 0.0, "d": 1, "age": 1.5, "grav": 9.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 246, "qw": 0, "k": 33106, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "code_implementation", "flbl": "Code & Implementation (Unsafe)", "urls": ["https://github.com/tialaramex/misfortunate/"], "ig": 1.709, "fa": 2.08, "gp": 0.782, "bl": 0.0, "ds": 0.0, "txt": "Of course this in Rust's model. The whole point of even having the distinction between safe and unsafe traits is that this is in the model.\n\nI thought maybe I explain this well in the README for https://github.com/tialaramex/misfortunate/ but apparently not, so that's on my FIXME list now.\n\nWhen I write such an explanation it will probably use Comte as an example. Comte implements ExactSizeIterator which is a safe trait for claiming your iterator gives accurate information about how many items are left. It's lying (but equally a safe implementer might just be mistaken), and Comte is not in fact giving accurate size information. However, if you need to rely on a promise that the iterator length is correct Rust has an unsafe trait for such promises named TrustedLen.\n\nUnlike Comte, mis-implementing TrustedLen could cause Memory Unsafety, but you would need to write the `unsafe` keyword and be lying or mistaken, which is what Rust promised you will happen.\n\nTo give a concrete example, if I tell Rust I want to put the results from this iterator over Goose into an array [Goose; 6] in usual cases it will emit code to check for overflow and panic if the Iterator makes the wrong number of Goose, even if the iterator implements ExactSizeIterator and claims to have six Goose, that panic check happens. But if it implements TrustedLen and makes the same claim, the compiler will believe it a"}, {"id": 50506094, "au": "ViewTrick1002", "dom": 16, "sr": 4, "sc": 8.92, "ep": 9.07, "bs": 0.0, "d": 2, "age": 0.59, "grav": 5.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 186, "qw": 0, "k": 1253, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 1.806, "fa": 1.24, "gp": 0.89, "bl": 0.0, "ds": 0.0, "txt": "This is an interesting comment which mostly seems to aimed at causing outrage? For the last many years I see more people with an axe to grind whenver Rust is mentioned rather than the other way around.\n\nThe issue with actix-web, which played out in 2018-20, was that it played very liberally with memory safety, prioritizing speed over everything else, with the author closing PRs solving memory bugs.\n\nBasing your definition on \"techinical ground\" you can dismiss anything that isn't perfect.\n\nRust's solution is the human response. Memory unsafety are treated as bugs, listed and fixed. Some fast, some more slowly. Depending on impact and how deep they go. C and C++'s solution is listing them in the specification, or having it be implementation defined, and telling you to not step on the land mine.\n\nGiven the research on this area introducing Rust in some of the most battle hardened codebases globally leads to far fewer memory issues and high impact vulnerabilities in the Rust parts. And the parts converted to Rust often are the ones which has had an history of bugs and vulnerabilities becuase they are non-trivial."}, {"id": 50505807, "au": "MindSpunk", "dom": 113, "sr": 5, "sc": 7.34, "ep": 7.34, "bs": 0.0, "d": 1, "age": 1.38, "grav": 9.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 178, "qw": 0, "k": 1087, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "panics_cas", "flbl": "Panics & Cas (Loop)", "urls": [], "ig": 1.754, "fa": 0.62, "gp": 0.999, "bl": 0.0, "ds": 0.0, "txt": "To me, panic being an unwind feels like Rust's biggest sin. It's especially problematic IMO since an idiomatic Rust program would use Result and pass errors as function returns, except the panic unwind machinery sits there as a hidden return path that's very easy to forget about. It's the same problem as writing exception safe C++, every function call can turn into an early exit from the function.\n\nMost Rust learning material teaches panic as if it's an abort. They don't lie about it unwinding, but 99% of uses of panic use it like a fatal error with no expectation of recovery. The fact you can _recover_ from panics is even worse because you can then continue running a program after one of these \"fatal\" errors failed to abort the process.\n\nThere's some powerful things panic/catch_unwind let you do. I'm yet to be convinced the complexity imposed on all code is worth the squeeze on the cases where panic = unwind is a genuine requirement.\n\nI wish the default was panic = abort, but as a whole I still find Rust the best tool for where I use it."}, {"id": 50505853, "au": "locknitpicker", "dom": 117, "sr": 6, "sc": 6.97, "ep": 7.11, "bs": 0.0, "d": 1, "age": 1.27, "grav": 8.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 160, "qw": 32, "k": 1138, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "language_bugs", "flbl": "Language & Bugs (Project)", "urls": [], "ig": 1.81, "fa": 0.7, "gp": 0.596, "bl": 0.0, "ds": 0.0, "txt": "> The community-driven quest for \"panic safety\" in Rust is the same curse that befell C++ in terms of \"exception safety\", maybe worse because at least more C++ shops are sensible enough to disable exceptions.\n\nYou seem confused. The \"exception safety\" topic in C++, which clueless people often cite Google's style guide as an appeal to authority, is that it's undesirable to modify old legacy code that does not use exceptions to call libraries that do. The sole reason this is not desirable is that calling code that throws exceptions introduces code paths that the legacy code was not designed to consider and cleanups that leave it in a state it was not designed to be in (i.e., all stack unwinding and RAII cleanup in surprising points with surprising implications).\n\nAnd project managers tasked with a project that involves legacy C++ code can't simply spare time and resources to redesigns legacy project to accommodate for these changes, or the risk of having stable production code one day crash just because someone linked to a library that now throws.\n\nTherefore, the \"exception safety\" discussion in C++ is not a technical one. It is a project management one, and one which involves high reliable legacy code."}, {"id": 50505535, "au": "simonask", "dom": 42, "sr": 7, "sc": 6.75, "ep": 7.04, "bs": 0.0, "d": 8, "age": 2.14, "grav": 12.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 112, "qw": 0, "k": 2402, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "language_bugs", "flbl": "Language & Bugs (Project)", "urls": ["https://ferrocene.dev/"], "ig": 1.355, "fa": 0.9, "gp": 0.89, "bl": 0.0, "ds": 0.0, "txt": "Calling it \"vibes\" is just so unserious.\n\nIf you would like the Rust language to have a formal specification, I would suggest you look at ways to help that happen. There is already the Ferrocene[1] project.\n\nThe safety model of Rust is extremely well described in detail. It's not particularly hard to understand, either. Are you worried that there is some kind of fundamental flaw in the design, we're just waiting to discover it, and it will all come crumbling down? My suggestion would be to start by understanding Rust's type system and why it works the way it does, and you will very quickly build an intuition (\"vibes\") that it obviously works.\n\n[1]: https://ferrocene.dev/"}, {"id": 50505533, "au": "codeflo", "dom": 112, "sr": 8, "sc": 6.52, "ep": 6.81, "bs": 0.0, "d": 0, "age": 2.15, "grav": 13.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 88, "qw": 0, "k": 9662, "kpp": 6.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "panics_cas", "flbl": "Panics & Cas (Loop)", "urls": [], "ig": 1.698, "fa": 0.28, "gp": 1.396, "bl": 0.0, "ds": 0.0, "txt": "The community-driven quest for \"panic safety\" in Rust is the same curse that befell C++ in terms of \"exception safety\", maybe worse because at least more C++ shops are sensible enough to disable exceptions. It's an exercise put forth by language lawyers that increases program complexity beyond comprehension, often without achieving the stated goal. It's simply not practical to think through 20 convoluted edge cases for every innocent little function, which means that no realistic program will safely recover from a panic. It's best to admit this and engineer your system accordingly."}, {"id": 50505947, "au": "locknitpicker", "dom": 15, "sr": 9, "sc": 6.02, "ep": 6.46, "bs": 0.0, "d": 1, "age": 1.02, "grav": 7.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 100, "qw": 31, "k": 1138, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 1.651, "fa": 0.7, "gp": 0.403, "bl": 0.0, "ds": 0.0, "txt": "> Just because emotions seem to be always boiling whenever Rust is mentioned, I want to clarify for people who only follow casually that there is nothing unusual or scandalous about these finds.\n\nRust unfortunately is renowned for it's toxic community (see actix-web). Within that community, some clueless but vocal members routinely attack people who have the audacity of not rewriting all their projects in Rust, and they parrot cargo cult mantras such as memory safety as their main attack points.\n\nConsequently, discussions on memory issues plaguing Rust often draw these types, with the expected consequences.\n\nYes, Rust also suffers from memory safety issues. Yes, there are CVEs caused by Rust code. Yes, using Rust obviously does not make your code better or bug-free. But these discussions are not grounded on a technical ground."}, {"id": 50505841, "au": "tialaramex", "dom": 106, "sr": 10, "sc": 5.99, "ep": 5.99, "bs": 0.0, "d": 4, "age": 1.3, "grav": 8.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 78, "qw": 18, "k": 33106, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "panics_cas", "flbl": "Panics & Cas (Loop)", "urls": [], "ig": 1.189, "fa": 0.7, "gp": 0.828, "bl": 0.0, "ds": 0.0, "txt": "> If it's more, you shouldn't try to invent a more clever CAS loop, you should replace it with a mutex.\n\nAlso, if your language isn't old and crap your mutex already knows about this trick and so you should default to using a mutex, because it will do that anyway, and only write your own CAS loop if you have measured that it matters.\n\nNote that word measured. Since we're talking about Rust here and people doing this stuff should be used to writing SAFETY justifications in their Rust, your CAS loop should have an accompanying justification comment."}, {"id": 50505235, "au": "Xirdus", "dom": 84, "sr": 11, "sc": 5.96, "ep": 5.96, "bs": 0.0, "d": 3, "age": 3.03, "grav": 18.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 65, "qw": 0, "k": 1073, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "code_implementation", "flbl": "Code & Implementation (Unsafe)", "urls": [], "ig": 1.336, "fa": 0.34, "gp": 1.279, "bl": 0.0, "ds": 0.0, "txt": "It would be entirely unsuitable for the kind of project I work on in my day job, which requires running user-provided code (trusted code, but one that may contain many bugs) in 100 different worker threads, and if one of them crashes  the other 99 must keep running. Without unwinding and recovery, we'd have to completely redesign the whole application, probably to multiprocess architecture with all its downsides."}, {"id": 50505165, "au": "simonask", "dom": 40, "sr": 12, "sc": 5.77, "ep": 6.21, "bs": 0.0, "d": 6, "age": 3.32, "grav": 20.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 115, "qw": 0, "k": 2402, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "language_bugs", "flbl": "Language & Bugs (Project)", "urls": [], "ig": 1.476, "fa": 0.56, "gp": 0.794, "bl": 0.0, "ds": 0.0, "txt": "I can't be defending the statements of whoever says this, but I do think that the reasonable way to understand it is that the fundamental model that the Rust compiler and standard library attempt to implement is safe and correct by construction, rather than as a statement about the concrete implementation.\n\nAmong software developers, we shouldn't need to provide a \"assuming there are no bugs\" caveat with every statement about how something works, because we know that bugs are essentially unavoidable at scale. We can say that Rust makes it much easier to avoid bugs, but nobody serious has ever claimed that they are 100% eliminated.\n\nIt's not like C or C++ compilers are bug free either, despite implementing much weaker models."}, {"id": 50505225, "au": "thesz", "dom": 25, "sr": 13, "sc": 5.44, "ep": 5.88, "bs": 0.0, "d": 3, "age": 3.07, "grav": 18.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 231, "qw": 0, "k": 2699, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "code_implementation", "flbl": "Code & Implementation (Unsafe)", "urls": [], "ig": 1.819, "fa": 0.28, "gp": 0.556, "bl": 0.0, "ds": 0.0, "txt": "From the article: \"The findings reveal three recurring patterns of misplaced trust in unsafe code: trusting code not to panic, trusting user-provided implementations to be correct, and trusting the underlying system.\"\n\nThe call to \"panic\" is an effect and can be checked at compile time. Haskell does this with MonadError class, marking up code that may throw.\n\nRust has Turing complete type system for years and still does not have effects of any kind.\n\nTo be fair, \"trusting user provided implementation\" is also has something to do with effects. Proper type system would require user-provided implementation to use only certain effects and nothing else.\n\nSo two of of found shortcomings are directly related to the type system and, specifically, to the choice of original Rust implementors to not to distinguish between pure and effectful computations.\n\nDo Rust implementors highly competent? Yes, of course! They work on Turing complete type system. Will they eliminate two of three recurring patterns? I strongly doubts so. It is a design decision and these are especially hard to change. Changing it will also break all Rust source code produced to that point of time.\n\nIs it a scandalous situation? For me, it is. The situation is so dire, actually, that \"highly competent people working\" has to be defended with trivially true fact that \"bugs exist in complex software no matter how hard you "}, {"id": 50504875, "au": "adwn", "dom": 67, "sr": 14, "sc": 5.29, "ep": 5.43, "bs": 0.0, "d": 3, "age": 4.35, "grav": 27.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 86, "qw": 0, "k": 6097, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "panics_cas", "flbl": "Panics & Cas (Loop)", "urls": [], "ig": 1.526, "fa": 0.28, "gp": 0.723, "bl": 0.0, "ds": 0.0, "txt": "Applying the ? operator to an Option<_> doesn't work inside a function returning io::Result<_>, for example, and turning the None from an out-of-bounds vector access into some io::Result::Err usually wouldn't make sense.\n\nI would go so far as to say that an out-of-bounds index is always a logic error (to be handled by panicking), not an input error (to be handled with Result). And if the out-of-bounds access was caused by invalid input, then logic error consists of not checking the input before indexing."}, {"id": 50505249, "au": "JuniperMesos", "dom": 54, "sr": 15, "sc": 4.85, "ep": 5.29, "bs": 0.0, "d": 6, "age": 2.98, "grav": 18.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 79, "qw": 0, "k": 1681, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 1.443, "fa": 0.28, "gp": 0.759, "bl": 0.0, "ds": 0.0, "txt": "Also you gotta write the garbage collector itself in some language that isn't itself garbage collected - usually C or C++, before Rust existed.\n\nAnyway, it's basically slander to say that people advocating Rust are snake oil salesman. Rust is a genuine improvement to systems languages over the existing options (primarily C/C++) in multiple respects, not just memory safety; it is not a panacea that solves every problem or eliminates every possible bug, and no one involved with the project ever claimed that it did."}, {"id": 50505759, "au": "ViewTrick1002", "dom": 116, "sr": 16, "sc": 4.66, "ep": 5.11, "bs": 0.0, "d": 2, "age": 1.53, "grav": 9.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 158, "qw": 0, "k": 1253, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "language_bugs", "flbl": "Language & Bugs (Project)", "urls": [], "ig": 1.514, "fa": 0.28, "gp": 0.516, "bl": 0.0, "ds": 0.0, "txt": "I would say the problem with this becomes that it’s all best effort.\n\nYou can’t rely on it for correctness because for your software to be reliable it needs to deal with an abrupt power outage and recover.\n\nBest effort diagnostics make sense. And the “Rust 2.0” or successor language will with certainty close this gap.\n\nBut I also understand why we are here. A decade ago when 1.0 came out Rust had already used up most of its complexity budget for traits, enums, borrow checker, generics, functional style programming and so on.\n\nDiverging even further from what was expected by the majority of programmers would very likely have left Rust as an esoteric language with a tiny following. Instead of what it became.\n\nAnd back then unsafe was thought to work more like “just do like in C”.\n\nThere has been years of research formalizing how it actually works that’s brought us to the current understanding where it’s not trivial to write it correctly."}, {"id": 50505104, "au": "masklinn", "dom": 83, "sr": 17, "sc": 4.53, "ep": 4.9, "bs": 0.0, "d": 2, "age": 3.59, "grav": 22.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 57, "qw": 0, "k": 69187, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "panics_cas", "flbl": "Panics & Cas (Loop)", "urls": [], "ig": 1.122, "fa": 0.34, "gp": 0.894, "bl": 0.0, "ds": 0.0, "txt": "OTOH that panics are ok and easy to reach for and unwind is why you have to handle them and keep the program running.\n\nI don’t think that an unwind-less rust would have fit within the weirdness budget 10 years ago, today it would definitely be something to consider. Although it would have an unwind effect to contend with."}, {"id": 50505166, "au": "gspr", "dom": 96, "sr": 18, "sc": 4.4, "ep": 4.77, "bs": 0.0, "d": 0, "age": 3.32, "grav": 20.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 115, "qw": 0, "k": 3141, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "code_implementation", "flbl": "Code & Implementation (Unsafe)", "urls": [], "ig": 1.488, "fa": 0.0, "gp": 0.879, "bl": 0.0, "ds": 0.0, "txt": "Very interesting finds for sure. But taking the \"trusting user-provided code\" as an example: isn't this just a case of malicious code being malicious? I understand the point that the malicious act comes through memory unsafety, and it's a big gotcha that safe Rust (i.e. Rust without `unsafe`) can trigger memory unsafe behavior. But the code doing it is still acting maliciously (by having an `AsRef` implementation that returns different slices at different times). And the code being abused (the one that does the unsafe indexing) does have `unsafe` – so this is a case of the user writing unsafe Rust that interacts with malicious safe Rust.\n\nI don't know if it's ever been in Rust's threat model to handle malicious code."}, {"id": 50505381, "au": "csande17", "dom": 41, "sr": 19, "sc": 4.36, "ep": 5.02, "bs": 0.0, "d": 7, "age": 2.57, "grav": 15.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 53, "qw": 19, "k": 4520, "kpp": 4.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "language_bugs", "flbl": "Language & Bugs (Project)", "urls": ["https://goals.rust-lang.org/2026/roadmap-project-zero.html\u0023"], "ig": 0.493, "fa": 1.04, "gp": 0.616, "bl": 0.0, "ds": 0.0, "txt": "> the fundamental model that the Rust compiler and standard library attempt to implement is safe and correct by construction\n\nThis comes up a lot as a defensive argument too, but it's also pretty frustrating, because Rust's \"fundamental model\" is not a thing that really exists. There are project proposals to create one (such as https://goals.rust-lang.org/2026/roadmap-project-zero.html\u0023), but at the moment it's just a vague set of vibes people gesture towards to dismiss all the problems with Rust-as-actually-implemented."}, {"id": 50505187, "au": "simonask", "dom": 48, "sr": 20, "sc": 4.28, "ep": 5.73, "bs": 0.8, "d": 6, "age": 3.23, "grav": 19.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 89, "qw": 0, "k": 2402, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 1.546, "fa": 0.28, "gp": 0.897, "bl": 0.3, "ds": 0.0, "txt": "Who, exactly?\n\nIt has been known for decades that GC was one way to achieve memory safety. That was one of the main selling point of Java back in the 90s - no more segfaults.\n\nRust was an absolute breakthrough, because it provides a second way to gain memory safety, this time without the significant drawbacks of a garbage collector, bringing memory safety to systems programming. That's materially different.\n\nThe only other previous attempt at this was Ada, which for a variety of reasons never quite fit the bill despite its obvious strengths."}, {"id": 50504442, "au": "senderista", "dom": 102, "sr": 21, "sc": 4.13, "ep": 4.28, "bs": 0.0, "d": 0, "age": 5.8, "grav": 40.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 3257, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 1.158, "fa": 0.34, "gp": 0.403, "bl": 0.0, "ds": 0.0, "txt": "I sure wish they'd rewrite the Azure Linux VM Agent in Rust. That thing normally burns 10-15% of a core, and also blocks VM restart for tens of minutes, god knows why."}, {"id": 50506105, "au": "tancop", "dom": 87, "sr": 22, "sc": 3.95, "ep": 4.69, "bs": 0.0, "d": 3, "age": 0.57, "grav": 5.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 126, "qw": 0, "k": 1424, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "panics_cas", "flbl": "Panics & Cas (Loop)", "urls": [], "ig": 1.65, "fa": 0.0, "gp": 0.557, "bl": 0.0, "ds": 0.0, "txt": "That would only make sense if your replaced it with a full effect system, which would also be good for different reasons (testability, bug isolation, no global state) but I don't think it's possible to fit into an existing language.\n\nIf you don't have any way to do non local control flow you get what web developers call prop drilling. Code gets more complex because you need to check and handle every possible error condition inline.\n\nMaybe you could get away with it by supporting union types and changing the `?` operator to accumulate error types into a `Result<T, E1|E2|E3|...>` then short circuit on failure. That way your code can decide how to handle each one instead of choosing between immediately return error or do verbose manual handling."}, {"id": 50504566, "au": "hingler36", "dom": 59, "sr": 23, "sc": 3.78, "ep": 4.51, "bs": 0.0, "d": 0, "age": 5.39, "grav": 36.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 65, "qw": 0, "k": 239, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "code_implementation", "flbl": "Code & Implementation (Unsafe)", "urls": [], "ig": 1.286, "fa": 0.0, "gp": 1.029, "bl": 0.0, "ds": 0.0, "txt": "I've always felt that parts of the Rust standard library to be weirdly un-rusty. Like indexing a vector panicking instead of returning a Some(T) in case the index is out of bounds. It's easy to avoid if you put the effort in of course, but it did always feel weird that one of the first data structures you learn has this behavior right out of the gate."}, {"id": 50504619, "au": "Chai-T-Rex", "dom": 60, "sr": 24, "sc": 3.23, "ep": 4.33, "bs": 0.0, "d": 1, "age": 5.19, "grav": 34.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 84, "qw": 0, "k": 37, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "panics_cas", "flbl": "Panics & Cas (Loop)", "urls": [], "ig": 1.357, "fa": 0.28, "gp": 0.234, "bl": 0.0, "ds": 0.0, "txt": "That's not really a memory safety bug, due to the fact that it panics rather than doing something unsafe.\n\nThe `variable[i]` notation is intended to function like in other languages, where it returns an unwrapped value. It would be ugly, noisy, unergonomic, and annoying to have to properly handle `Some` (like in `variable[i].unwrap()`) every single time you ever used it. Imagine doing `c[i].unwrap()[j].unwrap() += a[i].unwrap()[k].unwrap() * b[k].unwrap()[j].unwrap();`.\n\nIf you really want the result to be wrapped in `Some`, you can use `variable.get(i)`."}, {"id": 50505328, "au": "dcminter", "dom": 50, "sr": 25, "sc": 3.11, "ep": 4.0, "bs": 0.0, "d": 7, "age": 2.75, "grav": 16.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 78, "qw": 2, "k": 9947, "kpp": 4.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 1.209, "fa": 0.28, "gp": 0.247, "bl": 0.0, "ds": 0.0, "txt": "> Who, exactly?\n\nI'm on your side of this, but there are Rust zealots out there and they're incredibly annoying.\n\n(Edit to add:)\n\nAs a longtime Java guy (after a decade or so as a C++ guy) what drew me to Rust wasn't actually memory safety; that was table-stakes for me and Go might have lured me in if that was all I wanted. The low-cost (cognitive complexity is a cost) of memory safety  was a factor, but it was the expressive type system that sealed the deal."}, {"id": 50505383, "au": "cowlevel", "dom": 82, "sr": 26, "sc": 3.02, "ep": 3.9, "bs": 0.0, "d": 2, "age": 2.57, "grav": 15.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 166, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "language_bugs", "flbl": "Language & Bugs (Project)", "urls": [], "ig": 1.46, "fa": 0.0, "gp": 0.323, "bl": 0.0, "ds": 0.0, "txt": "This is already the case for any other non-JVM language though, and they usually manage to deal with it by separating operating system processes. A lot of C programs have plugins (even the kernel!) and don't crash because the plugins aren't buggy (by which I don't mean they have no bugs).\n\nYour plugin can still crash in ways other than a panic, like a segfault inside an unsafe block.\n\nIt's also likely possible to DoS the application from a plugin in ways other than a crash, e.g. add a billion entries to the right-click menu.\n\nAnd if you're loading a plugin, how do you know the plugin was actually written in Rust, anyway? It could be written in C and scribble over all your stack memory as soon as you load it.\n\nIt's very hard to guarantee stability in the presence of arbitrary extensions, and you might not even want to because someone might have a real use case for an extremely large right-click menu (probably not a billion though). I don't think even language server protocol guarantees it."}, {"id": 50505463, "au": "mswphd", "dom": 98, "sr": 27, "sc": 2.92, "ep": 3.87, "bs": 0.0, "d": 1, "age": 2.31, "grav": 13.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 43, "qw": 0, "k": 429, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_implementation", "flbl": "Code & Implementation (Unsafe)", "urls": [], "ig": 1.197, "fa": 0.28, "gp": 0.181, "bl": 0.0, "ds": 0.0, "txt": "Rust's goal is no UB in safe Rust. That includes in (incorrect) impls of safe traits.\n\nNote that incorrect code can still cause\n\n1. incorrect outputs, or\n\n2. arbitrary performance degredations\n\nsafe rust doesn't have to work magic. All it must do is prevent UB."}, {"id": 50506254, "au": "locknitpicker", "dom": 18, "sr": 28, "sc": 2.75, "ep": 3.85, "bs": 0.0, "d": 3, "age": 0.13, "grav": 3.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 93, "qw": 13, "k": 1138, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 1.128, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> This is an interesting comment which mostly seems to aimed at causing outrage?\n\nNo, unfortunately Rust's toxic community tends to flock to these topics to flood them with their blend cargo cult claims. Topics which happen to question and even refute their claims is like their bat signal.\n\nThe actix-web episode is a good example of how far these types can take even the most harmless claim, at the expense of everyone.\n\nMeanwhile, anyone who actually works in the field for a living is hardly surprised by this. When this sort of news pops up, we check if we need to start an unplanned update and that's it."}, {"id": 50505133, "au": "pseudony", "dom": 47, "sr": 29, "sc": 2.75, "ep": 3.85, "bs": 0.0, "d": 5, "age": 3.46, "grav": 21.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 54, "qw": 0, "k": 431, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "language_bugs", "flbl": "Language & Bugs (Project)", "urls": [], "ig": 1.382, "fa": 0.0, "gp": 0.413, "bl": 0.0, "ds": 0.0, "txt": "Funny. I would think a GCed language was safer - maybe Haskell being the safest of all (outside even more niche languages) for its ability to encode so much in the type system.\n\nYet, for some curious reason, a substantial group of snake oil salesmen insist that only this one particularly cut puzzle piece (rust) fits the bill."}, {"id": 50504744, "au": "cube00", "dom": 61, "sr": 30, "sc": 2.74, "ep": 4.06, "bs": 0.0, "d": 2, "age": 4.81, "grav": 31.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 61, "qw": 18, "k": 7469, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "panics_cas", "flbl": "Panics & Cas (Loop)", "urls": [], "ig": 1.025, "fa": 0.42, "gp": 0.312, "bl": 0.0, "ds": 0.0, "txt": "> That's not really a memory safety bug, due to the fact that it panics rather than doing something unsafe.\n\nThe ? operator can be nicer to read then all those .unwraps() as an alternative and doesn't panic.\n\nI guess the concern with panics is you're not forced to think about how you want to handle them like you do when you get a `Result` or `Option` returned.\n\nAs a result it could be used as a DDOS against your app if it's network accessible."}, {"id": 50504648, "au": "suresk", "dom": 71, "sr": 31, "sc": 2.7, "ep": 3.14, "bs": 0.0, "d": 1, "age": 5.11, "grav": 34.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 67, "qw": 0, "k": 1425, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "spec_array", "flbl": "Spec & Array (Via)", "urls": [], "ig": 1.204, "fa": 0.0, "gp": 0.214, "bl": 0.0, "ds": 0.0, "txt": "I think it is a reasonable tradeoff, especially since `get(i)` is available to do what you want. An array index oob error is usually a logic issue, not some recoverable error, and in a lot of cases you're doing it where it is impossible to be wrong, so it is a lot of error-checking (and giving up things like x[0] += 1) to have the Index trait return an Option instead of a direct reference."}, {"id": 50504896, "au": "Panzerschrek", "dom": 80, "sr": 32, "sc": 2.48, "ep": 4.03, "bs": 0.0, "d": 0, "age": 4.29, "grav": 27.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 21, "k": 461, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "panics_cas", "flbl": "Panics & Cas (Loop)", "urls": [], "ig": 0.945, "fa": 0.42, "gp": 0.419, "bl": 0.0, "ds": 0.0, "txt": "> But many operations in Rust can panic, from out-of-bounds indexing to calls into user-provided code, and by default a panic unwinds\n\nThat's why I think having unwinding in Rust is a mistake. It gives a false sense of safety, but it's very hard to write unwinding-correct code. So, it would be better to handle panics as immediate process termination instead."}, {"id": 50505085, "au": "irealis", "dom": 37, "sr": 33, "sc": 2.44, "ep": 3.76, "bs": 0.0, "d": 4, "age": 3.65, "grav": 22.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 111, "qw": 0, "k": 17, "kpp": 8.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 1.177, "fa": 0.0, "gp": 0.684, "bl": 0.0, "ds": 0.0, "txt": "I have never understood this argument. Rust, by default, is safer. This is trivially true. But it also is not perfect.\n\nThis entire argument against Rust hinges on it somehow invalidating all of the improvements it does have, all the safety it does guarantee, just because it also has a few bugs. It's neither a myth that Rust is safer, nor is it a nail in the coffin for it.\n\nOtherwise you must make the argument that just because unsafe exists, and is used, it is automatically as bad as let's say C - a language that has proven time and time again how trivial it is to make mistakes with. Something that just doesn't happen in Rust."}, {"id": 50505064, "au": "teiferer", "dom": 36, "sr": 34, "sc": 2.21, "ep": 3.75, "bs": 0.0, "d": 3, "age": 3.74, "grav": 23.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 0, "k": 2661, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 1.264, "fa": 0.0, "gp": 0.54, "bl": 0.0, "ds": 0.0, "txt": "You may have noticed the wave of \"rewritten in rust\" software in recent years, whose only (?) selling point was that this makes the software somehow automatically safe and if not bug free then at least significantly lower on bugs.\n\nThis finding is just yet another nail in the coffin of that myth."}, {"id": 50505923, "au": "tialaramex", "dom": 27, "sr": 35, "sc": 2.17, "ep": 3.71, "bs": 0.0, "d": 5, "age": 1.1, "grav": 7.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 116, "qw": 0, "k": 33106, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 1.532, "fa": 0.0, "gp": 0.077, "bl": 0.0, "ds": 0.0, "txt": "WUFFS can prevent a lot more bugs but it pays a very high price for that because it's not a General Purpose Language.\n\nRust's \"Hello, world!\" reports an error if your stdout can't be used to actually print \"Hello, world!\" because e.g. it's full or has I/O errors -- that's Rust taking safety seriously\n\nWUFFS \"Hello, world!\" can't print text to stdout, that's not in its wheelhouse. It doesn't have text or printing or stdout. That's WUFFS taking safety seriously in a way that's maybe entirely too far for many people.\n\nWUFFS is only for Wrangling Untrusted File Formats Safely. Note that word \"Format\", it can't access files, has no idea what a \"file\" would be, it only handles the data, the file's format."}, {"id": 50505124, "au": "Galanwe", "dom": 39, "sr": 36, "sc": 2.17, "ep": 3.71, "bs": 0.0, "d": 5, "age": 3.51, "grav": 21.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 4098, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 1.087, "fa": 0.34, "gp": 0.128, "bl": 0.0, "ds": 0.0, "txt": "The annoyance comes from the fact that your kind of _reasonable_ discourse on safety is always thrown when there is a bug, but never when there is a claim that rust is 100% by construction. I.e. It's always a defensive argument, but I never see someone step up to mention it on overly optimistic claims."}, {"id": 50506226, "au": "pjmlp", "dom": 19, "sr": 37, "sc": 2.05, "ep": 3.37, "bs": 0.0, "d": 2, "age": 0.2, "grav": 4.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 60, "qw": 0, "k": 134000, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_implementation", "flbl": "Code & Implementation (Unsafe)", "urls": [], "ig": 1.435, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Additionally those toxic vocal evangelists keep forgetting that without C++ there is no Rust compiler.\n\nTheir beloved language is most likely decades away from ever having a fully bootstraped reference implementation.\n\nWhich even if it ever happens,  projects like Linux would most likely never adopt, as that new reference implementation has to provide the same hardware support guarantees as LLVM and GCC."}, {"id": 50505591, "au": "simonask", "dom": 114, "sr": 38, "sc": 1.99, "ep": 4.33, "bs": 0.8, "d": 1, "age": 1.99, "grav": 12.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 85, "qw": 0, "k": 2402, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "panics_cas", "flbl": "Panics & Cas (Loop)", "urls": [], "ig": 1.466, "fa": 0.0, "gp": 0.609, "bl": 0.3, "ds": 0.0, "txt": "This is such a deep topic with literally decades of discourse behind it.\n\nI tend to agree with the general principle that panicking or throwing an exception should terminate the process in most cases. But those last microseconds of a process' lifetime matter quite a lot: Are you able to save the user's work? Are you able to log the error so the crash can be diagnosed?\n\nWith Undefined Behavior in the picture, you cannot do anything. The whole process is toast, and its entire memory state is invalid."}, {"id": 50505350, "au": "ablob", "dom": 68, "sr": 39, "sc": 1.99, "ep": 3.53, "bs": 0.0, "d": 4, "age": 2.67, "grav": 16.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 87, "qw": 0, "k": 514, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "panics_cas", "flbl": "Panics & Cas (Loop)", "urls": [], "ig": 1.501, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The former issue arises from post-hoc thinking. Of course it's hard to retrofit into the language, but I see no reason why there shouldn't be facilities for the ? operator to turn a None into an appropriate error type.\n\nThe latter is a subjective matter. There are reasons to never want a panic (hello there, Linux kernel) and reasons to do more sophisticated stuff (core dump, cleanup or notifications) before crashing. And maybe one thread shouldn't lead to process death. I think most of these decisions should be kept to the user's discretion."}, {"id": 50506237, "au": "pjmlp", "dom": 17, "sr": 40, "sc": 1.83, "ep": 3.37, "bs": 0.0, "d": 3, "age": 0.17, "grav": 4.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 57, "qw": 0, "k": 134000, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "panics_cas", "flbl": "Panics & Cas (Loop)", "urls": [], "ig": 1.436, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Here is another one, the attack on ThePD, the end result being that Rust still has no reflection support, while C has been getting several goodies caused by him moving away from Rust back into C and C++ ISO work groups.\n\nThanks to that Rust community behaviour, C23 has several nice improvements, with several others to possibly land on C2y."}, {"id": 50506153, "au": "cowlevel", "dom": 32, "sr": 41, "sc": 1.78, "ep": 3.32, "bs": 0.0, "d": 5, "age": 0.42, "grav": 4.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 93, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 1.414, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Um, this very post? The equivalent code in Go is memory-safe. As a rule of thumb, everything in a GC language is memory-safe by default and there's nothing to prove, because the GC won't deallocate anything that is pointed to, and everything has a well-defined type that's known at runtime (because the GC needs that) so you can't avoid it by bad casting. Rust's innovation was trying to achieve the same level of safety without the GC.\n\nSeriously, when is the last time you heard of a buffer overflow RCE in Java code? I actually want to know."}, {"id": 50504889, "au": "uecker", "dom": 74, "sr": 42, "sc": 1.7, "ep": 2.14, "bs": 0.0, "d": 2, "age": 4.31, "grav": 27.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 2455, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "spec_array", "flbl": "Spec & Array (Via)", "urls": [], "ig": 0.688, "fa": 0.0, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "There is also the idea that the language is so good because such things are caught at compile time via the type system. (But this is generally not done for the same reason it is not done in C.)"}, {"id": 50505669, "au": "ozgrakkurt", "dom": 95, "sr": 43, "sc": 1.68, "ep": 2.78, "bs": 0.0, "d": 0, "age": 1.76, "grav": 10.8, "surf": 3.9, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 78, "qw": 0, "k": 1312, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "panics_cas", "flbl": "Panics & Cas (Loop)", "urls": [], "ig": 1.067, "fa": 0.0, "gp": 0.186, "bl": 0.0, "ds": 0.0, "txt": "Do not ever use with anything other than panic = abort.\n\nIt is just the sketchiest feature in a very realiable language.\n\nIt doesn't make sense to me why anyone whould use rust with panic handling.\n\nAnd the of course the language trusts the operating system, how else can you program?\n\nThis kind of thing is basically why all projects blocked AI issues, it is just slop that kind of makes sense if you don't know what you are doing."}, {"id": 50505317, "au": "dcminter", "dom": 56, "sr": 44, "sc": 1.67, "ep": 3.21, "bs": 0.0, "d": 4, "age": 2.79, "grav": 16.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 48, "qw": 0, "k": 9947, "kpp": 4.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 0.974, "fa": 0.28, "gp": 0.088, "bl": 0.0, "ds": 0.0, "txt": "Yes, that's a myth.\n\nI, like many others, still think that a language that requires a bug in the compiler for a certain category of error to be exhibited is preferable to one that has no such guarantees. I like C but it's not crazy to consider rewriting a tool in Rust for memory safety reasons."}, {"id": 50505970, "au": "locknitpicker", "dom": 13, "sr": 45, "sc": 1.63, "ep": 3.17, "bs": 0.0, "d": 5, "age": 0.94, "grav": 7.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 8, "k": 1138, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 0.838, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> Software with bugs in it. Or shorter, Software.\n\nYes, that's the whole point. Rust is used to write software. Not memory-safe software. Let alone bug-free software.\n\nBut somehow that's the extraordinary cargo cult claim that Rust proponents make. Is that claim valid?\n\nThat's the point. Isn't it?"}, {"id": 50505423, "au": "chiffaa", "dom": 64, "sr": 46, "sc": 1.59, "ep": 2.91, "bs": 0.0, "d": 5, "age": 2.43, "grav": 14.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 112, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "language_bugs", "flbl": "Language & Bugs (Project)", "urls": [], "ig": 1.154, "fa": 0.0, "gp": 0.133, "bl": 0.0, "ds": 0.0, "txt": "Rust does VERY limited breaking changes, the largest one probably being the `!` type inference change that was very carefully vetted, deemed a necessity and saw contributions to fix the issue in all crates in the official registry"}, {"id": 50505176, "au": "eptcyka", "dom": 92, "sr": 47, "sc": 1.58, "ep": 2.68, "bs": 0.0, "d": 0, "age": 3.28, "grav": 20.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 5407, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_implementation", "flbl": "Code & Implementation (Unsafe)", "urls": [], "ig": 0.949, "fa": 0.0, "gp": 0.312, "bl": 0.0, "ds": 0.0, "txt": "An effect system could gelp us reason about code by making calls to panic-capable functions marked as such. Maybe we could mark some types as panic unsafe?"}, {"id": 50505320, "au": "nopurpose", "dom": 38, "sr": 48, "sc": 1.45, "ep": 2.99, "bs": 0.0, "d": 5, "age": 2.78, "grav": 16.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 1394, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_implementation", "flbl": "Code & Implementation (Unsafe)", "urls": [], "ig": 1.217, "fa": 0.0, "gp": 0.091, "bl": 0.0, "ds": 0.0, "txt": "In addition to that, many of reported soundness issues rely on adversarial implementations for stdlib' traits by user's types, like Borrow::borrow or as_ref returning different value between back to back calls. You would do that if you try to break compiler,  but not when writing regular programs."}, {"id": 50504529, "au": "loeg", "dom": 103, "sr": 49, "sc": 1.43, "ep": 2.82, "bs": 0.0, "d": 1, "age": 5.52, "grav": 37.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 27237, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_implementation", "flbl": "Code & Implementation (Unsafe)", "urls": [], "ig": 1.093, "fa": 0.0, "gp": 0.177, "bl": 0.0, "ds": 0.0, "txt": "I've seen certain MSFT engineers get a lock ordering warning from taking mutexes in a wrong order and \"fix\" it by using a spin loop + try lock instead."}, {"id": 50505766, "au": "csande17", "dom": 43, "sr": 50, "sc": 1.36, "ep": 3.75, "bs": 0.85, "d": 9, "age": 1.51, "grav": 9.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 151, "qw": 0, "k": 4520, "kpp": 4.9, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "language_bugs", "flbl": "Language & Bugs (Project)", "urls": [], "ig": 1.445, "fa": 0.0, "gp": 0.241, "bl": 0.32, "ds": 0.0, "txt": "If your intuitive understanding of Rust is that its type system \"obviously works\", then you have developed an incorrect understanding! There are many documented cases where it does not work, and there is an active project to change its design so it works in more cases.\n\nI don't think we should accept this kind of vibes-based reasoning from C programmers who are confident their programs don't have any memory bugs, and we shouldn't accept it from people trying to sell us programming languages either.\n\nI think it's reasonable to say that Rust successfully prevents a lot of memory issues, and that it's it's a good choice for lots of projects. But it frustrates me when people try to dishonestly argue that it's perfect and then retreat to arguing that the implementation is flawed but the design is perfect, because neither statement is true but they take a lot of oxygen away from efforts to improve the situation."}, {"id": 50505396, "au": "arijun", "dom": 21, "sr": 51, "sc": 1.28, "ep": 2.82, "bs": 0.0, "d": 2, "age": 2.51, "grav": 15.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 59, "qw": 0, "k": 1770, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "language_bugs", "flbl": "Language & Bugs (Project)", "urls": [], "ig": 1.202, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I’m having a hard time understanding you here. Are you saying that since rust is a good language for AI to write code in, it says something about the (lack of) power of AI, that it wasn’t what found the bug? Because the logic there seems twisted: “F1 drivers, the biggest users of F1 cars, almost never make improvements to F1 engines”."}, {"id": 50505760, "au": "masklinn", "dom": 86, "sr": 52, "sc": 1.24, "ep": 3.63, "bs": 0.85, "d": 4, "age": 1.53, "grav": 9.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 5, "k": 69187, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "panics_cas", "flbl": "Panics & Cas (Loop)", "urls": [], "ig": 0.955, "fa": 0.42, "gp": 0.129, "bl": 0.32, "ds": 0.0, "txt": "> if one of them crashes\n\nBut that's the point see? You have to catch panics because it's easy, straightforward and \"common\" to trigger panics.\n\nIf it were not, you wouldn't, because the buggy user-provided code would not be triggering panics, in the same way you're not catching `std::process::abort` or segfaults or whatnot."}, {"id": 50505537, "au": "saagarjha", "dom": 46, "sr": 53, "sc": 1.22, "ep": 1.67, "bs": 0.0, "d": 8, "age": 2.14, "grav": 12.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 69, "qw": 0, "k": 62079, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "spec_array", "flbl": "Spec & Array (Via)", "urls": [], "ig": 0.709, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I mean it would be nice to make one of those, but I also don't really see the point of doing so besides shutting up the guys who like to talk about how Rust doesn't have a spec, most of whom do not even seem involved in the language really? Nobody really has an issue with the current situation, they are all clearly bugs and they more or less get triaged appropriately."}, {"id": 50505551, "au": "saagarjha", "dom": 78, "sr": 54, "sc": 1.11, "ep": 1.55, "bs": 0.0, "d": 3, "age": 2.12, "grav": 12.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 62079, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "spec_array", "flbl": "Spec & Array (Via)", "urls": [], "ig": 0.66, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The language can catch a lot of things via the type system, but there are always going to be some things that are just not in scope and must be asserted via precondition. This is one of them."}, {"id": 50506208, "au": "masklinn", "dom": 88, "sr": 55, "sc": 1.0, "ep": 2.54, "bs": 0.0, "d": 4, "age": 0.24, "grav": 4.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 48, "qw": 0, "k": 69187, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "panics_cas", "flbl": "Panics & Cas (Loop)", "urls": [], "ig": 1.08, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "You can also type erase and shunt shit up by hand, that is what Go or Swift do (the latter with more syntactic support). It is essentially unwinding by hand, but it avoids the issue of unwitting unwinding so you don’t have a “secret” code path on the side."}, {"id": 50505318, "au": "shevy-java", "dom": 20, "sr": 56, "sc": 1.0, "ep": 2.53, "bs": 0.0, "d": 1, "age": 2.79, "grav": 16.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 72, "qw": 9, "k": 2084, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "language_bugs", "flbl": "Language & Bugs (Project)", "urls": [], "ig": 0.569, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> there is nothing unusual or scandalous about these finds\n\nI would not go so far. I just mentioned in a separate comment, a minute before writing this here, that it is rather\noutrageous that the premier language for AI these days (aka Rust), \nhas not used AI to find these bugs before. Would you not\nalso consider that it should follow from simple logic that\na language that is the premier AI language now, also would\nuse AI as it preaches for it, to find bugs?"}, {"id": 50506270, "au": "pjmlp", "dom": 30, "sr": 57, "sc": 1.0, "ep": 2.51, "bs": 0.0, "d": 4, "age": 0.09, "grav": 3.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 134000, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_implementation", "flbl": "Code & Implementation (Unsafe)", "urls": [], "ig": 1.036, "fa": 0.0, "gp": 0.053, "bl": 0.0, "ds": 0.0, "txt": "I rather take the options that offer GC, whichever kind of implementation, alongside mechanisms for value types and manual resource management when required to do so.\n\nD, Swift, C\u0023, Linear Haskell, Scala (with capabilities), OCaml (with effects), Idris (with dependent types), Koka,..."}, {"id": 50504951, "au": "simonask", "dom": 24, "sr": 58, "sc": 1.0, "ep": 3.29, "bs": 0.8, "d": 2, "age": 4.13, "grav": 26.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 2402, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 1.067, "fa": 0.0, "gp": 0.54, "bl": 0.3, "ds": 0.0, "txt": "Why would you think that? Bugs exist in complex software no matter how hard you try, including software written in Rust such as the Rust compiler and standard library. Did you expect the highly competent people working on these projects to just one-shot everything?"}, {"id": 50505259, "au": "cowlevel", "dom": 29, "sr": 59, "sc": 1.0, "ep": 3.92, "bs": 1.59, "d": 3, "age": 2.95, "grav": 17.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 75, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 1.33, "fa": 0.28, "gp": 0.0, "bl": 0.6, "ds": 0.0, "txt": "Actually, software that probably has no bugs does exist, starting with the seL4 microkernel. Such software is usually pretty simplistic because that goes a long way towards proving an absence of bugs.\n\nMore practically, however, Rust has proven to have more memory safety bugs than GC languages. If you want memory safety you should go GC. If you want consistent performance or tight control over memory, and pretty good memory safety, then you should go Rust."}, {"id": 50506287, "au": "pjmlp", "dom": 34, "sr": 60, "sc": 1.0, "ep": 2.29, "bs": 0.0, "d": 7, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 134000, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 0.973, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Neither is Rust, outside a very specific concurrency scenario, where the data being accessed in fully contained to unprocess memory.\n\nFearless concurrency tends to overlook OS IPC mechanism, DMA, or external data like shared database connections."}, {"id": 50505058, "au": "Xirdus", "dom": 81, "sr": 61, "sc": 1.0, "ep": 2.22, "bs": 0.0, "d": 1, "age": 3.77, "grav": 23.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 1073, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "panics_cas", "flbl": "Panics & Cas (Loop)", "urls": [], "ig": 0.721, "fa": 0.0, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "But that would make Rust unsuitable for writing anything that wants to keep the program running even if something does panic - say, test harness, or a plugin system."}, {"id": 50506136, "au": "cowlevel", "dom": 107, "sr": 62, "sc": 1.0, "ep": 3.78, "bs": 1.59, "d": 5, "age": 0.46, "grav": 5.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 59, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "panics_cas", "flbl": "Panics & Cas (Loop)", "urls": [], "ig": 1.269, "fa": 0.28, "gp": 0.0, "bl": 0.6, "ds": 0.0, "txt": "A CAS loop can be used to implement arbitrary atomic operations, such as \"atomic square and divide by two\" or \"atomic logarithm\". This is a proper way to use them, you don't need to use a mutex for something like that unless the computation is long (which logarithm might be - idk, haven't benchmarked it).\n\nAgreed that mutexes are easy and a safe default."}, {"id": 50506196, "au": "eptcyka", "dom": 94, "sr": 63, "sc": 1.0, "ep": 2.19, "bs": 0.0, "d": 2, "age": 0.29, "grav": 4.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 5407, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "panics_cas", "flbl": "Panics & Cas (Loop)", "urls": [], "ig": 0.932, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Sure, but knowing if a call canor cannot panic can be incredibly useful. Knowing if a call can wait on I/O or not can be incredibly useful (as long as logging can be worked around)."}, {"id": 50505265, "au": "no-name-here", "dom": 57, "sr": 64, "sc": 1.0, "ep": 2.14, "bs": 0.0, "d": 4, "age": 2.94, "grav": 17.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 4, "k": 982, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 0.911, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> automatically safe\n\n> bug free\n\nIn most discussions involving Rust I hear those “counter” criticisms, but is it a common claim by Rust proponents that Rust makes software bug free, etc.? I feel like I don’t regularly encounter the original claim that others regularly argue against."}, {"id": 50505792, "au": "locknitpicker", "dom": 11, "sr": 65, "sc": 1.0, "ep": 2.12, "bs": 0.0, "d": 3, "age": 1.43, "grav": 9.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 10, "k": 1138, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 0.561, "fa": 0.28, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> Is a language only memory-safe if its implementations are completely bug-free?\n\nWhat do you call a programming language which claims to be memory-safe that has memory safety issues in it's standard library?"}, {"id": 50504625, "au": "rurban", "dom": 121, "sr": 66, "sc": 1.0, "ep": 2.05, "bs": 0.0, "d": 1, "age": 5.18, "grav": 34.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 7479, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_implementation", "flbl": "Code & Implementation (Unsafe)", "urls": [], "ig": 0.873, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "No, a good use to fix their specs.\n\nRust is unsafe by spec, not just by implementation. For memory and type safety. concurrency safety is impossible to get with their blocking IO approach."}, {"id": 50506129, "au": "ozgrakkurt", "dom": 89, "sr": 67, "sc": 1.0, "ep": 1.94, "bs": 0.0, "d": 2, "age": 0.47, "grav": 5.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 1312, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "panics_cas", "flbl": "Panics & Cas (Loop)", "urls": [], "ig": 0.824, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "This is a downstream issue that happened because unwinding was there in the first place.\n\nTesting for panics is just a silly feature itself anyway."}, {"id": 50505406, "au": "cowlevel", "dom": 105, "sr": 68, "sc": 1.0, "ep": 3.43, "bs": 1.59, "d": 3, "age": 2.48, "grav": 14.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 86, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "panics_cas", "flbl": "Panics & Cas (Loop)", "urls": [], "ig": 1.462, "fa": 0.0, "gp": 0.0, "bl": 0.6, "ds": 0.0, "txt": "If it only retries because a different thread made progress, it's lock-free and total work is bounded - even though one particular thread could get very unlucky, system-wide luck is conserved.\n\nHow much code's inside the CAS loop? If it's being held for less than (sticks finger in the wind) a few thousand of instructions then backoff or limits are actively counterproductive. That's how you're supposed to use a CAS loop.\n\nIf it's more, you shouldn't try to invent a more clever CAS loop, you should replace it with a mutex."}, {"id": 50505481, "au": "arijun", "dom": 65, "sr": 69, "sc": 1.0, "ep": 1.83, "bs": 0.0, "d": 5, "age": 2.27, "grav": 13.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 1770, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_implementation", "flbl": "Code & Implementation (Unsafe)", "urls": [], "ig": 0.777, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "They do break backwards compatibility at edition boundaries, but if they do that too much without a good enough reason they could end up with a python2->python3 situation, with low uptake."}, {"id": 50505132, "au": "Sytten", "dom": 14, "sr": 70, "sc": 1.0, "ep": 1.82, "bs": 0.0, "d": 1, "age": 3.47, "grav": 21.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 2665, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_implementation", "flbl": "Code & Implementation (Unsafe)", "urls": [], "ig": 0.599, "fa": 0.0, "gp": 0.283, "bl": 0.0, "ds": 0.0, "txt": "Even more, the fact that unsafe blocks are a thing allows for this kind of deep scrutiny of the STD."}, {"id": 50506144, "au": "ozgrakkurt", "dom": 115, "sr": 71, "sc": 1.0, "ep": 1.79, "bs": 0.0, "d": 2, "age": 0.44, "grav": 5.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 45, "qw": 0, "k": 1312, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "panics_cas", "flbl": "Panics & Cas (Loop)", "urls": [], "ig": 0.763, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It is not really a deep topic. Pretty much anyone that undestands it agrees that unwinding is too sketchy a feature in a language like rust.\n\nIt is just too difficult to write unwind safe code and it is not much of a benefit even if you have it."}, {"id": 50505441, "au": "dist-epoch", "dom": 100, "sr": 72, "sc": 1.0, "ep": 1.67, "bs": 0.0, "d": 1, "age": 2.38, "grav": 14.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 3009, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_implementation", "flbl": "Code & Implementation (Unsafe)", "urls": [], "ig": 0.711, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Only JavaScript partially supports this, based on the domain where the code originated from, so your website code is not infected by the Javascript run by an ad you embed."}, {"id": 50505311, "au": "shevy-java", "dom": 118, "sr": 73, "sc": 1.0, "ep": 1.55, "bs": 0.0, "d": 0, "age": 2.81, "grav": 16.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 45, "qw": 0, "k": 2084, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "language_bugs", "flbl": "Language & Bugs (Project)", "urls": [], "ig": 0.658, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The best AI language has not used AI to find all bugs yet?\n\nI don't quite like AI, but I think from an objective point of\nview one can reason that AI led to the discovery of more bugs,\nif we deduct the non-bugs from those reports."}, {"id": 50505392, "au": "cowlevel", "dom": 85, "sr": 74, "sc": 1.0, "ep": 3.11, "bs": 1.59, "d": 4, "age": 2.52, "grav": 15.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 61, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "panics_cas", "flbl": "Panics & Cas (Loop)", "urls": [], "ig": 1.215, "fa": 0.0, "gp": 0.177, "bl": 0.6, "ds": 0.0, "txt": "What do you do if they segfault on raw pointers? Does Rust's runtime catch SIGSEGV and translate it to a panic?\n\nYou can also get SIGBUS by mapping a file beyond the end of the file and then trying to read the extra bytes. If Rust's version of mmap checks this, you can still do it by truncating the file while it's mapped."}, {"id": 50505493, "au": "stymaar", "dom": 55, "sr": 75, "sc": 1.0, "ep": 1.5, "bs": 0.0, "d": 6, "age": 2.25, "grav": 13.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 3421, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_implementation", "flbl": "Code & Implementation (Unsafe)", "urls": [], "ig": 0.64, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "A GCed language wouldn't be safe from the kinds of bugs exhibited in the OP, all it takes is a bug in the runtime."}, {"id": 50505135, "au": "masklinn", "dom": 108, "sr": 76, "sc": 1.0, "ep": 1.5, "bs": 0.0, "d": 3, "age": 3.46, "grav": 21.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 69187, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "panics_cas", "flbl": "Panics & Cas (Loop)", "urls": [], "ig": 0.639, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Does the system provide ready made backoff and / or bounded CAS loop primitives? Because if you have to write the entire thing in full every time I can see why it’s get skipped."}, {"id": 50505946, "au": "cowlevel", "dom": 28, "sr": 77, "sc": 0.99, "ep": 3.0, "bs": 1.59, "d": 6, "age": 1.03, "grav": 7.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 57, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_implementation", "flbl": "Code & Implementation (Unsafe)", "urls": [], "ig": 1.275, "fa": 0.0, "gp": 0.0, "bl": 0.6, "ds": 0.0, "txt": "WUFFS is a successful limited implementation of the more general concept of formally verified code.\n\nWe don't formally verify code because it's extremely difficult at a level that cannot be practically expressed. However difficult you think it is, square it. I wouldn't be surprised if the only two formally verified code bases that anyone actually uses are seL4 and WUFFS."}, {"id": 50505375, "au": "pwdisswordfishq", "dom": 97, "sr": 78, "sc": 0.99, "ep": 1.22, "bs": 0.0, "d": 1, "age": 2.6, "grav": 15.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 306, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.391, "fa": 0.0, "gp": 0.204, "bl": 0.0, "ds": 0.0, "txt": "Sufficiently deniable malice is indistinguishable from incompetence.  If a condition can be triggered \"maliciously\", then it can probably be also triggered inadvertently.  There's no point in saying \"that's malicious so it doesn't count\"."}, {"id": 50505444, "au": "pjmlp", "dom": 77, "sr": 79, "sc": 0.99, "ep": 2.01, "bs": 0.85, "d": 5, "age": 2.37, "grav": 14.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 94, "qw": 0, "k": 134000, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "spec_array", "flbl": "Spec & Array (Via)", "urls": [], "ig": 0.857, "fa": 0.0, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "In PL/I you can declare arrays with a length descriptor, thus allocating storage for the length, like in mostly safe systems languages.\n\nAlternatively when allocating the array storage define its access to be pointer based.\n\nThis means no length descriptor will be stored alongside the array, and the access to array elements will be done via the given pointer.\n\nIt is up to the programmer not to mess up then.\n\nUnfortunately C authors never added a way to do the former, given their experience with PL/I and Multics.\n\nI am aware we are finally going into that direction."}, {"id": 50504862, "au": "senderista", "dom": 104, "sr": 80, "sc": 0.99, "ep": 2.28, "bs": 1.19, "d": 2, "age": 4.4, "grav": 28.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 3257, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "panics_cas", "flbl": "Panics & Cas (Loop)", "urls": [], "ig": 0.748, "fa": 0.0, "gp": 0.36, "bl": 0.45, "ds": 0.0, "txt": "I work on a commercial database marketed as \"lock-free\" and I can't tell you how many CAS spin loops I've seen with no backoff or iteration bounds."}, {"id": 50506200, "au": "simonask", "dom": 44, "sr": 81, "sc": 0.99, "ep": 3.55, "bs": 2.49, "d": 10, "age": 0.27, "grav": 4.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 53, "qw": 26, "k": 2402, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 5, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "language_bugs", "flbl": "Language & Bugs (Project)", "urls": [], "ig": 0.942, "fa": 0.42, "gp": 0.092, "bl": 0.94, "ds": 0.0, "txt": "> There are many documented cases where it does not work, and there is an active project to change its design so it works in more cases.\n\nAre you referring to the implementation or the model? Because there are several bugs in the implementation, but they are very clearly bugs.\n\nIf you're aware of any actual holes in the type system as it is designed, I think the Rust lang team would be very interested in hearing about your paper!"}, {"id": 50505721, "au": "lelanthran", "dom": 9, "sr": 82, "sc": 0.81, "ep": 0.81, "bs": 0.0, "d": 5, "age": 1.64, "grav": 10.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 15077, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_implementation", "flbl": "Code & Implementation (Unsafe)", "urls": [], "ig": 0.345, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It means that the language and implementation are one and the same,  so a bug in the compiler is a bug in the language."}, {"id": 50505252, "au": "cowlevel", "dom": 2, "sr": 83, "sc": 0.55, "ep": 2.14, "bs": 1.59, "d": 1, "age": 2.97, "grav": 17.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "code_implementation", "flbl": "Code & Implementation (Unsafe)", "urls": [], "ig": 0.74, "fa": 0.0, "gp": 0.277, "bl": 0.6, "ds": 0.0, "txt": "That there's nothing unusual about these finds, the Drop static lifetime bug, or cve-rs is proof that Rust is not, and probably never will be, memory-safe. It's still an improvement though."}, {"id": 50505466, "au": "simonask", "dom": 26, "sr": 84, "sc": 0.46, "ep": 1.26, "bs": 0.8, "d": 4, "age": 2.31, "grav": 13.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 2402, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 0.535, "fa": 0.0, "gp": 0.0, "bl": 0.3, "ds": 0.0, "txt": "You're pointing out that there can exist a language other that Rust that is even safer, and prevents even more classes of bugs. That's trivially true, of course, but this language doesn't currently exist."}, {"id": 50506198, "au": "pjmlp", "dom": 7, "sr": 85, "sc": 0.35, "ep": 1.54, "bs": 1.19, "d": 4, "age": 0.27, "grav": 4.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 134000, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.655, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Ferroce has the one shared between them and Ada Core for high integrity computing certification purposes."}, {"id": 50504781, "au": "saagarjha", "dom": 73, "sr": 86, "sc": -0.28, "ep": 0.92, "bs": 1.19, "d": 1, "age": 4.71, "grav": 30.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 16, "k": 62079, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_implementation", "flbl": "Code & Implementation (Unsafe)", "urls": [], "ig": 0.271, "fa": 0.0, "gp": 0.192, "bl": 0.45, "ds": 0.0, "txt": "> Like indexing a vector panicking instead of returning a Some(T) in case the index is out of bounds.\n\nIf you are doing this then you've made a mistake in your code. Rust is consistent in catching these early."}, {"id": 50505474, "au": "throwawayqqq11", "dom": 66, "sr": 87, "sc": -0.39, "ep": 0.8, "bs": 1.19, "d": 5, "age": 2.29, "grav": 13.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 872, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 0.34, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Rust editions exist for handling breaking changes. I dont get why so many people treat them as unthinkable/impossible."}, {"id": 50505868, "au": "dcminter", "dom": 52, "sr": 88, "sc": -0.4, "ep": 2.43, "bs": 2.84, "d": 9, "age": 1.23, "grav": 8.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 31, "qw": 0, "k": 9947, "kpp": 4.8, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://forum.qt.io/topic/142885/rewriting-qt-in-rust/10"], "ig": 0.283, "fa": 0.62, "gp": 0.0, "bl": 1.07, "ds": 0.0, "txt": "I dug out this example:\n\nhttps://forum.qt.io/topic/142885/rewriting-qt-in-rust/10\n\nThey might not be that common but they're definitely out there, and memorable, and irritating. You can see why it colours people's impression of the community."}, {"id": 50505266, "au": "petterroea", "dom": 111, "sr": 89, "sc": -0.43, "ep": 0.76, "bs": 1.19, "d": 0, "age": 2.93, "grav": 17.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 1505, "kpp": 4.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.22, "fa": 0.0, "gp": 0.166, "bl": 0.45, "ds": 0.0, "txt": "Is it just me or is it painful that they format their product name like that in the blog text."}, {"id": 50505407, "au": "hmry", "dom": 3, "sr": 90, "sc": -0.5, "ep": 0.7, "bs": 1.19, "d": 2, "age": 2.48, "grav": 14.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 1798, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "language_bugs", "flbl": "Language & Bugs (Project)", "urls": [], "ig": 0.297, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Is a language only memory-safe if its implementations are completely bug-free? I guess no language can ever be memory-safe then, might as well throw out the concept."}, {"id": 50505278, "au": "cowlevel", "dom": 79, "sr": 91, "sc": -0.51, "ep": 1.08, "bs": 1.59, "d": 1, "age": 2.9, "grav": 17.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "language_bugs", "flbl": "Language & Bugs (Project)", "urls": [], "ig": 0.458, "fa": 0.0, "gp": 0.0, "bl": 0.6, "ds": 0.0, "txt": "Wrapping everything in optional does lead to optional fatigue, and people just unwrap each optional they get since they know the index is inbounds, missing the one instance where it really is possible to get None.\n\nMaybe optional fatigue is Rusty but it's not a good style in any language"}, {"id": 50505285, "au": "cowlevel", "dom": 63, "sr": 92, "sc": -1.15, "ep": 1.63, "bs": 2.78, "d": 4, "age": 2.88, "grav": 17.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 0.474, "fa": 0.0, "gp": 0.36, "bl": 1.05, "ds": 0.0, "txt": "Is that Rust's guarantee? I know that Go avoids breaking changes but I thought they were normal in Rust."}, {"id": 50505997, "au": "HackerThemAll", "dom": 101, "sr": 93, "sc": -1.22, "ep": 2.4, "bs": 3.62, "d": 0, "age": 0.89, "grav": 6.8, "surf": 6.3, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 462, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "language_bugs", "flbl": "Language & Bugs (Project)", "urls": [], "ig": 0.98, "fa": 0.0, "gp": 0.069, "bl": 1.366, "ds": 0.0, "txt": "Could they first focus on fixing flaws within all their products maybe? The unusable patchwork of corporate programmers motivated by promotional cycles which breaks all the time on various fronts is worth abandoning and starting over in this Rust they complain about."}, {"id": 50506171, "au": "simonask", "dom": 10, "sr": 94, "sc": -1.3, "ep": 0.69, "bs": 1.99, "d": 6, "age": 0.36, "grav": 4.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 2402, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "language_bugs", "flbl": "Language & Bugs (Project)", "urls": [], "ig": 0.292, "fa": 0.0, "gp": 0.0, "bl": 0.75, "ds": 0.0, "txt": "What absurd nonsense. That's not how anything works.\n\nIf it were true, every bugfix would be a breaking change. It's clearly not."}, {"id": 50505549, "au": "simonask", "dom": 51, "sr": 95, "sc": -1.36, "ep": 0.63, "bs": 1.99, "d": 8, "age": 2.12, "grav": 12.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 17, "k": 2402, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 0.267, "fa": 0.0, "gp": 0.0, "bl": 0.75, "ds": 0.0, "txt": "> I'm on your side of this, but there are Rust zealots out there and they're incredibly annoying.\n\nI mean, I keep hearing about them, and they just literally never show up anywhere I am, and I'm pretty active in the Rust community."}, {"id": 50505879, "au": "tialaramex", "dom": 31, "sr": 96, "sc": -1.7, "ep": 1.34, "bs": 3.05, "d": 4, "age": 1.2, "grav": 8.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 15, "k": 33106, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 0.232, "fa": 0.28, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "> More practically, however, Rust has proven to have more memory safety bugs than GC languages\n\nCitation needed I think. Where was this proven? Who measured and on which \"GC languages\" ?"}, {"id": 50504915, "au": "rendaw", "dom": 70, "sr": 97, "sc": -1.76, "ep": 1.29, "bs": 3.05, "d": 2, "age": 4.23, "grav": 26.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 4394, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 0.209, "fa": 0.28, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "GP didn't say it was a memory safety bug."}, {"id": 50506219, "au": "ViewTrick1002", "dom": 33, "sr": 98, "sc": -1.95, "ep": 1.1, "bs": 3.05, "d": 6, "age": 0.22, "grav": 4.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 1253, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 0.467, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Go is not memory safe by design when you introduce concurrency?"}, {"id": 50505418, "au": "cowlevel", "dom": 109, "sr": 99, "sc": -2.08, "ep": 0.7, "bs": 2.78, "d": 4, "age": 2.45, "grav": 14.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "panics_cas", "flbl": "Panics & Cas (Loop)", "urls": [], "ig": 0.3, "fa": 0.0, "gp": 0.0, "bl": 1.05, "ds": 0.0, "txt": "Normally if you find yourself needing something like that, it means a CAS loop is the wrong tool for the job."}, {"id": 50505295, "au": "cowlevel", "dom": 93, "sr": 100, "sc": -2.1, "ep": 0.68, "bs": 2.78, "d": 1, "age": 2.85, "grav": 17.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "spec_array", "flbl": "Spec & Array (Via)", "urls": [], "ig": 0.289, "fa": 0.0, "gp": 0.0, "bl": 1.05, "ds": 0.0, "txt": "That's literally what returning optional does.\n\nEffect systems usually fail because effects are very different from each other and can't be generalised."}, {"id": 50505662, "au": "catlifeonmars", "dom": 5, "sr": 101, "sc": -2.39, "ep": 0.66, "bs": 3.05, "d": 3, "age": 1.76, "grav": 10.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 2070, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 0.198, "fa": 0.0, "gp": 0.133, "bl": 1.15, "ds": 0.0, "txt": "I think it only has to be free of memory soundness bugs."}, {"id": 50506260, "au": "csande17", "dom": 45, "sr": 102, "sc": -3.01, "ep": 0.73, "bs": 3.74, "d": 11, "age": 0.12, "grav": 3.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 4520, "kpp": 4.9, "td": 0.0, "mod": 0, "pp": 6, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "language_bugs", "flbl": "Language & Bugs (Project)", "urls": [], "ig": 0.31, "fa": 0.0, "gp": 0.0, "bl": 1.41, "ds": 0.0, "txt": "I am referring to the one that exists in material reality, and not just the collective imagination of the people making this dishonest argument."}, {"id": 50504829, "au": "aslilac", "dom": 62, "sr": 103, "sc": -3.23, "ep": 1.01, "bs": 4.24, "d": 3, "age": 4.53, "grav": 29.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 292, "kpp": 5.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "code_implementation", "flbl": "Code & Implementation (Unsafe)", "urls": [], "ig": 0.431, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "gotta remember tho that ? didn’t exist in 1.0, and now we can’t break existing code"}, {"id": 50505822, "au": "Sankozi", "dom": 4, "sr": 104, "sc": -3.61, "ep": 0.63, "bs": 4.24, "d": 3, "age": 1.34, "grav": 8.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 395, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "language_bugs", "flbl": "Language & Bugs (Project)", "urls": [], "ig": 0.204, "fa": 0.0, "gp": 0.106, "bl": 1.6, "ds": 0.0, "txt": "By that logic you can remove any trait from any language."}, {"id": 50505359, "au": "WOTERMEON", "dom": 22, "sr": 105, "sc": -3.68, "ep": 0.56, "bs": 4.24, "d": 2, "age": 2.64, "grav": 15.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 30, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "language_bugs", "flbl": "Language & Bugs (Project)", "urls": [], "ig": 0.238, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Are you paddling some? I’ve never seen rust described as premier language for AI"}, {"id": 50505483, "au": "orf", "dom": 69, "sr": 106, "sc": -3.68, "ep": 0.56, "bs": 4.24, "d": 5, "age": 2.27, "grav": 13.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 18, "k": 18317, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "panics_cas", "flbl": "Panics & Cas (Loop)", "urls": [], "ig": 0.236, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "> no reason why there shouldn't be facilities for the ? operator to turn a None into an appropriate error type\n\nThere are facilities for this.\n\n   option.ok_or(MyError::new())?"}, {"id": 50504977, "au": "pjmlp", "dom": 75, "sr": 107, "sc": -3.79, "ep": 1.38, "bs": 5.17, "d": 3, "age": 4.04, "grav": 25.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 56, "qw": 0, "k": 134000, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "spec_array", "flbl": "Spec & Array (Via)", "urls": [], "ig": 0.449, "fa": 0.0, "gp": 0.223, "bl": 1.95, "ds": 0.0, "txt": "As shown in PL/I or NEWP, C could have done it both ways, checked and unchecked when really required, e.g. PREFIX(SUBSCRIPTRANGE), PREFIX(NOSUBSCRIPTRANGE).\n\nLikewise regarding the storage for the length, if one is willing to go the way C went down a few years later, declare a pointer and make the array storage be pointer based, e.g. BASED(MY_ARRAY_PTR)."}, {"id": 50505860, "au": "tialaramex", "dom": 12, "sr": 108, "sc": -3.82, "ep": 0.42, "bs": 4.24, "d": 4, "age": 1.26, "grav": 8.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 33106, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "safety_memory", "flbl": "Safety & Memory (Software)", "urls": [], "ig": 0.179, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Software with bugs in it. Or shorter, Software."}, {"id": 50505017, "au": "uecker", "dom": 76, "sr": 109, "sc": -3.87, "ep": 0.37, "bs": 4.24, "d": 4, "age": 3.9, "grav": 24.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 2455, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "spec_array", "flbl": "Spec & Array (Via)", "urls": [], "ig": 0.157, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Can you explain what you mean by \"make the array storage be pointer based\"?"}, {"id": 50504934, "au": "fsckboy", "dom": 23, "sr": 110, "sc": -4.07, "ep": 0.17, "bs": 4.24, "d": 1, "age": 4.19, "grav": 26.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 10, "k": 8212, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "code_implementation", "flbl": "Code & Implementation (Unsafe)", "urls": [], "ig": 0.071, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": ">that there is nothing unusual or scandalous about these finds\n\nthat there is nothing unusual is the scandal"}, {"id": 50505063, "au": "arccy", "dom": 110, "sr": 111, "sc": -4.21, "ep": 0.83, "bs": 5.04, "d": 1, "age": 3.74, "grav": 23.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 13, "qw": 0, "k": 2119, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "language_bugs", "flbl": "Language & Bugs (Project)", "urls": ["https://news.ycombinator.com/item?id=47616242"], "ig": 0.352, "fa": 0.0, "gp": 0.0, "bl": 1.9, "ds": 0.0, "txt": "no amount of rust will fix the problems in azure that lead to https://news.ycombinator.com/item?id=47616242"}, {"id": 50505422, "au": "cowlevel", "dom": 122, "sr": 112, "sc": -5.55, "ep": 0.28, "bs": 5.83, "d": 2, "age": 2.44, "grav": 14.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "spec_array", "flbl": "Spec & Array (Via)", "urls": [], "ig": 0.12, "fa": 0.0, "gp": 0.0, "bl": 2.2, "ds": 0.0, "txt": "Rust doesn't have a spec, last I heard. The compiler is the spec."}, {"id": 50506221, "au": "simonask", "dom": 53, "sr": 113, "sc": -6.27, "ep": 1.39, "bs": 7.66, "d": 10, "age": 0.22, "grav": 4.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 2402, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 5, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "code_implementation", "flbl": "Code & Implementation (Unsafe)", "urls": [], "ig": 0.591, "fa": 0.0, "gp": 0.0, "bl": 2.89, "ds": 0.0, "txt": "I skimmed the topic. This is a forum post seemingly asking an honest if ill-informed question, and it seemed to foster an interesting and informative debate about why Qt isn't a good candidate for being rewritten in Rust.\n\nI didn't notice any toxicity from either side at all, though admittedly I did just skim."}, {"id": 50504356, "au": "nektro", "dom": 91, "sr": 114, "sc": -8.28, "ep": 0.0, "bs": 6.89, "d": 0, "age": 6.19, "grav": 44.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 0, "qw": 10, "k": 723, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.583, "bl": 2.6, "ds": 0.0, "txt": "> Notes from  Microsoft Security's Frontier Offensive Research & Generative Exploitation Lab."}, {"id": 50505470, "au": "dxdm", "dom": 8, "sr": 115, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 4, "age": 2.29, "grav": 13.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 1306, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "language_bugs", "flbl": "Language & Bugs (Project)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "So? I don't understand how that matters here."}, {"id": 50506292, "au": "pjmlp", "dom": 49, "sr": 116, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 7, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 1, "qw": 0, "k": 134000, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Cyclone."}, {"id": 50505088, "au": "Certhas", "dom": 58, "sr": 117, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 4, "age": 3.63, "grav": 22.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 1, "qw": 0, "k": 5745, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Because?"}, {"id": 50505560, "au": "saagarjha", "dom": 119, "sr": 118, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 2.09, "grav": 12.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 62079, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "language_bugs", "flbl": "Language & Bugs (Project)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "\"The best AI language\"?"}, {"id": 50504393, "au": "not_a_bot_4sho", "dom": 120, "sr": 119, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 0, "age": 6.02, "grav": 42.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 757, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "language_bugs", "flbl": "Language & Bugs (Project)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "A good use for AI"}, {"id": 50504448, "au": "nektro", "dom": 90, "sr": 120, "sc": -10.31, "ep": 0.0, "bs": 8.88, "d": 0, "age": 5.79, "grav": 40.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 6, "qw": 7, "k": 723, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://oxide.computer/blog/iddqd-unsafe"], "ig": -0.95, "fa": 0.0, "gp": 0.55, "bl": 3.35, "ds": 0.0, "txt": "> Pattern 2: Trusting user-provided implementations to be correct\n\nreminds me of the tales from https://oxide.computer/blog/iddqd-unsafe"}, {"id": 50505482, "au": "saagarjha", "dom": 35, "sr": 121, "sc": -12.17, "ep": 0.0, "bs": 9.94, "d": 4, "age": 2.27, "grav": 13.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 62079, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.75, "ds": 0.0, "txt": "Neither of these is true lmao"}, {"id": 50505439, "au": "cowlevel", "dom": 6, "sr": 122, "sc": -16.35, "ep": 0.61, "bs": 16.96, "d": 3, "age": 2.38, "grav": 14.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "spec_array", "flbl": "Spec & Array (Via)", "urls": [], "ig": 0.151, "fa": 0.0, "gp": 0.177, "bl": 6.4, "ds": 0.0, "txt": "Last I heard, Rust has no independent spec so the compiler is the spec."}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      const jumpBtns = isPinned
+        ? `<button type="button" class="probe-inline-btn" data-probe-jump="1">Comment &darr;</button>` +
+          `<button type="button" class="probe-inline-btn" data-probe-clear="1">Clear &times;</button>`
+        : "";
+      probeEl.innerHTML =
+        `<strong>@${escHtml(hit.au)}</strong> | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})` +
+        jumpBtns +
+        `<br>"${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 60);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 50);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 50);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 50);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `Showing ${shown.length} of ${pool.length} matching comments (mode: ${activeMode})` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear selection</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeSelect = document.getElementById("modeSelect");
+  modeSelect.addEventListener("change", () => {
+    activeMode = modeSelect.value;
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

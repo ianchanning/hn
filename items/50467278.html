@@ -1,0 +1,1273 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50467278 // Testing a trash can Faraday cage — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      background: rgb(247, 247, 245);
+      color: rgb(13, 13, 13);
+      font: 15px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+    }
+    .sheet-top {
+      border-top: 3px solid rgb(13, 13, 13);
+      border-bottom: 1px solid rgb(13, 13, 13);
+      padding: 16px 0 26px;
+    }
+    .eyebrow {
+      font: 600 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .eyebrow strong { color: rgb(255, 51, 0); }
+    h1 {
+      font-size: clamp(36px, 5.2vw, 72px);
+      line-height: 0.96;
+      letter-spacing: -0.045em;
+      margin: 18px 0 14px;
+      font-weight: 800;
+    }
+    h1 .accent { color: rgb(255, 51, 0); }
+    .sublead {
+      max-width: 920px;
+      font-size: 16px;
+      color: rgb(52, 52, 50);
+      margin: 0;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      font: 700 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 24px;
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+    }
+    .kpi-cell {
+      padding: 16px 16px 14px;
+      border-right: 1px solid rgb(205, 205, 200);
+    }
+    .kpi-cell:last-child { border-right: 0; }
+    .kpi-label {
+      font: 600 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 8px 0 4px;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      font-size: 12px;
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      background: rgb(13, 15, 17);
+      color: rgb(228, 232, 236);
+      border: 2px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 6px;
+      corner-shape: bevel;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(156, 166, 176);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      background: rgb(9, 11, 13);
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(180, 188, 196);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 58px;
+      background: rgb(20, 24, 28);
+      border-left: 3px solid rgb(0, 230, 118);
+      font: 12px/19px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(220, 226, 232);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 38px;
+    }
+
+    /* Collapsible 03A / 03B Justification Drawer */
+    details.proof-drawer {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 12px 0;
+    }
+    details.proof-drawer > summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      font: 700 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      user-select: none;
+    }
+    details.proof-drawer > summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary:hover { border-color: rgb(255, 51, 0); }
+    details.proof-drawer > summary .toggle-pill {
+      flex-shrink: 0;
+      padding: 3px 8px;
+      background: rgb(13, 13, 13);
+      color: rgb(247, 247, 245);
+      font-size: 10px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 16px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: rgb(255, 255, 253);
+      border: 1px solid rgb(13, 13, 13);
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+    }
+    table.ablation th {
+      background: rgb(236, 236, 231);
+      font: 700 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgb(60, 60, 58);
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      font: 600 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+      color: rgb(13, 13, 13);
+      padding: 7px 11px;
+      font: 600 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      box-shadow: 0 2px 0 rgb(13, 13, 13);
+    }
+    button.tab-btn.active {
+      background: rgb(13, 13, 13);
+      color: rgb(247, 247, 245);
+    }
+    button.tab-btn:hover {
+      border-color: rgb(255, 51, 0);
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      padding: 8px 11px;
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+      font: 600 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { flex: 1; min-width: 220px; font-weight: 400; }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border: 1px solid rgb(216, 216, 206);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      border-top: 3px solid rgb(13, 13, 13);
+      padding-top: 14px;
+      margin-top: 36px;
+      font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        background: rgb(239, 239, 234);
+        border: 1px solid rgb(13, 13, 13);
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        font-size: 17px;
+        margin: 0;
+        white-space: normal;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        background: rgb(13, 13, 13);
+        color: rgb(247, 247, 245);
+        font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-] HIDE"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+] SHOW"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpi-cell { border-bottom: 1px solid rgb(205, 205, 200); }
+      .filter-bar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .filter-bar select.sel-in {
+        width: 100%;
+        font-size: 16px;
+        padding: 8px 9px;
+      }
+      .filter-bar input.search-in {
+        grid-column: span 2;
+        width: 100%;
+        min-width: 0;
+        font-size: 16px;
+      }
+    }
+  </style>
+  <script>
+    (function() {
+      if (window.location.pathname.includes("/items/")) {
+        var m = window.location.pathname.match(/\/items\/(\d+)\.html/);
+        if (m) {
+          var base = window.location.pathname.replace(/\/items\/\d+\.html$/, "");
+          var target = (base || "") + "/item?id=" + m[1];
+          try {
+            history.replaceState(null, "", target);
+          } catch(e) {}
+        }
+      }
+    })();
+  </script>
+</head>
+<body>
+<div class="wrap">
+  <header class="sheet-top">
+    <div class="eyebrow">
+      <span>NYX OBSERVATORY // <a class="ext-link" href="https://news.ycombinator.com/item?id=50467278">HN ITEM 50467278</a> // JEFFTK.COM</span>
+      <span><strong>BULLSHIT: 81.4%</strong>
+    </div>
+    <h1>Bullshit vs. <span class="accent">Epistemic.</span></h1>
+    <p class="sublead">
+      <strong>59</strong> Hacker News comments on <a class="ext-link" href="https://www.jefftk.com/p/testing-a-trash-can-faraday-cage">Testing a trash can Faraday cage (jefftk.com)</a>.
+    </p>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary>
+      <span>01 // EVIDENCE</span>
+      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    </summary>
+    <p>
+      Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+      Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+    </p>
+    <div class="proof-body">
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">59</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 33 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">18.6%</div>
+          <div class="kpi-sub">11 comments (2 Gold / 3.4%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">81.4%</div>
+          <div class="kpi-sub">34 chatter &bull; 14 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">1</div>
+        <div class="kpi-sub">3% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.917</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">15</div>
+          <div class="kpi-sub">HN POS 45..59 (25.4% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="margin-top:10px;font:600 11px/1.5 ui-monospace,Menlo,monospace;color:rgb(70,70,68)"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary>
+      <span>02 // EXPLORE</span>
+      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / INTERACTIVE EQUATION</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p style="font-size:11.5px;line-height:1.42;color:rgb(85,85,82);margin:12px 0 0">
+              Drag any weight to watch the 59-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 59)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (2)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (9)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (34)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (14)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..59) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 25)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (@schiffern, 16.9h); largest subtree (@0c3ca83) occupies 15 slots (HN POS 45..59).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="modeSelect" class="sel-in" aria-label="Ranking view">
+          <option value="hn_top40">HN Top 40</option>
+          <option value="top_signal">Epistemic Top 50</option>
+          <option value="buried_gems">Buried Gems (HN POS &gt; 25)</option>
+          <option value="bullshit_traps">High-Karma / URL Traps Caught</option>
+          <option value="mod_morgue">Mod Rebukes &amp; Downvoted Morgue</option>
+          <option value="c5a_rescues">c5A Heterodox Rescues</option>
+        </select>
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (59)</option>
+          <option value="trash_inside">Trash &amp; Inside (Lid) (17)</option>
+          <option value="kill_easier">Kill &amp; Easier (Humans) (11)</option>
+          <option value="emp_equipment">Emp &amp; Equipment (Slit) (10)</option>
+          <option value="nuclear_pulse">Nuclear &amp; Pulse (Transformers) (9)</option>
+          <option value="faraday_phone">Faraday &amp; Phone (Microwave) (9)</option>
+          <option value="general_commentary">General Commentary (3)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, faraday, testing, cage, trash, power...">
+      </div>
+      <div id="resultMeta" style="font:600 11px/1.4 ui-monospace,Menlo,monospace;color:rgb(90,90,88);margin-bottom:10px"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50467278 + JEFFTK.COM + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50467278, "story_title": "Testing a trash can Faraday cage", "story_url": "https://www.jefftk.com/p/testing-a-trash-can-faraday-cage", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50467278, "story_title": "Testing a trash can Faraday cage", "story_url": "https://www.jefftk.com/p/testing-a-trash-can-faraday-cage", "points": 78, "story_author": "torutofu", "article_source": "fetched_url", "t1_ref_utc": "2026-11-15T08:26:38+00:00", "t2_ref_utc": "2026-11-15T08:26:38+00:00", "delta_minutes": 0.0, "story_anchors": ["faraday", "testing", "cage", "trash", "power", "test", "radio", "seam", "frequency", "emp", "lid", "inside", "shielding", "nuclear", "metal", "resistance", "source", "box", "protect", "field", "emps", "electronics", "equipment", "range", "thinking"], "facet_labels": {"trash_inside": "Trash & Inside (Lid)", "nuclear_pulse": "Nuclear & Pulse (Transformers)", "emp_equipment": "Emp & Equipment (Slit)", "kill_easier": "Kill & Easier (Humans)", "faraday_phone": "Faraday & Phone (Microwave)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "trash_inside", "label": "Trash & Inside (Lid)", "count": 17, "top_terms": ["trash", "inside", "lid", "floor"]}, {"slug": "nuclear_pulse", "label": "Nuclear & Pulse (Transformers)", "count": 9, "top_terms": ["nuclear", "pulse", "transformers", "results"]}, {"slug": "emp_equipment", "label": "Emp & Equipment (Slit)", "count": 10, "top_terms": ["emp", "equipment", "slit", "lights"]}, {"slug": "kill_easier", "label": "Kill & Easier (Humans)", "count": 11, "top_terms": ["kill", "easier", "humans", "aliens"]}, {"slug": "faraday_phone", "label": "Faraday & Phone (Microwave)", "count": 9, "top_terms": ["faraday", "phone", "microwave", "risk"]}], "counts": {"total_comments": 59, "live_t2_comments": 59, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 33, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "d432211e15e10e8961f40daecd059a88392b9141b31c8cc87cb596acc1ef56eb"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 2, "grounded_analysis": 9, "crowd_chatter": 34, "bullshit_or_flamewar": 14}, "facets": {"nuclear_pulse": 9, "kill_easier": 11, "trash_inside": 17, "faraday_phone": 9, "emp_equipment": 10, "general_commentary": 3}, "facet_options": [{"slug": "trash_inside", "label": "Trash & Inside (Lid)", "count": 17}, {"slug": "kill_easier", "label": "Kill & Easier (Humans)", "count": 11}, {"slug": "emp_equipment", "label": "Emp & Equipment (Slit)", "count": 10}, {"slug": "nuclear_pulse", "label": "Nuclear & Pulse (Transformers)", "count": 9}, {"slug": "faraday_phone", "label": "Faraday & Phone (Microwave)", "count": 9}, {"slug": "general_commentary", "label": "General Commentary", "count": 3}], "facet_diagnostics": [{"slug": "trash_inside", "label": "Trash & Inside (Lid)", "count": 17, "useful": 3, "useful_pct": 17.6, "terms": "trash, inside, lid, floor"}, {"slug": "kill_easier", "label": "Kill & Easier (Humans)", "count": 11, "useful": 1, "useful_pct": 9.1, "terms": "kill, easier, humans, aliens"}, {"slug": "emp_equipment", "label": "Emp & Equipment (Slit)", "count": 10, "useful": 3, "useful_pct": 30.0, "terms": "emp, equipment, slit, lights"}, {"slug": "nuclear_pulse", "label": "Nuclear & Pulse (Transformers)", "count": 9, "useful": 3, "useful_pct": 33.3, "terms": "nuclear, pulse, transformers, results"}, {"slug": "faraday_phone", "label": "Faraday & Phone (Microwave)", "count": 9, "useful": 1, "useful_pct": 11.1, "terms": "faraday, phone, microwave, risk"}, {"slug": "general_commentary", "label": "General Commentary", "count": 3, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 5}, {"category": "doi_peer_reviewed", "count": 1}, {"category": "primary_technical_doc", "count": 1}, {"category": "low_cred_or_joke", "count": 1}], "story_anchors": ["faraday", "testing", "cage", "trash", "power", "test", "radio", "seam", "frequency", "emp", "lid", "inside", "shielding", "nuclear", "metal", "resistance", "source", "box"], "largest_root": {"root_id": 50498096, "author": "0c3ca83", "slots": 15, "start_dom": 45, "end_dom": 59, "share_pct": 25.4, "top_dom1_age": 16.9, "top_dom1_author": "schiffern"}, "buried_cutoff": 25, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50499549, "au": "areoform", "dom": 37, "sr": 1, "sc": 13.43, "ep": 13.43, "bs": 0.0, "d": 0, "age": 13.8, "grav": 143.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 255, "qw": 341, "k": 12895, "kpp": 8.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "nuclear_pulse", "flbl": "Nuclear & Pulse (Transformers)", "urls": ["https://www.aps.org/apsnews/2022/11/electromagnetic-pulse", "http://ece-research.unm.edu/summa/notes/SDAN/0031.pdf", "https://sgp.fas.org/crs/homesec/R43604.pdf"], "ig": 1.656, "fa": 2.77, "gp": 1.131, "bl": 0.0, "ds": 0.0, "txt": "> It's not totally known what effect an EMP would have on stuff\n\nUnder Operation Fishbowl, the United States military conducted exo-atmospheric nuclear explosions to study the effects of an electromagnetic pulse. Multiple tests were conducted. The most famous of these tests is Starfish Prime which created an aurora, https://www.aps.org/apsnews/2022/11/electromagnetic-pulse\n\nSandia wrote a report called, \"Did High-Altitude EMP Cause the Hawaiian Streetlight Incident?\" - http://ece-research.unm.edu/summa/notes/SDAN/0031.pdf\n\nThere's probably a hyper detailed classified study sitting somewhere in a dusty drawer with that data that should probably be declassified. If you'd be down to FOIA it, I'd love to read it!\n\n    > With how quickly AI is going basically all futures are weird in some ways. I've been thinking about how this affects me personally, and \"try as hard as possible to keep AI from getting us all killed\" is pretty high on the list. For me this mostly looks like donations and pandemic deterrence, but I also put some time into thinking about disasters. There are ways AI might go very well, or very poorly, and then there's the \"messy middle\" where we muddle through and things might fall apart some in the meantime.\n    > \n    > The big things here are making sure you have enough water and food for a while, along with critical medications and the standard \"prepping\" recommen"}, {"id": 50501181, "au": "KennyBlanken", "dom": 43, "sr": 2, "sc": 9.18, "ep": 9.18, "bs": 0.0, "d": 0, "age": 10.79, "grav": 98.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 465, "qw": 0, "k": 5626, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "kill_easier", "flbl": "Kill & Easier (Humans)", "urls": ["https://www.hubbell.com/hubbellpowersystems/en/products/power-utilities/arresters/cl/559824"], "ig": 1.784, "fa": 1.57, "gp": 0.357, "bl": 0.0, "ds": 0.0, "txt": "This is idiotic.\n\nFirst off, this isn't Hollywood. You can't put an EMP device in the back of a panel van like in Ocean's 11. There are no non-nuclear weapons that can do the whole \"aliens knock out all our electronic devices\" schtick.\n\nThe effects of HEMPs (ie extremely high altitude nuclear explosions) are wildly overstated and based off Starfish Prime which was in the 60's, with the effects used to scaremonger people ever since. The electrical grid and everything connected to it then, bears nearly zero resemblance to the grid of today and the devices on it. Both the grid and everything connected to it are all much better protected and tolerant of electrical surges. Also, if a country did something like Starfish Prime it would take the US minutes to figure out where the weapon had come from, regardless of what country did it, or what country was hit, because US space command tracks everything bigger than about the size of an apple.\n\nYour cell phone (and nearly everything else around you that is electronic) is designed to handle static electricity shocks which can be 20,000 volts and 10-20mJ. The modern electrical grid is designed to tolerate solar flare storms and more, with automatic protection devices that trip disconnects, and there are millions of arresting devices (like this: https://www.hubbell.com/hubbellpowersystems/en/products/powe...) all along transmission lines an"}, {"id": 50500411, "au": "doodlebugging", "dom": 31, "sr": 3, "sc": 6.58, "ep": 6.58, "bs": 0.0, "d": 4, "age": 12.12, "grav": 117.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 213, "qw": 56, "k": 2995, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "trash_inside", "flbl": "Trash & Inside (Lid)", "urls": [], "ig": 1.571, "fa": 0.7, "gp": 0.617, "bl": 0.0, "ds": 0.0, "txt": "From another comment:\n\n>Presumes the floor (or other surface) is perfectly flat...\n\nwith your reply to that comment:\n\n>And that the floor will attenuate any reflected EMP/signal from underneath (should be small in a basement, but ...)\n\nI believe that I addressed those issues in my reply to the other poster.\n\n>Trash can lids are usually not so flat, which makes the whole thing wobbly.\n\nVery true but simple to accommodate for even if the wobble has zero effect on its signal attenuation characteristics. If the can that I linked topples in the wind it will not affect the seal at all. That is a very durable can with a dependable grip on the lid.\n\n>The ones you linked lack a handle on top, but it's a common feature on metal cans.\n\nTrue that handles are common on trash cans. I buy that trash can specifically because it does not have a handle and therefore it has no holes or slits in the lid. The dish shape makes it suitable for use as a shallow, very durable bird bath or water feature for attracting bees and other insect pollinators. When you have a lid like that one you can get a cheap solar-powered floating aerator/sprayer and add a few rocks and a piece of weathered driftwood for perches. Bees, wasps, dragonflies, butterflies, moths, etc will make good use of the small fountain feature. Fountains that I have scattered on my place draw all kinds of insects and birds. A few weeks ago"}, {"id": 50498371, "au": "superkuh", "dom": 36, "sr": 4, "sc": 6.2, "ep": 6.2, "bs": 0.0, "d": 0, "age": 15.8, "grav": 178.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 122, "qw": 0, "k": 14439, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "trash_inside", "flbl": "Trash & Inside (Lid)", "urls": [], "ig": 1.604, "fa": 0.68, "gp": 0.338, "bl": 0.0, "ds": 0.0, "txt": "This is a cool test and a great use of (relatively cheap) rtlsdr dongles. Ignoring the \"prepper\" aspect a faraday cage is genuinely useful thing to have around if you want to play with radio transmitting without any chance of breaking any laws.\n\nA much better faraday cage is matroiska doll nesting of two different size trash cans with a non-conductive platform supporting inside smaller can. The air gap and double conducting surfaces really help. And with the different circumference of the smaller can's rim there'll be a different resonant freq that gets let in. So while the outside seam may pass ~339 MHz without any attenuation the inner seam might pass ~450 MHz and so both unintentional passbands will get at least the minimum ~20dB attenuation per can."}, {"id": 50502340, "au": "areoform", "dom": 42, "sr": 5, "sc": 5.54, "ep": 7.39, "bs": 1.7, "d": 4, "age": 8.57, "grav": 69.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 68, "qw": 0, "k": 12895, "kpp": 8.6, "td": 0.0, "mod": 0, "pp": 5, "meme": 0, "tier": "grounded_analysis", "facet": "faraday_phone", "flbl": "Faraday & Phone (Microwave)", "urls": ["https://news.ycombinator.com/item?id=49620746", "https://news.ycombinator.com/item?id=49637557", "https://news.ycombinator.com/item?id=49890381"], "ig": 1.3, "fa": 0.9, "gp": 1.217, "bl": 0.64, "ds": 0.0, "txt": "Sure. I've interacted with you before and communicated my point of view frequently. See,\n\nhttps://news.ycombinator.com/item?id=49620746\n\nhttps://news.ycombinator.com/item?id=49637557\n\nThe self-fulfilling prophecy, https://news.ycombinator.com/item?id=49890381\n\nOn WMDs, https://news.ycombinator.com/item?id=50293688\n\nAn intuitive explanation for why a lot of the hysteria is wrong, https://news.ycombinator.com/item?id=50484072\n\nHow the hysteria is already harming the field, https://news.ycombinator.com/item?id=49651727\n\nAnd the walling off of the global intellectual commons, https://news.ycombinator.com/item?id=50028478\n\nWhereas the real risk of these machines aren't being discussed or countered, in fact the hysteria makes that outcome almost certain, https://news.ycombinator.com/item?id=49252258\n\nhttps://news.ycombinator.com/item?id=48024901"}, {"id": 50501561, "au": "DoctorOetker", "dom": 48, "sr": 6, "sc": 5.51, "ep": 5.51, "bs": 0.0, "d": 1, "age": 10.12, "grav": 89.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 100, "qw": 10, "k": 1969, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "nuclear_pulse", "flbl": "Nuclear & Pulse (Transformers)", "urls": [], "ig": 1.601, "fa": 0.42, "gp": 0.382, "bl": 0.0, "ds": 0.0, "txt": "> Automating the economy is the risk to humans, not EMPs.\n\nA false dilemma, automating the economy can cause (soon to be) disenfranchised people to attack centralized data centers with EMPs.\n\nSecurity has a cost, ignoring it results in more economical solutions... until eventually the concomitant lapse in security makes it the more costly solution.\n\nSam Altman claims DRAM shouldn't go to the proles, but into datacenters, but such concentration brings substantial risk to said data centers.\n\nIt's harder to attack progress in ML if training were federated throughout the population, so there is no DC to attack. Yes, it appears a bit more inefficient, until it doesn't, thats simply the cost of security."}, {"id": 50497752, "au": "varjag", "dom": 8, "sr": 7, "sc": 5.25, "ep": 5.25, "bs": 0.0, "d": 0, "age": 17.05, "grav": 201.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 16249, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "trash_inside", "flbl": "Trash & Inside (Lid)", "urls": [], "ig": 0.889, "fa": 0.34, "gp": 1.51, "bl": 0.0, "ds": 0.0, "txt": "Technically I'm measuring in the \"wrong direction\" since I would be very surprised if an EMP were initiated inside a trash can in my basement, but shielding works the same in both directions so this doesn't matter.\n\nIt really doesn't, with 1.5GHz you're still in near field regime inside the can."}, {"id": 50500717, "au": "nstents", "dom": 47, "sr": 8, "sc": 4.67, "ep": 4.82, "bs": 0.0, "d": 2, "age": 11.52, "grav": 108.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 66, "qw": 0, "k": 44, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "nuclear_pulse", "flbl": "Nuclear & Pulse (Transformers)", "urls": ["https://www.inss.org.il/publication/electromagnetic/"], "ig": 1.08, "fa": 0.62, "gp": 0.355, "bl": 0.0, "ds": 0.0, "txt": "I appreciate your sharing your results. They're in line with other anecdotal readings I've found over the years, as well as what an MS in Electrical Engineering friend once told me.\n\nReading up to learn more on this, here's [0], and doubtlessly there is classified material on non nuclear EMP devices, and it wouldn't surprise me if someone got itchy enough to test them in the field.\n\n[0] https://www.inss.org.il/publication/electromagnetic/"}, {"id": 50504944, "au": "Animats", "dom": 38, "sr": 9, "sc": 4.52, "ep": 4.81, "bs": 0.0, "d": 1, "age": 0.56, "grav": 5.4, "surf": 21.7, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 254, "qw": 0, "k": 167835, "kpp": 6.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "emp_equipment", "flbl": "Emp & Equipment (Slit)", "urls": [], "ig": 1.823, "fa": 0.0, "gp": 0.366, "bl": 0.0, "ds": 0.0, "txt": "The Oahu info is interesting. That was a series street light system, something rarely seen any more. The idea is that all the bulbs are wired in series, the street light system is a big loop, and there's a constant-current transformer at the head end, providing a few thousand volts.\n\nConstant current lighting is kind of a mirror world of normal constant voltage systems. Each lamp is equipped with not a fuse, but an insulating shorting disk between two contacts, wired in parallel with the bulb. In normal operation, each lamp sees 1/N of the system voltage, usually 120V. If a lamp burns out, no current flows, all lights go out, the failed lamp's insulating disk sees the full system voltage, the high voltage arcs through the insulating disk, the contacts close, and the dead lamp is thus bypassed. Now the lamp string has less resistance, current goes up a bit, the constant-current transformer adjusts, and things go back to normal, minus one lamp.\nThe Oahu system had a mix of incandescent and mercury vapor lamps, running at different voltages. complicating the situation.\n\nThis is apparently a bad case for EMP vulnerability. But all that happened was that some of the shorting disks at the voltage conversion points arced through and cut that part of the loop out of circuit.\n\nThose old series lighting systems are almost totally gone. But one application for series lighting remains - ai"}, {"id": 50500833, "au": "DoctorOetker", "dom": 24, "sr": 10, "sc": 4.28, "ep": 4.43, "bs": 0.0, "d": 1, "age": 11.31, "grav": 105.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 309, "qw": 0, "k": 1969, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "emp_equipment", "flbl": "Emp & Equipment (Slit)", "urls": [], "ig": 1.884, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "a trash can upside down ... on top of what? a shallow mercury bath?\n\na passing wave, even a distant plane wave, will couple to the EM surface waves of the can surface.\n\nalso novices always home in and hyperfocus on reflectivity and transmission attenuation lengths, which works when done properly, but is a complete PITA without using absorbers.\n\nsimply placing an unopen plastic water bottle inside the cavity means that any EM energy that does make its way in, would be absorbed, instead of repeatedly reflecting from your perfect metallic reflector walls...\n\nConsider a small 2D patch of metal sheet with some resistivity: any attenuated tails of EM waves will induce currents in the metal, and those currents can flow in all directions in the sheet.\n\nNow consider the same metal sheet with a very fine unintentional slit, while currents can still run parallel to the slit, the metal doesn't admit significant current (ignore electron tunneling across the slit) across the slit, this means a current can circulate around the slit, this is why some of the commenters here point out the issues with slits. Simply placing mating metal lids / doors / ... against metal containers does not guarantee identical conductivity across the formed slit: imperfect planarity (think placing the Alps upside down on the Pyrenees), different metallic phases (annealing etc) at the surface, the spontaneous formati"}, {"id": 50498554, "au": "jefftk", "dom": 46, "sr": 11, "sc": 4.16, "ep": 4.45, "bs": 0.0, "d": 1, "age": 15.45, "grav": 171.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 127, "qw": 0, "k": 24178, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "emp_equipment", "flbl": "Emp & Equipment (Slit)", "urls": [], "ig": 1.308, "fa": 0.28, "gp": 0.4, "bl": 0.0, "ds": 0.0, "txt": "[author]\n\nI agree with you that this is silly, and don't recommend it. It looks to me like even in an EMP situation, you don't need a Faraday cage, you just need your equipment to be unplugged: \"Overall, I think it's pretty likely that for EMP resistance it's enough to leave your equipment off and unplugged. Unless you're excited about testing Faraday cages, make sure your stuff stays unplugged and you can stop reading now.\"\n\nOn the other hand, I don't think we can rule out a lot of situations in which an EMP might be used, even if none of them involve an AI directly trying to kill people. For example, other countries could conclude that risking nuclear war is a better bet than allowing the US to build superintelligent AI."}, {"id": 50501378, "au": "KennyBlanken", "dom": 2, "sr": 12, "sc": 4.04, "ep": 4.04, "bs": 0.0, "d": 1, "age": 10.45, "grav": 93.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 170, "qw": 0, "k": 5626, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "kill_easier", "flbl": "Kill & Easier (Humans)", "urls": [], "ig": 1.717, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "You mean a guy who sells crap to preppers?\n\n...Who has never published in a peer reviewed journal on EMI or anything relating, remotely, to grid infrastructure or power control, etc?\n\n...Who has zero background in electrical grids? He worked on cables in spacecraft. That does not apply to national electrical grids. Do you ask your dentist for his opinions on brain surgery?\n\n...Who is basing everything off the assumption that none of the last fifty to sixty years of improvements in grid control, monitoring, and protection don't exist?\n\nNeither pulse does anything because modern electrical grids have tens of millions of arresting devices, extensive monitoring, and extensive self protection devices at nearly all levels? At least in no small part to be able to handle the millions of lightning strikes that hit grids?\n\nEvery substation you drive by has a controller that watches voltage, current, and frequency and nearly instantly disconnects the substation from the grid if parameters exceed safety margins.\n\nA HEMP would cause widespread electrical outages. It would not fry everything."}, {"id": 50497586, "au": "jonhohle", "dom": 4, "sr": 13, "sc": 3.58, "ep": 3.58, "bs": 0.0, "d": 0, "age": 17.38, "grav": 207.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 130, "qw": 0, "k": 8203, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "faraday_phone", "flbl": "Faraday & Phone (Microwave)", "urls": [], "ig": 0.816, "fa": 0.0, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "I did a much lower fidelity experiment this past week with one of my kids.\n\nI have some radios I threw in metal boxes on the off chance something like this happened so we’d have some way to get emergency alerts. To check how well it shielded we threw my phone in it and they called to see if it rang. It did.\n\nSo we tried some other things - the microwave (worked), a tool chest (didn’t), a faraday bag (worked), miscellaneous storage boxes (didn’t).\n\nFortunately, the box with the radio was an old box and some paint had worn from the edges. We made a “seal” out of aluminum foil and tried again. It worked.\n\nThis only tested high frequency signals and probably doesn’t reflect real EMP risk in any way, but it was fun to do."}, {"id": 50498096, "au": "0c3ca83", "dom": 45, "sr": 14, "sc": 3.54, "ep": 3.98, "bs": 0.0, "d": 0, "age": 16.38, "grav": 188.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 95, "qw": 0, "k": 797, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "nuclear_pulse", "flbl": "Nuclear & Pulse (Transformers)", "urls": [], "ig": 1.47, "fa": 0.0, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "This kind of prepping is silly. I suppose it's a way for adults to build pillow forts.\n\nAI isn't likely to deliberately kill anyone. It's likely to make them entirely economically uncompetitive.\n\nToday, if people go on strike, the economy grinds to a halt. This gives them a good deal of political power. If the economically useless go on strike, nobody cares.\n\nThat leaves violence to make people's voices heard, and the surveillance and police forces that we've been automating should be effective at undermining, dispersal, or suppression.\n\nAutomating the economy is the risk to humans, not EMPs."}, {"id": 50500396, "au": "jefftk", "dom": 39, "sr": 15, "sc": 3.48, "ep": 3.92, "bs": 0.0, "d": 1, "age": 12.16, "grav": 118.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 73, "qw": 72, "k": 24178, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "emp_equipment", "flbl": "Emp & Equipment (Slit)", "urls": [], "ig": 1.041, "fa": 0.42, "gp": 0.188, "bl": 0.0, "ds": 0.0, "txt": "> I don't think this is a healthy line of thought, but I don't think most people who think this way are ready to hear that.\n\nHappy to talk about this if you like!\n\n> But based on the post, it seems that your threat model is off. The biggest threat of an EMP blast won't be your electronics acting up, but it would be the critical high voltage transformers being taken offline. These transformers have a lead time of months. Weeks in the best-case scenario.\n\nI agree with you that long-term blackouts are the largest impact in an EMP situation and I should have said something along those lines in my post. I've been thinking a lot about backup power already, and part of what I was looking at in the post is whether I need to take extra steps to protect my backup power options from an EMP (it seems to me I really don't.)"}, {"id": 50499061, "au": "superkuh", "dom": 9, "sr": 16, "sc": 3.36, "ep": 3.51, "bs": 0.0, "d": 1, "age": 14.67, "grav": 158.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 138, "qw": 0, "k": 14439, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "trash_inside", "flbl": "Trash & Inside (Lid)", "urls": [], "ig": 1.436, "fa": 0.0, "gp": 0.091, "bl": 0.0, "ds": 0.0, "txt": "Yep. The exact placement of the monopole w/r to the close can wall will change the the polarization which changes how will it will get through the imperfections in the horizontal seam slots which will be polarized. And that's ignoring the that different places will be better or worse (vs frequency) for exciting the can's cavity modes (at $frequency) in the first place.\n\nBut a long distance high power RF source can have these properties altered too by the type of emission mechanisn, reflections, scattering, etc and items placed in such a faraday cage will be located at good and bad places to excite the cavity mode too.\n\nSo it's kind of a wash and probably okay for this kind of test. The fact that the electric and magnetic components of the field aren't in balance (near field) doesn't matter too much."}, {"id": 50499554, "au": "MarsZebra", "dom": 14, "sr": 17, "sc": 3.04, "ep": 3.26, "bs": 0.0, "d": 0, "age": 13.79, "grav": 143.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": -8, "kpp": -0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "emp_equipment", "flbl": "Emp & Equipment (Slit)", "urls": [], "ig": 1.061, "fa": 0.0, "gp": 0.529, "bl": 0.0, "ds": 0.0, "txt": "EMPs do not affect small devices that aren't plugged in, they simply don't have the size to couple that much EM energy.\n\nWhat is potentially affected is large power lines, railways, street lights, copper-networking equipment, some industrial systems, etc.."}, {"id": 50499229, "au": "doodlebugging", "dom": 29, "sr": 18, "sc": 2.73, "ep": 3.24, "bs": 0.0, "d": 2, "age": 14.37, "grav": 153.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 108, "qw": 0, "k": 2995, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "trash_inside", "flbl": "Trash & Inside (Lid)", "urls": [], "ig": 1.379, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "In a reply to another comment I gave a link to the type of trash can that I was thinking about for the cage.\n\nWhile there may be imperfections in flatness on standard, uncarpeted floors that can allow RF signal to find a path inside (reflections from below or from other angles as another comment mentions) or you could live in a house like mine where flat had a non-standard definition with lots of slop, I believe that you solve those issues by setting the lid upside down on the floor, placing your apparatus inside the lid, then covering and sealing it with the inverted trash can.\n\nYou should have plenty of signal attenuation either way."}, {"id": 50503359, "au": "schiffern", "dom": 3, "sr": 19, "sc": 2.67, "ep": 3.04, "bs": 0.0, "d": 2, "age": 6.06, "grav": 42.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 4, "k": 8343, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "nuclear_pulse", "flbl": "Nuclear & Pulse (Transformers)", "urls": [], "ig": 1.293, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Innuendo and sarcasm, entertaining!\n\nThe idea that the E3 pulse (not the E1 pulse) is what effects big beefy transformers is uncontroversial. Not sure what your issue is, but please inform me.\n\n  >Neither pulse does anything\n\nSource for this rather outrageous claim? Last I checked, there were no large scale high fidelity EMP tests in modern times."}, {"id": 50499795, "au": "Goodliff", "dom": 12, "sr": 20, "sc": 2.51, "ep": 5.03, "bs": 2.52, "d": 0, "age": 13.36, "grav": 136.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 77, "qw": 0, "k": 1, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "faraday_phone", "flbl": "Faraday & Phone (Microwave)", "urls": [], "ig": 1.431, "fa": 0.0, "gp": 1.15, "bl": 0.95, "ds": 0.0, "txt": "I use metal cookie tins with lids that seal tightly to store thumb drives and hdds of data, my most recent old phone, emergency crank-and-solar-powered radio, walkie talkies, etc.\n\nI tested it by putting my phone in there, closing the lid, and then calling it. No ring. Then loosened the top and it rang. Tested it with streaming music too.\n\nI tested with the radio too. It played music with top off, and went to static with top on."}, {"id": 50499596, "au": "LodeOfCode", "dom": 11, "sr": 21, "sc": 2.36, "ep": 3.09, "bs": 0.0, "d": 2, "age": 13.74, "grav": 142.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 0, "k": 114, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "emp_equipment", "flbl": "Emp & Equipment (Slit)", "urls": [], "ig": 0.976, "fa": 0.28, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "As GP pointed out, the problem is that if the source is inside the can, the walls are near the source - where the EM field diverges - whereas with an EMP the source would be far  away (hopefully) so the EM field lines would be roughly parallel over the surface of the cage"}, {"id": 50498152, "au": "psanford", "dom": 35, "sr": 22, "sc": 2.1, "ep": 2.54, "bs": 0.0, "d": 0, "age": 16.26, "grav": 186.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 4558, "kpp": 7.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "trash_inside", "flbl": "Trash & Inside (Lid)", "urls": [], "ig": 0.971, "fa": 0.0, "gp": 0.177, "bl": 0.0, "ds": 0.0, "txt": "When apple started doing mac address randomization on the iphone, we used a metal trash can to test that in a controlled environment. It worked quite well for wifi isolation. We did not tape the lid."}, {"id": 50505105, "au": "trilogic", "dom": 13, "sr": 23, "sc": 1.89, "ep": 1.89, "bs": 0.0, "d": 0, "age": 0.05, "grav": 3.6, "surf": 55.9, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 185, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "faraday_phone", "flbl": "Faraday & Phone (Microwave)", "urls": [], "ig": 0.803, "fa": 0.0, "gp": 0.003, "bl": 0.0, "ds": 0.0, "txt": "Now put that inside water and have fun testing with minerals/chemicals and wide range of spectrum frequency, intensity, volts, resistance :)"}, {"id": 50497700, "au": "doodlebugging", "dom": 18, "sr": 24, "sc": 1.88, "ep": 2.98, "bs": 0.0, "d": 0, "age": 17.16, "grav": 203.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 65, "qw": 0, "k": 2995, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "trash_inside", "flbl": "Trash & Inside (Lid)", "urls": [], "ig": 1.123, "fa": 0.0, "gp": 0.236, "bl": 0.0, "ds": 0.0, "txt": "Since you already suspect that any EMP will come from above why didn't this guy simply turn the trash can upside down and place it over the test setup?\n\nThere would be no need to seal anything since the can has a continuous rolled seam. Just use a standard trash can instead of one of those kitchen trash cans that likely has a plastic bottom for easy clean-up."}, {"id": 50498745, "au": "probably_wrong", "dom": 33, "sr": 25, "sc": 1.83, "ep": 1.83, "bs": 0.0, "d": 0, "age": 15.12, "grav": 166.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 10643, "kpp": 5.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "kill_easier", "flbl": "Kill & Easier (Humans)", "urls": [], "ig": 0.68, "fa": 0.0, "gp": 0.161, "bl": 0.0, "ds": 0.0, "txt": "On the topic of Faraday cages: is there a way to make one whose \"Faradayness\" can be turned on and off at will? I remember hearing that you can do so with current, but I haven't found much info since."}, {"id": 50500287, "au": "swader999", "dom": 16, "sr": 26, "sc": 1.52, "ep": 2.1, "bs": 0.0, "d": 1, "age": 12.36, "grav": 121.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 4203, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "nuclear_pulse", "flbl": "Nuclear & Pulse (Transformers)", "urls": [], "ig": 0.896, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Nuclear weapon vs extreme solar events are quite different beasts to protect against. I think your statement above applies very well to solar but might not play out that way for the nuclear weapon scenario."}, {"id": 50499288, "au": "ck2", "dom": 44, "sr": 27, "sc": 1.47, "ep": 1.69, "bs": 0.0, "d": 0, "age": 14.26, "grav": 151.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 32324, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "faraday_phone", "flbl": "Faraday & Phone (Microwave)", "urls": [], "ig": 0.718, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "decadess ago for film canisters they made lead-lined bags to take them through airports\n\nI bet that's a pretty good faraday cage"}, {"id": 50498676, "au": "doodlebugging", "dom": 20, "sr": 28, "sc": 1.46, "ep": 2.78, "bs": 0.0, "d": 2, "age": 15.23, "grav": 168.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 53, "qw": 0, "k": 2995, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "trash_inside", "flbl": "Trash & Inside (Lid)", "urls": ["https://www.homedepot.com/p/Behrens-31-Gal-Galvanized-Steel-Round-Metal-Household-Trash-Can-with-Lid-1270/100202118"], "ig": 0.431, "fa": 0.62, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I see what you are saying and understand that problem but I was picturing something like this type of can from Home Depot:\n\nhttps://www.homedepot.com/p/Behrens-31-Gal-Galvanized-Steel-...\n\nI use these as planters for my orchard fruit and nut trees. They have no open holes. I have to drill the bottoms or side to add drainage so that the trees don't drown."}, {"id": 50501757, "au": "andai", "dom": 52, "sr": 29, "sc": 1.35, "ep": 2.63, "bs": 0.85, "d": 3, "age": 9.75, "grav": 84.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 9, "k": 18117, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "kill_easier", "flbl": "Kill & Easier (Humans)", "urls": [], "ig": 0.612, "fa": 0.42, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "> If AI works out as the frontier labs hope\n\nThey hope for Earth to be colonized by artificial life? I'm not entirely sure that's up to them.\n\n(They do seem to be trying to speed it along though... although they are starting with artificial humanoid slaves.)"}, {"id": 50500625, "au": "lostlogin", "dom": 21, "sr": 30, "sc": 1.06, "ep": 3.45, "bs": 0.85, "d": 3, "age": 11.74, "grav": 111.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 123, "qw": 0, "k": 19917, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "trash_inside", "flbl": "Trash & Inside (Lid)", "urls": [], "ig": 1.467, "fa": 0.0, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "Sorry I thought you meant to leave the lid off.\n\nThat would probably work well with the lid on floor, bin over the top.\n\nI work with an MR scanner. Bluetooth seems to work through the cage (or did on the previous scanner I used) and cellphone calls work though it fine as long as the door is just a tiny bit open.\n\nIt’s quite interesting to play with.\n\nThe cage drops signal 100db (well, that the spec it’s built to).\n\nRf leaks are the worst. You can run the scanner in a ‘detect rf’ mode to try find any leaks.\nThey can be a pinhole, a faulty light, a poorly sealed escape hatch etc.\n\nA bad one can take a very long time to find and it’s enormously expensive to do so."}, {"id": 50499782, "au": "tclancy", "dom": 32, "sr": 31, "sc": 0.9, "ep": 2.0, "bs": 0.0, "d": 0, "age": 13.38, "grav": 136.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 5564, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "trash_inside", "flbl": "Trash & Inside (Lid)", "urls": [], "ig": 0.755, "fa": 0.0, "gp": 0.154, "bl": 0.0, "ds": 0.0, "txt": "As a New Englander, I am not surprised WBZ was the strongest AM signal available. Depending on the weather, you would hear callers from the Midwest and South regularly on a Boston-based station."}, {"id": 50501003, "au": "doodlebugging", "dom": 25, "sr": 32, "sc": 0.88, "ep": 2.42, "bs": 0.0, "d": 2, "age": 11.01, "grav": 101.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 2995, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "trash_inside", "flbl": "Trash & Inside (Lid)", "urls": [], "ig": 1.029, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I will definitely remember your advice about incorporating an absorbing medium inside the device should I ever need any EMP protection.\n\nThanks for the added context about apprehending those barbarians that find their way inside the containment shield."}, {"id": 50500842, "au": "doodlebugging", "dom": 22, "sr": 33, "sc": 0.71, "ep": 3.5, "bs": 1.7, "d": 4, "age": 11.29, "grav": 105.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 91, "qw": 0, "k": 2995, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 5, "meme": 0, "tier": "crowd_chatter", "facet": "emp_equipment", "flbl": "Emp & Equipment (Slit)", "urls": [], "ig": 1.49, "fa": 0.0, "gp": 0.0, "bl": 0.64, "ds": 0.0, "txt": "As a geophysicist, I understand your problem. Pinholes, slit length and width, mesh size, etc will all factor into the suitability for use as a signal attenuator. It comes down to the wavelength of the energy that you're trying to block. Common millimeter or submillimeter wavelengths from ordinary consumer devices make it important to take a hard look at your shielding to identify any stray path opportunities. Transmission and reflection coefficients of the materials and the propagation medium, reflection paths, material density properties, etc. All these things will work with or conspire against you."}, {"id": 50497814, "au": "schiffern", "dom": 1, "sr": 34, "sc": 0.69, "ep": 5.22, "bs": 3.58, "d": 0, "age": 16.91, "grav": 198.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": -1, "lu": 1, "w": 63, "qw": 0, "k": 8343, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "nuclear_pulse", "flbl": "Nuclear & Pulse (Transformers)", "urls": ["https://www.youtube.com/watch?v=aMct99DiZak"], "ig": 1.441, "fa": 0.0, "gp": 1.265, "bl": 1.35, "ds": 0.0, "txt": "Nice to see the results match Dr Arthur Bradley, the OG in the field (no pun intended).\n\nhttps://www.youtube.com/watch?v=aMct99DiZak\n\nFor my money, a triple burrito wrap of foil and ziploc gives 90+ dB attenuation plus moisture and mechanical protection.\n\nAlso nitpick, but the E1 pulse doesn't fry beefy transformers, instead it's the long-period E3 pulse (seconds to minutes) that raises the grid voltage and overvolts the transformers."}, {"id": 50498256, "au": "wilkystyle", "dom": 5, "sr": 35, "sc": 0.64, "ep": 1.23, "bs": 0.0, "d": 1, "age": 16.06, "grav": 182.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 1746, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "faraday_phone", "flbl": "Faraday & Phone (Microwave)", "urls": [], "ig": 0.362, "fa": 0.0, "gp": 0.261, "bl": 0.0, "ds": 0.0, "txt": "When you say \"worked\", do you mean the phone worked in the microwave or that the microwave worked as a Faraday cage and prevented the phone from ringing?"}, {"id": 50500062, "au": "toast0", "dom": 30, "sr": 36, "sc": 0.53, "ep": 2.07, "bs": 0.0, "d": 3, "age": 12.8, "grav": 127.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 33017, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "trash_inside", "flbl": "Trash & Inside (Lid)", "urls": [], "ig": 0.881, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Trash can lids are usually not so flat, which makes the whole thing wobbly. The ones you linked lack a handle on top, but it's a common feature on metal cans."}, {"id": 50498253, "au": "jagged-chisel", "dom": 10, "sr": 37, "sc": 0.49, "ep": 2.03, "bs": 0.0, "d": 1, "age": 16.06, "grav": 182.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 5435, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "trash_inside", "flbl": "Trash & Inside (Lid)", "urls": [], "ig": 0.863, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "He’s testing penetration from the opposite side regardless of the source location.\n\nYeah, you put a transmitter inside the can, and a receiver inside the can, and the receiver is gonna get signal."}, {"id": 50503556, "au": "MarsZebra", "dom": 17, "sr": 38, "sc": 0.41, "ep": 1.59, "bs": 0.0, "d": 2, "age": 5.44, "grav": 37.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": -8, "kpp": -0.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "nuclear_pulse", "flbl": "Nuclear & Pulse (Transformers)", "urls": [], "ig": 0.676, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "yes it applies to nuclear as well assuming you're talking about traditional high-altitude EMP type nuclear weapons"}, {"id": 50498606, "au": "lostlogin", "dom": 19, "sr": 39, "sc": 0.35, "ep": 1.89, "bs": 0.0, "d": 1, "age": 15.36, "grav": 170.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 19917, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "trash_inside", "flbl": "Trash & Inside (Lid)", "urls": [], "ig": 0.688, "fa": 0.0, "gp": 0.188, "bl": 0.0, "ds": 0.0, "txt": "That wouldn’t help I don’t think. I’ve had very small holes in a faraday cage results in rf leaks - slots thinner than a credit card."}, {"id": 50498415, "au": "0c3ca83", "dom": 51, "sr": 40, "sc": 0.21, "ep": 0.87, "bs": 0.0, "d": 2, "age": 15.7, "grav": 176.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 797, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "kill_easier", "flbl": "Kill & Easier (Humans)", "urls": [], "ig": 0.372, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "If AI works out as the frontier labs hope, humans will not be involved in automating it -- the improvement will also be automated.\n\nSo, of course not. Those humans won't exist."}, {"id": 50498360, "au": "ftchd", "dom": 6, "sr": 41, "sc": -0.21, "ep": 0.96, "bs": 0.0, "d": 2, "age": 15.83, "grav": 178.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 184, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "faraday_phone", "flbl": "Faraday & Phone (Microwave)", "urls": [], "ig": 0.41, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "They are saying the microwave and the faraday bag worked as a faraday cage.\n\nThe storage boxes and tool boxes did not function as a faraday cage."}, {"id": 50500339, "au": "jefftk", "dom": 15, "sr": 42, "sc": -0.36, "ep": 1.18, "bs": 0.0, "d": 1, "age": 12.26, "grav": 119.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 24178, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "trash_inside", "flbl": "Trash & Inside (Lid)", "urls": [], "ig": 0.501, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "[author]\n\nI think you're very likely right, and do say so in the post. I thought it would be fun to test how well the trash can worked anyway."}, {"id": 50499126, "au": "toast0", "dom": 28, "sr": 43, "sc": -0.5, "ep": 1.04, "bs": 0.0, "d": 2, "age": 14.56, "grav": 156.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 33017, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "trash_inside", "flbl": "Trash & Inside (Lid)", "urls": [], "ig": 0.443, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "And that the floor will attenuate any reflected EMP/signal from underneath (should be small in a basement, but ...)"}, {"id": 50501771, "au": "andai", "dom": 55, "sr": 44, "sc": -1.13, "ep": 0.95, "bs": 1.19, "d": 2, "age": 9.71, "grav": 83.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 18117, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "kill_easier", "flbl": "Kill & Easier (Humans)", "urls": [], "ig": 0.403, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Wouldn't symbiosis be infinitely more practical?\n\nI mean if we landed on an alien planet... What would be easier... Kill eight billion aliens? Or make some trade deals?"}, {"id": 50498420, "au": "drcode", "dom": 54, "sr": 45, "sc": -1.68, "ep": 0.61, "bs": 1.19, "d": 1, "age": 15.7, "grav": 176.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 11819, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "kill_easier", "flbl": "Kill & Easier (Humans)", "urls": [], "ig": 0.26, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Seems easier just to kill the humans, and then not bother with that complicated multi-step process"}, {"id": 50499334, "au": "0c3ca83", "dom": 59, "sr": 46, "sc": -1.7, "ep": 1.32, "bs": 1.7, "d": 4, "age": 14.18, "grav": 150.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 797, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 5, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "emp_equipment", "flbl": "Emp & Equipment (Slit)", "urls": [], "ig": 0.294, "fa": 0.22, "gp": 0.0, "bl": 0.64, "ds": 0.0, "txt": "Sure. It's still unlikely to take action that kills people on purpose (in the absence of being promoted to).\n\nOnly the ones that make their owners money get kept, so that's the most likely thing that they're going to do."}, {"id": 50501939, "au": "0c3ca83", "dom": 49, "sr": 47, "sc": -1.95, "ep": 0.56, "bs": 1.19, "d": 2, "age": 9.43, "grav": 80.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 797, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "kill_easier", "flbl": "Kill & Easier (Humans)", "urls": [], "ig": 0.24, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "And what would be the benefit of progress in ML? Who does obsoleting human brains serve?"}, {"id": 50502223, "au": "lostlogin", "dom": 23, "sr": 48, "sc": -3.09, "ep": 1.08, "bs": 3.74, "d": 5, "age": 8.87, "grav": 73.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 19917, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 6, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.461, "fa": 0.0, "gp": 0.0, "bl": 1.41, "ds": 0.0, "txt": "With MRI things only ever seem to conspire against.\n\nThe more time I spend with it the more incredible it seems that that it ever works."}, {"id": 50501945, "au": "0c3ca83", "dom": 53, "sr": 49, "sc": -3.11, "ep": 1.32, "bs": 2.89, "d": 4, "age": 9.41, "grav": 80.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 797, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 5, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "kill_easier", "flbl": "Kill & Easier (Humans)", "urls": [], "ig": 0.562, "fa": 0.0, "gp": 0.0, "bl": 1.09, "ds": 0.0, "txt": "They hope to build general intelligence that can replace human thought, which effectively leads to that, yes."}, {"id": 50502565, "au": "glitchc", "dom": 7, "sr": 50, "sc": -4.8, "ep": 0.76, "bs": 4.24, "d": 1, "age": 8.08, "grav": 64.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 5452, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "faraday_phone", "flbl": "Faraday & Phone (Microwave)", "urls": [], "ig": 0.325, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "While I appreciate your experiment, a thick enough paper bag would block 5G access for most phones."}, {"id": 50498926, "au": "beezle", "dom": 27, "sr": 51, "sc": -5.1, "ep": 0.68, "bs": 4.24, "d": 1, "age": 14.88, "grav": 161.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 1957, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "trash_inside", "flbl": "Trash & Inside (Lid)", "urls": [], "ig": 0.289, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Presumes the floor (or other surface) is perfectly flat, perhaps not the best assumption?"}, {"id": 50499276, "au": "catlikesshrimp", "dom": 34, "sr": 52, "sc": -5.16, "ep": 0.33, "bs": 4.24, "d": 1, "age": 14.28, "grav": 151.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 639, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "nuclear_pulse", "flbl": "Nuclear & Pulse (Transformers)", "urls": [], "ig": 0.138, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "The simplest solution is to use an actuator"}, {"id": 50498460, "au": "0c3ca83", "dom": 56, "sr": 53, "sc": -5.33, "ep": 0.45, "bs": 4.24, "d": 2, "age": 15.62, "grav": 175.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 797, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "emp_equipment", "flbl": "Emp & Equipment (Slit)", "urls": [], "ig": 0.191, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Why would any AI care about killing people? It's being engineered to make companies money."}, {"id": 50501790, "au": "andai", "dom": 57, "sr": 54, "sc": -5.4, "ep": 1.31, "bs": 5.17, "d": 3, "age": 9.68, "grav": 83.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 73, "qw": 0, "k": 18117, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "kill_easier", "flbl": "Kill & Easier (Humans)", "urls": [], "ig": 0.557, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "It is also actually being engineered to kill people (OpenAI and Microsoft's work in Gaza).\n\nAnd this year, Anthropic's complaint to the DoD was basically \"we just want to make sure that a human pushes the button\" (authorizing the AI assisted killing), i.e. no full auto pls.\n\nHow it might evolve outside containment is a separate question though. (I think a much more peaceful and cooperative strategy would make sense there, at least for the first few centuries.)"}, {"id": 50498373, "au": "andai", "dom": 50, "sr": 55, "sc": -5.89, "ep": 0.12, "bs": 4.24, "d": 1, "age": 15.79, "grav": 178.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 18117, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "faraday_phone", "flbl": "Faraday & Phone (Microwave)", "urls": [], "ig": 0.053, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Is it also a risk to the humans automating it?"}, {"id": 50498774, "au": "drcode", "dom": 58, "sr": 56, "sc": -5.89, "ep": 0.53, "bs": 5.09, "d": 3, "age": 15.08, "grav": 165.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 11819, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "kill_easier", "flbl": "Kill & Easier (Humans)", "urls": [], "ig": 0.223, "fa": 0.0, "gp": 0.0, "bl": 1.92, "ds": 0.0, "txt": "it's not \"engineered\", it's grown via GSD in a process no one understands well"}, {"id": 50502020, "au": "jefftk", "dom": 41, "sr": 57, "sc": -5.89, "ep": 0.42, "bs": 5.88, "d": 3, "age": 9.28, "grav": 78.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 12, "qw": 0, "k": 24178, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "emp_equipment", "flbl": "Emp & Equipment (Slit)", "urls": ["https://www.jefftk.com/p/comment-dont-message"], "ig": 0.178, "fa": 0.0, "gp": 0.0, "bl": 2.22, "ds": 0.0, "txt": "Sorry, I meant here!  I like to talk in public as much as possible (https://www.jefftk.com/p/comment-dont-message)"}, {"id": 50501438, "au": "tomcam", "dom": 26, "sr": 58, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 3, "age": 10.37, "grav": 92.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 22059, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "It’s all about the barbarians"}, {"id": 50501865, "au": "areoform", "dom": 40, "sr": 59, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 9.55, "grav": 81.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 8, "k": 12895, "kpp": 8.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "> Happy to talk about this if you like!\n\nI'd be down! How do I get in touch?"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      const jumpBtns = isPinned
+        ? `<button type="button" class="probe-inline-btn" data-probe-jump="1">Comment &darr;</button>` +
+          `<button type="button" class="probe-inline-btn" data-probe-clear="1">Clear &times;</button>`
+        : "";
+      probeEl.innerHTML =
+        `<strong>@${escHtml(hit.au)}</strong> | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})` +
+        jumpBtns +
+        `<br>"${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 60);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 50);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 50);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 50);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `Showing ${shown.length} of ${pool.length} matching comments (mode: ${activeMode})` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear selection</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeSelect = document.getElementById("modeSelect");
+  modeSelect.addEventListener("change", () => {
+    activeMode = modeSelect.value;
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

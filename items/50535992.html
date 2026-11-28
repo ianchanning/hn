@@ -1,0 +1,1398 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50535992 // Phrack 73 — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+      text-transform: lowercase;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      text-transform: lowercase;
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .kpi-cell {
+      padding: 8px 0;
+    }
+    .kpi-label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 4px 0;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer:not([open]) {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary,
+    details.proof-drawer > summary {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+    }
+    table.ablation th {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: normal;
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    button.nav-btn,
+    button.mode-tab,
+    button.topbar-toggle {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: rgb(0, 0, 0);
+      cursor: pointer;
+      text-decoration: none;
+      line-height: inherit;
+      vertical-align: baseline;
+      transition: color 0.12s ease;
+      text-transform: lowercase;
+    }
+    button.nav-btn:hover,
+    button.nav-btn.active,
+    button.mode-tab:hover,
+    button.mode-tab.active,
+    button.topbar-toggle:hover,
+    button.topbar-toggle.active {
+      color: rgb(255, 255, 255);
+      text-decoration: none;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      padding: 14px;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; row-gap: 4px; }
+      .topbar-right { font-size: 8pt; padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+  <script>
+    (function() {
+      if (window.location.pathname.includes("/items/")) {
+        var m = window.location.pathname.match(/\/items\/(\d+)\.html/);
+        if (m) {
+          var base = window.location.pathname.replace(/\/items\/\d+\.html$/, "");
+          var target = (base || "") + "/item?id=" + m[1];
+          try {
+            history.replaceState(null, "", target);
+          } catch(e) {}
+        }
+      }
+    })();
+  </script>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+        <span class="pagetop" id="modeTabs">
+          <button type="button" class="nav-btn mode-tab active" data-mode="top_signal" role="tab" aria-selected="true">Top 40</button> | <button type="button" class="nav-btn mode-tab" data-mode="hn_top40" role="tab" aria-selected="false">HN Top 40</button>
+        </span>
+      </div>
+      <div class="topbar-right">
+        <button type="button" class="nav-btn topbar-toggle" id="exploreToggleBtn" aria-expanded="false">explore</button> | <button type="button" class="nav-btn topbar-toggle" id="evidenceToggleBtn" aria-expanded="false">evidence</button>
+      </div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://phrack.org/issues/73/introduction_md">Phrack 73</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=phrack.org"><span class="sitestr">phrack.org</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">448 points</span> by <a href="https://news.ycombinator.com/user?id=notmine1337">notmine1337</a> <span class="age" title="2026-11-17T18:31:25.000Z"><a href="https://news.ycombinator.com/item?id=50535992">22 hours ago</a></span> | <a href="https://news.ycombinator.com/item?id=50535992">66&nbsp;comments</a> | 89.4% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Evidence</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">66</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 57 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">10.6%</div>
+          <div class="kpi-sub">7 comments (2 Gold / 3.0%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">89.4%</div>
+          <div class="kpi-sub">15 chatter &bull; 44 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">2</div>
+        <div class="kpi-sub">7% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.790</div>
+        <div class="kpi-sub">2 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">16</div>
+          <div class="kpi-sub">HN POS 23..38 (24.2% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="color: rgb(90, 90, 88); margin-top: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Explore</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 66-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 66)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (2)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (5)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (15)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (44)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..66) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 25)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (ashleyn, 18.4h); largest subtree (@myth_drannon) occupies 16 slots (HN POS 23..38).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (66)</option>
+          <option value="game_met">Game &amp; Met (Defcon) (21)</option>
+          <option value="box_phrack">Box &amp; Phrack (Took) (21)</option>
+          <option value="general_commentary">General Commentary (24)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, phrack, defcon, hope, history, box...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50535992 + PHRACK.ORG + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50535992, "story_title": "Phrack 73", "story_url": "https://phrack.org/issues/73/introduction_md", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50535992, "story_title": "Phrack 73", "story_url": "https://phrack.org/issues/73/introduction_md", "points": 448, "story_author": "notmine1337", "article_source": "fetched_url", "t1_ref_utc": "2026-11-18T16:36:45+00:00", "t2_ref_utc": "2026-11-18T16:36:45+00:00", "delta_minutes": 0.0, "story_anchors": ["phrack", "defcon", "hope", "history", "box", "several", "went", "huge", "makes", "computer", "wow", "favorite", "whatever"], "facet_labels": {"box_phrack": "Box & Phrack (Took)", "game_met": "Game & Met (Defcon)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "box_phrack", "label": "Box & Phrack (Took)", "count": 21, "top_terms": ["box", "phrack", "took", "huge"]}, {"slug": "game_met", "label": "Game & Met (Defcon)", "count": 21, "top_terms": ["game", "met", "defcon", "went"]}], "counts": {"total_comments": 66, "live_t2_comments": 66, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 57, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 1, "pages_fetched": 1}, "sha256": {"corpus.json": "43814348155634fe523faa1845e6a8d71830a0c86d9e22e8f12072f420198458"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 2, "grounded_analysis": 5, "crowd_chatter": 15, "bullshit_or_flamewar": 44}, "facets": {"game_met": 21, "box_phrack": 21, "general_commentary": 24}, "facet_options": [{"slug": "game_met", "label": "Game & Met (Defcon)", "count": 21}, {"slug": "box_phrack", "label": "Box & Phrack (Took)", "count": 21}, {"slug": "general_commentary", "label": "General Commentary", "count": 24}], "facet_diagnostics": [{"slug": "game_met", "label": "Game & Met (Defcon)", "count": 21, "useful": 4, "useful_pct": 19.0, "terms": "game, met, defcon, went"}, {"slug": "box_phrack", "label": "Box & Phrack (Took)", "count": 21, "useful": 3, "useful_pct": 14.3, "terms": "box, phrack, took, huge"}, {"slug": "general_commentary", "label": "General Commentary", "count": 24, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 12}, {"category": "primary_technical_doc", "count": 2}, {"category": "low_cred_or_joke", "count": 1}], "story_anchors": ["phrack", "defcon", "hope", "history", "box", "several", "went", "huge", "makes", "computer", "wow", "favorite", "whatever"], "largest_root": {"root_id": 50537119, "author": "myth_drannon", "slots": 16, "start_dom": 23, "end_dom": 38, "share_pct": 24.2, "top_dom1_age": 18.4, "top_dom1_author": "ashleyn"}, "buried_cutoff": 25, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50547150, "au": "_bent", "dom": 65, "sr": 1, "sc": 12.26, "ep": 12.26, "bs": 0.0, "d": 4, "age": 1.54, "grav": 9.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 33, "qw": 0, "k": 417, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "game_met", "flbl": "Game & Met (Defcon)", "urls": ["https://pangram-public.s3.us-east-1.amazonaws.com/pdf/pangram_4_technical_report.pdf"], "ig": 0.834, "fa": 2.97, "gp": 1.263, "bl": 0.0, "ds": 0.0, "txt": "99.9959% according to themself https://pangram-public.s3.us-east-1.amazonaws.com/pdf/pangra...\n\nThough if you have a look at the suspected articles in this Phrack issue, I'd wager you'd agree that no ai ai-detector is needed get the idea that they were ai authored"}, {"id": 50544833, "au": "guitmz", "dom": 44, "sr": 2, "sc": 8.47, "ep": 8.47, "bs": 0.0, "d": 1, "age": 5.39, "grav": 36.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 17, "qw": 0, "k": 144, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "game_met", "flbl": "Game & Met (Defcon)", "urls": ["https://www.lulu.com/shop/phrack-zine/phrack-72/paperback/product-p6j89w6.html?page=1&pageSize=4", "https://archives.phrack.org/issues/72/phrack-72.pdf"], "ig": 0.143, "fa": 2.35, "gp": 0.991, "bl": 0.0, "ds": 0.0, "txt": "It's available https://www.lulu.com/shop/phrack-zine/phrack-72/paperback/pr...\n\nYou can also print it yourself with the pdf: https://archives.phrack.org/issues/72/phrack-72.pdf\n\nThe 73 will be available too later."}, {"id": 50537176, "au": "giancarlostoro", "dom": 24, "sr": 3, "sc": 5.79, "ep": 5.79, "bs": 0.0, "d": 1, "age": 20.73, "grav": 276.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 119, "qw": 0, "k": 23190, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "game_met", "flbl": "Game & Met (Defcon)", "urls": ["https://phrack.org/issues/69/adobe-shockwave-a-case-study-on-memory-disclosure\u0023article"], "ig": 1.555, "fa": 0.62, "gp": 0.257, "bl": 0.0, "ds": 0.0, "txt": "My favorite is Phrack Magazine Issue 69 because it went into Adobe Shockwave (Director - not Flash), and memory issues. I've come to learn years later, that people figured out long ago that you could.... RCE via Adobe Shockwave if you knew what you were doing, I've seen one proof of concept when Habbo relaunched its legacy client as Habbo Origins, someone showed them running the Calculator app from the game client.\n\nIt's no wonder they made their own engine to run their Lingo code.\n\nThe amoung of shennanigans I've seen people do with Adove Shockwave is quite higher than I'd like to admit, but I enjoy seeing people take video game modding / tweaking / hacking (if you will) to extremes.\n\nFor anyone curious:\n\nhttps://phrack.org/issues/69/adobe-shockwave-a-case-study-on..."}, {"id": 50539674, "au": "CircuitSeuss", "dom": 53, "sr": 4, "sc": 5.7, "ep": 5.85, "bs": 0.0, "d": 1, "age": 17.18, "grav": 203.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 14, "k": 298, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "box_phrack", "flbl": "Box & Phrack (Took)", "urls": [], "ig": 1.343, "fa": 0.76, "gp": 0.363, "bl": 0.0, "ds": 0.0, "txt": "> Last year marked the 40th anniversary of Phrack so we went big. We published\nour anniversary launch release in print at Defcon 33, HOPE, WHY25 and some\nadditional variations at several conferences around the world including\nAlligatorCon, B-Sides Canberra, Out of the Box, Datenspuren, DistrictCon,\nOffensiveCon, Recon, and Toorcamp.\n\nEreader with a good font, good lighting, and hydration work wonders."}, {"id": 50538989, "au": "ashleyn", "dom": 1, "sr": 5, "sc": 4.71, "ep": 4.71, "bs": 0.0, "d": 0, "age": 18.39, "grav": 227.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 67, "qw": 0, "k": 3408, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "box_phrack", "flbl": "Box & Phrack (Took)", "urls": [], "ig": 1.297, "fa": 0.0, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "The computer security space has changed quite a bit from when I first learned of Phrack in the 90s-00s and would see plenty of \"how to pwn the phone company\" type articles. So like...when I see an exploit in the latest issue of Phrack (like the docker escape in this issue)...has it already been responsibly disclosed, given a CVE, etc? Or do they just drop 'em out of nowhere?"}, {"id": 50538851, "au": "Grimburger", "dom": 55, "sr": 6, "sc": 4.69, "ep": 4.69, "bs": 0.0, "d": 0, "age": 18.59, "grav": 231.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 2402, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "game_met", "flbl": "Game & Met (Defcon)", "urls": [], "ig": 0.715, "fa": 0.68, "gp": 0.737, "bl": 0.0, "ds": 0.0, "txt": "87% sure a certain group writes 83% of these things(articles)\n\nDefcon hotel rooms and all that jazz, but whatever. All in the game."}, {"id": 50539004, "au": "trilogic", "dom": 8, "sr": 7, "sc": 4.23, "ep": 4.23, "bs": 0.0, "d": 0, "age": 18.37, "grav": 227.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 16, "qw": 0, "k": 185, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "box_phrack", "flbl": "Box & Phrack (Took)", "urls": ["https://archives.phrack.org/issues/73/10.txt"], "ig": 0.677, "fa": 0.34, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "Interesting: https://archives.phrack.org/issues/73/10.txt\n\n2600, ccc.de, astalavista sk box, spaghettihackers and warez... cool stuff. \nBrrr, thinking to revive emule."}, {"id": 50540757, "au": "gmmachine", "dom": 11, "sr": 8, "sc": 3.71, "ep": 4.19, "bs": 0.27, "d": 0, "age": 15.02, "grav": 164.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 5, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "game_met", "flbl": "Game & Met (Defcon)", "urls": [], "ig": 1.074, "fa": 0.0, "gp": 1.15, "bl": 0.1, "ds": 0.0, "txt": "Might I just add, I like how unpolished these magazines are/were; how unpolished and open expectations engendered more freedom of expression.\n\nSometimes, comments here on HN are like resumes, makes me reticent to comment out of not wanting to seem out of touch or whatever."}, {"id": 50543099, "au": "theseamusjames", "dom": 40, "sr": 9, "sc": 3.3, "ep": 3.3, "bs": 0.0, "d": 0, "age": 8.76, "grav": 72.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 22, "qw": 0, "k": 85, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "box_phrack", "flbl": "Box & Phrack (Took)", "urls": ["https://calif.io/java4shell"], "ig": 0.854, "fa": 0.0, "gp": 0.892, "bl": 0.0, "ds": 0.0, "txt": "Quang Luong had a huge day: published on Phrack 73 the same day he released a CVE that (probably) took the NSA and apple offline.\n\nhttps://calif.io/java4shell"}, {"id": 50541158, "au": "ValdikSS", "dom": 9, "sr": 10, "sc": 2.66, "ep": 3.03, "bs": 0.0, "d": 1, "age": 13.97, "grav": 146.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 4, "k": 1446, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "box_phrack", "flbl": "Box & Phrack (Took)", "urls": [], "ig": 0.948, "fa": 0.28, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": ">thinking to revive emule\n\nThere's a community fork running for several years, and also aMule (Linux version) is in active development.\n\n    - https://github.com/emule-community-version/emule-project\n    - https://github.com/amule-project/amule\n\nThere's mostly Italians though. Peerates used to have map of peers, but after website update it's gone, only server list is left."}, {"id": 50542010, "au": "ptek", "dom": 16, "sr": 11, "sc": 2.56, "ep": 4.55, "bs": 1.99, "d": 0, "age": 11.77, "grav": 112.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 28, "qw": 0, "k": 196, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://demozoo.org/productions/tagged/phreaking-tool/"], "ig": 0.473, "fa": 0.62, "gp": 1.15, "bl": 0.75, "ds": 0.0, "txt": "Shout out to gamma and skyp3r for the bluebox article. I miss those days. :'(\n!A2DC\nRoxBox Dialer, Chicken Dialer 2.5 and Arrested Dialer Workshop 004B for the win :)\n\nhttps://demozoo.org/productions/tagged/phreaking-tool/ for screenshots :D"}, {"id": 50540745, "au": "gmmachine", "dom": 51, "sr": 12, "sc": 2.24, "ep": 2.8, "bs": 0.27, "d": 1, "age": 15.05, "grav": 164.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 5, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.297, "fa": 0.68, "gp": 0.111, "bl": 0.1, "ds": 0.0, "txt": "Granted. To my surprise, 2600 not only still exists, but exists in the same Barnes And Noble, on the same shelf, I discovered it about 28 years ago."}, {"id": 50539647, "au": "ssl-3", "dom": 46, "sr": 13, "sc": 2.02, "ep": 2.9, "bs": 0.0, "d": 1, "age": 17.23, "grav": 204.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 63, "qw": 0, "k": 5357, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "game_met", "flbl": "Game & Met (Defcon)", "urls": [], "ig": 1.143, "fa": 0.0, "gp": 0.152, "bl": 0.0, "ds": 0.0, "txt": "It's best read in 80x25 text mode on a CRT, with BIOS fonts and ANSI color limitations.  White (not bright, just regular-white) text on black has always my favorite, but white on blue is a close second.  (Adjust the brightness and contrast knobs for best viewing with present ambient light.)\n\nUnless it's instead printed on fan-fold paper and read during class.  That's pretty good, too."}, {"id": 50536947, "au": "ChrisArchitect", "dom": 57, "sr": 14, "sc": 1.97, "ep": 2.41, "bs": 0.0, "d": 0, "age": 21.03, "grav": 283.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 30038, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "box_phrack", "flbl": "Box & Phrack (Took)", "urls": [], "ig": 0.902, "fa": 0.0, "gp": 0.197, "bl": 0.0, "ds": 0.0, "txt": "keepin the fire burning. Particularly noted the \"Phrack World History\" features. Good to document stuff like that, forgotten stories/gems."}, {"id": 50547841, "au": "BorisMelnik", "dom": 17, "sr": 15, "sc": 1.57, "ep": 2.23, "bs": 0.0, "d": 0, "age": 0.71, "grav": 6.0, "surf": 46.4, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 985, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "game_met", "flbl": "Game & Met (Defcon)", "urls": [], "ig": 0.852, "fa": 0.0, "gp": 0.159, "bl": 0.0, "ds": 0.0, "txt": "met a kid on a bbs where I am from in a small town in new england in the 90s, he was 13 at the time, a few years later I found out he was a phrack contributor!"}, {"id": 50540480, "au": "samplatt", "dom": 52, "sr": 16, "sc": 1.29, "ep": 2.39, "bs": 0.0, "d": 1, "age": 15.65, "grav": 175.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 60, "qw": 8, "k": 1540, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "box_phrack", "flbl": "Box & Phrack (Took)", "urls": [], "ig": 0.443, "fa": 0.42, "gp": 0.106, "bl": 0.0, "ds": 0.0, "txt": ">LMK if anyone knows advanced migraine mitigation techniques\n\nTwo of the people I know that get migraines the worst, are also two of the most ADHD people I know. Once they got diagnosed and started medication, their migraines... well, didn't go away, but got a LOT more manageable.\n\nIf you suspect you're part of the neurodivergent crowd and undiagnosed because you're too old to bother, give it a shot anyway."}, {"id": 50540564, "au": "scrame", "dom": 47, "sr": 17, "sc": 1.06, "ep": 2.39, "bs": 0.0, "d": 1, "age": 15.51, "grav": 173.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 1249, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "box_phrack", "flbl": "Box & Phrack (Took)", "urls": [], "ig": 0.94, "fa": 0.0, "gp": 0.122, "bl": 0.0, "ds": 0.0, "txt": "In high school me and a friend tried to print out an issue of phrack on his dot matrix printer. it took all day, i'm not sure if it ever finished. Those old issues were huge."}, {"id": 50539060, "au": "t-3", "dom": 48, "sr": 18, "sc": 1.01, "ep": 2.33, "bs": 0.0, "d": 1, "age": 18.29, "grav": 225.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 4718, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "game_met", "flbl": "Game & Met (Defcon)", "urls": [], "ig": 0.886, "fa": 0.0, "gp": 0.169, "bl": 0.0, "ds": 0.0, "txt": "Ebook readers are good. Not having a backlight makes reading much more pleasant, no eye strain or fatigue. There are also newer reflective LCD (RLCD) tablets with higher refresh rates that are decent for reading as well."}, {"id": 50548087, "au": "no-dr-onboard", "dom": 7, "sr": 19, "sc": 0.31, "ep": 1.41, "bs": 0.0, "d": 0, "age": 0.38, "grav": 4.7, "surf": 58.7, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 1609, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "box_phrack", "flbl": "Box & Phrack (Took)", "urls": [], "ig": 0.533, "fa": 0.0, "gp": 0.108, "bl": 0.0, "ds": 0.0, "txt": "Good to see Halvar Flake getting some attention. He's been a huge influencer for me for a while now."}, {"id": 50537119, "au": "myth_drannon", "dom": 23, "sr": 20, "sc": -0.01, "ep": 3.18, "bs": 3.05, "d": 0, "age": 20.83, "grav": 278.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 10656, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.233, "fa": 0.34, "gp": 1.15, "bl": 1.15, "ds": 0.0, "txt": "Nothing beats issue 49 from 1996, Smashing The Stack For Fun And Profit"}, {"id": 50538597, "au": "nateccs", "dom": 20, "sr": 21, "sc": -0.63, "ep": 2.98, "bs": 2.52, "d": 1, "age": 18.94, "grav": 238.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 3, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "game_met", "flbl": "Game & Met (Defcon)", "urls": [], "ig": 0.857, "fa": 0.34, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "i was an ansi artist =) graduated to the p/h/a scene and went to summercon '92 met emmanual goldstein, ran into him at defcon 2024 and he remembered."}, {"id": 50540704, "au": "itomato", "dom": 50, "sr": 22, "sc": -0.69, "ep": 0.85, "bs": 0.0, "d": 1, "age": 15.16, "grav": 166.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 872, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "game_met", "flbl": "Game & Met (Defcon)", "urls": [], "ig": 0.29, "fa": 0.0, "gp": 0.117, "bl": 0.0, "ds": 0.0, "txt": "Pressure point: “the great eliminator”. Have someone who knows do it to you. It hurts, but your headache fades and doesn’t come back until much later, if at all."}, {"id": 50538679, "au": "tenat10", "dom": 42, "sr": 23, "sc": -0.71, "ep": 3.35, "bs": 2.52, "d": 0, "age": 18.82, "grav": 236.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 60, "qw": 0, "k": 1, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "box_phrack", "flbl": "Box & Phrack (Took)", "urls": [], "ig": 0.678, "fa": 0.0, "gp": 1.212, "bl": 0.95, "ds": 0.0, "txt": "I wish Phrak had a physicalized mag like 2600. Nice being able to absorb knowledge away from digital devices. Remember books?! ;)\n\nOlder I get harder it is to read on puter and go down rabit holes with ocular migraines gets worse.  Age sucks, but thats life. \nSorry got little side tracked. LMK if anyone knows advanced migraine mitigation techniques. \n..and here comes another..yay."}, {"id": 50537944, "au": "dualvariable", "dom": 27, "sr": 24, "sc": -0.74, "ep": 0.74, "bs": 1.19, "d": 1, "age": 19.83, "grav": 257.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 864, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.203, "fa": 0.0, "gp": 0.183, "bl": 0.45, "ds": 0.0, "txt": "I actually devoured that article when it came out and adapted it to other processors and other Unixes."}, {"id": 50540728, "au": "gmmachine", "dom": 21, "sr": 25, "sc": -1.66, "ep": 1.04, "bs": 1.46, "d": 2, "age": 15.11, "grav": 165.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 5, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "box_phrack", "flbl": "Box & Phrack (Took)", "urls": [], "ig": 0.249, "fa": 0.0, "gp": 0.315, "bl": 0.55, "ds": 0.0, "txt": "Remember his epic fight with the MPAA? He is a really down to earth person, so is Bernie S."}, {"id": 50541070, "au": "positron26", "dom": 14, "sr": 26, "sc": -1.89, "ep": 0.55, "bs": 1.19, "d": 1, "age": 14.24, "grav": 151.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 83, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "box_phrack", "flbl": "Box & Phrack (Took)", "urls": [], "ig": 0.234, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "The centroid is corrupt and unclean, demanding to see only what it \"knows\".  Burn it from your life."}, {"id": 50538622, "au": "myth_drannon", "dom": 30, "sr": 27, "sc": -2.4, "ep": 1.31, "bs": 3.05, "d": 2, "age": 18.9, "grav": 237.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 13, "qw": 0, "k": 10656, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://archive.org/details/nc101_hackers"], "ig": 0.145, "fa": 0.34, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Looks like.\nThere is even an interview with him on Net Cafe in 1996 https://archive.org/details/nc101_hackers"}, {"id": 50541230, "au": "johnisgood", "dom": 61, "sr": 28, "sc": -2.41, "ep": 1.88, "bs": 3.05, "d": 3, "age": 13.82, "grav": 144.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 5166, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "game_met", "flbl": "Game & Met (Defcon)", "urls": [], "ig": 0.166, "fa": 0.34, "gp": 0.36, "bl": 1.15, "ds": 0.0, "txt": "I run my own writings through pangram and I get >90%. I do not trust it. Sadly people do."}, {"id": 50539408, "au": "dimator", "dom": 31, "sr": 29, "sc": -2.71, "ep": 2.41, "bs": 3.58, "d": 3, "age": 17.72, "grav": 214.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 1, "w": 26, "qw": 0, "k": 1390, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "box_phrack", "flbl": "Box & Phrack (Took)", "urls": ["https://en.wikipedia.org/wiki/Stewart_Cheifet", "https://youtu.be/cHkdQ5CG0PY?si="], "ig": 1.025, "fa": 0.0, "gp": 0.0, "bl": 1.35, "ds": 0.0, "txt": "Wow, that's https://en.wikipedia.org/wiki/Stewart_Cheifet hosting, he also hosted computer chronicles. His voice brings back so many memories. He died late last year.\n\nHere's an episode about windows NT\n\nhttps://youtu.be/cHkdQ5CG0PY?si="}, {"id": 50537591, "au": "neuro", "dom": 18, "sr": 30, "sc": -3.01, "ep": 2.63, "bs": 4.24, "d": 0, "age": 20.28, "grav": 266.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 213, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "game_met", "flbl": "Game & Met (Defcon)", "urls": [], "ig": 0.408, "fa": 0.0, "gp": 1.15, "bl": 1.6, "ds": 0.0, "txt": "300-baud modem synth, ANSI art, and my favorite: Issue 36."}, {"id": 50540551, "au": "oldhead", "dom": 60, "sr": 31, "sc": -3.16, "ep": 1.28, "bs": 3.05, "d": 2, "age": 15.54, "grav": 173.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 36, "kpp": 12.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "game_met", "flbl": "Game & Met (Defcon)", "urls": [], "ig": 0.134, "fa": 0.34, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Just ran some of the articles through Pangram, 100% AI."}, {"id": 50539788, "au": "NelsonMinar", "dom": 39, "sr": 32, "sc": -3.38, "ep": 2.75, "bs": 5.04, "d": 0, "age": 16.99, "grav": 200.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 15, "qw": 0, "k": 18099, "kpp": 7.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "game_met", "flbl": "Game & Met (Defcon)", "urls": ["https://phrack.org/issues/73/history-the-2000-ssh1-exploit-that-broke-the-internet_md\u0023article"], "ig": 0.462, "fa": 0.0, "gp": 1.15, "bl": 1.9, "ds": 0.0, "txt": "The ssh RCE history is a good read for reflecting on how fast things move now: https://phrack.org/issues/73/history-the-2000-ssh1-exploit-t..."}, {"id": 50548191, "au": "knorker", "dom": 41, "sr": 33, "sc": -3.49, "ep": 1.85, "bs": 4.24, "d": 0, "age": 0.26, "grav": 4.4, "surf": 65.1, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 4198, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "game_met", "flbl": "Game & Met (Defcon)", "urls": [], "ig": 0.778, "fa": 0.0, "gp": 0.011, "bl": 1.6, "ds": 0.0, "txt": "From the content I understand that the kernel backdoor thing was not written by a native English speaker, but wow, that was borderline incomprehensible. The kind of writing quality you'd expect on a BBS back in the day."}, {"id": 50540259, "au": "andersonc0d3", "dom": 2, "sr": 34, "sc": -3.91, "ep": 1.05, "bs": 3.71, "d": 1, "age": 16.17, "grav": 184.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "game_met", "flbl": "Game & Met (Defcon)", "urls": [], "ig": 0.327, "fa": 0.0, "gp": 0.192, "bl": 1.4, "ds": 0.0, "txt": "The article is about a technique that could be used in exploits with a certain characteristic (primitive). It doesn't describe any specific vulnerability, so there's nothing to report."}, {"id": 50539728, "au": "negura", "dom": 58, "sr": 35, "sc": -4.12, "ep": 1.01, "bs": 4.24, "d": 0, "age": 17.09, "grav": 202.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 967, "kpp": 5.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.428, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Annoying that MateuZSecurity's article is slop, makes it really hard to read."}, {"id": 50545031, "au": "rithdmc", "dom": 6, "sr": 36, "sc": -4.51, "ep": 0.68, "bs": 4.24, "d": 3, "age": 5.04, "grav": 33.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 346, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.29, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "I think they're saying \"time changes everything\" is a simple observation; forgetting hindsight is 20/20."}, {"id": 50540737, "au": "gmmachine", "dom": 32, "sr": 37, "sc": -4.61, "ep": 1.43, "bs": 4.5, "d": 4, "age": 15.08, "grav": 165.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 5, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "game_met", "flbl": "Game & Met (Defcon)", "urls": [], "ig": 0.609, "fa": 0.0, "gp": 0.0, "bl": 1.7, "ds": 0.0, "txt": "Cheifet wasn't afraid to cover whatever topic he wanted, regardless of political or corporate interference."}, {"id": 50540717, "au": "gmmachine", "dom": 10, "sr": 38, "sc": -4.64, "ep": 1.26, "bs": 4.5, "d": 1, "age": 15.13, "grav": 166.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 5, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "box_phrack", "flbl": "Box & Phrack (Took)", "urls": [], "ig": 0.537, "fa": 0.0, "gp": 0.0, "bl": 1.7, "ds": 0.0, "txt": "astalavista sk box <-- 101 l337 ways to play Starcraft on Battlenet w/o a key"}, {"id": 50545272, "au": "unk2000", "dom": 56, "sr": 39, "sc": -4.8, "ep": 1.86, "bs": 5.57, "d": 0, "age": 4.55, "grav": 29.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "box_phrack", "flbl": "Box & Phrack (Took)", "urls": [], "ig": 0.443, "fa": 0.28, "gp": 0.015, "bl": 2.1, "ds": 0.0, "txt": "man - I had no idea this was still alive! \n- anonymous author from Phrack \u002337 :heart:"}, {"id": 50538707, "au": "raffraffraff", "dom": 25, "sr": 40, "sc": -5.13, "ep": 0.43, "bs": 4.24, "d": 1, "age": 18.79, "grav": 235.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 4443, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.075, "fa": 0.0, "gp": 0.174, "bl": 1.6, "ds": 0.0, "txt": "Christ I'm old, I read that when it was just out."}, {"id": 50540774, "au": "gmmachine", "dom": 3, "sr": 41, "sc": -5.21, "ep": 0.83, "bs": 4.5, "d": 1, "age": 14.99, "grav": 163.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 5, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "box_phrack", "flbl": "Box & Phrack (Took)", "urls": [], "ig": 0.251, "fa": 0.0, "gp": 0.169, "bl": 1.7, "ds": 0.0, "txt": "Sure has. Lets hope they just dropped it out of nowhere."}, {"id": 50540264, "au": "1potato", "dom": 59, "sr": 42, "sc": -5.24, "ep": 0.54, "bs": 4.24, "d": 1, "age": 16.16, "grav": 184.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 227, "kpp": 4.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "box_phrack", "flbl": "Box & Phrack (Took)", "urls": [], "ig": 0.231, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Now freaking PHRACK is AI? Is nothing sacred?"}, {"id": 50545407, "au": "tad_tough_anne", "dom": 15, "sr": 43, "sc": -5.37, "ep": 0.26, "bs": 4.24, "d": 2, "age": 4.31, "grav": 27.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 8, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.112, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "What in the name of Eris is the \"centroid\"?"}, {"id": 50542644, "au": "tomcatfish", "dom": 62, "sr": 44, "sc": -5.46, "ep": 1.25, "bs": 5.17, "d": 4, "age": 9.97, "grav": 87.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 0, "k": 361, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "game_met", "flbl": "Game & Met (Defcon)", "urls": [], "ig": 0.534, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "You should report this— they would love to be made aware. Almost all people claiming to run their own, non AI generated, work through Pangram and get a false positive are unable to produce a Pangram result to show the team. It's frustrating to hear about a problem without any proof to fix it from!"}, {"id": 50542748, "au": "khafra", "dom": 63, "sr": 45, "sc": -5.56, "ep": 1.15, "bs": 5.17, "d": 4, "age": 9.72, "grav": 83.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 3668, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "game_met", "flbl": "Game & Met (Defcon)", "urls": [], "ig": 0.488, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "There's usually someone offering a reward around $1000 for verifiably pre-2019 writing that scores over 75% AI on Pangram, you should pick up some easy cash! So far, the only writing to do so is a very bizarre-looking poem that repeats a line many times."}, {"id": 50541930, "au": "tptacek", "dom": 29, "sr": 46, "sc": -5.64, "ep": 0.14, "bs": 4.24, "d": 2, "age": 11.98, "grav": 115.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 426786, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.059, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "He's around, but I don't think he's a commenter here."}, {"id": 50538698, "au": "MomsAVoxell", "dom": 33, "sr": 47, "sc": -5.84, "ep": 0.79, "bs": 5.09, "d": 3, "age": 18.8, "grav": 235.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 1464, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "game_met", "flbl": "Game & Met (Defcon)", "urls": [], "ig": 0.335, "fa": 0.0, "gp": 0.0, "bl": 1.92, "ds": 0.0, "txt": "Ah, thats the period I knew him.  Nice trip down memory lane, thanks for sharing .."}, {"id": 50540972, "au": "bittwiddle", "dom": 49, "sr": 48, "sc": -6.19, "ep": 0.39, "bs": 5.04, "d": 1, "age": 14.52, "grav": 155.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 9, "qw": 0, "k": 42, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "box_phrack", "flbl": "Box & Phrack (Took)", "urls": ["https://phrack.org/contact"], "ig": 0.099, "fa": 0.0, "gp": 0.108, "bl": 1.9, "ds": 0.0, "txt": "You can still get them via print on demand: https://phrack.org/contact"}, {"id": 50540031, "au": "leptons", "dom": 37, "sr": 49, "sc": -6.2, "ep": 0.37, "bs": 5.04, "d": 1, "age": 16.59, "grav": 192.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 15, "qw": 0, "k": 2161, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "game_met", "flbl": "Game & Met (Defcon)", "urls": ["https://phrack.org/issues/37/card-o-rama-magnetic-stripe-technology-and-beyond\u0023article"], "ig": 0.158, "fa": 0.0, "gp": 0.0, "bl": 1.9, "ds": 0.0, "txt": "For me it was: https://phrack.org/issues/37/card-o-rama-magnetic-stripe-tec...\n\nI got up to quite a lot of shenanigans thanks to this article."}, {"id": 50546978, "au": "throwa356262", "dom": 12, "sr": 50, "sc": -6.39, "ep": 0.58, "bs": 5.43, "d": 1, "age": 1.8, "grav": 11.0, "surf": 14.5, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 2260, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.244, "fa": 0.0, "gp": 0.003, "bl": 2.05, "ds": 0.0, "txt": "Unpolished?\n\nSome of those articles (e.g. QNX shellcode) are more readable than the than the official documentation."}, {"id": 50540793, "au": "gmmachine", "dom": 64, "sr": 51, "sc": -8.99, "ep": 0.0, "bs": 7.16, "d": 3, "age": 14.94, "grav": 163.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 0, "k": 5, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.68, "gp": 0.0, "bl": 2.7, "ds": 0.0, "txt": "How 100% is that 100%?"}, {"id": 50548419, "au": "Shorel", "dom": 43, "sr": 52, "sc": -9.39, "ep": 0.63, "bs": 8.48, "d": 1, "age": 0.05, "grav": 3.6, "surf": 61.9, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 4356, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.216, "fa": 0.0, "gp": 0.085, "bl": 3.2, "ds": 0.0, "txt": "Get a large format ebook reader, 10\" is fine to read just about anything."}, {"id": 50538829, "au": "s_u_d_o", "dom": 66, "sr": 53, "sc": -10.22, "ep": 0.0, "bs": 6.89, "d": 0, "age": 18.62, "grav": 232.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 31, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "box_phrack", "flbl": "Box & Phrack (Took)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Good memories, i hope this never dies."}, {"id": 50538003, "au": "MomsAVoxell", "dom": 28, "sr": 54, "sc": -10.37, "ep": 0.0, "bs": 6.89, "d": 1, "age": 19.75, "grav": 255.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 1464, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.201, "bl": 2.6, "ds": 0.0, "txt": "I wonder if Aleph One is on HN?"}, {"id": 50538916, "au": "MASNeo", "dom": 35, "sr": 55, "sc": -10.4, "ep": 0.0, "bs": 6.89, "d": 1, "age": 18.5, "grav": 229.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 200, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.181, "bl": 2.6, "ds": 0.0, "txt": "+1 best issue of any online zine."}, {"id": 50542102, "au": "megablast", "dom": 4, "sr": 56, "sc": -10.4, "ep": 0.0, "bs": 6.89, "d": 1, "age": 11.53, "grav": 108.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 17, "k": 5387, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "> The computer security space has changed quite a bit from when I first learned of Phrack in the 90s-00s\n\nHahahhaa. Really??? WOW."}, {"id": 50544835, "au": "ykonstant", "dom": 5, "sr": 57, "sc": -10.4, "ep": 0.0, "bs": 6.89, "d": 2, "age": 5.39, "grav": 36.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 0, "k": 2780, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Share the joke?"}, {"id": 50540889, "au": "yowayb", "dom": 13, "sr": 58, "sc": -10.4, "ep": 0.0, "bs": 6.89, "d": 1, "age": 14.75, "grav": 159.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 190, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Unpolished?! The homepage is sublime!"}, {"id": 50543835, "au": "NetOpWibby", "dom": 22, "sr": 59, "sc": -10.4, "ep": 0.0, "bs": 6.89, "d": 2, "age": 7.44, "grav": 56.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 2706, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Rad af"}, {"id": 50546172, "au": "pattt", "dom": 26, "sr": 60, "sc": -10.4, "ep": 0.0, "bs": 6.89, "d": 2, "age": 2.98, "grav": 18.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 30, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "it's a privilege"}, {"id": 50540300, "au": "tadasv", "dom": 36, "sr": 61, "sc": -10.4, "ep": 0.0, "bs": 6.89, "d": 1, "age": 16.05, "grav": 182.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 698, "kpp": 6.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "+1 I read it as an infant."}, {"id": 50539307, "au": "fauria", "dom": 54, "sr": 62, "sc": -10.4, "ep": 0.0, "bs": 6.89, "d": 1, "age": 17.93, "grav": 218.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 2403, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "box_phrack", "flbl": "Box & Phrack (Took)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Why don't you just print it?"}, {"id": 50540731, "au": "gmmachine", "dom": 34, "sr": 63, "sc": -10.4, "ep": 0.0, "bs": 7.16, "d": 1, "age": 15.1, "grav": 165.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 5, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.13, "bl": 2.7, "ds": 0.0, "txt": "That itself became a book."}, {"id": 50540741, "au": "gmmachine", "dom": 38, "sr": 64, "sc": -10.4, "ep": 0.0, "bs": 7.16, "d": 2, "age": 15.07, "grav": 165.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 0, "k": 5, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.7, "ds": 0.0, "txt": "Ever read kingpin?"}, {"id": 50548072, "au": "diamondDrill", "dom": 45, "sr": 65, "sc": -11.02, "ep": 0.0, "bs": 9.76, "d": 1, "age": 0.4, "grav": 4.8, "surf": 46.6, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 6, "qw": 0, "k": 3, "kpp": 0.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "box_phrack", "flbl": "Box & Phrack (Took)", "urls": ["https://store.2600.com/collections/2020-2021/products/autumn-2026"], "ig": -0.95, "fa": 0.34, "gp": 0.0, "bl": 3.683, "ds": 0.0, "txt": "wow didn't know 2600 still in print.\n\nhttps://store.2600.com/collections/2020-2021/products/autumn..."}, {"id": 50539143, "au": "aleph_minus_one", "dom": 19, "sr": 66, "sc": -11.11, "ep": 0.0, "bs": 8.88, "d": 1, "age": 18.18, "grav": 223.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 5, "qw": 3, "k": 5084, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://phrack.org/issues/36/introduction-to-diet-phrack-36"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.35, "ds": 0.0, "txt": "> my favorite: Issue 36\n\nWhat made Issue 36 (https://phrack.org/issues/36/introduction-to-diet-phrack-36) so special?"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "top_signal";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 40);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 40);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 40);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `${shown.length} of ${pool.length} comments` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const proofDrawer = document.getElementById("proofDrawer");
+  const expBtn = document.getElementById("exploreToggleBtn");
+  const eviBtn = document.getElementById("evidenceToggleBtn");
+
+  if (expBtn && labDrawer) {
+    expBtn.addEventListener("click", () => {
+      labDrawer.open = !labDrawer.open;
+    });
+    labDrawer.addEventListener("toggle", () => {
+      const isOpen = labDrawer.open;
+      expBtn.classList.toggle("active", isOpen);
+      expBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  if (eviBtn && proofDrawer) {
+    eviBtn.addEventListener("click", () => {
+      proofDrawer.open = !proofDrawer.open;
+    });
+    proofDrawer.addEventListener("toggle", () => {
+      const isOpen = proofDrawer.open;
+      eviBtn.classList.toggle("active", isOpen);
+      eviBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1273 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50491980 // Unsloth Qwen3.8-27B Quantizations – Dynamic v3.1 Update — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      background: rgb(247, 247, 245);
+      color: rgb(13, 13, 13);
+      font: 15px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+    }
+    .sheet-top {
+      border-top: 3px solid rgb(13, 13, 13);
+      border-bottom: 1px solid rgb(13, 13, 13);
+      padding: 16px 0 26px;
+    }
+    .eyebrow {
+      font: 600 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .eyebrow strong { color: rgb(255, 51, 0); }
+    h1 {
+      font-size: clamp(36px, 5.2vw, 72px);
+      line-height: 0.96;
+      letter-spacing: -0.045em;
+      margin: 18px 0 14px;
+      font-weight: 800;
+    }
+    h1 .accent { color: rgb(255, 51, 0); }
+    .sublead {
+      max-width: 920px;
+      font-size: 16px;
+      color: rgb(52, 52, 50);
+      margin: 0;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      font: 700 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 24px;
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+    }
+    .kpi-cell {
+      padding: 16px 16px 14px;
+      border-right: 1px solid rgb(205, 205, 200);
+    }
+    .kpi-cell:last-child { border-right: 0; }
+    .kpi-label {
+      font: 600 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 8px 0 4px;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      font-size: 12px;
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      background: rgb(13, 15, 17);
+      color: rgb(228, 232, 236);
+      border: 2px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 6px;
+      corner-shape: bevel;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(156, 166, 176);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      background: rgb(9, 11, 13);
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(180, 188, 196);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 58px;
+      background: rgb(20, 24, 28);
+      border-left: 3px solid rgb(0, 230, 118);
+      font: 12px/19px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(220, 226, 232);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 38px;
+    }
+
+    /* Collapsible 03A / 03B Justification Drawer */
+    details.proof-drawer {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 12px 0;
+    }
+    details.proof-drawer > summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      font: 700 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      user-select: none;
+    }
+    details.proof-drawer > summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary:hover { border-color: rgb(255, 51, 0); }
+    details.proof-drawer > summary .toggle-pill {
+      flex-shrink: 0;
+      padding: 3px 8px;
+      background: rgb(13, 13, 13);
+      color: rgb(247, 247, 245);
+      font-size: 10px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 16px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: rgb(255, 255, 253);
+      border: 1px solid rgb(13, 13, 13);
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+    }
+    table.ablation th {
+      background: rgb(236, 236, 231);
+      font: 700 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgb(60, 60, 58);
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      font: 600 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+      color: rgb(13, 13, 13);
+      padding: 7px 11px;
+      font: 600 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      box-shadow: 0 2px 0 rgb(13, 13, 13);
+    }
+    button.tab-btn.active {
+      background: rgb(13, 13, 13);
+      color: rgb(247, 247, 245);
+    }
+    button.tab-btn:hover {
+      border-color: rgb(255, 51, 0);
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      padding: 8px 11px;
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+      font: 600 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { flex: 1; min-width: 220px; font-weight: 400; }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border: 1px solid rgb(216, 216, 206);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      border-top: 3px solid rgb(13, 13, 13);
+      padding-top: 14px;
+      margin-top: 36px;
+      font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        background: rgb(239, 239, 234);
+        border: 1px solid rgb(13, 13, 13);
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        font-size: 17px;
+        margin: 0;
+        white-space: normal;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        background: rgb(13, 13, 13);
+        color: rgb(247, 247, 245);
+        font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-] HIDE"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+] SHOW"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpi-cell { border-bottom: 1px solid rgb(205, 205, 200); }
+      .filter-bar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .filter-bar select.sel-in {
+        width: 100%;
+        font-size: 16px;
+        padding: 8px 9px;
+      }
+      .filter-bar input.search-in {
+        grid-column: span 2;
+        width: 100%;
+        min-width: 0;
+        font-size: 16px;
+      }
+    }
+  </style>
+  <script>
+    (function() {
+      if (window.location.pathname.includes("/items/")) {
+        var m = window.location.pathname.match(/\/items\/(\d+)\.html/);
+        if (m) {
+          var base = window.location.pathname.replace(/\/items\/\d+\.html$/, "");
+          var target = (base || "") + "/item?id=" + m[1];
+          try {
+            history.replaceState(null, "", target);
+          } catch(e) {}
+        }
+      }
+    })();
+  </script>
+</head>
+<body>
+<div class="wrap">
+  <header class="sheet-top">
+    <div class="eyebrow">
+      <span>NYX OBSERVATORY // <a class="ext-link" href="https://news.ycombinator.com/item?id=50491980">HN ITEM 50491980</a> // UNSLOTH.AI</span>
+      <span><strong>BULLSHIT: 72.5%</strong>
+    </div>
+    <h1>Bullshit vs. <span class="accent">Epistemic.</span></h1>
+    <p class="sublead">
+      <strong>69</strong> Hacker News comments on <a class="ext-link" href="https://unsloth.ai/docs/models/qwen3.8">Unsloth Qwen3.8-27B Quantizations – Dynamic v3.1 Update (unsloth.ai)</a>.
+    </p>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary>
+      <span>01 // EVIDENCE</span>
+      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    </summary>
+    <p>
+      Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+      Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+    </p>
+    <div class="proof-body">
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">69</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 48 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">27.5%</div>
+          <div class="kpi-sub">19 comments (5 Gold / 7.2%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">72.5%</div>
+          <div class="kpi-sub">30 chatter &bull; 20 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">3</div>
+        <div class="kpi-sub">10% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.941</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">21</div>
+          <div class="kpi-sub">HN POS 18..38 (30.4% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="margin-top:10px;font:600 11px/1.5 ui-monospace,Menlo,monospace;color:rgb(70,70,68)"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary>
+      <span>02 // EXPLORE</span>
+      <span class="toggle-pill" data-show="[+] SHOW" data-hide="[-] HIDE"></span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / INTERACTIVE EQUATION</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p style="font-size:11.5px;line-height:1.42;color:rgb(85,85,82);margin:12px 0 0">
+              Drag any weight to watch the 69-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 69)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (5)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (14)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (30)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (20)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..69) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 25)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (@danielhanchen, 8.6h); largest subtree (@aliljet) occupies 21 slots (HN POS 18..38).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="modeSelect" class="sel-in" aria-label="Ranking view">
+          <option value="hn_top40">HN Top 40</option>
+          <option value="top_signal">Epistemic Top 50</option>
+          <option value="buried_gems">Buried Gems (HN POS &gt; 25)</option>
+          <option value="bullshit_traps">High-Karma / URL Traps Caught</option>
+          <option value="mod_morgue">Mod Rebukes &amp; Downvoted Morgue</option>
+          <option value="c5a_rescues">c5A Heterodox Rescues</option>
+        </select>
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (69)</option>
+          <option value="quants_model">Quants &amp; Model (Bonsai) (17)</option>
+          <option value="studio_cpp">Studio &amp; Cpp (Llama) (15)</option>
+          <option value="benchmark_tokens">Benchmark &amp; Tokens (8-27b) (12)</option>
+          <option value="models_nonlocal">Models &amp; Non-local (Byteshape) (12)</option>
+          <option value="cache_cell">Cache &amp; Cell (Throw) (9)</option>
+          <option value="general_commentary">General Commentary (4)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, qwen3, unsloth, dynamic, v3, quants...">
+      </div>
+      <div id="resultMeta" style="font:600 11px/1.4 ui-monospace,Menlo,monospace;color:rgb(90,90,88);margin-bottom:10px"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50491980 + UNSLOTH.AI + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50491980, "story_title": "Unsloth Qwen3.8-27B Quantizations – Dynamic v3.1 Update", "story_url": "https://unsloth.ai/docs/models/qwen3.8", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50491980, "story_title": "Unsloth Qwen3.8-27B Quantizations – Dynamic v3.1 Update", "story_url": "https://unsloth.ai/docs/models/qwen3.8", "points": 218, "story_author": "Retro_Dev", "article_source": "fetched_url", "t1_ref_utc": "2026-11-14T16:36:54+00:00", "t2_ref_utc": "2026-11-14T16:36:54+00:00", "delta_minutes": 0.0, "story_anchors": ["qwen3", "unsloth", "dynamic", "v3", "quants", "8-27b", "thinking", "ram", "models", "model", "context", "llama", "faster", "vram", "cpp", "benchmarks", "usage", "tokens", "version", "coding", "page", "accuracy", "qwen", "locally", "quantization"], "facet_labels": {"studio_cpp": "Studio & Cpp (Llama)", "cache_cell": "Cache & Cell (Throw)", "quants_model": "Quants & Model (Bonsai)", "benchmark_tokens": "Benchmark & Tokens (8-27b)", "models_nonlocal": "Models & Non-local (Byteshape)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "studio_cpp", "label": "Studio & Cpp (Llama)", "count": 15, "top_terms": ["studio", "cpp", "llama", "page"]}, {"slug": "cache_cell", "label": "Cache & Cell (Throw)", "count": 9, "top_terms": ["cache", "cell", "throw", "benchmarks"]}, {"slug": "quants_model", "label": "Quants & Model (Bonsai)", "count": 17, "top_terms": ["quants", "model", "bonsai", "expensive"]}, {"slug": "benchmark_tokens", "label": "Benchmark & Tokens (8-27b)", "count": 12, "top_terms": ["benchmark", "tokens", "8-27b", "tool"]}, {"slug": "models_nonlocal", "label": "Models & Non-local (Byteshape)", "count": 12, "top_terms": ["models", "non-local", "byteshape", "bonsai"]}], "counts": {"total_comments": 69, "live_t2_comments": 69, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 48, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "7b3b52298641af53e539d1cbd78719219baff793b34f695202ec181605fc7766"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 5, "grounded_analysis": 14, "crowd_chatter": 30, "bullshit_or_flamewar": 20}, "facets": {"studio_cpp": 15, "quants_model": 17, "benchmark_tokens": 12, "cache_cell": 9, "models_nonlocal": 12, "general_commentary": 4}, "facet_options": [{"slug": "quants_model", "label": "Quants & Model (Bonsai)", "count": 17}, {"slug": "studio_cpp", "label": "Studio & Cpp (Llama)", "count": 15}, {"slug": "benchmark_tokens", "label": "Benchmark & Tokens (8-27b)", "count": 12}, {"slug": "models_nonlocal", "label": "Models & Non-local (Byteshape)", "count": 12}, {"slug": "cache_cell", "label": "Cache & Cell (Throw)", "count": 9}, {"slug": "general_commentary", "label": "General Commentary", "count": 4}], "facet_diagnostics": [{"slug": "quants_model", "label": "Quants & Model (Bonsai)", "count": 17, "useful": 4, "useful_pct": 23.5, "terms": "quants, model, bonsai, expensive"}, {"slug": "studio_cpp", "label": "Studio & Cpp (Llama)", "count": 15, "useful": 4, "useful_pct": 26.7, "terms": "studio, cpp, llama, page"}, {"slug": "benchmark_tokens", "label": "Benchmark & Tokens (8-27b)", "count": 12, "useful": 4, "useful_pct": 33.3, "terms": "benchmark, tokens, 8-27b, tool"}, {"slug": "models_nonlocal", "label": "Models & Non-local (Byteshape)", "count": 12, "useful": 3, "useful_pct": 25.0, "terms": "models, non-local, byteshape, bonsai"}, {"slug": "cache_cell", "label": "Cache & Cell (Throw)", "count": 9, "useful": 4, "useful_pct": 44.4, "terms": "cache, cell, throw, benchmarks"}, {"slug": "general_commentary", "label": "General Commentary", "count": 4, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 9}, {"category": "code_repository", "count": 2}, {"category": "github_artifact", "count": 1}], "story_anchors": ["qwen3", "unsloth", "dynamic", "v3", "quants", "8-27b", "thinking", "ram", "models", "model", "context", "llama", "faster", "vram", "cpp", "benchmarks", "usage", "tokens"], "largest_root": {"root_id": 50493948, "author": "aliljet", "slots": 21, "start_dom": 18, "end_dom": 38, "share_pct": 30.4, "top_dom1_age": 8.6, "top_dom1_author": "danielhanchen"}, "buried_cutoff": 25, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50497254, "au": "xrd", "dom": 11, "sr": 1, "sc": 9.99, "ep": 9.99, "bs": 0.0, "d": 0, "age": 2.2, "grav": 13.2, "surf": 8.9, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 104, "qw": 0, "k": 9898, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "studio_cpp", "flbl": "Studio & Cpp (Llama)", "urls": ["https://github.com/synchopate/llama-modchip.git", "https://github.com/noonghunna/club-3090"], "ig": 1.43, "fa": 2.08, "gp": 0.484, "bl": 0.0, "ds": 0.0, "txt": "I've been happily using unsloth/Qwen3.6 for a while using llama.cpp on several rtx3090s. Excited to try this update.\n\nAnd, reading through the ggml update on the front page of HN this morning, I realize I might do better than llama.cpp.\n\nI've also really fascinated by llama-modchip and running these models in RAM (https://github.com/synchopate/llama-modchip.git)\n\nIs there a place to find the best way to optimize my hardware setup?\n\nI know about this:\n\nhttps://github.com/noonghunna/club-3090\n\nAre there others? Are there better nooks to look?\n\nI assume unsloth studio (since it uses llama.cpp behind the scenes) is not going to do better than HEAD of llama.cpp from github, but am I wrong?"}, {"id": 50495601, "au": "danielhanchen", "dom": 6, "sr": 2, "sc": 9.56, "ep": 9.56, "bs": 0.0, "d": 2, "age": 6.78, "grav": 50.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 24, "qw": 0, "k": 3617, "kpp": 5.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "epistemic_gold", "facet": "quants_model", "flbl": "Quants & Model (Bonsai)", "urls": ["https://github.com/unslothai/llama.cpp"], "ig": 0.659, "fa": 2.42, "gp": 0.767, "bl": 0.0, "ds": 0.0, "txt": "Oh it's correct - that's the installer size - but we will need to download binaries from https://github.com/unslothai/llama.cpp and also PyTorch etc which will take 2-3GB more"}, {"id": 50495613, "au": "danielhanchen", "dom": 4, "sr": 3, "sc": 9.37, "ep": 9.52, "bs": 0.0, "d": 2, "age": 6.76, "grav": 49.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 32, "qw": 0, "k": 3617, "kpp": 5.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "epistemic_gold", "facet": "studio_cpp", "flbl": "Studio & Cpp (Llama)", "urls": ["https://github.com/unslothai/notebooks/blob/main/fsdp2_scripts/README.md"], "ig": 0.734, "fa": 2.35, "gp": 0.754, "bl": 0.0, "ds": 0.0, "txt": "Oh we have not announced it, but in the past month, Unsloth has FSDP2 support - full finetuning, LoRA and QLoRA all work! We also support pipeline parallel, tensor parallel, and more!\n\nSee https://github.com/unslothai/notebooks/blob/main/fsdp2_scrip..."}, {"id": 50495446, "au": "armcat", "dom": 46, "sr": 4, "sc": 7.93, "ep": 7.93, "bs": 0.0, "d": 0, "age": 7.25, "grav": 54.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 60, "qw": 0, "k": 2773, "kpp": 6.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "benchmark_tokens", "flbl": "Benchmark & Tokens (8-27b)", "urls": ["https://huggingface.co/bottlecapai/ThinkingCap-Qwen3.8-27B-GGUF"], "ig": 1.363, "fa": 0.96, "gp": 1.37, "bl": 0.0, "ds": 0.0, "txt": "Great work as always Dan! I've used Qwen3.8 quite a bit and it's very verbose - its propensity for tool calling is insane and it uses 2x as many tokens as GLM-5.2 (which itself uses huge amount of tokens). I'm wondering if you have any plans to incorporate Bottlecap AI Qwen3.8 [1] checkpoints? They have done post-training where they significantly improve the token efficiency.\n\n[1] https://huggingface.co/bottlecapai/ThinkingCap-Qwen3.8-27B-G..."}, {"id": 50495647, "au": "danielhanchen", "dom": 51, "sr": 5, "sc": 6.88, "ep": 7.41, "bs": 0.53, "d": 1, "age": 6.66, "grav": 48.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 3617, "kpp": 5.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "cache_cell", "flbl": "Cache & Cell (Throw)", "urls": [], "ig": 1.149, "fa": 1.23, "gp": 0.83, "bl": 0.2, "ds": 0.0, "txt": "Yes as requested by the community :) We also run all benchmarks multiple times, and provide error bars! For eg Terminal Bench and DeepSWE are run 3x, and LiveCodeBench 6x or more, and other faster benchmarks are run 12x"}, {"id": 50494245, "au": "3eb7988a1663", "dom": 22, "sr": 6, "sc": 6.77, "ep": 6.77, "bs": 0.0, "d": 1, "age": 11.28, "grav": 105.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 101, "qw": 0, "k": 3412, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "benchmark_tokens", "flbl": "Benchmark & Tokens (8-27b)", "urls": [], "ig": 1.408, "fa": 0.68, "gp": 1.048, "bl": 0.0, "ds": 0.0, "txt": "As an experiment I took, not this current quant, of Qwen 3.8 27B and had it analyze some of my writing in CPU-only mode with llamacpp. Tried a Q4 and Q5. It was dreadfully slow, but you fire that off before bed, and you can get results the next day. This was a ~6000 word markdown file, took maybe 10 minutes before it started generating anything at all, but then it just cranks away. I would need to tune down the default thinking intensity, but it otherwise did the job.\n\nNot compatible with vibe coding, but if you want a local tool to review content, it is possible today."}, {"id": 50495062, "au": "alex43578", "dom": 62, "sr": 7, "sc": 6.6, "ep": 6.6, "bs": 0.0, "d": 4, "age": 8.5, "grav": 68.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 711, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "benchmark_tokens", "flbl": "Benchmark & Tokens (8-27b)", "urls": [], "ig": 1.188, "fa": 0.96, "gp": 0.738, "bl": 0.0, "ds": 0.0, "txt": "Every local and reasonable model is bad at that. It’s OpenAI’s own benchmark, so take it with a grain of salt, but “GPT-6 Astra achieved 100.0% accuracy on contexts from 256K to 512K tokens and 96.3% accuracy from 512K to 1M tokens on OpenAI's 8-needle long-context benchmark”."}, {"id": 50497139, "au": "whatifitoldyou", "dom": 17, "sr": 8, "sc": 6.51, "ep": 6.51, "bs": 0.0, "d": 0, "age": 2.5, "grav": 15.0, "surf": 8.6, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 79, "qw": 0, "k": 54, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "benchmark_tokens", "flbl": "Benchmark & Tokens (8-27b)", "urls": ["https://sevangelatos.github.io/spiruxbench-results/"], "ig": 1.531, "fa": 0.9, "gp": 0.24, "bl": 0.0, "ds": 0.0, "txt": "In my home grown (not grass fed) benchmark, the V3 and V3.1 Qwen3.8-27B-UD-Q2_K_XL have roughly the same capability with the new one being a bit worse consistently in debugging tasks but still having some edge overall. I tried this config with Q8 KV cache as it fully fits in a 16Gig graphics card. The new quant is also significantly less token hungry with 46.5k vs 61.7k tokens/task.\n\nSo kudos to unsloth. The difference is measurable. Check it out:\nhttps://sevangelatos.github.io/spiruxbench-results/"}, {"id": 50495640, "au": "danielhanchen", "dom": 47, "sr": 9, "sc": 6.29, "ep": 6.97, "bs": 0.53, "d": 1, "age": 6.68, "grav": 48.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 82, "qw": 0, "k": 3617, "kpp": 5.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "quants_model", "flbl": "Quants & Model (Bonsai)", "urls": [], "ig": 1.335, "fa": 0.95, "gp": 0.777, "bl": 0.2, "ds": 0.0, "txt": "Oh yes I think I saw bottecap's work - very interesting!\n\nFor Qwen3.8-Flash-Next (I know not 27B haha), we actually cut reasoning by up to 50% esp for the small quants - we found quantizing models naively coincidentally also made them more verbose, as it would \"correct\" itself during the reasoning process. We managed to make the extra token usage of lower bit quants now only be +5% vs BF16 vs +50% extra from other quants.\n\n27B should have similar benefits, but it's less as it's a smaller model!"}, {"id": 50495038, "au": "danielhanchen", "dom": 19, "sr": 10, "sc": 6.15, "ep": 6.82, "bs": 0.53, "d": 1, "age": 8.56, "grav": 69.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 59, "qw": 0, "k": 3617, "kpp": 5.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "cache_cell", "flbl": "Cache & Cell (Throw)", "urls": [], "ig": 1.268, "fa": 0.96, "gp": 0.765, "bl": 0.2, "ds": 0.0, "txt": "Yes! One method is KV cache compression to 4-bits - llama.cpp does have hadamard, but it's not very accurate - we were researching if 4-bit KV cache can be used with a sliding window of 1024 for example of 8-bit KV cache\n\nSo we can have a 4bit KV cache, but the most recent N tokens can be 8bit - we found accuracy improves 2x!"}, {"id": 50495420, "au": "dev_dan_2", "dom": 20, "sr": 11, "sc": 5.82, "ep": 6.12, "bs": 0.0, "d": 2, "age": 7.31, "grav": 55.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 257, "qw": 0, "k": 56, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "cache_cell", "flbl": "Cache & Cell (Throw)", "urls": [], "ig": 1.646, "fa": 0.62, "gp": 0.332, "bl": 0.0, "ds": 0.0, "txt": "Cool! (And massive thanks for all the great work you and your team do!) An idea I had was to \"finetune\" the KV cache compression to a dataset that represents what data one uses - but sliding window kinda achieves that out of the box, neat!\n\nSome more ideas, most if not all were likely tried out already:\n\n- add a decay to the KV cache: Each KV cell has an age, and if not read for a long enough time; we can throw that cell out and free that memory? (as I understood, KV cache stores intermediate results that can be restored on the fly - so if we throw out a cell that will be used in the future; it can just be recomputed)\n\n  - could expand on that: If we \"revive\" a KV cell that we killed; we could decrease it's likelyhood to get killed again...\n\n- could we dynamically learn what input leads to what KV cache usage? this would be a start time thing - maybe we could preemptively set many KV cells to 2,3,4 bit and just bump their accuracy once accessed at least once? (this is related to the sliding window approach I think)\n\n- last; I think probabilistic data structures lurk somewhere around the edges here and wait for their chance to shine... ;D \"need to storage big amount of information in a set AND have a fast way to verify/falsify whether set membership (i.e. KV cell in the KV cache\") was correct\" seems to be applicable; but I don't have a clue how! And I am a huge fan of probalisti"}, {"id": 50495028, "au": "danielhanchen", "dom": 1, "sr": 12, "sc": 5.2, "ep": 6.03, "bs": 0.53, "d": 0, "age": 8.6, "grav": 70.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 38, "qw": 0, "k": 3617, "kpp": 5.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "quants_model", "flbl": "Quants & Model (Bonsai)", "urls": ["https://huggingface.co/unsloth/DeepSeek-V4.1-Flash-1017-GGUF", "https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF", "https://unsloth.ai/docs/basics/dynamic-3.0-ggufs/dynamic-3.1-ggufs"], "ig": 0.86, "fa": 0.62, "gp": 1.544, "bl": 0.2, "ds": 0.0, "txt": "If anyone has any questions as well - feel free to ask!\n\nWe also updated https://huggingface.co/unsloth/DeepSeek-V4.1-Flash-1017-GGUF with UD3.1 quants\n\nAnd also https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF as well!\n\nWe provide our benchmarking methods like what graders we use, infra fixes and issues and more in https://unsloth.ai/docs/basics/dynamic-3.0-ggufs/dynamic-3.1..."}, {"id": 50495973, "au": "DiabloD3", "dom": 40, "sr": 13, "sc": 5.19, "ep": 5.19, "bs": 0.0, "d": 1, "age": 5.66, "grav": 39.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 92, "qw": 0, "k": 47599, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "models_nonlocal", "flbl": "Models & Non-local (Byteshape)", "urls": [], "ig": 1.574, "fa": 0.34, "gp": 0.361, "bl": 0.0, "ds": 0.0, "txt": "IMO Byteshape is kind of the winner here if you're only looking at 24GB and down targets.\n\nContinually compressing the model down with more computationally complex quantization schemes crosses from memory bandwidth being the limit into compute is the limit, Byteshape tries to keep the models performant while also using techniques appropriately.\n\nLike, for me, their biggest version saves enough space that I can actually fit the dflash2 kernel without digging into context, yet score virtually identical to Unsloth's 3.0 Q4_K_M.\n\nThats like going from, say, 15-20 tok/s with MTP to 50+ with DFlash2."}, {"id": 50493948, "au": "aliljet", "dom": 18, "sr": 14, "sc": 5.04, "ep": 5.48, "bs": 0.0, "d": 0, "age": 12.1, "grav": 117.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 1565, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "cache_cell", "flbl": "Cache & Cell (Throw)", "urls": [], "ig": 1.001, "fa": 0.34, "gp": 1.489, "bl": 0.0, "ds": 0.0, "txt": "There are so many of us with weak GPUs and these updates are massive wins. Still waiting for the 2080 moment where this 27B param model and a reasonable kv cache can exist and function at slow, but overnight-burning speeds .."}, {"id": 50495816, "au": "armcat", "dom": 48, "sr": 15, "sc": 4.89, "ep": 5.19, "bs": 0.0, "d": 2, "age": 6.15, "grav": 43.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 56, "qw": 0, "k": 2773, "kpp": 6.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "quants_model", "flbl": "Quants & Model (Bonsai)", "urls": [], "ig": 1.349, "fa": 0.34, "gp": 0.723, "bl": 0.0, "ds": 0.0, "txt": "Interesting, thanks for the info! Incidentally we've been testing nvfp4 weights vs vanilla 16-bit, GLM-5.3 in this case, and found that the vanilla 16 bit ones use 10x more tokens, but the output is more stable and better quality (less Chinese characters appearing, better coding solutions). So to me it's all just alchemy at this point."}, {"id": 50495551, "au": "mirod1", "dom": 5, "sr": 16, "sc": 4.41, "ep": 4.85, "bs": 0.0, "d": 1, "age": 6.93, "grav": 51.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 42, "qw": 0, "k": 15, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "studio_cpp", "flbl": "Studio & Cpp (Llama)", "urls": ["https://unsloth.ai/download/linux"], "ig": 0.898, "fa": 0.96, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "In order to run the model, I need to install the Unsloth desktop, on Ubuntu. The link at https://unsloth.ai/download/linux says it should be 44.3MB, but the download itself is 23M.\nIs this an oversight on the download page or am I getting the wrong package?"}, {"id": 50494797, "au": "badsectoracula", "dom": 23, "sr": 17, "sc": 4.4, "ep": 4.84, "bs": 0.0, "d": 2, "age": 9.33, "grav": 79.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 66, "qw": 0, "k": 8809, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "studio_cpp", "flbl": "Studio & Cpp (Llama)", "urls": [], "ig": 1.432, "fa": 0.34, "gp": 0.35, "bl": 0.0, "ds": 0.0, "txt": "FWIW depending on what exactly you want to review something smaller like Gemma 4 E4B would be much faster. On my 7yo 3700X, llama.cpp runs Gemma 4 E4B UD-Q4_K_XL with a 131k context (context size doesn't seem to make much of a difference in speed) at ~10-15 tps (using MTP draft).\n\nI'm mainly using it when i need some simple stuff and Qwen 3.8 27B is already occupied in the background :-P"}, {"id": 50497284, "au": "whatifitoldyou", "dom": 15, "sr": 18, "sc": 4.37, "ep": 4.37, "bs": 0.0, "d": 1, "age": 2.12, "grav": 12.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 33, "qw": 0, "k": 54, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "models_nonlocal", "flbl": "Models & Non-local (Byteshape)", "urls": ["https://sevangelatos.github.io/spiruxbench-results/"], "ig": 0.766, "fa": 0.9, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I could not find one that's why I built my own. It only covers python and C++ but at least it is not benchmaxed. I specifically tried to focus on models that are runnable in consumer GPUs https://sevangelatos.github.io/spiruxbench-results/"}, {"id": 50497987, "au": "zkmon", "dom": 54, "sr": 19, "sc": 4.13, "ep": 4.13, "bs": 0.0, "d": 0, "age": 0.75, "grav": 6.2, "surf": 24.3, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 2325, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "models_nonlocal", "flbl": "Models & Non-local (Byteshape)", "urls": [], "ig": 0.889, "fa": 0.68, "gp": 0.069, "bl": 0.0, "ds": 0.0, "txt": "Just tested Q4_K_M. About 100 MB larger than the earlier version. Quality appears same, for an identical coding task, with a run of about 10 minutes. YMMV."}, {"id": 50494089, "au": "hacker_88", "dom": 64, "sr": 20, "sc": 3.85, "ep": 4.07, "bs": 0.0, "d": 0, "age": 11.67, "grav": 110.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 26, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "studio_cpp", "flbl": "Studio & Cpp (Llama)", "urls": [], "ig": 0.802, "fa": 0.68, "gp": 0.172, "bl": 0.0, "ds": 0.0, "txt": "Figuring out local llms , but it did built me single page html . On 12 GB VRAM and 16 GB ram windows ."}, {"id": 50495329, "au": "magicalhippo", "dom": 61, "sr": 21, "sc": 3.49, "ep": 3.86, "bs": 0.0, "d": 4, "age": 7.63, "grav": 58.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 18464, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "cache_cell", "flbl": "Cache & Cell (Throw)", "urls": [], "ig": 1.011, "fa": 0.5, "gp": 0.039, "bl": 0.0, "ds": 0.0, "txt": "Depends on how unique the needles are. If they're fairly unique then even Qwen 3.5 27B @ Q5 with 128k context and Q4 KV cache has perfect recall of at least up to 5 needles, according to my tests.\n\nBut I'm sure if you make them less unique they'll start to struggle."}, {"id": 50495717, "au": "serf", "dom": 53, "sr": 22, "sc": 3.34, "ep": 3.56, "bs": 0.0, "d": 0, "age": 6.41, "grav": 46.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 11509, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "benchmark_tokens", "flbl": "Benchmark & Tokens (8-27b)", "urls": [], "ig": 0.802, "fa": 0.28, "gp": 0.602, "bl": 0.0, "ds": 0.0, "txt": "releasing the Q8 variants anytime soon with the dynamic work ?\n\nQ8 stomps Q6 on personal benchmarks here for me wrt Qwen 3.8 27b."}, {"id": 50494211, "au": "jedbrooke", "dom": 57, "sr": 23, "sc": 3.27, "ep": 3.78, "bs": 0.0, "d": 1, "age": 11.35, "grav": 106.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 63, "qw": 0, "k": 635, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "quants_model", "flbl": "Quants & Model (Bonsai)", "urls": [], "ig": 1.177, "fa": 0.28, "gp": 0.148, "bl": 0.0, "ds": 0.0, "txt": "Bonsai 2 does some additional tuning in addition to just quantizing (mostly around the fp16 block weights per 32 params), so they’re able to pack more in to just so few GB.\n\nThe tradeoff with unsloth seems to be that it’s more directly applicable for other off the shelf open models, whereas with Bonsai you’d have to wait for them to release another one"}, {"id": 50494294, "au": "quaddoggy", "dom": 67, "sr": 24, "sc": 3.07, "ep": 3.51, "bs": 0.0, "d": 0, "age": 11.11, "grav": 102.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 18, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "studio_cpp", "flbl": "Studio & Cpp (Llama)", "urls": [], "ig": 1.082, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Just installed Qwen 3.8 Splash tonight (doesn’t appear on linked page). Super impressed. Easily averaging 45 tps, even with thinking on. Totally acceptable. Running M4 Mac mini, 48GB, LM Studio."}, {"id": 50495339, "au": "rdslw", "dom": 7, "sr": 25, "sc": 2.96, "ep": 3.84, "bs": 0.0, "d": 1, "age": 7.61, "grav": 58.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 2270, "kpp": 6.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "benchmark_tokens", "flbl": "Benchmark & Tokens (8-27b)", "urls": [], "ig": 1.04, "fa": 0.34, "gp": 0.297, "bl": 0.0, "ds": 0.0, "txt": "how to best run your 27G v3.1 quants on recent mac hardware with 32-64gb of ram. mlx etc. ?\n\nwhat would you recommend re: software stack for best pp/tg overall performance?"}, {"id": 50496066, "au": "zmmmmm", "dom": 41, "sr": 26, "sc": 2.79, "ep": 2.93, "bs": 0.0, "d": 1, "age": 5.35, "grav": 36.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 22248, "kpp": 5.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_nonlocal", "flbl": "Models & Non-local (Byteshape)", "urls": [], "ig": 0.836, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "ByteShape was what finally made Qwen3.8 27b actually fast and usably intelligent for me after trying a LOT of different options at 16GB VRAM."}, {"id": 50495660, "au": "danielhanchen", "dom": 21, "sr": 27, "sc": 2.77, "ep": 3.65, "bs": 0.0, "d": 3, "age": 6.59, "grav": 48.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 112, "qw": 0, "k": 3617, "kpp": 5.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "cache_cell", "flbl": "Cache & Cell (Throw)", "urls": [], "ig": 1.396, "fa": 0.0, "gp": 0.252, "bl": 0.0, "ds": 0.0, "txt": "Yes the decay is not a bad idea - I think there were some research papers on this but I forgot haha - sparse attention partially does this, where if beforehand we know softmax(QK^T/sqrt(d)) will have a 0 cell, we can skip the calculation of QK^T for that cell (ie that KV row has 0 weight)\n\nThe main issue though is Q and K still need to be whole, so cannot be compressed. However one can do some sort of KV cache \"double cache\" where we can offload KV rows that are not that attended to - so the \"cold KV rows\" to RAM and or SSD, and the \"hot KV rows\" are in VRAM - this might work, but sounds complex"}, {"id": 50497600, "au": "yearolinuxdsktp", "dom": 55, "sr": 28, "sc": 2.72, "ep": 3.16, "bs": 0.0, "d": 0, "age": 1.51, "grav": 9.6, "surf": 15.7, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 77, "qw": 0, "k": 136, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "quants_model", "flbl": "Quants & Model (Bonsai)", "urls": [], "ig": 1.334, "fa": 0.0, "gp": 0.015, "bl": 0.0, "ds": 0.0, "txt": "Is it possible to use these Qwen3.8-Flash-Next quants as a coding variant, with half the experts removed, like the ISTA-DASLAB Coder version? The performance and quality of that model is quite good when run with Splash and DFlash. But I wonder if there’s room left to improve, as the Coder model is I_Q3S variant, so it seems like doing 5 or 6-bit quants with half of experts removed might be even better. (And using the Dynamic v3.1 quantization)"}, {"id": 50497174, "au": "dofm", "dom": 2, "sr": 29, "sc": 2.51, "ep": 3.61, "bs": 0.0, "d": 1, "age": 2.42, "grav": 14.5, "surf": 4.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 139, "qw": 0, "k": 4882, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "studio_cpp", "flbl": "Studio & Cpp (Llama)", "urls": [], "ig": 1.503, "fa": 0.0, "gp": 0.052, "bl": 0.0, "ds": 0.0, "txt": "Just downloaded it because I finally have time to work through Sam Witteveen's Qwen 3 variants video; it looks like your new dynamic quants mean that I perhaps only additionally need ThinkingCap's variant for the few occasions I use xhigh.\n\nIs this new technique limited to Qwen-type architectures, or can e.g. Muse Glimmer be updated this way?\n\nP.S. the literal only thing that occasionally has me going back to LM Studio instead of Unsloth Studio: slightly better PDF export. Is there a way to export PDFs with the thinking hidden?\n\nP.P.S. thank you for all of this. While I have posted about it a fair bit here, I can still hardly begin to explain how much more confident I have been with AI from having the ability to tinker with things like Unsloth Studio. It has let me get from total cynicism to a kind of cynical pragmatism through a process of exploration."}, {"id": 50495043, "au": "alex43578", "dom": 26, "sr": 30, "sc": 2.4, "ep": 3.06, "bs": 0.0, "d": 3, "age": 8.54, "grav": 69.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 711, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_nonlocal", "flbl": "Models & Non-local (Byteshape)", "urls": [], "ig": 0.891, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It’s fun, but it’s just so tough to see the value when the same research report via ChatGPT is done in 5 minutes and likely higher quality, for less than a dollar a day."}, {"id": 50493615, "au": "nout", "dom": 52, "sr": 31, "sc": 2.31, "ep": 2.97, "bs": 0.0, "d": 0, "age": 12.89, "grav": 129.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 536, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "benchmark_tokens", "flbl": "Benchmark & Tokens (8-27b)", "urls": [], "ig": 0.62, "fa": 0.0, "gp": 1.039, "bl": 0.0, "ds": 0.0, "txt": "How does it compare to the 3.8-27B versions from TensorFold? I.e. does it make sense to run unsloth via TensorFold engine?"}, {"id": 50495527, "au": "stared", "dom": 50, "sr": 32, "sc": 2.27, "ep": 3.07, "bs": 0.0, "d": 0, "age": 7.01, "grav": 52.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 14388, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "cache_cell", "flbl": "Cache & Cell (Throw)", "urls": [], "ig": 0.584, "fa": 0.28, "gp": 0.623, "bl": 0.0, "ds": 0.0, "txt": "I am happy they are showing charts for actual benchmarks, not just easily measurable proxies like KL-div."}, {"id": 50494498, "au": "Incipient", "dom": 27, "sr": 33, "sc": 2.04, "ep": 3.36, "bs": 0.0, "d": 1, "age": 10.38, "grav": 92.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 57, "qw": 0, "k": 1225, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "benchmark_tokens", "flbl": "Benchmark & Tokens (8-27b)", "urls": [], "ig": 1.114, "fa": 0.0, "gp": 0.514, "bl": 0.0, "ds": 0.0, "txt": "This would depend hugely on the price of electricity, however I'm pretty sure where I am (at roughly 25c/kwh in usd) the price of running qwen costs more than 6.1-luna per token. So other than privacy (which doesn't matter for my work) there isn't any justification for running locally. Is privacy purely what people justify local models on?"}, {"id": 50496158, "au": "anakaine", "dom": 32, "sr": 34, "sc": 1.99, "ep": 3.32, "bs": 0.0, "d": 3, "age": 5.1, "grav": 34.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 65, "qw": 0, "k": 1902, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "cache_cell", "flbl": "Cache & Cell (Throw)", "urls": [], "ig": 0.586, "fa": 0.68, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "When the XGX Spark is the equivalent of 1/10th of the pre tax annual salary of a top 5-8% earner, its far too expensive. Not sure if its cheaper comparatively in the US, but its a nightmare in Australia unless you are on an obscene salary. Throw in an approximate 30% tax rate and high cost of living - you've got to strongly wonder if it's worth it."}, {"id": 50495502, "au": "dr_kiszonka", "dom": 3, "sr": 35, "sc": 1.83, "ep": 3.15, "bs": 0.0, "d": 1, "age": 7.07, "grav": 53.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 71, "qw": 0, "k": 2087, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "studio_cpp", "flbl": "Studio & Cpp (Llama)", "urls": [], "ig": 1.27, "fa": 0.0, "gp": 0.117, "bl": 0.0, "ds": 0.0, "txt": "Hi! Unsloth Studio is great, and I was wondering where exactly you are with multi-GPU and multi-node training and fine-tuning? I have been checking your documentation and GitHub issues from time to time and there doesn't seem to be as much development as I initially anticipated. Is making this aspect as user friendly as other parts of Studio and the docs on your near term roadmap or are your prioritizing other areas for now?"}, {"id": 50497727, "au": "3eb7988a1663", "dom": 24, "sr": 36, "sc": 1.8, "ep": 2.9, "bs": 0.0, "d": 3, "age": 1.27, "grav": 8.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 68, "qw": 0, "k": 3412, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "quants_model", "flbl": "Quants & Model (Bonsai)", "urls": [], "ig": 1.236, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I kind of like the slow process, it forces me to be deliberate and not lean on the tooling as a crutch. I don't write that much, so having to wait a day is kind of like having your final work ready to review by a human editor.\n\nPlus, using a bigger model makes me feel a little better that I am not taking a hit on quality when I do not even care about the turnaround time."}, {"id": 50498355, "au": "amelius", "dom": 45, "sr": 37, "sc": 1.26, "ep": 2.36, "bs": 0.0, "d": 2, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 52467, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "studio_cpp", "flbl": "Studio & Cpp (Llama)", "urls": [], "ig": 0.666, "fa": 0.28, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Well, I want Claude Code, Opus 5.5 specifically, but locally. I assume that if you give e.g. Qwen a certain set of instructions (skills, etc.) or complete harness, you can make it behave more like Claude. And I assume there are people who are trying to do this. So that's what I'm asking."}, {"id": 50494450, "au": "jedbrooke", "dom": 25, "sr": 38, "sc": 1.19, "ep": 2.73, "bs": 0.0, "d": 2, "age": 10.58, "grav": 95.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 57, "qw": 0, "k": 635, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "studio_cpp", "flbl": "Studio & Cpp (Llama)", "urls": [], "ig": 1.163, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I’ve been using Bonsai 2 (also based off of Qwen3.8 27B) on my mac mini in this way (using pizza-bot for the harness). In my case I’ve been using more for deep web search type stuff. It’s been a nice workflow to kick off a request in the evening and come back to a 1 page report on it the next morning."}, {"id": 50495457, "au": "LeBit", "dom": 28, "sr": 39, "sc": 1.09, "ep": 1.97, "bs": 0.0, "d": 2, "age": 7.22, "grav": 54.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 66, "qw": 0, "k": 513, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_nonlocal", "flbl": "Models & Non-local (Byteshape)", "urls": [], "ig": 0.771, "fa": 0.0, "gp": 0.111, "bl": 0.0, "ds": 0.0, "txt": "Non-local models are sometimes unavailable.\n\nNon-local models don’t get nerfed before the release of the newer model.\n\nNon-local model provide privacy. You say you don’t care for your kind of world, but eventually you do care for other aspects of your work or life. I’m don’t want even a zdr model to see my private notes where I plan how to get back at coworkers who stole my lunch."}, {"id": 50494718, "au": "ycui7", "dom": 59, "sr": 40, "sc": 0.93, "ep": 2.48, "bs": 0.0, "d": 2, "age": 9.6, "grav": 82.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 125, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "benchmark_tokens", "flbl": "Benchmark & Tokens (8-27b)", "urls": [], "ig": 0.714, "fa": 0.28, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Bonsai 2 is quite bad, it cannot even reliably retrieve multiple needles. regardless what the benchmark says."}, {"id": 50495356, "au": "danielhanchen", "dom": 8, "sr": 41, "sc": 0.89, "ep": 2.96, "bs": 0.53, "d": 2, "age": 7.53, "grav": 57.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 3617, "kpp": 5.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "studio_cpp", "flbl": "Studio & Cpp (Llama)", "urls": [], "ig": 0.733, "fa": 0.0, "gp": 0.855, "bl": 0.2, "ds": 0.0, "txt": "Oh llama.cpp has massively improved so it should function well! We're also making MLX faster soon!"}, {"id": 50496311, "au": "danielhanchen", "dom": 69, "sr": 42, "sc": 0.69, "ep": 2.1, "bs": 0.53, "d": 1, "age": 4.65, "grav": 30.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 3617, "kpp": 5.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "quants_model", "flbl": "Quants & Model (Bonsai)", "urls": [], "ig": 0.552, "fa": 0.28, "gp": 0.0, "bl": 0.2, "ds": 0.0, "txt": "We updated 4, 5 and 6bit as well! For now no agentic / coding benchmarks, but KLD is definitely much better!"}, {"id": 50497795, "au": "SamInTheShell", "dom": 44, "sr": 43, "sc": 0.55, "ep": 1.79, "bs": 0.0, "d": 1, "age": 1.13, "grav": 7.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 61, "qw": 0, "k": 277, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "studio_cpp", "flbl": "Studio & Cpp (Llama)", "urls": [], "ig": 0.763, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "If you look through the ollama codebase, it has a bunch of helpers for just pointing claude code, codex, etc at the ollama api. You can just use ollama and it's helpers or just write your own wrapper to make it work however you want.\n\nI assume you really just want claude code, Qwen 3.8 is practically Claude Opus 4.8-ish out of the box."}, {"id": 50494887, "au": "sroussey", "dom": 66, "sr": 44, "sc": 0.32, "ep": 1.51, "bs": 1.19, "d": 0, "age": 9.04, "grav": 75.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 5895, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.592, "fa": 0.0, "gp": 0.082, "bl": 0.45, "ds": 0.0, "txt": "How do you know which parameters matter?\n\nLess important parameters should get quantized more, seems odd that we would quantize every parameter the same. At least for storage."}, {"id": 50493361, "au": "DiabloD3", "dom": 58, "sr": 45, "sc": -0.27, "ep": 0.83, "bs": 0.0, "d": 1, "age": 13.48, "grav": 138.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 47599, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_nonlocal", "flbl": "Models & Non-local (Byteshape)", "urls": [], "ig": 0.355, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Bonsai 2 doesn't work at all, Unsloth's smallest... also doesn't work, but is still better.\n\nBonsai's technology would be better suited for 100s of B models."}, {"id": 50495993, "au": "nkmnz", "dom": 14, "sr": 46, "sc": -0.85, "ep": 1.59, "bs": 1.19, "d": 0, "age": 5.6, "grav": 38.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 1179, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "benchmark_tokens", "flbl": "Benchmark & Tokens (8-27b)", "urls": [], "ig": 0.326, "fa": 0.0, "gp": 0.566, "bl": 0.45, "ds": 0.0, "txt": "Is there something like artificialanalysis, but for the multitude of versions created for local usage, such as this one?"}, {"id": 50494740, "au": "sroussey", "dom": 60, "sr": 47, "sc": -0.86, "ep": 1.88, "bs": 1.19, "d": 3, "age": 9.52, "grav": 81.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 5895, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "quants_model", "flbl": "Quants & Model (Bonsai)", "urls": [], "ig": 0.576, "fa": 0.0, "gp": 0.36, "bl": 0.45, "ds": 0.0, "txt": "Every model is bad at needle in a haystack. I am constantly shocked at how often they fail my evals."}, {"id": 50496887, "au": "LeBit", "dom": 30, "sr": 48, "sc": -0.89, "ep": 0.75, "bs": 1.19, "d": 4, "age": 3.09, "grav": 18.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 513, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.318, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "It was late. I even reread my post because I have a tendency to mistype a lot the older I get.\n\nGod damn it!"}, {"id": 50495010, "au": "girvo", "dom": 31, "sr": 49, "sc": -1.65, "ep": 1.08, "bs": 1.19, "d": 2, "age": 8.64, "grav": 70.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 13471, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "quants_model", "flbl": "Quants & Model (Bonsai)", "urls": [], "ig": 0.372, "fa": 0.0, "gp": 0.141, "bl": 0.45, "ds": 0.0, "txt": "Depends. The running costs of the DGX Spark-like’s GB10 are very low; they run at crazy low wattages really. But they’re expensive devices"}, {"id": 50497024, "au": "testtestmetest", "dom": 38, "sr": 50, "sc": -2.13, "ep": 1.93, "bs": 2.52, "d": 1, "age": 2.78, "grav": 16.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": -3, "kpp": -0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "quants_model", "flbl": "Quants & Model (Bonsai)", "urls": [], "ig": 0.82, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "Okay lets say you could run it, lets say it runs fast eve. What could you possibly allow this 27B param model to do overnight unsupervised..."}, {"id": 50496577, "au": "nunodonato", "dom": 16, "sr": 51, "sc": -3.0, "ep": 1.23, "bs": 3.05, "d": 1, "age": 3.94, "grav": 24.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 10, "qw": 0, "k": 1822, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "models_nonlocal", "flbl": "Models & Non-local (Byteshape)", "urls": ["https://tinyleague.nunodonato.com"], "ig": 0.521, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "there is Tiny League (https://tinyleague.nunodonato.com) but it doesnt include quantized models"}, {"id": 50494249, "au": "aliljet", "dom": 65, "sr": 52, "sc": -3.0, "ep": 1.29, "bs": 3.05, "d": 1, "age": 11.28, "grav": 105.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 1565, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "cache_cell", "flbl": "Cache & Cell (Throw)", "urls": [], "ig": 0.551, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Give us more details. What kind of hardware? What kind of setup?"}, {"id": 50495381, "au": "puzzlingcaptcha", "dom": 63, "sr": 53, "sc": -3.23, "ep": 0.92, "bs": 3.05, "d": 0, "age": 7.44, "grav": 56.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 1575, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "quants_model", "flbl": "Quants & Model (Bonsai)", "urls": [], "ig": 0.346, "fa": 0.0, "gp": 0.076, "bl": 1.15, "ds": 0.0, "txt": "How does it compare to ik_llama's KT/KS quants?"}, {"id": 50498182, "au": "strix_varius", "dom": 12, "sr": 54, "sc": -3.37, "ep": 0.93, "bs": 3.05, "d": 1, "age": 0.37, "grav": 4.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 21, "k": 2206, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "studio_cpp", "flbl": "Studio & Cpp (Llama)", "urls": [], "ig": 0.395, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "> And, reading through the ggml update on the front page of HN this morning, I realize I might do better than llama.cpp.\n\nWhat do you mean by this? (from another llama.cpp user)"}, {"id": 50493318, "au": "ilaksh", "dom": 56, "sr": 55, "sc": -4.12, "ep": 0.88, "bs": 3.05, "d": 0, "age": 13.58, "grav": 140.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 10839, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "quants_model", "flbl": "Quants & Model (Bonsai)", "urls": [], "ig": 0.188, "fa": 0.0, "gp": 0.301, "bl": 1.15, "ds": 0.0, "txt": "How do the smallest quants of this compare to Bonsai 2?"}, {"id": 50494524, "au": "dajonker", "dom": 39, "sr": 56, "sc": -4.12, "ep": 1.74, "bs": 5.04, "d": 0, "age": 10.31, "grav": 91.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 14, "qw": 0, "k": 966, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "models_nonlocal", "flbl": "Models & Non-local (Byteshape)", "urls": ["https://byteshape.com/blogs/Qwen3.8-27B/"], "ig": 0.212, "fa": 0.0, "gp": 0.857, "bl": 1.9, "ds": 0.0, "txt": "This is a great area of research with many players. See also ByteShape https://byteshape.com/blogs/Qwen3.8-27B/ (I'm not affiliated)"}, {"id": 50494818, "au": "otabdeveloper4", "dom": 35, "sr": 57, "sc": -4.12, "ep": 0.9, "bs": 4.24, "d": 2, "age": 9.26, "grav": 78.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 3236, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "quants_model", "flbl": "Quants & Model (Bonsai)", "urls": [], "ig": 0.283, "fa": 0.0, "gp": 0.161, "bl": 1.6, "ds": 0.0, "txt": "You can rent a dedicated server. It's easy and costs 10 times less than a \"cloud\"."}, {"id": 50493020, "au": "jan_Sate", "dom": 68, "sr": 58, "sc": -4.12, "ep": 0.81, "bs": 4.24, "d": 0, "age": 14.2, "grav": 150.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 249, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "benchmark_tokens", "flbl": "Benchmark & Tokens (8-27b)", "urls": [], "ig": 0.345, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Awesome! I wonder how it does at Q5+ compared with v3.0"}, {"id": 50494851, "au": "NooneAtAll5", "dom": 36, "sr": 59, "sc": -4.12, "ep": 0.61, "bs": 4.24, "d": 2, "age": 9.16, "grav": 76.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 55, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "quants_model", "flbl": "Quants & Model (Bonsai)", "urls": [], "ig": 0.162, "fa": 0.0, "gp": 0.159, "bl": 1.6, "ds": 0.0, "txt": "if privacy doesn't matter for you, why use expensive luna instead of deepseek?"}, {"id": 50495458, "au": "ReptileMan", "dom": 37, "sr": 60, "sc": -4.12, "ep": 0.43, "bs": 4.24, "d": 2, "age": 7.21, "grav": 54.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 22, "k": 1083, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "benchmark_tokens", "flbl": "Benchmark & Tokens (8-27b)", "urls": [], "ig": 0.183, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": ">however I'm pretty sure where I am (at roughly 25c/kwh in usd) the price of running qwen costs more than 6.1-luna per token\n\nWhat is the price of not having your ssh keys uploaded to the NSA?"}, {"id": 50495638, "au": "badsectoracula", "dom": 29, "sr": 61, "sc": -4.12, "ep": 0.42, "bs": 4.24, "d": 3, "age": 6.68, "grav": 48.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 8809, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "models_nonlocal", "flbl": "Models & Non-local (Byteshape)", "urls": [], "ig": 0.178, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "I think the last two should have been \"Local models\" instead of \"Non-local models\" :-P"}, {"id": 50496957, "au": "entrope", "dom": 33, "sr": 62, "sc": -4.12, "ep": 1.11, "bs": 5.17, "d": 4, "age": 2.93, "grav": 17.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 235, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "models_nonlocal", "flbl": "Models & Non-local (Byteshape)", "urls": [], "ig": 0.47, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "A DGX Spark is currently less than 10% of the median US household income (~80,000 USD/year), but that's still a big expense for the middle class.  Until July or so, it was under 10% of the median personal income (~47,000 USD/year)."}, {"id": 50497603, "au": "rdslw", "dom": 9, "sr": 63, "sc": -4.55, "ep": 0.54, "bs": 5.09, "d": 3, "age": 1.51, "grav": 9.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 2270, "kpp": 6.6, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "studio_cpp", "flbl": "Studio & Cpp (Llama)", "urls": [], "ig": 0.23, "fa": 0.0, "gp": 0.0, "bl": 1.92, "ds": 0.0, "txt": "look forward it. thank you for your work on unsloth!"}, {"id": 50497497, "au": "amelius", "dom": 42, "sr": 64, "sc": -7.44, "ep": 1.04, "bs": 8.48, "d": 0, "age": 1.73, "grav": 10.7, "surf": 13.1, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 52467, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "models_nonlocal", "flbl": "Models & Non-local (Byteshape)", "urls": [], "ig": 0.318, "fa": 0.0, "gp": 0.199, "bl": 3.2, "ds": 0.0, "txt": "What harnesses are people creating to make the local models act more like Claude?"}, {"id": 50494586, "au": "stkdump", "dom": 34, "sr": 65, "sc": -8.86, "ep": 0.0, "bs": 6.89, "d": 2, "age": 10.06, "grav": 88.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 1126, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "quants_model", "flbl": "Quants & Model (Bonsai)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.183, "bl": 2.6, "ds": 0.0, "txt": "Doesn't Qwen3.8 do much better than Luna?"}, {"id": 50498361, "au": "regexorcist", "dom": 10, "sr": 66, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 282, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "studio_cpp", "flbl": "Studio & Cpp (Llama)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Check out kapitsa for mac."}, {"id": 50496307, "au": "danielhanchen", "dom": 49, "sr": 67, "sc": -10.5, "ep": 0.0, "bs": 8.27, "d": 3, "age": 4.66, "grav": 30.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 0, "k": 3617, "kpp": 5.3, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "quants_model", "flbl": "Quants & Model (Bonsai)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.12, "ds": 0.0, "txt": "Oh yes interesting!"}, {"id": 50498345, "au": "xrd", "dom": 13, "sr": 68, "sc": -11.11, "ep": 0.0, "bs": 8.88, "d": 2, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 2, "qw": 0, "k": 9898, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://news.ycombinator.com/item?id=50494982"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.35, "ds": 0.0, "txt": "This comment.\n\nhttps://news.ycombinator.com/item?id=50494982"}, {"id": 50497966, "au": "jeffyaw", "dom": 43, "sr": 69, "sc": -11.11, "ep": 0.0, "bs": 8.88, "d": 1, "age": 0.79, "grav": 6.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 0, "qw": 0, "k": 17, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://yaw.sh/typed-local"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.35, "ds": 0.0, "txt": "https://yaw.sh/typed-local"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      const jumpBtns = isPinned
+        ? `<button type="button" class="probe-inline-btn" data-probe-jump="1">Comment &darr;</button>` +
+          `<button type="button" class="probe-inline-btn" data-probe-clear="1">Clear &times;</button>`
+        : "";
+      probeEl.innerHTML =
+        `<strong>@${escHtml(hit.au)}</strong> | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})` +
+        jumpBtns +
+        `<br>"${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 60);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 50);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 50);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 50);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `Showing ${shown.length} of ${pool.length} matching comments (mode: ${activeMode})` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear selection</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeSelect = document.getElementById("modeSelect");
+  modeSelect.addEventListener("change", () => {
+    activeMode = modeSelect.value;
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

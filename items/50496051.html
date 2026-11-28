@@ -1,0 +1,1376 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50496051 // Project Zero will disclose vulnerabilities 90 days after reporting — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      font: 700 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 16px;
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+    }
+    .kpi-cell {
+      padding: 16px 16px 14px;
+      border-right: 1px solid rgb(205, 205, 200);
+    }
+    .kpi-cell:last-child { border-right: 0; }
+    .kpi-label {
+      font: 600 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 8px 0 4px;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      font-size: 12px;
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 6px;
+      corner-shape: bevel;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(156, 166, 176);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      background: rgb(9, 11, 13);
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(180, 188, 196);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 58px;
+      border-left: 3px solid rgb(0, 230, 118);
+      font: 12px/19px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 38px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      border-bottom: 1px solid rgb(216, 216, 206);
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer > summary.hn-summary {
+      list-style: none;
+      cursor: pointer;
+      display: block;
+      padding: 2px 0;
+      margin: 0;
+      background: transparent;
+      border: 0;
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      user-select: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: rgb(255, 255, 253);
+      border: 1px solid rgb(13, 13, 13);
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+    }
+    table.ablation th {
+      background: rgb(236, 236, 231);
+      font: 700 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgb(60, 60, 58);
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 6px;
+      corner-shape: bevel;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-decoration: ;
+      text-transform: lowercase;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      border-width: 1px;
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      background: rgb(255, 255, 253);
+      font: 600 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { flex: 1; min-width: 220px; font-weight: 400; }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      border-top: 3px solid rgb(13, 13, 13);
+      padding-top: 14px;
+      margin-top: 36px;
+      font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        background: rgb(239, 239, 234);
+        border: 1px solid rgb(13, 13, 13);
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        font-size: 17px;
+        margin: 0;
+        white-space: normal;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        background: rgb(13, 13, 13);
+        color: rgb(247, 247, 245);
+        font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-] HIDE"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+] SHOW"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpi-cell { border-bottom: 1px solid rgb(205, 205, 200); }
+      .filter-bar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in {
+        width: 100%;
+        font-size: 16px;
+        padding: 8px 9px;
+      }
+      .filter-bar input.search-in {
+        grid-column: span 2;
+        width: 100%;
+        min-width: 0;
+        font-size: 16px;
+      }
+    }
+  </style>
+  <script>
+    (function() {
+      if (window.location.pathname.includes("/items/")) {
+        var m = window.location.pathname.match(/\/items\/(\d+)\.html/);
+        if (m) {
+          var base = window.location.pathname.replace(/\/items\/\d+\.html$/, "");
+          var target = (base || "") + "/item?id=" + m[1];
+          try {
+            history.replaceState(null, "", target);
+          } catch(e) {}
+        }
+      }
+    })();
+  </script>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+      </div>
+      <div class="topbar-right">&nbsp;</div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://projectzero.google/2026/11/disclosure-policy.html">Project Zero will disclose vulnerabilities 90 days after reporting</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=projectzero.google"><span class="sitestr">projectzero.google</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">282 points</span> by <a href="https://news.ycombinator.com/user?id=hacb">hacb</a> <span class="age" title="2026-11-14T11:13:17.000Z"><a href="https://news.ycombinator.com/item?id=50496051">1 day ago</a></span> | <a href="https://news.ycombinator.com/flag?id=50496051">flag</a> | <a href="https://news.ycombinator.com/hide?id=50496051">hide</a> | <a href="https://hn.algolia.com/?query=Project+Zero+will+disclose+vulnerabilities+90+days+after+reporting&sort=byDate&dateRange=all&type=story" class="hnpast">past</a> | <a href="https://news.ycombinator.com/fave?id=50496051">favorite</a> | <a href="https://news.ycombinator.com/item?id=50496051">157&nbsp;comments</a>
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">01 // EVIDENCE</span>
+        <span class="sec-headline">81.5% bullshit</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">157</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 84 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">18.5%</div>
+          <div class="kpi-sub">29 comments (5 Gold / 3.2%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">81.5%</div>
+          <div class="kpi-sub">78 chatter &bull; 47 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">1</div>
+        <div class="kpi-sub">3% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.846</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">82</div>
+          <div class="kpi-sub">HN POS 8..89 (52.2% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="margin-top:10px;font:600 11px/1.5 ui-monospace,Menlo,monospace;color:rgb(70,70,68)"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">02 // EXPLORE</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p style="line-height:1.42;color:rgb(85,85,82);margin:12px 0 0">
+              Drag any weight to watch the 157-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 157)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (5)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (24)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (78)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (3)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (47)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..157) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 47)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (@Aissen, 5.9h); largest subtree (@my-huge-pony) occupies 82 slots (HN POS 8..89).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="modeSelect" class="sel-in" aria-label="Ranking view">
+          <option value="hn_top40">HN Top 40</option>
+          <option value="top_signal">Epistemic Top 50</option>
+          <option value="buried_gems">Buried Gems (HN POS &gt; 47)</option>
+          <option value="bullshit_traps">High-Karma / URL Traps Caught</option>
+          <option value="mod_morgue">Mod Rebukes &amp; Downvoted Morgue</option>
+          <option value="c5a_rescues">c5A Heterodox Rescues</option>
+        </select>
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (157)</option>
+          <option value="access_vulnerabilities">Access &amp; Vulnerabilities (Patch) (37)</option>
+          <option value="google_security">Google &amp; Security (Projects) (35)</option>
+          <option value="project_zero">Project &amp; Zero (Bug) (33)</option>
+          <option value="ffmpeg_vulnerable">Ffmpeg &amp; Vulnerable (Software) (22)</option>
+          <option value="force_finally">Force &amp; Finally (Move) (19)</option>
+          <option value="general_commentary">General Commentary (11)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, disclosure, zero, vulnerabilities, policy, patch...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50496051 + PROJECTZERO.GOOGLE + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50496051, "story_title": "Project Zero will disclose vulnerabilities 90 days after reporting", "story_url": "https://projectzero.google/2026/11/disclosure-policy.html", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50496051, "story_title": "Project Zero will disclose vulnerabilities 90 days after reporting", "story_url": "https://projectzero.google/2026/11/disclosure-policy.html", "points": 282, "story_author": "hacb", "article_source": "fetched_url", "t1_ref_utc": "2026-11-15T13:51:56+00:00", "t2_ref_utc": "2026-11-15T13:51:56+00:00", "delta_minutes": 0.0, "story_anchors": ["disclosure", "zero", "vulnerabilities", "policy", "patch", "project", "vendors", "reported", "bug", "patching", "llms", "vendor", "security", "users", "including", "allowing", "vulnerability", "disclose", "disclosed", "severity", "faster", "fixed", "publicly", "relevant", "bugs"], "facet_labels": {"project_zero": "Project & Zero (Bug)", "access_vulnerabilities": "Access & Vulnerabilities (Patch)", "ffmpeg_vulnerable": "Ffmpeg & Vulnerable (Software)", "force_finally": "Force & Finally (Move)", "google_security": "Google & Security (Projects)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "project_zero", "label": "Project & Zero (Bug)", "count": 33, "top_terms": ["project", "zero", "bug", "finds"]}, {"slug": "access_vulnerabilities", "label": "Access & Vulnerabilities (Patch)", "count": 37, "top_terms": ["access", "vulnerabilities", "patch", "open"]}, {"slug": "ffmpeg_vulnerable", "label": "Ffmpeg & Vulnerable (Software)", "count": 22, "top_terms": ["ffmpeg", "vulnerable", "software", "product"]}, {"slug": "force_finally", "label": "Force & Finally (Move)", "count": 19, "top_terms": ["force", "finally", "move", "exploits"]}, {"slug": "google_security", "label": "Google & Security (Projects)", "count": 35, "top_terms": ["google", "security", "projects", "extortion"]}], "counts": {"total_comments": 157, "live_t2_comments": 157, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 84, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 1, "pages_fetched": 1}, "sha256": {"corpus.json": "90d3f5bae1178146150da504fd59aaf0c3ee6fb6c9c93727720f12cc88f9d413"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 5, "grounded_analysis": 24, "crowd_chatter": 78, "bullshit_or_flamewar": 47, "meme_or_snark": 3}, "facets": {"force_finally": 19, "google_security": 35, "access_vulnerabilities": 37, "project_zero": 33, "ffmpeg_vulnerable": 22, "general_commentary": 11}, "facet_options": [{"slug": "access_vulnerabilities", "label": "Access & Vulnerabilities (Patch)", "count": 37}, {"slug": "google_security", "label": "Google & Security (Projects)", "count": 35}, {"slug": "project_zero", "label": "Project & Zero (Bug)", "count": 33}, {"slug": "ffmpeg_vulnerable", "label": "Ffmpeg & Vulnerable (Software)", "count": 22}, {"slug": "force_finally", "label": "Force & Finally (Move)", "count": 19}, {"slug": "general_commentary", "label": "General Commentary", "count": 11}], "facet_diagnostics": [{"slug": "access_vulnerabilities", "label": "Access & Vulnerabilities (Patch)", "count": 37, "useful": 11, "useful_pct": 29.7, "terms": "access, vulnerabilities, patch, open"}, {"slug": "google_security", "label": "Google & Security (Projects)", "count": 35, "useful": 5, "useful_pct": 14.3, "terms": "google, security, projects, extortion"}, {"slug": "project_zero", "label": "Project & Zero (Bug)", "count": 33, "useful": 7, "useful_pct": 21.2, "terms": "project, zero, bug, finds"}, {"slug": "ffmpeg_vulnerable", "label": "Ffmpeg & Vulnerable (Software)", "count": 22, "useful": 2, "useful_pct": 9.1, "terms": "ffmpeg, vulnerable, software, product"}, {"slug": "force_finally", "label": "Force & Finally (Move)", "count": 19, "useful": 4, "useful_pct": 21.1, "terms": "force, finally, move, exploits"}, {"slug": "general_commentary", "label": "General Commentary", "count": 11, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 7}, {"category": "investigative_or_tech_press", "count": 1}], "story_anchors": ["disclosure", "zero", "vulnerabilities", "policy", "patch", "project", "vendors", "reported", "bug", "patching", "llms", "vendor", "security", "users", "including", "allowing", "vulnerability", "disclose"], "largest_root": {"root_id": 50499022, "author": "my-huge-pony", "slots": 82, "start_dom": 8, "end_dom": 89, "share_pct": 52.2, "top_dom1_age": 5.9, "top_dom1_author": "Aissen"}, "buried_cutoff": 47, "rescue_top_k": 31, "ablations": [], "tournament": [], "comments": [{"id": 50503748, "au": "tybit", "dom": 44, "sr": 1, "sc": 10.64, "ep": 10.64, "bs": 0.0, "d": 4, "age": 10.26, "grav": 91.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 38, "qw": 0, "k": 890, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "force_finally", "flbl": "Force & Finally (Move)", "urls": ["https://blog.cloudflare.com/18-november-2025-outage/"], "ig": 1.292, "fa": 2.08, "gp": 1.158, "bl": 0.0, "ds": 0.0, "txt": "Crowdstrike was a good example of why you should never allow global updates to roll out all at once , even for configuration changes. \nCloudflare has learnt the same lesson recently https://blog.cloudflare.com/18-november-2025-outage/\n\nBug fix speed isn’t particularly relevant, rollout speed is."}, {"id": 50505773, "au": "FabCH", "dom": 139, "sr": 2, "sc": 9.44, "ep": 9.44, "bs": 0.0, "d": 4, "age": 3.33, "grav": 20.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 274, "qw": 0, "k": 1066, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "epistemic_gold", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 1.743, "fa": 1.18, "gp": 1.366, "bl": 0.0, "ds": 0.0, "txt": "Yes. You are missing the wider interpretation of the word extortion that includes obtaining benefit by coercion. Presumably you are only including extortion by use of blatantly illegal means in your definition. However, you don't need to threaten using illegal means to be extorting and/or blackmailing someone. You can be blackmailing someone by threatening to sue them in court, for example.\n\nGoogle is extorting benefit, specifically fixes to software it heavily depends on for its multi billion dollar business, by coercion, specifically by actively threatening the project with reputational damage in 90 days if certain action is not taken, even if the action is not in the vendors best interest.\n\nAs a thought experiment, imagine if Google was reporting this to the project, but _without_ the 90 day limit. The one that the original article describes going down to 60 then 30 days. Yes, you might first think \"that will cause the projects to never fix bugs\" which might be true for some projects, but you do realize how legally that would completely change the dynamic between Google and the project and remove the entire extortion part from the picture? Or indeed, if they simply published it without any notice at all.\n\nWhether or not other people also happen to benefit is related, but it doesn't remove the fact that Google also benefits.\n\nOr if you would like a more vivid picture:\n\nIf the"}, {"id": 50501055, "au": "Frost1x", "dom": 105, "sr": 3, "sc": 7.6, "ep": 7.6, "bs": 0.0, "d": 0, "age": 16.37, "grav": 188.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 103, "qw": 0, "k": 6170, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 1.577, "fa": 0.62, "gp": 1.469, "bl": 0.0, "ds": 0.0, "txt": "I’m not familiar with this specific effort but it seems like the companies digging around for the bugs should also offer similar access to their products that discovered the vulnerabilities to the vendors or OSS projects to patch them. Otherwise vendors might use this as a leveraged approach to get people to adopt LLMs, specifically theirs, so their products remain reasonably attractive. Google, OpenAI, Anthropic etc could just turn on existing software as a strategy to get more adoption of their tools.\n\n“Don’t like our constant stream of patches? For $10k/mo + tokens you can get access to the model to patch the vulnerabilities we disclose!”"}, {"id": 50506602, "au": "xoa", "dom": 120, "sr": 4, "sc": 7.56, "ep": 7.71, "bs": 0.0, "d": 5, "age": 0.95, "grav": 7.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 202, "qw": 27, "k": 11303, "kpp": 6.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 1.567, "fa": 0.7, "gp": 1.401, "bl": 0.0, "ds": 0.0, "txt": ">Google is liable for their actions\n\nYou might wish that, but in the US at least they literally are not. There is no \"security bugs\" exception to the First Amendment. Anyone who finds one is perfectly free to shout it to the world instantly, or never, or anything in between. There is no gray area or complexity here as a matter of law. As a matter of morals, it is quite complex, and only getting more so in the age of LLMs. It was always the case that knowing a bug existed will let operators do \"something\" whether there is a patch or not, even if that something is \"shut off all network access until patched\", and it was always the case that anything one party can discover somebody else could at any moment, or at any earlier point from release before the second discoverer. LLMs can tremendously accelerate the discovery angle and expand the parties likely to do it, and might also speed up patching even by users of the software vs the devs.\n\n>What happens if a project has a vulnerability disclosure policy with a mandatory 90 day period, and Google ignores it starting 1.1.2027 and releases after 60 days?\n\nThey can apply any social or economic pressure they're able to, otherwise too bad for the project? They can set whatever policy they want, nobody else is under any obligation to follow it unless contractually obligated."}, {"id": 50505270, "au": "fc417fc802", "dom": 54, "sr": 5, "sc": 6.7, "ep": 7.11, "bs": 0.27, "d": 6, "age": 4.76, "grav": 31.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 80, "qw": 25, "k": 5664, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 1.591, "fa": 0.76, "gp": 0.832, "bl": 0.1, "ds": 0.0, "txt": "> Google finds it, but it's going to take longer than 30 days to fix. Is it really better to let everyone know about it after 30 days?\n\nYes it absolutely is. Because going forward google will almost certainly have found it using the same widely accessible tool - LLMs - that everyone else also has access to. The fact that a bug has gone unnoticed for the past 20 years has no bearing whatsoever on the future year (or probably even six months). At this point given that team A has found a bug the probability that teams B thru Z will also find it within the next half year or so is extremely high."}, {"id": 50504870, "au": "FabCH", "dom": 117, "sr": 6, "sc": 6.66, "ep": 6.96, "bs": 0.0, "d": 2, "age": 6.21, "grav": 44.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 90, "qw": 0, "k": 1066, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": ["https://bughunters.google.com/about/rules/open-source/patch-rewards-program-rules"], "ig": 1.464, "fa": 0.62, "gp": 1.206, "bl": 0.0, "ds": 0.0, "txt": "You are ignoring the part of Project Zero that reports the vulnerability.\n\nNeither the users nor the vendors chose the 90/60/30 day limit.\n\nGoogle is making an active choice in the design of their reporting process, and that is something that is open to critique and in some sense liability.\n\nWhy is Google choosing to report unlimited number of bugs, but a different Google program will only pay to fix 3 bugs? (https://bughunters.google.com/about/rules/open-source/patch-...) Why are not all Project Zero bugs exempt from that limit and awarded a minimum reward?\n\nThese are legitimate questions to ask."}, {"id": 50506689, "au": "FabCH", "dom": 121, "sr": 7, "sc": 6.48, "ep": 6.92, "bs": 0.0, "d": 6, "age": 0.7, "grav": 6.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 148, "qw": 0, "k": 1066, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 1.257, "fa": 0.68, "gp": 1.397, "bl": 0.0, "ds": 0.0, "txt": "See but I do wonder if it would be less liable for them to literally shout it out instantly.\n\nIt’s not the vulnerability that is the problem, it’s the timeline.\n\nThat’s what the original article is about. The 90-60-30 limit is something Google actually chooses, and that is not a first amendment issue.\n\nImagine a research found a vulnerability in Google and said, “You have 90 days to transfer 1 000 000 to my account or I will make the vulnerability public”. Pretty sure that would be considered actual blackmail and would be illegal.\n\nIt’s kind of tricky to see where the line would be. Google is effectively saying “You have 90 days to fix this vulnerability, in the software we use to make billions, or we will make the vulnerability public”. It’s not a huge difference. At best, you could argue it’s two different departments: one that find vulnerabilities and the other that makes money from the project."}, {"id": 50506558, "au": "xoa", "dom": 26, "sr": 8, "sc": 6.37, "ep": 6.67, "bs": 0.0, "d": 7, "age": 1.09, "grav": 7.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 132, "qw": 10, "k": 11303, "kpp": 6.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 1.689, "fa": 0.42, "gp": 1.035, "bl": 0.0, "ds": 0.0, "txt": ">Only until cybersecurity liability legislation finally starts to kick in\n\nIn America software is protected by the First Amendment, so most software (and all open source for sure) cannot be subjected to \"cybersecurity liability\" of the sort you seem to be envisioning. Congress could have an angle when it comes to stuff that is sold, including in particular hardware and subscription services though there will be both plenty of lobbying and plenty of potential landmines involved in any such effort.\n\nBut with anything free there is no commercial angle involved, no contract. It's just speech that's put out there, identical to the posts we're writing here on HN right now. Software bugs aren't true threats, incitement, defamation, or obscene.\n\nOther countries of course could take a different tack, but they'd then face \"OSS becomes fully American\" and I'm deeply skeptical that'd work politically."}, {"id": 50506848, "au": "xoa", "dom": 123, "sr": 9, "sc": 6.28, "ep": 7.57, "bs": 0.85, "d": 7, "age": 0.22, "grav": 4.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 257, "qw": 99, "k": 11303, "kpp": 6.0, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "epistemic_gold", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 1.456, "fa": 0.76, "gp": 1.37, "bl": 0.32, "ds": 0.0, "txt": ">See but I do wonder if it would be less liable for them to literally shout it out instantly.\n\nWonder no more. They have zero liability either way.\n\n>That’s what the original article is about. The 90-60-30 limit is something Google actually chooses, and that is not a first amendment issue.\n\nUh. Choosing time/place for speech is absolutely a 1A issue. Google (and you, me, and anyone else) is completely protected from legal action in how and when they make a unilateral decision to speak using their own resources.\n\n>Imagine a research found a vulnerability in Google and said, “You have 90 days to transfer 1 000 000 to my account or I will make the vulnerability public”.\n\nYes, as you say that'd be blackmail but that's completely irrelevant to anything you have said or anything in this case. Google is not demanding money.\n\n>It’s kind of tricky to see where the line would be.\n\nNo. It's not actually. Blackmail is extremely well defined in law and caselaw. No demand for anything? No blackmail.\n\n>“You have 90 days to fix this vulnerability, in the software we use to make billions, or we will make the vulnerability public”. It’s not a huge difference.\n\nYes, it's a huge difference, even if you were being honest in your statement, which you aren't. Google doesn't have any \"or we\", they just say \"when we find something, we've decided we'll generally try to let you know, and then at X time l"}, {"id": 50499022, "au": "my-huge-pony", "dom": 8, "sr": 10, "sc": 6.15, "ep": 6.59, "bs": 0.0, "d": 0, "age": 20.14, "grav": 263.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 113, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "force_finally", "flbl": "Force & Finally (Move)", "urls": [], "ig": 0.773, "fa": 0.95, "gp": 1.428, "bl": 0.0, "ds": 0.0, "txt": "Starting today, our policy is “Full 90”, i.e. vulnerabilities will be disclosed 90 days after they are reported to the vendor.\n\nOn February 2, 2027, we will move to a “Full 60” policy where vulnerabilities are disclosed after 60 days.\n\nOn January 3, 2028, we will move to a “Full 30” policy where vulnerabilities are disclosed after 30 days."}, {"id": 50504169, "au": "Wowfunhappy", "dom": 53, "sr": 11, "sc": 5.95, "ep": 6.39, "bs": 0.0, "d": 5, "age": 8.75, "grav": 71.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 88, "qw": 0, "k": 31949, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 1.032, "fa": 0.95, "gp": 0.866, "bl": 0.0, "ds": 0.0, "txt": "Obviously you can't prove that, but again, you can't prove that for literally any software you're using right now.\n\nLet's say a bug hasn't been found for the past 20 years. Google finds it, but it's going to take longer than 30 days to fix. Is it really better to let everyone know about it after 30 days? If no one else has found it (true, as far as we know) in the past 20 years, what are the probabilities it will be found by a second person in the next few months?"}, {"id": 50505272, "au": "massroot", "dom": 102, "sr": 12, "sc": 5.6, "ep": 8.33, "bs": 2.52, "d": 0, "age": 4.75, "grav": 31.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 79, "qw": 0, "k": 0, "kpp": 0.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 1.615, "fa": 1.23, "gp": 0.712, "bl": 0.95, "ds": 0.0, "txt": "This is unfortunately too slow. As their finances show & name states p0 they need to act accordingly 0 day patch & disclosure and with the advancement of Ai 0 hour, 0 minute 0 seconds needs to be on the near roadmap if they want to remain “p0” alphabet/Google/other big tech need to fund the patches if they intend to disclose and they need to do it much faster. 30 days time is laughable anyone with basic understanding of 0 days, Ai & latency knows this."}, {"id": 50506065, "au": "ExoticPearTree", "dom": 145, "sr": 13, "sc": 5.42, "ep": 5.86, "bs": 0.0, "d": 7, "age": 2.52, "grav": 15.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 16, "k": 1428, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "ffmpeg_vulnerable", "flbl": "Ffmpeg & Vulnerable (Software)", "urls": [], "ig": 1.094, "fa": 0.76, "gp": 0.772, "bl": 0.0, "ds": 0.0, "txt": "> Just because the response can be \"No\", it doesn't mean Google didn't require _something_ from ffmpeg.\n\nIt requires zero things from ffmpeg. As it is today, they privately contact them with info about the vulnerability and also informs them that in 90 days the whole world will know about the vulnerability too.\n\nffmpeg ca either fix it if it wants or be \"cool story bro, yolo\"."}, {"id": 50506071, "au": "Aissen", "dom": 6, "sr": 14, "sc": 5.38, "ep": 5.38, "bs": 0.0, "d": 4, "age": 2.5, "grav": 15.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 14, "k": 16070, "kpp": 7.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 1.042, "fa": 0.64, "gp": 0.766, "bl": 0.0, "ds": 0.0, "txt": "> perhaps governments to finally step in and mandate some minimum level of software maintenance.\n\nEU's CRA is coming (already delayed).\n\nBut it will all depends on enforcement strength. Until the first supermarket (or online reseller) is heavily fined for selling a smartphone that no longer receives updates, I won't hold my breath."}, {"id": 50506156, "au": "FabCH", "dom": 119, "sr": 15, "sc": 5.26, "ep": 6.76, "bs": 1.06, "d": 4, "age": 2.26, "grav": 13.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 1066, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "ffmpeg_vulnerable", "flbl": "Ffmpeg & Vulnerable (Software)", "urls": [], "ig": 1.087, "fa": 0.95, "gp": 1.031, "bl": 0.4, "ds": 0.0, "txt": "Google is liable for their actions. In particular, Google is liable for choosing 90, 60 and 30 days waiting time.\n\nWhat happens if a project has a vulnerability disclosure policy with a mandatory 90 day period, and Google ignores it starting 1.1.2027 and releases after 60 days?"}, {"id": 50506907, "au": "akerl_", "dom": 147, "sr": 16, "sc": 5.05, "ep": 5.49, "bs": 0.0, "d": 9, "age": 0.11, "grav": 3.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 104, "qw": 0, "k": 13343, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 1.357, "fa": 0.34, "gp": 0.923, "bl": 0.0, "ds": 0.0, "txt": "Project Zero doesn’t care.\n\nWhy would a project get to tell somebody who found a vuln when they can talk about it to the public?\n\nImagine you go to a restaurant and see an issue with the food. You tell the restaurant “hey I’m writing a review of this. I’m going to publish it in a month; if you want to include any response before that time I’ll include it in my review”.\n\nIt would be nuts for the restaurant to say “actually we require you wait 180 days to publish”.\n\nYou can also take a look at how essentially all investigative reporting works, where a reporter asks the subject for comment before publishing."}, {"id": 50505772, "au": "fc417fc802", "dom": 4, "sr": 17, "sc": 4.92, "ep": 5.06, "bs": 0.0, "d": 3, "age": 3.34, "grav": 20.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 94, "qw": 0, "k": 5664, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "force_finally", "flbl": "Force & Finally (Move)", "urls": [], "ig": 1.659, "fa": 0.0, "gp": 0.804, "bl": 0.0, "ds": 0.0, "txt": "I hate to say this, but that's a good thing IMO. It will serve to either force those companies to finally start caring to fix their process or it will force the relevant users to get hacked until they vote with their wallets or (less likely) possibly force bootloaders to be unlocked or perhaps governments to finally step in and mandate some minimum level of software maintenance.\n\nThe tools enabling these exploits exist and aren't going away so burying our collective heads in the sand by allowing messes to be swept under rugs isn't a productive response."}, {"id": 50503167, "au": "fn-mote", "dom": 63, "sr": 18, "sc": 4.85, "ep": 5.29, "bs": 0.0, "d": 4, "age": 12.1, "grav": 117.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 17, "k": 4843, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 0.906, "fa": 0.76, "gp": 0.688, "bl": 0.0, "ds": 0.0, "txt": "> you still need to have the 90 days no matter what to induce the vendor to create a fix\n\nYou’re replying in a thread whose top level comment is that the 90 days will rapidly decrease to 30.\n\nHope 30 is enough to induce them to fix.\n\nMaybe the future fixes will be “Reddit + Claude”, done at home."}, {"id": 50505205, "au": "FabCH", "dom": 125, "sr": 19, "sc": 4.79, "ep": 5.45, "bs": 0.0, "d": 4, "age": 5.0, "grav": 33.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 176, "qw": 0, "k": 1066, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 1.766, "fa": 0.0, "gp": 0.894, "bl": 0.0, "ds": 0.0, "txt": "Not necessarily. This view contains an inherent contradiction. If the bugs require skill to find, then Project Zero makes sense because it donates that skill. But if the bugs require skill to find, then \"someone else finds it\" stops being certain. Alternatively, if the bugs don't require skill to find, then Project Zero is not actually doing anything valuable.\n\nSo it is absolutely possible that nobody would ever find a memory corruption bug in a Lucas Arts SCUMM VM video transcoder if Project Zero didn't go poking around.\n\nBut because they did, and chose NOT to fund the fix, they DO carry some fault for anyone who acts on the bug after they disclosed it. Or if it is fixed in time, they must accept responsibility for consuming resources of a project they use but did not contribute to.\n\nAnd the free money printer argument is absurd. The projects that Google uses are notable enough that writing bugs on purpose would be self-defeating. A project that write bugs on purpose would simply lose all users and nobody would care anymore."}, {"id": 50503061, "au": "habitue", "dom": 62, "sr": 20, "sc": 4.77, "ep": 5.65, "bs": 0.0, "d": 3, "age": 12.39, "grav": 121.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 5309, "kpp": 4.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 0.783, "fa": 0.95, "gp": 0.757, "bl": 0.0, "ds": 0.0, "txt": "So you're saying:\n\n2 days after there's a fix, with a max of 90 days after disclosure?\n\nBecause you still need to have the 90 days no matter what to induce the vendor to create a fix. Otherwise (many) just sit on it forever."}, {"id": 50504842, "au": "FabCH", "dom": 155, "sr": 21, "sc": 4.52, "ep": 6.24, "bs": 1.06, "d": 1, "age": 6.3, "grav": 45.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 86, "qw": 0, "k": 1066, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": ["https://thenewstack.io/ffmpeg-to-google-fund-us-or-stop-sending-bugs/"], "ig": 1.314, "fa": 0.62, "gp": 0.954, "bl": 0.4, "ds": 0.0, "txt": "I agree with you. Google pretends that this is \"donating security research to the community\" and maybe it started like that, but it has been clear for some time that there is an element of bullying and abuse in the process that they are conveniently ignoring to be able to sleep better at night.\n\nIt all came to a head once before: https://thenewstack.io/ffmpeg-to-google-fund-us-or-stop-send...\n\nAnd Google has a vested interest in FFMPEG, because it uses it heavily to transcode and process videos. So they absolutely benefit from the work, for free."}, {"id": 50503903, "au": "Gigachad", "dom": 80, "sr": 22, "sc": 4.25, "ep": 5.35, "bs": 0.0, "d": 4, "age": 9.81, "grav": 85.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 65, "qw": 0, "k": 25048, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 1.358, "fa": 0.34, "gp": 0.818, "bl": 0.0, "ds": 0.0, "txt": "Because LLMs are not deterministic or predictable and make mistakes that they are capable of fixing.\n\nLLMs will write vulnerable code while the same model can find those vulnerabilities if you prompt it right. Some stats from a previous post was that the CVEs found in Linux were costing on average $1000 in api usage each. So having the LLM prevent writing vulnerabilities would explode the costs."}, {"id": 50503904, "au": "sethaurus", "dom": 116, "sr": 23, "sc": 4.17, "ep": 5.05, "bs": 0.0, "d": 1, "age": 9.8, "grav": 85.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 82, "qw": 0, "k": 423, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 1.572, "fa": 0.0, "gp": 0.934, "bl": 0.0, "ds": 0.0, "txt": "Project Zero doesn't create the vulnerabilities, it finds them. Vendors want unlimited time to fix their bugs. Users want to know ASAP if the software they are running is vulnerable. These things are obviously in tension, so you need a deadline.\n\nIt's gotten easier finding vulnerabilities, so every day without disclosure now brings a higher chance that blackhats have already found the bug. The deadline gets shorter accordingly.\n\nCalling vulnerability research \"extortion\" is the kind of ignorant messenger-blaming the hacker culture has always ridiculed."}, {"id": 50505538, "au": "sigmoid10", "dom": 3, "sr": 24, "sc": 3.9, "ep": 5.07, "bs": 0.0, "d": 2, "age": 3.98, "grav": 25.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 57, "qw": 0, "k": 6689, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 1.508, "fa": 0.34, "gp": 0.386, "bl": 0.0, "ds": 0.0, "txt": "The first party and flagship security patch chain was always fast. The real issue is the bottom-of-the-barrel third party budget sector chain. They already need 6+ months (if they patch at all) despite 90 days disclosures having been industry standard for a while. Tightening these timelines won't make them care, it will only increase threat levels for low-income users."}, {"id": 50504409, "au": "Gigachad", "dom": 16, "sr": 25, "sc": 3.82, "ep": 4.26, "bs": 0.0, "d": 4, "age": 7.78, "grav": 60.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 55, "qw": 0, "k": 25048, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "force_finally", "flbl": "Force & Finally (Move)", "urls": [], "ig": 1.209, "fa": 0.34, "gp": 0.311, "bl": 0.0, "ds": 0.0, "txt": "You should not connect a service maintained by individuals in their free time to the public internet. Put it behind a VPN or local network only and then you don’t have to worry.\n\nDelaying disclosures is a false sense of security when the attackers are running the same scans Google is. They will have exploits faster than 30 days."}, {"id": 50506659, "au": "tomsmeding", "dom": 5, "sr": 26, "sc": 3.42, "ep": 4.96, "bs": 0.0, "d": 4, "age": 0.77, "grav": 6.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 94, "qw": 56, "k": 1735, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 1.295, "fa": 0.42, "gp": 0.494, "bl": 0.0, "ds": 0.0, "txt": "> It will serve to either force those companies to finally start caring to fix their process\n\nThose companies care about their revenue; they care only about the security of their customers' devices if it impacts their business success.\n\n> or it will force the relevant users to get hacked\n\nThat it well might.\n\n> ... until they vote with their wallets\n\nThey won't, because the next company over is just as bad, and the first-party devices are too expensive. And anyway the knowledge of which companies patch early may not even spread outside the tech circle.\n\n> ... or (less likely) possibly force bootloaders to be unlocked\n\nBy whom? I have no idea what party would arrange that.\n\n> ... or perhaps governments to finally step in and mandate some minimum level of software maintenance.\n\nNow that would be nice, but that would be regulating the industry, and since when is that happening?\n\nI doubt this is a good thing."}, {"id": 50504970, "au": "jgeralnik", "dom": 11, "sr": 27, "sc": 3.2, "ep": 4.3, "bs": 0.0, "d": 2, "age": 5.9, "grav": 41.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 66, "qw": 0, "k": 1175, "kpp": 5.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 1.206, "fa": 0.34, "gp": 0.345, "bl": 0.0, "ds": 0.0, "txt": "After reading the first line of the comment I thought it was a criticism that 30 would be way too _long_ of a deadline in 2028\n\nWith AI assisted vulnerability research the relative edge of project zero is going down - anything they can find can likely be found by others in a similar timeframe. We see this today with the parallel discovery of php2shell by many groups in the same few weeks"}, {"id": 50504229, "au": "Gigachad", "dom": 34, "sr": 28, "sc": 2.96, "ep": 4.5, "bs": 0.0, "d": 4, "age": 8.54, "grav": 69.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 71, "qw": 0, "k": 25048, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 1.263, "fa": 0.0, "gp": 1.055, "bl": 0.0, "ds": 0.0, "txt": "If you have an embedded device connected to the Internet that doesn’t get updates and has vulnerabilities that can be picked up by LLMs then you need to unplug it.\n\nThat is the world we live in now and pretending otherwise is reckless and leads to mass hacking like the recent supermarket fridge hacking.\n\nOnly devices and applications that can respond to security reports quickly should be connected to the internet."}, {"id": 50503824, "au": "Gigachad", "dom": 92, "sr": 29, "sc": 2.95, "ep": 3.39, "bs": 0.0, "d": 2, "age": 10.01, "grav": 87.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 61, "qw": 0, "k": 25048, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 1.38, "fa": 0.0, "gp": 0.103, "bl": 0.0, "ds": 0.0, "txt": "Running trivy scans on my docker containers has really highlighted which projects keep up to date. I’ve been moving away from all the one person projects to more commercial offerings that keep on top of updates.\n\nOf course I don’t expect a single person to work every day for free, but I also can’t have a project with only a single dev exposed to the internet."}, {"id": 50501295, "au": "Frost1x", "dom": 107, "sr": 30, "sc": 2.86, "ep": 4.11, "bs": 0.0, "d": 2, "age": 16.02, "grav": 182.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 146, "qw": 0, "k": 6170, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 1.611, "fa": 0.0, "gp": 0.222, "bl": 0.0, "ds": 0.0, "txt": "How is it irrelevant? Just because an effort existed before some change, doesn’t mean it can be repurposed and leveraged for other purposes. It’s the entire reason law and policy for government isn’t set in stone and is adaptable, because culture, technology and so on change.\n\nThe dynamic in this context absolutely has changed. Marginal cost to discover vulnerabilities from AI frontier labs and the big players has dropped significantly. The cost to patch is low, if you have access to certain resources. If you don’t, tough luck.\n\nSo this argument is essentially against the entire argument of AI alignment guardrails right now. Maybe you disagree with those, but I for one am happy they’re doing some things to protect against bio related warfare engineering. This is a case of cyber that’s about grey. Even there the labs have limited access to some and are choosing winners."}, {"id": 50504517, "au": "margalabargala", "dom": 23, "sr": 31, "sc": 2.78, "ep": 3.44, "bs": 0.0, "d": 5, "age": 7.4, "grav": 56.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 43, "qw": 0, "k": 9185, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "force_finally", "flbl": "Force & Finally (Move)", "urls": [], "ig": 0.64, "fa": 0.68, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "That would be the problem of the people running the software, not writing it.\n\nConsidering the direction software and their exploits are going with AI, if 30 days is insufficient in 2028 then that's useful signal to the people running that they should move elsewhere."}, {"id": 50506802, "au": "pjmlp", "dom": 27, "sr": 32, "sc": 2.55, "ep": 3.65, "bs": 0.0, "d": 8, "age": 0.35, "grav": 4.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 66, "qw": 0, "k": 134000, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 1.554, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "There is this thing called soverignity where goveremnts can legally track down the citzens who fails to comply, and whose actions can endager the country in whatever means the forces in power decide it may be.\n\nAlso when US gets a saner goverment back, I am quite sure CISA will have yet another opinion on the matter, especially if national security is considered exposed in some media case."}, {"id": 50504491, "au": "sam345", "dom": 40, "sr": 33, "sc": 2.42, "ep": 3.3, "bs": 0.0, "d": 5, "age": 7.48, "grav": 57.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 70, "qw": 0, "k": 1710, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "force_finally", "flbl": "Force & Finally (Move)", "urls": [], "ig": 1.381, "fa": 0.0, "gp": 0.039, "bl": 0.0, "ds": 0.0, "txt": "This is ridiculous. Vulnerabilities dont mean severity of damage and risk assessment is better made by individuals themselves. If you're afraid of botnets  get a firewall. But go ahead and mandate this. Let's do it. Better yet, let's require the registeration of all unable to be patched  devices and give the government the right to smash those devices if they don't get updates. That's the world I want to live in."}, {"id": 50505210, "au": "fc417fc802", "dom": 21, "sr": 34, "sc": 2.41, "ep": 3.11, "bs": 0.27, "d": 4, "age": 4.97, "grav": 33.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 80, "qw": 0, "k": 5664, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ffmpeg_vulnerable", "flbl": "Ffmpeg & Vulnerable (Software)", "urls": [], "ig": 1.278, "fa": 0.0, "gp": 0.076, "bl": 0.1, "ds": 0.0, "txt": "I see only two possibilities. If it's a proprietary product that should either be rapidly fixed by the vendor or abandoned by the customer. Alternatively, if it's a FOSS project then if the maintainers are unresponsive the end user can simply request his LLM of choice to patch it for him. I honestly see no issue here. It isn't how things used to work even as recently as a year ago but it seems to be the only sensible way they can work going forward."}, {"id": 50502521, "au": "glitchc", "dom": 94, "sr": 35, "sc": 2.4, "ep": 3.28, "bs": 0.0, "d": 0, "age": 13.57, "grav": 140.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 5452, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 0.999, "fa": 0.0, "gp": 0.639, "bl": 0.0, "ds": 0.0, "txt": "It makes to hold out for disclosure if there's a pay day involved. Since this is Google, the bug bounty is not the issue. I say release right away. Nothing else will compel the company being reported on to fix otherwise."}, {"id": 50505291, "au": "justin_oaks", "dom": 138, "sr": 36, "sc": 2.27, "ep": 2.71, "bs": 0.0, "d": 3, "age": 4.7, "grav": 30.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 45, "qw": 0, "k": 3303, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ffmpeg_vulnerable", "flbl": "Ffmpeg & Vulnerable (Software)", "urls": [], "ig": 1.152, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I read the linked article and can't find anything involving extortion; just that one person associated with the FFMPEG didnt like the flood of vulnerability reports.\n\nIn fact, the article cites one of the FFMPEG maintainers as being grateful for the vulnerability reports.\n\nDid I miss something?"}, {"id": 50503057, "au": "Wowfunhappy", "dom": 9, "sr": 37, "sc": 2.23, "ep": 6.59, "bs": 3.05, "d": 1, "age": 12.39, "grav": 121.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 31949, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 1.297, "fa": 0.95, "gp": 0.579, "bl": 1.15, "ds": 0.0, "txt": "WTF with a 30 days deadline in 2028?\n\nI thought they made a strong case for removing the additional 30 day patch rollout time. But reducing the entire process to 30 days total seems needlessly harsh and I didn't think it was justified by the article at all. What if the bug is actually inherently hard to fix?"}, {"id": 50502641, "au": "darkamaul", "dom": 110, "sr": 38, "sc": 2.08, "ep": 3.47, "bs": 0.0, "d": 1, "age": 13.34, "grav": 136.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 68, "qw": 0, "k": 949, "kpp": 7.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 1.343, "fa": 0.0, "gp": 0.219, "bl": 0.0, "ds": 0.0, "txt": "For sure I would love to get access to P0 researchers for a m 10k/months, but i don’t believe you can hire such talent for this sum.\n\nThey are one of or maybe the most skilled security research team that’s doing public research and their blog is the source of many modern exploitation techniques\n\nFor a while, asking your agent to act like a P0 researcher was a nice nudge to find better bugs !"}, {"id": 50503148, "au": "fn-mote", "dom": 42, "sr": 39, "sc": 2.04, "ep": 2.71, "bs": 0.0, "d": 2, "age": 12.14, "grav": 117.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 4843, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ffmpeg_vulnerable", "flbl": "Ffmpeg & Vulnerable (Software)", "urls": [], "ig": 0.996, "fa": 0.0, "gp": 0.252, "bl": 0.0, "ds": 0.0, "txt": "They expect that in another year LLM-assisted fixing will be the norm. It probably is already.\n\nThe article says they are willing to negotiate in exceptional cases, and mentions Spectre."}, {"id": 50506020, "au": "ExoticPearTree", "dom": 118, "sr": 40, "sc": 1.96, "ep": 3.5, "bs": 0.0, "d": 3, "age": 2.64, "grav": 15.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 10, "k": 1428, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 0.978, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> Neither the users nor the vendors chose the 90/60/30 day limit.\n\nWell, vendors can be more invested in building secure software and users get a lesson in why the \"Check for updates\" button exists in many devices' configuration options.\n\nGoogle is not liable in any way for the vulnerabilities it finds."}, {"id": 50502807, "au": "InsidiousWombat", "dom": 60, "sr": 41, "sc": 1.87, "ep": 2.97, "bs": 0.0, "d": 2, "age": 13.0, "grav": 131.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 0, "k": 515, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "force_finally", "flbl": "Force & Finally (Move)", "urls": [], "ig": 1.263, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "IMO the disclosure should ~day-two after there is a fix/workaround available\n\nReleasing before that is non-actionable by many actors (aside from taking the service completely down I guess). Any time after fix is available is just allowing vulnerable systems to be attacked and is playing favourites with who gets fix and who doesn't"}, {"id": 50503820, "au": "IncreasePosts", "dom": 84, "sr": 42, "sc": 1.8, "ep": 3.34, "bs": 0.0, "d": 6, "age": 10.02, "grav": 87.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 76, "qw": 0, "k": 4231, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 1.423, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Project zero is run by Google, one of the few groups doing frontier models. If you consider their revenue streams, Google is the sole frontier player that can actually fund insane research and  compute out of pocket without relying on any hype cycle.\n\nSo, Google will have some model that is much more powerful than the publicly available models. Before releasing it to the world, they can use it to mitigate any issue it discovers anywhere"}, {"id": 50504825, "au": "FabCH", "dom": 137, "sr": 43, "sc": 1.78, "ep": 4.38, "bs": 1.06, "d": 2, "age": 6.38, "grav": 45.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 25, "qw": 0, "k": 1066, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": ["https://thenewstack.io/ffmpeg-to-google-fund-us-or-stop-sending-bugs/"], "ig": 0.918, "fa": 0.22, "gp": 1.099, "bl": 0.4, "ds": 0.0, "txt": "Google is extorting free fixes for software Google depends on, instead of paying for them to be fixed.\n\nAs seen by the infamous FFMPEG incident: https://thenewstack.io/ffmpeg-to-google-fund-us-or-stop-send..."}, {"id": 50504743, "au": "cowlevel", "dom": 58, "sr": 44, "sc": 1.75, "ep": 3.29, "bs": 0.0, "d": 2, "age": 6.65, "grav": 48.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 45, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 1.4, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "You misunderstand - denying patches to downstream vendors improves financial security for Google.\n\nBut they actually did this to comply with the EU Cyber Resilience Act. When a patch is released, a legal clock starts ticking - anyone who doesn't apply it promptly is liable for any resulting damages."}, {"id": 50506867, "au": "akerl_", "dom": 122, "sr": 45, "sc": 1.72, "ep": 2.6, "bs": 0.0, "d": 7, "age": 0.18, "grav": 4.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 13343, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ffmpeg_vulnerable", "flbl": "Ffmpeg & Vulnerable (Software)", "urls": [], "ig": 0.692, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "There’s a pretty big difference between saying “pay me hush money or I release this vulnerability” and saying “we found this vulnerability and we’re going to publicly disclose it in 30 days”."}, {"id": 50503767, "au": "bmitc", "dom": 115, "sr": 46, "sc": 1.69, "ep": 3.23, "bs": 0.0, "d": 0, "age": 10.2, "grav": 90.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 14984, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 1.037, "fa": 0.0, "gp": 0.55, "bl": 0.0, "ds": 0.0, "txt": "Is this a version of extortion? Isn't this Google, a massive company with lots of power and control, forcing the prioritization of work on everyone under the guise of security? It's at least clearly a threat."}, {"id": 50505208, "au": "justin_oaks", "dom": 134, "sr": 47, "sc": 1.63, "ep": 3.17, "bs": 0.0, "d": 5, "age": 4.99, "grav": 33.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 56, "qw": 0, "k": 3303, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 0.526, "fa": 0.68, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Funny, I don't consider it a threat when my pharmacy says \"You have 5 days to pick up your prescription until we reshelve the medication\".\n\nNor do I consider it a threat when someone says \"Items in the lost and found will be held for 30 days before they're donated to charity.\"\n\nThis is called \"setting expectations\" or maybe \"communicating intentions\"."}, {"id": 50504392, "au": "SR2Z", "dom": 46, "sr": 48, "sc": 1.52, "ep": 3.06, "bs": 0.0, "d": 6, "age": 7.87, "grav": 61.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 79, "qw": 0, "k": 2194, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 1.303, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Two week rollouts are insane. Three days, in the vast majority of contexts, is generous.\n\nI hate to see slow rollouts. The single best thing you can do for fighting bugs is to roll out with canaries; weekslong rollouts only make sense when someone actually has to be in the middle of a cursed release while it runs.\n\nIf there's a bug in your code and it's rare there isn't much disruption. If it's not rare, why didn't your tests catch it?"}, {"id": 50501408, "au": "clhodapp", "dom": 114, "sr": 49, "sc": 1.52, "ep": 3.06, "bs": 0.0, "d": 1, "age": 15.83, "grav": 178.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 2101, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 0.889, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "You say that like it's a bad thing...\n\nI mean, sure, the cited $10k / mo is exploitative for small open-source projects but... in general, why wouldn't we want there to be pressure on companies and projects to use high-quality LLM-based checks if they want to see wide adoption?"}, {"id": 50501917, "au": "varun_ch", "dom": 98, "sr": 50, "sc": 1.48, "ep": 2.58, "bs": 0.0, "d": 1, "age": 14.88, "grav": 161.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 2691, "kpp": 6.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 1.098, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "so are .ads, .android, .cal, .chrome, .dclk, .docs, .drive, .gbiz, .gle, .gmail, .goog, .google, .guge, .hangout, .map, .meet, .play, .prod, .search,, .youtube, and .グーグル, .谷歌.\n\nThey are all owned by Google, but registrations are not open to the public."}, {"id": 50503854, "au": "Gigachad", "dom": 12, "sr": 51, "sc": 1.47, "ep": 3.01, "bs": 0.0, "d": 2, "age": 9.94, "grav": 86.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 25048, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 0.421, "fa": 0.34, "gp": 0.728, "bl": 0.0, "ds": 0.0, "txt": "If the bug can’t be fixed in 30 days, the service should be disconnected from the internet until it can be fixed."}, {"id": 50505048, "au": "arccy", "dom": 124, "sr": 52, "sc": 1.43, "ep": 2.97, "bs": 0.0, "d": 3, "age": 5.64, "grav": 38.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 62, "qw": 0, "k": 2119, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 1.263, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "the bug exists regardless of p0. either p0 reports it and users can mitigate its impact or p0 doesn't report it and someone else finds it and users are exploited.\n\nif anything liability is on vendors that claim to be secure but actually aren't.\n\nand sounds like you want a free money printer: write bugs, report to p0, get money to fix it."}, {"id": 50504499, "au": "Dylan16807", "dom": 112, "sr": 53, "sc": 1.35, "ep": 2.89, "bs": 0.0, "d": 1, "age": 7.46, "grav": 57.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 48, "qw": 0, "k": 38941, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 1.203, "fa": 0.0, "gp": 0.046, "bl": 0.0, "ds": 0.0, "txt": "Your argument makes complete sense if the tools that find a bug can automatically make a patch, but a vendor getting a thorough bug report can't make a patch with anywhere near the same amount of ease.\n\nBut that assumption is pretty crazy to me and your argument makes no sense to me."}, {"id": 50504795, "au": "cowlevel", "dom": 76, "sr": 54, "sc": 1.31, "ep": 2.85, "bs": 0.0, "d": 5, "age": 6.5, "grav": 47.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 57, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 0.8, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "We can extrapolate from the last two years now that it's older than that. In 2024, although vibe coding hadn't been coined yet, AI was being used to autocomplete lines and functions with the tab key. Now it is autocompleting entire programs with a chat interface. In another two years it may be autocompleting whole projects with a neural interface."}, {"id": 50504422, "au": "bawolff", "dom": 22, "sr": 55, "sc": 1.29, "ep": 2.61, "bs": 0.0, "d": 4, "age": 7.72, "grav": 59.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 29266, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "force_finally", "flbl": "Force & Finally (Move)", "urls": [], "ig": 0.618, "fa": 0.34, "gp": 0.13, "bl": 0.0, "ds": 0.0, "txt": "Well if an attacker starts attacking things in the wild, you better find a way to address it in faster than 30 days."}, {"id": 50500255, "au": "ares623", "dom": 59, "sr": 56, "sc": 1.29, "ep": 3.07, "bs": 0.0, "d": 1, "age": 17.84, "grav": 216.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 2100, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "force_finally", "flbl": "Force & Finally (Move)", "urls": [], "ig": 0.744, "fa": 0.34, "gp": 0.244, "bl": 0.0, "ds": 0.0, "txt": "Perhaps eventually, they can finally live up to their namesake. On January 1 2029, we will move to a \"Full 0\" policy where vulnerabilities are disclosed after (looks at camera) zero days."}, {"id": 50505068, "au": "bmitc", "dom": 156, "sr": 57, "sc": 1.29, "ep": 2.78, "bs": 0.0, "d": 2, "age": 5.56, "grav": 38.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 59, "qw": 0, "k": 14984, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 1.182, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "That story is basically what I'm getting at, although I didn't know about that particular story. At a certain level of product, organization, and severity of bug, Google's threat to publish the vulnerability forces the hand of organizations to prioritize the fix since it will then be exposed. But that could be disruptive and unproductive, as the story you linked points out."}, {"id": 50505996, "au": "ExoticPearTree", "dom": 157, "sr": 58, "sc": 1.29, "ep": 2.74, "bs": 0.0, "d": 1, "age": 2.74, "grav": 16.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 5, "k": 1428, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 0.657, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> Is this a version of extortion?\n\nHow is it extortion? Google does not create the vulnerabilities. It just validates them and makes the details public. It is a public service for everyone."}, {"id": 50504368, "au": "kqgnkqgn", "dom": 151, "sr": 59, "sc": 1.29, "ep": 2.67, "bs": 0.0, "d": 3, "age": 7.97, "grav": 62.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 48, "qw": 0, "k": 184, "kpp": 6.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 1.073, "fa": 0.0, "gp": 0.103, "bl": 0.0, "ds": 0.0, "txt": "Why does it take Google scale to address reported security vulnerabilities in a timely manner?\n\nAnd if something is just a personal / hobby project that you don't want to support - that's also fine.  Having the security vulnerability published just means people using it have a more realistic view of the situation."}, {"id": 50503918, "au": "kqgnkqgn", "dom": 149, "sr": 60, "sc": 1.29, "ep": 2.64, "bs": 0.0, "d": 1, "age": 9.75, "grav": 84.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 184, "kpp": 6.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 0.455, "fa": 0.34, "gp": 0.416, "bl": 0.0, "ds": 0.0, "txt": "If you can't bother fix a critical security vulnerability in 30 days, you shouldn't be in the business of building software for others to use."}, {"id": 50502834, "au": "InsidiousWombat", "dom": 113, "sr": 61, "sc": 1.29, "ep": 2.6, "bs": 0.0, "d": 1, "age": 12.94, "grav": 129.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 515, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 1.106, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "That's kinda the problem with asinine \"safety\" idea the AI moguls have.\n\nIt is just leaving people with less safe software. At least claude the limitations are actively preventing you from looking for security bugs in your own software"}, {"id": 50504167, "au": "bmitc", "dom": 154, "sr": 62, "sc": 1.29, "ep": 2.5, "bs": 0.0, "d": 3, "age": 8.76, "grav": 71.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 14984, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 0.65, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "This is sort of what I was getting at with my original post. I'm just curious as to the power dynamics here. Not everyone has $0.5 trillion in revenue every year."}, {"id": 50504975, "au": "Aissen", "dom": 1, "sr": 63, "sc": 1.29, "ep": 2.49, "bs": 0.0, "d": 0, "age": 5.89, "grav": 41.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 16070, "kpp": 7.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 0.936, "fa": 0.0, "gp": 0.204, "bl": 0.0, "ds": 0.0, "txt": "I wonder how this will work with Android's current long delays between patching (and distribution to trusted vendors) and public disclosure."}, {"id": 50502159, "au": "perching_aix", "dom": 66, "sr": 64, "sc": 1.29, "ep": 2.46, "bs": 0.0, "d": 4, "age": 14.43, "grav": 154.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 0, "k": 2981, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 1.046, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "No, that's not what it means. It just means that the benefit must outweigh the risk, as always. Making surgical patches to existing code is also quite different to introducing features, which is what developers typically spend their time on. Not that same-day patching would imply literally zero time to review either."}, {"id": 50506947, "au": "Valectar", "dom": 130, "sr": 65, "sc": 1.29, "ep": 2.38, "bs": 0.0, "d": 9, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 58, "qw": 0, "k": 70, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 1.014, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I think you're confused. Google isn't paying other people to fix bugs in their own software. Google pays people to find bugs in Google software so that they can fix it. The same service they are providing to other software projects, for free, they pay individuals for because finding bugs in Google software helps Google to improve it."}, {"id": 50501532, "au": "ylk", "dom": 111, "sr": 66, "sc": 1.29, "ep": 2.35, "bs": 0.0, "d": 1, "age": 15.6, "grav": 174.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 0, "k": 501, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 0.815, "fa": 0.0, "gp": 0.301, "bl": 0.0, "ds": 0.0, "txt": "Usually you can’t find the kind of bugs P0 finds by just throwing AI at it. You need highly skilled people driving/guiding it. Highly skilled people are the bottleneck.\n\nIn any case it’d be sensible to make yourself familiar with the “specific effort” before you make up your opinion on it."}, {"id": 50505663, "au": "no-name-here", "dom": 142, "sr": 67, "sc": 1.29, "ep": 2.34, "bs": 0.0, "d": 5, "age": 3.6, "grav": 22.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 982, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ffmpeg_vulnerable", "flbl": "Ffmpeg & Vulnerable (Software)", "urls": [], "ig": 0.772, "fa": 0.0, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "Does Google require ffmpeg to fix vulns? Per the GP commenter's point, isn't this just about whether people are eventually made aware of vulns?"}, {"id": 50504537, "au": "sam345", "dom": 17, "sr": 68, "sc": 1.29, "ep": 2.22, "bs": 0.0, "d": 5, "age": 7.34, "grav": 55.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 89, "qw": 0, "k": 1710, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "force_finally", "flbl": "Force & Finally (Move)", "urls": [], "ig": 0.746, "fa": 0.0, "gp": 0.32, "bl": 0.0, "ds": 0.0, "txt": "This is the kind of thinking that in the 90s would have kept the internet exclusive to the domains of university and government. Every new technology has risks and people adapt. In the early part of the 20th century we might as well have kept cars away from private citizens and relegated transportation to buses, trains and professional drivers. Need private transportation? Use a horse. What with the number of people killed and maimed every year it's just not worth it.  Take away our keys and mandate public transportation please."}, {"id": 50504018, "au": "bmitc", "dom": 131, "sr": 69, "sc": 1.29, "ep": 2.19, "bs": 0.0, "d": 2, "age": 9.4, "grav": 79.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 14984, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 0.934, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I didn't call it anything. I asked the question to understand.\n\nWhat types of vulnerabilities does Project Zero find, in terms of their severity? And who are the companies that they are notifying?\n\nYou have to admit that there is likely a power imbalance here."}, {"id": 50504620, "au": "Gigachad", "dom": 18, "sr": 70, "sc": 1.29, "ep": 2.09, "bs": 0.0, "d": 6, "age": 7.03, "grav": 52.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 25048, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "force_finally", "flbl": "Force & Finally (Move)", "urls": [], "ig": 0.478, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "People will adapt by updating stuff faster than 30 days, and by everything that doesn’t do that getting hacked."}, {"id": 50506889, "au": "dns_snek", "dom": 10, "sr": 71, "sc": 1.29, "ep": 2.09, "bs": 0.0, "d": 2, "age": 0.14, "grav": 3.9, "surf": 30.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 5382, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ffmpeg_vulnerable", "flbl": "Ffmpeg & Vulnerable (Software)", "urls": [], "ig": 0.472, "fa": 0.34, "gp": 0.008, "bl": 0.0, "ds": 0.0, "txt": "Users should be made aware that the product is vulnerable and to take appropriate precautions. 30 days always should've been the norm."}, {"id": 50504528, "au": "Dylan16807", "dom": 132, "sr": 72, "sc": 1.29, "ep": 2.01, "bs": 0.0, "d": 3, "age": 7.37, "grav": 56.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 70, "qw": 4, "k": 38941, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 0.855, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> I didn't call it anything.\n\nYou directly called it \"clearly a threat\", and you indirectly called it plausibly extortion or else there would be no reason to ask if it's extortion.\n\nBut you need to explain on what general basis this even could be extortion.\n\nAnd they're not \"forcing the prioritization\" of anything.  They're just reporting bugs they found.  They don't even need to warn the vendors at all if they don't want to."}, {"id": 50504097, "au": "Wowfunhappy", "dom": 50, "sr": 73, "sc": 1.29, "ep": 1.99, "bs": 0.0, "d": 3, "age": 9.08, "grav": 75.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 31949, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 0.846, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Every piece of software you have ever used almost certainly has critical security vulnerabilities, right now, no matter how up to date it is. However, you don't know about them and neither does anyone else."}, {"id": 50503907, "au": "asdfasgasdgasdg", "dom": 45, "sr": 74, "sc": 1.29, "ep": 1.98, "bs": 0.0, "d": 5, "age": 9.79, "grav": 84.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 10752, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ffmpeg_vulnerable", "flbl": "Ffmpeg & Vulnerable (Software)", "urls": [], "ig": 0.843, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Two week rollouts should be (and needs to be) sufficient in any product that imposes security risks. Attackers will not wait longer."}, {"id": 50504601, "au": "no-name-here", "dom": 136, "sr": 75, "sc": 1.29, "ep": 1.97, "bs": 0.0, "d": 1, "age": 7.11, "grav": 53.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 4, "k": 982, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 0.626, "fa": 0.0, "gp": 0.343, "bl": 0.0, "ds": 0.0, "txt": "> extortion\n\nWhat do you think Google is extorting from the publishers of insecure software - reduced security vulnerabilities? Or what is it that you think Google is actually after by doing this?\n\n> guise of security\n\nWhat do you think is the real motivation if not security?"}, {"id": 50501079, "au": "Refreeze5224", "dom": 106, "sr": 76, "sc": 1.29, "ep": 1.92, "bs": 0.0, "d": 1, "age": 16.34, "grav": 188.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 1249, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 0.62, "fa": 0.0, "gp": 0.317, "bl": 0.0, "ds": 0.0, "txt": "Project Zero has been around far longer than GenAI or LLMs, so your point is not really relevant here."}, {"id": 50506134, "au": "jsiepkes", "dom": 13, "sr": 77, "sc": 1.29, "ep": 1.89, "bs": 0.0, "d": 3, "age": 2.31, "grav": 13.8, "surf": 5.2, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 6644, "kpp": 6.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 0.722, "fa": 0.0, "gp": 0.136, "bl": 0.0, "ds": 0.0, "txt": "Google isn't doing this because they think this is best for all of this. They are doing it because it is best for Google. This is like when companies say they hate regulation, except for when they can weaponize it to bully (smaller) competition."}, {"id": 50504162, "au": "kapilvt", "dom": 33, "sr": 78, "sc": 1.29, "ep": 1.87, "bs": 0.0, "d": 3, "age": 8.77, "grav": 72.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 546, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 0.794, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "lol, and if its in a widespread library in an embedded device? Thanks for compromising the internet, aka there is a tension inherent, not that i disagree with policy and the forcing function underneath, but it is quite a different perspective for non corporate projects."}, {"id": 50500675, "au": "ares623", "dom": 85, "sr": 79, "sc": 1.29, "ep": 1.8, "bs": 0.0, "d": 6, "age": 17.04, "grav": 201.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 2100, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ffmpeg_vulnerable", "flbl": "Ffmpeg & Vulnerable (Software)", "urls": [], "ig": 0.766, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Exactly. That's super irresponsible to knowingly release software that you haven't used AI to check if it had any vulns. There's zero (heh) excuse to release vulnerable software at that point."}, {"id": 50504382, "au": "SR2Z", "dom": 36, "sr": 80, "sc": 1.29, "ep": 1.73, "bs": 0.0, "d": 5, "age": 7.95, "grav": 62.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 84, "qw": 0, "k": 2194, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "force_finally", "flbl": "Force & Finally (Move)", "urls": [], "ig": 0.734, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I (somewhat) agree.\n\nLots and lots of devices are gonna get turned into botnets and tons of personal information is going to get leaked.  However both of those things are already true.\n\nConstant attacks mean the future will hopefully see local-first devices that don't need software at all.\n\nWant to put them on the internet? They go behind gateways which are better maintained, because a world where every teenager can hack a vending machine through its vestigial Bluetooth stack would finally need to be secure to function."}, {"id": 50501928, "au": "jagged-chisel", "dom": 68, "sr": 81, "sc": 1.29, "ep": 1.65, "bs": 0.0, "d": 5, "age": 14.87, "grav": 161.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 5435, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.596, "fa": 0.0, "gp": 0.174, "bl": 0.0, "ds": 0.0, "txt": "And someone who understands the whole thing needs time to validate that the remediation is indeed what it's supposed to be."}, {"id": 50504728, "au": "cowlevel", "dom": 55, "sr": 82, "sc": 1.29, "ep": 1.64, "bs": 0.0, "d": 2, "age": 6.7, "grav": 49.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 0.283, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "If AI can find it in 30 days, so can the attacker's AI. Continuing an embargo of something the attacker already knows is counterproductive."}, {"id": 50505349, "au": "fc417fc802", "dom": 140, "sr": 83, "sc": 1.29, "ep": 1.9, "bs": 0.27, "d": 3, "age": 4.51, "grav": 29.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 51, "qw": 0, "k": 5664, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ffmpeg_vulnerable", "flbl": "Ffmpeg & Vulnerable (Software)", "urls": [], "ig": 0.809, "fa": 0.0, "gp": 0.0, "bl": 0.1, "ds": 0.0, "txt": "If google stops sending ffmpeg vulnerability reports the software will still be vulnerable but neither the maintainers nor the end users will be aware of it. As someone who makes use of ffmpeg I want google to continue sending such reports. If I'm running vulnerable software I very much want to know about it."}, {"id": 50505793, "au": "FabCH", "dom": 144, "sr": 84, "sc": 1.29, "ep": 2.68, "bs": 1.06, "d": 6, "age": 3.27, "grav": 19.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 74, "qw": 0, "k": 1066, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 1.139, "fa": 0.0, "gp": 0.0, "bl": 0.4, "ds": 0.0, "txt": "They require ffmpeg to respond in a Google controlled timeline.\n\nJust because the response can be \"No\", it doesn't mean Google didn't require _something_ from ffmpeg.\n\nIf they wanted to, they could also have \"close to bug when fixed and we will only then notify the public\", or they could have 0-day and just publish without notice.\n\nBut because they _actively choose_ 90 (60, 30) day windows, they _do_ require something from the projects that they report on."}, {"id": 50505247, "au": "fc417fc802", "dom": 2, "sr": 85, "sc": 1.29, "ep": 1.87, "bs": 0.27, "d": 1, "age": 4.82, "grav": 31.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 5664, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "force_finally", "flbl": "Force & Finally (Move)", "urls": [], "ig": 0.794, "fa": 0.0, "gp": 0.0, "bl": 0.1, "ds": 0.0, "txt": "Presumably it will force that entire chain to become much faster than it currently is. Which would be an unequivocally good thing IMO."}, {"id": 50504786, "au": "Onavo", "dom": 31, "sr": 86, "sc": 1.29, "ep": 1.59, "bs": 0.0, "d": 4, "age": 6.53, "grav": 47.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 1003, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 0.677, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Then Google can just send a patch. What better marketing than that if you want to sell people on your periodic table AI."}, {"id": 50506030, "au": "ExoticPearTree", "dom": 126, "sr": 87, "sc": 1.29, "ep": 1.58, "bs": 0.0, "d": 5, "age": 2.62, "grav": 15.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 1428, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ffmpeg_vulnerable", "flbl": "Ffmpeg & Vulnerable (Software)", "urls": [], "ig": 0.671, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "What are you blabbing about? Do you want Google now to fund the laziness of every software/firmware vendor on the planet?"}, {"id": 50505742, "au": "fc417fc802", "dom": 143, "sr": 88, "sc": 1.29, "ep": 1.84, "bs": 0.27, "d": 6, "age": 3.43, "grav": 21.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 5664, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 0.781, "fa": 0.0, "gp": 0.0, "bl": 0.1, "ds": 0.0, "txt": "Precisely. If it isn't worth fixing then don't fix it. As the end user I can then make an informed decision. If nothing else I'll know to thoroughly sandbox certain workloads if an unpatched CVE is applicable."}, {"id": 50503364, "au": "sippingabonedry", "dom": 43, "sr": 89, "sc": 1.29, "ep": 1.41, "bs": 0.0, "d": 3, "age": 11.46, "grav": 107.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 850, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 0.379, "fa": 0.0, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "It's not the fixing that's usually the problem, it's more the testing.\n\nThe testing can take a while, assuming it's a consideration at all.\n\nSkipping testing is how you end up with another Crowdstrike scenario."}, {"id": 50501617, "au": "mindwok", "dom": 99, "sr": 90, "sc": 1.18, "ep": 1.18, "bs": 0.0, "d": 1, "age": 15.44, "grav": 171.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 2918, "kpp": 5.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 0.5, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "There's lots of them now. Companies can apply to have their own for a few hundred thousand dollars."}, {"id": 50501953, "au": "TeMPOraL", "dom": 69, "sr": 91, "sc": 1.15, "ep": 1.15, "bs": 0.0, "d": 6, "age": 14.82, "grav": 160.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 116599, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 0.488, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "No, they're not - they can just release and wait for another vulnerability disclosure. Then the loop between [Vendors] and Project Zero needs no humans in it."}, {"id": 50506494, "au": "akerl_", "dom": 37, "sr": 92, "sc": 1.13, "ep": 1.13, "bs": 0.0, "d": 4, "age": 1.25, "grav": 8.4, "surf": 8.5, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 13343, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 0.483, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Project Zero isn’t creating these vulnerabilities, and there’s no reason to assume they’re the only ones who have found them."}, {"id": 50502674, "au": "dannyw", "dom": 91, "sr": 93, "sc": 1.02, "ep": 1.02, "bs": 0.0, "d": 1, "age": 13.29, "grav": 135.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 16080, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.435, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "After seeing the latest vuln response times by Ubuntu, I switched my main PC to Debian; and will progressively migrate my homelab as I have time.\n\nDefinitely much happier. There’s nothing I miss from Ubuntu."}, {"id": 50504357, "au": "cookiengineer", "dom": 57, "sr": 94, "sc": 0.86, "ep": 2.06, "bs": 1.19, "d": 1, "age": 8.03, "grav": 63.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 7948, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 0.838, "fa": 0.0, "gp": 0.06, "bl": 0.45, "ds": 0.0, "txt": "Oh the irony here.\n\nAOSP still has a 6 months holding back patches delay, the reasoning was \"improved security\".\n\nSo, what is improving security now? Fast patches or slow patches? :)"}, {"id": 50501403, "au": "nextaccountic", "dom": 65, "sr": 95, "sc": 0.76, "ep": 1.95, "bs": 1.19, "d": 3, "age": 15.84, "grav": 178.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 6924, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 0.509, "fa": 0.0, "gp": 0.521, "bl": 0.45, "ds": 0.0, "txt": "Which means developers must trust AI blindly since there is no time to review the fix. Which also means that developers are completely unneeded"}, {"id": 50505199, "au": "fc417fc802", "dom": 41, "sr": 96, "sc": 0.75, "ep": 1.01, "bs": 0.27, "d": 6, "age": 5.01, "grav": 33.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 5664, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 0.431, "fa": 0.0, "gp": 0.0, "bl": 0.1, "ds": 0.0, "txt": "Or, crazy idea, we could all just do what google is saying they will do here and the situation will naturally resolve itself."}, {"id": 50506085, "au": "cowlevel", "dom": 7, "sr": 97, "sc": 0.67, "ep": 0.67, "bs": 0.0, "d": 4, "age": 2.47, "grav": 14.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "force_finally", "flbl": "Force & Finally (Move)", "urls": [], "ig": 0.286, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "FWIW right to repair is already in force in the EU, which you'd think would require bootloaders to be unlocked, but they probably won't be until someone sues them over it."}, {"id": 50506139, "au": "FabCH", "dom": 146, "sr": 98, "sc": 0.53, "ep": 1.59, "bs": 1.06, "d": 8, "age": 2.3, "grav": 13.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 1066, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 0.263, "fa": 0.34, "gp": 0.0, "bl": 0.4, "ds": 0.0, "txt": "So, what if the project they are reporting to has a vulnerability disclosure project with 180 days notice?"}, {"id": 50500515, "au": "ares623", "dom": 79, "sr": 99, "sc": 0.43, "ep": 0.43, "bs": 0.0, "d": 3, "age": 17.36, "grav": 207.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 2100, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 0.183, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "If AI is doing all the work then why would remediation be needed at all? Why can't the software AI produces be vuln-free if the same AI is used to detect them?"}, {"id": 50503501, "au": "nextaccountic", "dom": 71, "sr": 100, "sc": 0.34, "ep": 1.19, "bs": 0.85, "d": 5, "age": 11.08, "grav": 102.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 6924, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 0.506, "fa": 0.0, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "The way you describe it puts the role of humans as merely decorarive and ceremonial. The work is done by AI and actually validated by AI too, and increasingly the role of the human is to give an ok to whatever the AI outputs"}, {"id": 50504989, "au": "pjmlp", "dom": 25, "sr": 101, "sc": 0.32, "ep": 1.51, "bs": 1.19, "d": 6, "age": 5.85, "grav": 40.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 134000, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "force_finally", "flbl": "Force & Finally (Move)", "urls": [], "ig": 0.422, "fa": 0.0, "gp": 0.36, "bl": 0.45, "ds": 0.0, "txt": "Only until cybersecurity liability legislation finally starts to kick in, then those writing it will have a solid reason to assign the necessary resources to make it happen."}, {"id": 50505051, "au": "gib444", "dom": 152, "sr": 102, "sc": 0.32, "ep": 1.16, "bs": 0.85, "d": 4, "age": 5.63, "grav": 38.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 55, "qw": 0, "k": 603, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 0.495, "fa": 0.0, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "You know that colleague at work who goes around \"helpfully\" and constantly making suggestions about how you could improve your work and even criticising you in front of your boss?\n\nYeah they're not doing it to help you but to sabotage you.\n\nBut when challenged they profess they're just trying to be \"helpful\""}, {"id": 50506402, "au": "FabCH", "dom": 129, "sr": 103, "sc": 0.2, "ep": 2.96, "bs": 2.76, "d": 8, "age": 1.54, "grav": 9.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 69, "qw": 0, "k": 1066, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 5, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 1.258, "fa": 0.0, "gp": 0.0, "bl": 1.04, "ds": 0.0, "txt": "Did the projects ask for vulnerability scanning from Google?\n\nDid they ask Google to decide how quickly they need to fix reported vulnerabilities?\n\nSame free will Google uses to decide to spam them with reports, they could use to exempt those fixes from the 3 per month limit in Google’s already existing vulnerability fix reward program.\n\nThey don’t _have to_. But then I am free to call them out on it."}, {"id": 50502255, "au": "canibalrex", "dom": 86, "sr": 104, "sc": 0.17, "ep": 2.69, "bs": 2.52, "d": 7, "age": 14.21, "grav": 150.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 1, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "ffmpeg_vulnerable", "flbl": "Ffmpeg & Vulnerable (Software)", "urls": [], "ig": 1.145, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "Catching lots of bugs in software written with poor methodology is the new norm and that is not the same as releasing software that is not vulnerable. That is releasing software that needs increasing technological improvements or luck to\nfind remaining vulnerabilities."}, {"id": 50504095, "au": "gib444", "dom": 150, "sr": 105, "sc": 0.13, "ep": 1.32, "bs": 1.19, "d": 2, "age": 9.1, "grav": 76.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 603, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 0.339, "fa": 0.0, "gp": 0.36, "bl": 0.45, "ds": 0.0, "txt": "Those kind of comments read like: if you aren't Google (sized), you have no business building software"}, {"id": 50500640, "au": "thwarted", "dom": 82, "sr": 106, "sc": 0.1, "ep": 1.29, "bs": 1.19, "d": 5, "age": 17.13, "grav": 202.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 5732, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 0.217, "fa": 0.0, "gp": 0.54, "bl": 0.45, "ds": 0.0, "txt": "Why aren't they? The people running the services can use the AI to find the vulnerabilities before they release."}, {"id": 50502812, "au": "InsidiousWombat", "dom": 93, "sr": 107, "sc": -0.08, "ep": 1.12, "bs": 1.19, "d": 2, "age": 12.99, "grav": 130.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 515, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.475, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Ubuntu is one thing (and is crazy it took so long) but RHEL somehow failed on that too."}, {"id": 50505634, "au": "FabCH", "dom": 141, "sr": 108, "sc": -0.14, "ep": 2.11, "bs": 2.25, "d": 4, "age": 3.69, "grav": 22.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 1066, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "ffmpeg_vulnerable", "flbl": "Ffmpeg & Vulnerable (Software)", "urls": [], "ig": 0.898, "fa": 0.0, "gp": 0.0, "bl": 0.85, "ds": 0.0, "txt": "You frequently transcode 40 year old Lucas Arts SCUMM VM videos?\n\nI would prefer ffmpeg team to have the time to focus on slightly newer stuff, as a user myself."}, {"id": 50504184, "au": "lalaithion", "dom": 38, "sr": 109, "sc": -0.19, "ep": 1.0, "bs": 1.19, "d": 4, "age": 8.68, "grav": 71.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 2420, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 0.426, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "if there’s a vulnerability in a widespread library in an embedded device that can’t be patched, people should go smash the device with hammers."}, {"id": 50503130, "au": "doodlesdev", "dom": 49, "sr": 110, "sc": -0.38, "ep": 0.81, "bs": 1.19, "d": 2, "age": 12.19, "grav": 118.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 10, "k": 3154, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ffmpeg_vulnerable", "flbl": "Ffmpeg & Vulnerable (Software)", "urls": [], "ig": 0.194, "fa": 0.0, "gp": 0.242, "bl": 0.45, "ds": 0.0, "txt": "> What if the bug is actually inherently hard to fix?\n\nThen users might just as well know about it so they can avoid the software while it's vulnerable."}, {"id": 50505779, "au": "xcavier", "dom": 103, "sr": 111, "sc": -0.82, "ep": 2.23, "bs": 3.05, "d": 0, "age": 3.32, "grav": 20.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 121, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "force_finally", "flbl": "Force & Finally (Move)", "urls": [], "ig": 0.46, "fa": 0.34, "gp": 0.122, "bl": 1.15, "ds": 0.0, "txt": "90 days is literally a ‘hand written bankbook’ service standard. Crazy"}, {"id": 50505298, "au": "fc417fc802", "dom": 47, "sr": 112, "sc": -1.01, "ep": 0.45, "bs": 1.46, "d": 7, "age": 4.68, "grav": 30.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 10, "k": 5664, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.19, "fa": 0.0, "gp": 0.0, "bl": 0.55, "ds": 0.0, "txt": "> If it's not rare, why didn't your tests catch it?\n\nWho can say? But it happens. If it didn't then deploying straight to production wouldn't be a problem."}, {"id": 50505197, "au": "Dylan16807", "dom": 135, "sr": 113, "sc": -1.11, "ep": 0.93, "bs": 2.04, "d": 5, "age": 5.04, "grav": 33.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 38941, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 0.394, "fa": 0.0, "gp": 0.0, "bl": 0.77, "ds": 0.0, "txt": "You have two weeks until I celebrate Thanksgiving.\n\nThreats need an \"or else\".  A non-negotiable publication is not a threat.  It's someone sharing their schedule."}, {"id": 50506943, "au": "xoa", "dom": 28, "sr": 114, "sc": -1.48, "ep": 2.15, "bs": 3.63, "d": 9, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 66, "k": 11303, "kpp": 6.0, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.407, "fa": 0.42, "gp": 0.0, "bl": 1.37, "ds": 0.0, "txt": ">There is this thing called soverignity where goveremnts can legally track down the citzens who fails to comply, and whose actions can endager the country in whatever means the forces in power decide it may be.\n\nPerhaps in your authoritarian fever-dreams or whatever shithole country you current reside in, but no in the US.\n\n>Also when US gets a saner goverment back, I am quite sure CISA will have yet another opinion on the matter, especially if national security is considered exposed in some media case.\n\nAnd I'm quite sure you're full of shit."}, {"id": 50505402, "au": "pjmlp", "dom": 30, "sr": 115, "sc": -1.65, "ep": 1.39, "bs": 3.05, "d": 8, "age": 4.33, "grav": 27.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 134000, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "force_finally", "flbl": "Force & Finally (Move)", "urls": [], "ig": 0.18, "fa": 0.34, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Or we go back to shareware and 30 days demos, most likely."}, {"id": 50503331, "au": "jeltz", "dom": 77, "sr": 116, "sc": -1.66, "ep": 1.39, "bs": 3.05, "d": 5, "age": 11.58, "grav": 109.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 8158, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "ffmpeg_vulnerable", "flbl": "Ffmpeg & Vulnerable (Software)", "urls": [], "ig": 0.18, "fa": 0.34, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "No, and neither does Google which makes their 30 days ridiculous."}, {"id": 50504536, "au": "Dylan16807", "dom": 153, "sr": 117, "sc": -1.76, "ep": 1.29, "bs": 3.05, "d": 3, "age": 7.34, "grav": 55.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 38941, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 0.549, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Smaller companies have less code for bugs to hide in."}, {"id": 50501899, "au": "sumeno", "dom": 108, "sr": 118, "sc": -1.77, "ep": 1.28, "bs": 3.05, "d": 1, "age": 14.91, "grav": 162.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 4215, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 0.37, "fa": 0.0, "gp": 0.283, "bl": 1.15, "ds": 0.0, "txt": "The \"product\" that finds Project Zero bugs is the people who work for Project Zero."}, {"id": 50506188, "au": "Symbiote", "dom": 35, "sr": 119, "sc": -1.83, "ep": 0.71, "bs": 2.54, "d": 5, "age": 2.15, "grav": 13.0, "surf": 4.8, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 20119, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.304, "fa": 0.0, "gp": 0.0, "bl": 0.96, "ds": 0.0, "txt": "(Now the fridges could be updated, and some supermarkets announced that they'd updated some, most of all of their fridges, either before the hacking, or after the first incident.)"}, {"id": 50500473, "au": "esafak", "dom": 64, "sr": 120, "sc": -2.69, "ep": 0.36, "bs": 3.05, "d": 2, "age": 17.43, "grav": 208.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 8779, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 0.151, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "If AI is doing all the work I could see that; same day remediation."}, {"id": 50504418, "au": "ikiris", "dom": 48, "sr": 121, "sc": -2.73, "ep": 2.43, "bs": 5.17, "d": 4, "age": 7.74, "grav": 60.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 1728, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "ffmpeg_vulnerable", "flbl": "Ffmpeg & Vulnerable (Software)", "urls": [], "ig": 1.035, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "You're both missing the point. The actual issue is llm exploit generation. If they can find it, so can other bad actors. We can't sit on issues anymore the time to exploit is now tiny or negative in some cases."}, {"id": 50504659, "au": "perching_aix", "dom": 32, "sr": 122, "sc": -3.05, "ep": 1.32, "bs": 4.37, "d": 4, "age": 6.91, "grav": 51.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 2981, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 0.561, "fa": 0.0, "gp": 0.0, "bl": 1.65, "ds": 0.0, "txt": "great! so companies and individuals will get to learn this reality of open source.\n\na reality that has always been blatantly obvious, unless one only listened to its all too many zealots."}, {"id": 50502291, "au": "wewewedxfgdf", "dom": 90, "sr": 123, "sc": -3.07, "ep": 1.17, "bs": 4.24, "d": 0, "age": 14.12, "grav": 148.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 2548, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.109, "fa": 0.0, "gp": 0.632, "bl": 1.6, "ds": 0.0, "txt": "Ubuntu will need a LOT more time than that."}, {"id": 50505498, "au": "aunderscored", "dom": 19, "sr": 124, "sc": -3.26, "ep": 1.12, "bs": 4.37, "d": 7, "age": 4.08, "grav": 25.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 281, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 0.475, "fa": 0.0, "gp": 0.0, "bl": 1.65, "ds": 0.0, "txt": "No. People will stop caring because they do not wish to have the extra stress of this. Which kills open source and therefore a lot of collaboration and innovation. Not to mention killing the open internet."}, {"id": 50501963, "au": "TeMPOraL", "dom": 88, "sr": 125, "sc": -3.26, "ep": 0.98, "bs": 4.24, "d": 5, "age": 14.8, "grav": 160.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 116599, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.417, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "The Machine is everywhere. Watching us with ten thousand eyes. Listening with a million ears."}, {"id": 50506877, "au": "Devasta", "dom": 148, "sr": 126, "sc": -3.28, "ep": 0.96, "bs": 4.24, "d": 2, "age": 0.17, "grav": 4.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 11, "k": 1649, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 0.408, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "> What do you think is the real motivation if not security?\n\nFor a lot of security people its collecting scout badges."}, {"id": 50503140, "au": "jagged-chisel", "dom": 70, "sr": 127, "sc": -3.42, "ep": 0.82, "bs": 4.24, "d": 7, "age": 12.18, "grav": 118.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 5435, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.349, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "And that's how wallets and bank accounts get drained. Future's looking bright."}, {"id": 50504805, "au": "cowlevel", "dom": 100, "sr": 128, "sc": -3.72, "ep": 0.52, "bs": 4.24, "d": 2, "age": 6.47, "grav": 46.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 0.223, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "It's been an amazing money maker for ICANN."}, {"id": 50504501, "au": "aurareturn", "dom": 61, "sr": 129, "sc": -3.75, "ep": 0.49, "bs": 4.24, "d": 3, "age": 7.45, "grav": 57.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 8775, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 0.21, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Nah. You need a clear deadline or people will just drag it out."}, {"id": 50501630, "au": "DaSHacka", "dom": 97, "sr": 130, "sc": -3.78, "ep": 1.26, "bs": 5.04, "d": 1, "age": 15.42, "grav": 171.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 13, "qw": 0, "k": 1886, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "ffmpeg_vulnerable", "flbl": "Ffmpeg & Vulnerable (Software)", "urls": ["https://en.wikipedia.org/wiki/List_of_Internet_top-level_domains\u0023Brand_and_corporate_top-level_domains"], "ig": 0.442, "fa": 0.0, "gp": 0.152, "bl": 1.9, "ds": 0.0, "txt": "Actually many brands pay for their own TLD, though most go unused (publicly).\n\nhttps://en.wikipedia.org/wiki/List_of_Internet_top-level_dom..."}, {"id": 50503403, "au": "perching_aix", "dom": 56, "sr": 131, "sc": -3.81, "ep": 0.43, "bs": 4.24, "d": 2, "age": 11.35, "grav": 106.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 2981, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 0.184, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "i find it more surprising they put it so far away really."}, {"id": 50506391, "au": "baq", "dom": 14, "sr": 132, "sc": -3.81, "ep": 1.62, "bs": 5.43, "d": 3, "age": 1.58, "grav": 9.9, "surf": 7.3, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 21674, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 0.682, "fa": 0.0, "gp": 0.015, "bl": 2.05, "ds": 0.0, "txt": "They should submit patches and/or publish fixed forks. Fighting irresponsibility with more irresponsibility is plain dumb."}, {"id": 50503569, "au": "jordemort", "dom": 89, "sr": 133, "sc": -3.83, "ep": 0.41, "bs": 4.24, "d": 1, "age": 10.81, "grav": 98.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 1691, "kpp": 4.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.174, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "they are altering the deal, pray that they do not alter it again"}, {"id": 50504487, "au": "Dylan16807", "dom": 78, "sr": 134, "sc": -3.87, "ep": 0.37, "bs": 4.24, "d": 6, "age": 7.5, "grav": 57.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 38941, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "force_finally", "flbl": "Force & Finally (Move)", "urls": [], "ig": 0.157, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "You can do a 30 day fix with just humans.  It's not ridiculous."}, {"id": 50504716, "au": "cowlevel", "dom": 24, "sr": 135, "sc": -3.89, "ep": 0.35, "bs": 4.24, "d": 6, "age": 6.72, "grav": 49.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 0.066, "fa": 0.0, "gp": 0.136, "bl": 1.6, "ds": 0.0, "txt": "Still is their problem either way. Who else's would it be?"}, {"id": 50501721, "au": "Catloafdev", "dom": 83, "sr": 136, "sc": -3.91, "ep": 1.26, "bs": 5.17, "d": 6, "age": 15.24, "grav": 168.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 677, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 0.414, "fa": 0.0, "gp": 0.199, "bl": 1.95, "ds": 0.0, "txt": "You talk as though there is one AI model that is perfect and capable of identifying all potential flaws with no mistakes or omissions, and that access is free and unlimited.\n\nReality is more complicated than that."}, {"id": 50502136, "au": "vorticalbox", "dom": 73, "sr": 137, "sc": -3.93, "ep": 0.31, "bs": 4.24, "d": 5, "age": 14.48, "grav": 155.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 1627, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 0.131, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "“Someone” being another AI agent.\n\nIt’s agents all the way down."}, {"id": 50504379, "au": "quaffcode", "dom": 39, "sr": 138, "sc": -3.95, "ep": 0.29, "bs": 4.24, "d": 5, "age": 7.95, "grav": 62.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 29, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "force_finally", "flbl": "Force & Finally (Move)", "urls": [], "ig": 0.123, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "They actually should, those devices get hijacked for botnets."}, {"id": 50505012, "au": "bmitc", "dom": 133, "sr": 139, "sc": -3.97, "ep": 0.27, "bs": 4.24, "d": 4, "age": 5.76, "grav": 40.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 14984, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 0.117, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Anything phrased as \"You have <x> days to do something until we do <y>\" is indeed a threat."}, {"id": 50500593, "au": "IncreasePosts", "dom": 81, "sr": 140, "sc": -3.97, "ep": 0.27, "bs": 4.24, "d": 4, "age": 17.23, "grav": 204.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 4231, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "ffmpeg_vulnerable", "flbl": "Ffmpeg & Vulnerable (Software)", "urls": [], "ig": 0.114, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Because the people finding the vulns aren't the people running the services."}, {"id": 50504145, "au": "dullcrisp", "dom": 52, "sr": 141, "sc": -4.0, "ep": 0.24, "bs": 4.24, "d": 4, "age": 8.83, "grav": 72.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 1636, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 0.102, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "If you can prove that no one else knows about them then I see no problem."}, {"id": 50506302, "au": "ExoticPearTree", "dom": 128, "sr": 142, "sc": -4.08, "ep": 1.01, "bs": 5.09, "d": 7, "age": 1.81, "grav": 11.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 1428, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": 0.429, "fa": 0.0, "gp": 0.0, "bl": 1.92, "ds": 0.0, "txt": "Are the projects they use requiring licenses for commercial use?"}, {"id": 50505190, "au": "fc417fc802", "dom": 29, "sr": 143, "sc": -4.08, "ep": 1.35, "bs": 5.43, "d": 7, "age": 5.07, "grav": 33.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 5664, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "ffmpeg_vulnerable", "flbl": "Ffmpeg & Vulnerable (Software)", "urls": [], "ig": 0.574, "fa": 0.0, "gp": 0.0, "bl": 2.05, "ds": 0.0, "txt": "Any sensible legislation will unconditionally exempt the authors of FOSS software. If that is ever not the case the logical consequence is all FOSS contributors moving to pseudnonymous identities and collaborating exclusively via tor."}, {"id": 50502740, "au": "LoganDark", "dom": 75, "sr": 144, "sc": -4.14, "ep": 0.1, "bs": 4.24, "d": 4, "age": 13.12, "grav": 132.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 4830, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 0.043, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Do we even know what AI will be doing in two years?"}, {"id": 50500683, "au": "unsloppable", "dom": 87, "sr": 145, "sc": -4.15, "ep": 0.09, "bs": 4.24, "d": 4, "age": 17.02, "grav": 200.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 38, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 0.039, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Is the AI in the room with you right now?"}, {"id": 50501506, "au": "esafak", "dom": 67, "sr": 146, "sc": -4.29, "ep": 0.88, "bs": 5.17, "d": 4, "age": 15.66, "grav": 175.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 8779, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 0.372, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "That does not follow. Somebody stills needs to set it up. And maybe to sign off. The AI could instantly diagnose and summarize the problem and its remediation and you say the word."}, {"id": 50504362, "au": "cookiengineer", "dom": 15, "sr": 147, "sc": -4.3, "ep": 1.27, "bs": 5.57, "d": 3, "age": 8.0, "grav": 63.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 7948, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 0.206, "fa": 0.0, "gp": 0.54, "bl": 2.1, "ds": 0.0, "txt": "That is not how scale works.\n\nSome (likely most) projects have just non-paid people working on it in their free time. That's the reality of open source."}, {"id": 50506785, "au": "Frost1x", "dom": 109, "sr": 148, "sc": -4.41, "ep": 0.62, "bs": 5.04, "d": 2, "age": 0.41, "grav": 4.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 12, "qw": 0, "k": 6170, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": ["https://projectzero.google/2024/06/project-naptime.html", "https://blog.google/innovation-and-ai/technology/safety-security/cybersecurity-updates-summer-2025/", "https://blog.google/security/chrome-stronger-with-every-update/"], "ig": 0.264, "fa": 0.0, "gp": 0.0, "bl": 1.9, "ds": 0.0, "txt": "https://projectzero.google/2024/06/project-naptime.html\n\nhttps://blog.google/innovation-and-ai/technology/safety-secu...\n\nhttps://blog.google/security/chrome-stronger-with-every-upda...\n\nSo I assume it’s all advertising and they’re not using LLMs then?"}, {"id": 50506671, "au": "esafak", "dom": 72, "sr": 149, "sc": -4.91, "ep": 1.03, "bs": 5.94, "d": 6, "age": 0.74, "grav": 6.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 8779, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 5, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": 0.437, "fa": 0.0, "gp": 0.0, "bl": 2.24, "ds": 0.0, "txt": "Today's it's to catch mistakes, but perhaps that won't be necessary either."}, {"id": 50506141, "au": "FabCH", "dom": 127, "sr": 150, "sc": -5.03, "ep": 0.27, "bs": 5.3, "d": 6, "age": 2.29, "grav": 13.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 1066, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "project_zero", "flbl": "Project & Zero (Bug)", "urls": [], "ig": 0.115, "fa": 0.0, "gp": 0.0, "bl": 2.0, "ds": 0.0, "txt": "No, but how about they pay for project they use?"}, {"id": 50501383, "au": "level87", "dom": 96, "sr": 151, "sc": -8.05, "ep": 0.0, "bs": 6.89, "d": 0, "age": 15.86, "grav": 179.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 116, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.741, "bl": 2.6, "ds": 0.0, "txt": "Unrelated, but didn't realise .google was a TLD."}, {"id": 50505915, "au": "billstickers", "dom": 20, "sr": 152, "sc": -8.32, "ep": 0.0, "bs": 6.89, "d": 5, "age": 2.95, "grav": 17.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 5, "qw": 0, "k": 7, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": ["https://sheets.works/data-viz/holding-up-the-internet", "https://ecosyste.ms/", "https://busfactor.tech/oss/study/edition-1"], "ig": -0.95, "fa": 0.28, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "That’s¹ not² how³ this⁵ works⁶.\n\n1. https://sheets.works/data-viz/holding-up-the-internet\n\n2. https://ecosyste.ms/\n\n3. https://busfactor.tech/oss/study/edition-1\n\n4. https://infrastructure-heroes.org/maintainers/\n\n5. https://www.linuxfoundation.org/research/census-iii\n\n6. https://xkcd.com/2347/"}, {"id": 50503087, "au": "giancarlostoro", "dom": 95, "sr": 153, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 12.31, "grav": 120.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 23190, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "google_security", "flbl": "Google & Security (Projects)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "You what the whole bottle?"}, {"id": 50505254, "au": "Barbing", "dom": 101, "sr": 154, "sc": -11.11, "ep": 0.0, "bs": 8.88, "d": 3, "age": 4.8, "grav": 31.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 7, "qw": 0, "k": 2037, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://learn.microsoft.com/en-us/microsoft-365/enterprise/cloud-microsoft-domain?view=o365-worldwide"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.35, "ds": 0.0, "txt": "But it’s so safe as MS explains https://learn.microsoft.com/en-us/microsoft-365/enterprise/c..."}, {"id": 50502694, "au": "newAccount2025", "dom": 74, "sr": 155, "sc": -12.09, "ep": 0.0, "bs": 9.86, "d": 3, "age": 13.22, "grav": 134.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 253, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "access_vulnerabilities", "flbl": "Access & Vulnerabilities (Patch)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.719, "ds": 0.0, "txt": "AI is not doing all the work."}, {"id": 50505878, "au": "sylware", "dom": 104, "sr": 156, "sc": -13.34, "ep": 0.0, "bs": 11.13, "d": 0, "age": 3.04, "grav": 18.4, "surf": 10.2, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 83, "kpp": 0.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "ffmpeg_vulnerable", "flbl": "Ffmpeg & Vulnerable (Software)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.019, "bl": 4.2, "ds": 0.0, "txt": "... and gogol won't catch all vulns..."}, {"id": 50506509, "au": "akerl_", "dom": 51, "sr": 157, "sc": -13.36, "ep": 0.0, "bs": 11.13, "d": 4, "age": 1.22, "grav": 8.2, "surf": 8.9, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 4, "k": 13343, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "ffmpeg_vulnerable", "flbl": "Ffmpeg & Vulnerable (Software)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 4.2, "ds": 0.0, "txt": "> neither does anyone else\n\nWhat makes you think this is true?"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      const jumpBtns = isPinned
+        ? `<button type="button" class="probe-inline-btn" data-probe-jump="1">Comment &darr;</button>` +
+          `<button type="button" class="probe-inline-btn" data-probe-clear="1">Clear &times;</button>`
+        : "";
+      probeEl.innerHTML =
+        `<strong>@${escHtml(hit.au)}</strong> | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})` +
+        jumpBtns +
+        `<br>"${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 60);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 50);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 50);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 50);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `Showing ${shown.length} of ${pool.length} matching comments (mode: ${activeMode})` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear selection</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeSelect = document.getElementById("modeSelect");
+  modeSelect.addEventListener("change", () => {
+    activeMode = modeSelect.value;
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1401 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50536387 // Solid 2.0 — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+      text-transform: lowercase;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      text-transform: lowercase;
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .kpi-cell {
+      padding: 8px 0;
+    }
+    .kpi-label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 4px 0;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer:not([open]) {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary,
+    details.proof-drawer > summary {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+    }
+    table.ablation th {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: normal;
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    button.nav-btn,
+    button.mode-tab,
+    button.topbar-toggle {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: rgb(0, 0, 0);
+      cursor: pointer;
+      text-decoration: none;
+      line-height: inherit;
+      vertical-align: baseline;
+      transition: color 0.12s ease;
+      text-transform: lowercase;
+    }
+    button.nav-btn:hover,
+    button.nav-btn.active,
+    button.mode-tab:hover,
+    button.mode-tab.active,
+    button.topbar-toggle:hover,
+    button.topbar-toggle.active {
+      color: rgb(255, 255, 255);
+      text-decoration: none;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      padding: 14px;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; row-gap: 4px; }
+      .topbar-right { font-size: 8pt; padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+  <script>
+    (function() {
+      if (window.location.pathname.includes("/items/")) {
+        var m = window.location.pathname.match(/\/items\/(\d+)\.html/);
+        if (m) {
+          var base = window.location.pathname.replace(/\/items\/\d+\.html$/, "");
+          var target = (base || "") + "/item?id=" + m[1];
+          try {
+            history.replaceState(null, "", target);
+          } catch(e) {}
+        }
+      }
+    })();
+  </script>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+        <span class="pagetop" id="modeTabs">
+          <button type="button" class="nav-btn mode-tab active" data-mode="top_signal" role="tab" aria-selected="true">Top 40</button> | <button type="button" class="nav-btn mode-tab" data-mode="hn_top40" role="tab" aria-selected="false">HN Top 40</button>
+        </span>
+      </div>
+      <div class="topbar-right">
+        <button type="button" class="nav-btn topbar-toggle" id="exploreToggleBtn" aria-expanded="false">explore</button> | <button type="button" class="nav-btn topbar-toggle" id="evidenceToggleBtn" aria-expanded="false">evidence</button>
+      </div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://www.solidjs.com/blog/solid-2-0-the-long-hold/">Solid 2.0</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=solidjs.com"><span class="sitestr">solidjs.com</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">351 points</span> by <a href="https://news.ycombinator.com/user?id=pier25">pier25</a> <span class="age" title="2026-11-17T18:56:17.000Z"><a href="https://news.ycombinator.com/item?id=50536387">20 hours ago</a></span> | <a href="https://news.ycombinator.com/item?id=50536387">111&nbsp;comments</a> | 82.0% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Evidence</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">111</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 85 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">18.0%</div>
+          <div class="kpi-sub">20 comments (6 Gold / 5.4%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">82.0%</div>
+          <div class="kpi-sub">54 chatter &bull; 34 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">5</div>
+        <div class="kpi-sub">17% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.918</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">23</div>
+          <div class="kpi-sub">HN POS 2..24 (20.7% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="color: rgb(90, 90, 88); margin-top: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Explore</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 111-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 111)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (6)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (14)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (54)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (3)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (34)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..111) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 33)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (WuxiFingerHold, 0.1h); largest subtree (@wk_end) occupies 23 slots (HN POS 2..24).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (111)</option>
+          <option value="solid_choice">Solid &amp; Choice (Return) (22)</option>
+          <option value="broadcast_live">Broadcast &amp; Live (Team) (22)</option>
+          <option value="svelte_solid">Svelte &amp; Solid (Vue) (19)</option>
+          <option value="agents_gaps">Agents &amp; Gaps (Knowledge) (18)</option>
+          <option value="renderer_state">Renderer &amp; State (Universal) (16)</option>
+          <option value="general_commentary">General Commentary (14)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, solid, async, state, server, framework...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50536387 + SOLIDJS.COM + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50536387, "story_title": "Solid 2.0", "story_url": "https://www.solidjs.com/blog/solid-2-0-the-long-hold/", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50536387, "story_title": "Solid 2.0", "story_url": "https://www.solidjs.com/blog/solid-2-0-the-long-hold/", "points": 351, "story_author": "pier25", "article_source": "fetched_url", "t1_ref_utc": "2026-11-18T15:00:11+00:00", "t2_ref_utc": "2026-11-18T15:00:11+00:00", "delta_minutes": 0.0, "story_anchors": ["solid", "async", "state", "server", "framework", "solidjs", "app", "user", "react", "code", "frameworks", "const", "project", "graph", "functions", "reactive", "agent", "everything", "reactivity", "team", "router", "agents", "change", "library", "ryan"], "facet_labels": {"broadcast_live": "Broadcast & Live (Team)", "agents_gaps": "Agents & Gaps (Knowledge)", "solid_choice": "Solid & Choice (Return)", "renderer_state": "Renderer & State (Universal)", "svelte_solid": "Svelte & Solid (Vue)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "broadcast_live", "label": "Broadcast & Live (Team)", "count": 22, "top_terms": ["broadcast", "live", "team", "project"]}, {"slug": "agents_gaps", "label": "Agents & Gaps (Knowledge)", "count": 18, "top_terms": ["agents", "gaps", "knowledge", "patterns"]}, {"slug": "solid_choice", "label": "Solid & Choice (Return)", "count": 22, "top_terms": ["solid", "choice", "return", "vercel"]}, {"slug": "renderer_state", "label": "Renderer & State (Universal)", "count": 16, "top_terms": ["renderer", "state", "universal", "react"]}, {"slug": "svelte_solid", "label": "Svelte & Solid (Vue)", "count": 19, "top_terms": ["svelte", "solid", "vue", "compile"]}], "counts": {"total_comments": 111, "live_t2_comments": 111, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 85, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "06d6818f0ad8538220caea2c0047fd21a75c9d7fcdc73e373410813a93d22c5a"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 6, "grounded_analysis": 14, "crowd_chatter": 54, "bullshit_or_flamewar": 34, "meme_or_snark": 3}, "facets": {"solid_choice": 22, "renderer_state": 16, "broadcast_live": 22, "svelte_solid": 19, "agents_gaps": 18, "general_commentary": 14}, "facet_options": [{"slug": "solid_choice", "label": "Solid & Choice (Return)", "count": 22}, {"slug": "broadcast_live", "label": "Broadcast & Live (Team)", "count": 22}, {"slug": "svelte_solid", "label": "Svelte & Solid (Vue)", "count": 19}, {"slug": "agents_gaps", "label": "Agents & Gaps (Knowledge)", "count": 18}, {"slug": "renderer_state", "label": "Renderer & State (Universal)", "count": 16}, {"slug": "general_commentary", "label": "General Commentary", "count": 14}], "facet_diagnostics": [{"slug": "solid_choice", "label": "Solid & Choice (Return)", "count": 22, "useful": 5, "useful_pct": 22.7, "terms": "solid, choice, return, vercel"}, {"slug": "broadcast_live", "label": "Broadcast & Live (Team)", "count": 22, "useful": 5, "useful_pct": 22.7, "terms": "broadcast, live, team, project"}, {"slug": "svelte_solid", "label": "Svelte & Solid (Vue)", "count": 19, "useful": 6, "useful_pct": 31.6, "terms": "svelte, solid, vue, compile"}, {"slug": "agents_gaps", "label": "Agents & Gaps (Knowledge)", "count": 18, "useful": 0, "useful_pct": 0.0, "terms": "agents, gaps, knowledge, patterns"}, {"slug": "renderer_state", "label": "Renderer & State (Universal)", "count": 16, "useful": 4, "useful_pct": 25.0, "terms": "renderer, state, universal, react"}, {"slug": "general_commentary", "label": "General Commentary", "count": 14, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 6}, {"category": "code_repository", "count": 4}, {"category": "github_artifact", "count": 1}], "story_anchors": ["solid", "async", "state", "server", "framework", "solidjs", "app", "user", "react", "code", "frameworks", "const", "project", "graph", "functions", "reactive", "agent", "everything"], "largest_root": {"root_id": 50537697, "author": "wk_end", "slots": 23, "start_dom": 2, "end_dom": 24, "share_pct": 20.7, "top_dom1_age": 0.1, "top_dom1_author": "WuxiFingerHold"}, "buried_cutoff": 33, "rescue_top_k": 22, "ablations": [], "tournament": [], "comments": [{"id": 50538943, "au": "AlexErrant", "dom": 77, "sr": 1, "sc": 12.46, "ep": 12.46, "bs": 0.0, "d": 0, "age": 16.86, "grav": 197.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 155, "qw": 0, "k": 1158, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "solid_choice", "flbl": "Solid & Choice (Return)", "urls": ["https://news.ycombinator.com/item?id=45257413", "https://github.com/bamlab/tanstack-query-detect-waterfall"], "ig": 1.859, "fa": 2.08, "gp": 1.492, "bl": 0.0, "ds": 0.0, "txt": "The async graph is VERY cool. It does a great job of encapsulating async's nature to cause \"colored\" functions by using the existing signal graph (which admittedly is its own color; but virtually every UI framework has similar coloring so at least Solid's cutting a color/making it composable).\n\nContrast that with React, where hooks are colored functions. You thought that hooks were just functions? Nope, if you have a hook, it MUST be called in a hook/component... exactly like async. Did you want to load this TTS player conditionally? Hahah, you can't. Have fun allocating memory for every TTS provider your app supports, even if the user uses only 1 player. https://news.ycombinator.com/item?id=45257413\n\n\"Thanks to async in the graph we can detect waterfalls, poorly constructed effect loops, poorly scaling graph shapes like wide graph fanouts and fan-ins.\" Incredibly cool. Apparently Tanstack Query has a waterfall detector https://github.com/bamlab/tanstack-query-detect-waterfall so the other frameworks have something similar, but it won't work with their state graphs."}, {"id": 50540684, "au": "extremeracer", "dom": 91, "sr": 2, "sc": 12.17, "ep": 12.17, "bs": 0.0, "d": 0, "age": 13.61, "grav": 140.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 304, "qw": 0, "k": 3, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "renderer_state", "flbl": "Renderer & State (Universal)", "urls": ["https://github.com/esensible/solid-watch"], "ig": 2.144, "fa": 2.08, "gp": 0.83, "bl": 0.0, "ds": 0.0, "txt": "Tangential, but since the thread is all DOM: I've been using Solid 2's universal renderer for native watchOS UIs, and just put the renderer and host up as an MIT repo: https://github.com/esensible/solid-watch\n\nThe bundle (Solid JSX compiled with the new babel plugin) runs in QuickJS-ng on the watch; the renderer emits node mutations over a small host interface; a Swift host lays them out with Yoga and draws with SwiftUI. The same bundle runs in a browser harness for development. The structure is borrowed from React Native's Fabric: three trees, batched commits, one schema that generates the prop code for both sides. A dozen node types, React Native style names, on purpose.\n\nFor context, it's the display layer of a larger personal project (not open source at this point): application state lives in a small expression language with a Rust evaluator, running on the phone or on an ESP32 box, with the state, events and view described by JSON Schemas and a schema-derived wire codec. The watch and an e-ink display are synced views of that state. Bundles and firmware are served and updated over BLE, and the phone app has a sign-in-with-ChatGPT authoring mode that writes the Solid UI and the expression logic against those schemas, checks them on the device, and packs the bundle locally on the phone, no server. Solid's universal renderer is what made the watch part feasible: the UI author"}, {"id": 50540313, "au": "nextaccountic", "dom": 15, "sr": 3, "sc": 10.92, "ep": 10.92, "bs": 0.0, "d": 3, "age": 14.41, "grav": 153.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 108, "qw": 0, "k": 6924, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "renderer_state", "flbl": "Renderer & State (Universal)", "urls": ["https://github.com/kunobi-ninja/kache"], "ig": 1.584, "fa": 2.08, "gp": 0.877, "bl": 0.0, "ds": 0.0, "txt": "waiting for the cargo lock is something else: cargo was not designed for multiple simultaneous entities developing in parallel\n\nmy take is, in the current state of the ecosystem, you should use https://github.com/kunobi-ninja/kache and make agente work on separate worktrees,each with their own target directory\n\nusually separate target dirs means multi-gigabyte artifacts for each worktrees (and waiting for the same code to compile again). but not with kache, it builds only once and reduplicate files (with reflinks if your filesystem supports it)\n\nthere's also some projects for live reloading rust, and some specific tips about faster builds during iterative development (the most relevant being, use the mold linker)"}, {"id": 50541816, "au": "FlameWolf", "dom": 38, "sr": 4, "sc": 9.94, "ep": 9.94, "bs": 0.0, "d": 0, "age": 10.68, "grav": 96.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 15, "qw": 0, "k": 4, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "solid_choice", "flbl": "Solid & Choice (Return)", "urls": ["https://gist.github.com/FlameWolf/7b3be7acb06775f02ea4a57297a43bc8"], "ig": 0.763, "fa": 2.35, "gp": 1.001, "bl": 0.0, "ds": 0.0, "txt": "A gist I wrote about my experience migrating from Solid 1.0 to Solid 2.0 (RC) a couple of months ago: https://gist.github.com/FlameWolf/7b3be7acb06775f02ea4a57297..."}, {"id": 50541389, "au": "extremeracer", "dom": 93, "sr": 5, "sc": 9.42, "ep": 9.57, "bs": 0.0, "d": 2, "age": 11.82, "grav": 113.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 27, "qw": 0, "k": 3, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "epistemic_gold", "facet": "broadcast_live", "flbl": "Broadcast & Live (Team)", "urls": ["https://github.com/esensible/silkjs", "https://github.com/esensible/silkflow", "https://github.com/esensible/extremeracer"], "ig": 0.929, "fa": 2.08, "gp": 1.006, "bl": 0.0, "ds": 0.0, "txt": "... bummer :(\nI'm real human & been iterating variations of this for a while. Some of my repos deprecated as I discovered solidjs 1\nhttps://github.com/esensible/silkjs\nhttps://github.com/esensible/silkflow\nand an older version of the project I'm working on\nhttps://github.com/esensible/extremeracer"}, {"id": 50542856, "au": "kilburn", "dom": 42, "sr": 6, "sc": 8.38, "ep": 8.38, "bs": 0.0, "d": 3, "age": 7.84, "grav": 61.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 201, "qw": 0, "k": 3478, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "solid_choice", "flbl": "Solid & Choice (Return)", "urls": ["https://ant.design/", "https://ui-sdk.dev/docs/core/behaviors"], "ig": 1.788, "fa": 0.9, "gp": 1.11, "bl": 0.0, "ds": 0.0, "txt": "Vercel UI SDK is a \"headless\" UI tooklit. \"Headless UI\" is packaging of behavior that has to be implemented in javascript to get properly working widgets.\n\nFor instance, to implement a menu you have to support things like keyboard navigation and auto-closing when the user clicks elsewhere.\n\nGettings these sort of behaviors right across all browsers is oftentimes _hard_, and testing them properly is very time consuming. That's why it's useful to have it built and tested by a large company.\n\nTraditionally, these behaviors came built-in with your \"UI Widget Library\" of choice (e.g.,  https://ant.design/). However, widget libraries bring in their own style and subtle opinions. When you are aligned with those everything is great, but when you want to deviate visually or behaviorally then you have a hard time.\n\nIn contrast, \"headless UI\" packages these behaviors (and only the behaviors) as little snippets that you \"plug in\" to your own widgets/components. Since how these behaviors get to be \"plugged in\" to components and how they can interact between them may be dictated by the UI framework/library (e.g., react, astro, solid) the headless ui kits explicitly call those that they support.\n\nFor Vercel UI SDK specifically, you can check the list of behaviors they implement here https://ui-sdk.dev/docs/core/behaviors"}, {"id": 50537697, "au": "wk_end", "dom": 2, "sr": 7, "sc": 6.97, "ep": 7.11, "bs": 0.0, "d": 0, "age": 18.55, "grav": 230.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 117, "qw": 0, "k": 6620, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "svelte_solid", "flbl": "Svelte & Solid (Vue)", "urls": [], "ig": 1.486, "fa": 0.28, "gp": 1.947, "bl": 0.0, "ds": 0.0, "txt": "What's amusing and/or interesting is that the stuff under \"Built to Be Written by Agents\" also would make it easier to write by hand, I imagine. It's just better debug diagnostics; nothing really to do with agentic development specifically.\n\nMaybe that's just marketing, but it's really intriguing how human best practices are also agent best practices; how, maybe, we've reached a point where even devs aren't recognizing agent best practices as human best practices anymore; and how suddenly best practices are being prioritized in a way they often weren't - humans could/would/were expected to suck it up and deal with poor devex, but agents simply can't. A strange sort of victory for us folks who cared about it."}, {"id": 50537109, "au": "_nothing", "dom": 67, "sr": 8, "sc": 6.88, "ep": 6.88, "bs": 0.0, "d": 0, "age": 19.24, "grav": 244.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 256, "qw": 0, "k": 296, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "svelte_solid", "flbl": "Svelte & Solid (Vue)", "urls": [], "ig": 1.557, "fa": 0.28, "gp": 1.673, "bl": 0.0, "ds": 0.0, "txt": "I honestly don't remember what drove me (and apparently a lot of the frontend JS community) to place my bets on Svelte over Solid, years ago now. It probably had something to do with Svelte feeling (and at the time, being) much simpler to develop in, looking on the surface like simple HTML and CSS with some JavaScript sprinkled in, and believing strongly in its magic compiler.\n\nHonestly, I was probably just so tired of React that it felt refreshing to develop in something so un-React-like, and it ergonomically felt better at the time than writing something similar to React via Solid, even if the latter was still holding its own in performance on paper. If you've spent years learning French then it might feel more refreshing to start learning Japanese than Italian.\n\nIt turns out Solid had a lot of it right all along. And after using Svelte for a while, something starting feeling... weird. For all its complexity, something I always appreciated about React was that I was ultimately just writing JavaScript, and with Svelte it felt like I was writing in something only made to resemble JavaScript.\n\nI still really appreciate Svelte, but I'm wondering if this would be a good time to see if Solid will feel more \"natural\" to me, having worked with JavaScript all these years. Curious if anyone can confirm if that would be the case.\n\nNow might also be a good time to tinker with it myself b"}, {"id": 50542354, "au": "altano", "dom": 32, "sr": 9, "sc": 6.03, "ep": 6.03, "bs": 0.0, "d": 0, "age": 9.14, "grav": 76.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 987, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "solid_choice", "flbl": "Solid & Choice (Return)", "urls": [], "ig": 1.178, "fa": 0.68, "gp": 0.912, "bl": 0.0, "ds": 0.0, "txt": "If you're sensitive to bundle sizes (which you almost certainly aren't), heads up: the Solid 2 bundles are much bigger.\n\nMy counter component bundle test is:\n\n     4.8 KiB (brotli'd) in Solid v1.9.18\n    20.3 KiB (brotli'd) in Solid v2.0.0"}, {"id": 50539205, "au": "DimmieMan", "dom": 70, "sr": 10, "sc": 5.98, "ep": 6.13, "bs": 0.0, "d": 3, "age": 16.48, "grav": 190.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 152, "qw": 0, "k": 151, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "svelte_solid", "flbl": "Svelte & Solid (Vue)", "urls": [], "ig": 1.857, "fa": 0.28, "gp": 0.667, "bl": 0.0, "ds": 0.0, "txt": "Solid is just JSX which is stock typescript tooling.\n\n* Does not need any unique editor plugin like Svelte and Vue to provide a language server.\n\n* Worked with Tsgo day 1.\n\n* Works with oxfmt by default day 1.\n\n* Works somewhat with oxlint out of the box day 1, eslint plugin is fully supported.\n\nSvelte has a much more complicated build system and customised plugins that need regular upkeep, for basic usage it might just look like a vite plugin line and the eslint/prettier config that gets generated as part of project init but as your app grows and you maintain it longer term you absolutely start feeling the deficiencies and weight of all the svelte tooling.\n\nSolid has a compiler and an eslint plugin, but otherwise leverages the standard typescript tooling, it's so much faster. Ryan's looking at reactive script now but it was an extremely good decision to not take on the tooling maintenance of Svelte and Vue."}, {"id": 50542893, "au": "troupo", "dom": 94, "sr": 11, "sc": 5.78, "ep": 6.07, "bs": 0.0, "d": 2, "age": 7.72, "grav": 60.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 37, "qw": 0, "k": 5897, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "renderer_state", "flbl": "Renderer & State (Universal)", "urls": ["https://lightning-js.github.io/solid/\u0023/"], "ig": 1.132, "fa": 0.9, "gp": 0.584, "bl": 0.0, "ds": 0.0, "txt": "Solid has had a universal renderer for a long time, and quite easy to swap out. For example, see https://lightning-js.github.io/solid/\u0023/ (WebGL renderer for Smart TVs)\n\nAFAIK React has never had a properly defined renderer, and it was a pain to swap out"}, {"id": 50540646, "au": "elxr", "dom": 107, "sr": 12, "sc": 5.68, "ep": 5.68, "bs": 0.0, "d": 2, "age": 13.68, "grav": 141.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 389, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "svelte_solid", "flbl": "Svelte & Solid (Vue)", "urls": [], "ig": 1.249, "fa": 0.68, "gp": 0.554, "bl": 0.0, "ds": 0.0, "txt": "Token costs are extremely important, and a big factor in any front-end/server tooling I end up picking nowadays.\n\nI'll gladly sacrifice 20%-30% of features of one thing over another if it lets me use that much fewer tokens."}, {"id": 50546247, "au": "gwerbin", "dom": 8, "sr": 13, "sc": 5.48, "ep": 5.78, "bs": 0.0, "d": 5, "age": 1.23, "grav": 8.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 142, "qw": 0, "k": 1247, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "broadcast_live", "flbl": "Broadcast & Live (Team)", "urls": [], "ig": 1.656, "fa": 0.34, "gp": 0.633, "bl": 0.0, "ds": 0.0, "txt": "Yes, that. And -- in keeping with the theme -- it's just as useful for me, the human, as it is for the model. I can even cross-link them to Jira items, so I can say things like \"task EV5 corresponds to Jira subtask DS-7491 within story DS-7389\".\n\nAlso this is in the context of data science, so I often have a big and ever-growing list of secondary analyses I could run, and each one ends up with a small pile of source code. This actually lets me organize my code around the IDs, so I can have a directory like `analysis/EV7/` with its own little PLAN.md and README and some .sql and .py files and a .ipynb to pull together the results (and/or a small AI-generated data explorer app). And then later if I need to refer to those results I can write a comment like \"parameter derived from EV7 results\" or whatever."}, {"id": 50540764, "au": "AlexErrant", "dom": 80, "sr": 14, "sc": 5.13, "ep": 5.28, "bs": 0.0, "d": 2, "age": 13.4, "grav": 137.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 70, "qw": 0, "k": 1158, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "renderer_state", "flbl": "Renderer & State (Universal)", "urls": ["https://pastebin.com/sjc3vXTd"], "ig": 1.088, "fa": 0.62, "gp": 0.657, "bl": 0.0, "ds": 0.0, "txt": "I assume you mean `useEffect`.\n\nThat does not work because `loadTTS` is actually a hook, so its `useLoadTTS`, and hooks must be top level. I encourage you to look at the pastebin in my link, repeated here https://pastebin.com/sjc3vXTd\n\nSo, I must have\n\n    let provider = useGetUserPreference()\n    let a = useLoadTTS_A()\n    let b = useLoadTTS_B()\n    let c = useLoadTTS_C()\n    useEffect(() => {\n      if (provider==\"a\") a()\n      if (provider==\"b\") b()\n      if (provider==\"c\") c()\n    })\n\nOh hey, what's that? I have to allocate memory for b and c even though only a is used? THANKS REACT."}, {"id": 50537519, "au": "pwmglenn", "dom": 25, "sr": 15, "sc": 5.03, "ep": 5.03, "bs": 0.0, "d": 0, "age": 18.76, "grav": 235.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 51, "qw": 0, "k": 53, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "broadcast_live", "flbl": "Broadcast & Live (Team)", "urls": [], "ig": 1.429, "fa": 0.0, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "Remix originally pitched itself as solving the 'middle' layer between frontend and backend. Closing the gap. It never quite managed to do so imo.\n\nSolid's solution here is beautiful. The server RPC and 'live' and 'broadcast' are seamless, and feel much more natural to use than liveview or htmx/datastar imo."}, {"id": 50541428, "au": "gwerbin", "dom": 4, "sr": 16, "sc": 4.91, "ep": 5.36, "bs": 0.0, "d": 2, "age": 11.72, "grav": 111.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 158, "qw": 0, "k": 1247, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "broadcast_live", "flbl": "Broadcast & Live (Team)", "urls": [], "ig": 1.834, "fa": 0.0, "gp": 0.721, "bl": 0.0, "ds": 0.0, "txt": "Same here, bigtime.\n\nAI has forced me to write out more planning documents. Not waterfall strategic planning, but tactical planning such as describing the desired behavior of a script before I write it, or pre-registering a data analysis and my expected findings in writing before I start querying data -- that goes in a PLAN.md within whatever folder I'm working on at the moment.\n\nI now keep a systematic todo list that I call TASKS.md, which groups tasks into topical sections and every task has an ID, such as MD3 or EV7.\n\nI also keep an append-only-ish journal of results, findings, unfinished thoughts, rejected ideas, etc.\n\nAll of that goes right into my project Git repo. It works great for both AI agents and humans.\n\nBut perhaps more interesting than my new workflows, is that I actually learn things from the AI. The idea to start pre-registering all my little analyses, not just the big tasks, was a Claude-ism that I've since adopted even when I'm not using AI."}, {"id": 50540418, "au": "miguel-muniz", "dom": 36, "sr": 17, "sc": 4.4, "ep": 4.62, "bs": 0.0, "d": 0, "age": 14.17, "grav": 149.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 268, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "broadcast_live", "flbl": "Broadcast & Live (Team)", "urls": [], "ig": 1.265, "fa": 0.0, "gp": 1.135, "bl": 0.0, "ds": 0.0, "txt": "Congrats to Ryan and the team. I never got deep enough into front-end to understand the nuance of these things but I still occasionally tuned into his Friday streams just to listen. You can tell he cares about this subject deeply and I enjoy listening to passionate people talk about their craft."}, {"id": 50543892, "au": "hdjrudni", "dom": 81, "sr": 18, "sc": 4.21, "ep": 4.73, "bs": 0.0, "d": 3, "age": 5.69, "grav": 39.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 71, "qw": 0, "k": 566, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "solid_choice", "flbl": "Solid & Choice (Return)", "urls": [], "ig": 1.665, "fa": 0.0, "gp": 0.562, "bl": 0.0, "ds": 0.0, "txt": "Can be simplified a little bit.\n\n  const players = {\n    sherpa: SherpaPlayer,\n    local: LocalPlayer,\n    gemini: GeminiPlayer,\n  } satisfies Record<VoiceProvider, React.ComponentType>;\n  \n  function PlayerSwitcher() {\n    const provider = useAppStore.use.voiceProvider();\n    const Player = players[provider];\n    return <Player />;\n  }\n  \n  function useRegisterPlayer(player: Player, shortPlayer: Player) {\n    const { setPlayer, setShortPlayer } = useAppActions();\n  \n    useEffect(() => {\n      setPlayer(player);\n      setShortPlayer(shortPlayer);\n    }, [player, shortPlayer, setPlayer, setShortPlayer]);\n  }\n  \n  function LocalPlayer() {\n    useRegisterPlayer(useLocalPlayer(), useShortLocalPlayer());\n    return null;\n  }\n  \n  function GeminiPlayer() {\n    useRegisterPlayer(useGeminiPlayer(), useShortGeminiPlayer());\n    return null;\n  }\n  \n  function SherpaPlayer() {\n    useRegisterPlayer(useSherpaPlayer(), useShortSherpaPlayer());\n    return null;\n  }"}, {"id": 50539405, "au": "techpression", "dom": 85, "sr": 19, "sc": 4.06, "ep": 4.06, "bs": 0.0, "d": 0, "age": 16.12, "grav": 183.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 51, "qw": 0, "k": 668, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agents_gaps", "flbl": "Agents & Gaps (Knowledge)", "urls": [], "ig": 1.354, "fa": 0.0, "gp": 0.608, "bl": 0.0, "ds": 0.0, "txt": "I see something like ”const user = createMemo(() => fetchUser(props.id));” or “use server” and I’m instantly reminded of why I abandoned JS frameworks (not to mention anything touching JS on the server).\n\nI much prefer Solid over React, but at least the idea of a compiler makes so much more sense instead of manually maintaining memoization."}, {"id": 50538206, "au": "ryansolid", "dom": 97, "sr": 20, "sc": 4.02, "ep": 4.39, "bs": 0.0, "d": 1, "age": 17.86, "grav": 217.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 118, "qw": 0, "k": 541, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "svelte_solid", "flbl": "Svelte & Solid (Vue)", "urls": [], "ig": 1.485, "fa": 0.0, "gp": 0.618, "bl": 0.0, "ds": 0.0, "txt": "I'm working on something right now it's called ReactiveScript which takes Solid's constraints and makes them in the compiled language. Its still WIP but early results are promising. It can do better than vanillaJS because async bugs are compiler error by construction etc. It's a bit like the Rust mentality. If the agent can't write bad code if it won't compile.\n\nI think we will see more of this. Frameworks have been \"languages\" for years. Rich Harris of Svelte saw that. This is exactly the remaining gap right now. Peeling away the layers is also peeling away the guard rails. You can add those back with rigor of testing. But huge benefits to just encoding our learnings in the language itself."}, {"id": 50539001, "au": "dmix", "dom": 59, "sr": 21, "sc": 3.7, "ep": 4.14, "bs": 0.0, "d": 0, "age": 16.77, "grav": 195.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 44038, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "svelte_solid", "flbl": "Svelte & Solid (Vue)", "urls": [], "ig": 0.641, "fa": 0.34, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "Still waiting for Vue 3.6 Vapor to be released which is supposed to be more competitive with these frameworks like Svelte and Solid in performance. Vue 3.5 came out in Sept 2024 and I've ported a lot of code off Vue since then."}, {"id": 50537027, "au": "aurareturn", "dom": 109, "sr": 22, "sc": 3.56, "ep": 3.85, "bs": 0.0, "d": 1, "age": 19.33, "grav": 246.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 8775, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agents_gaps", "flbl": "Agents & Gaps (Knowledge)", "urls": [], "ig": 0.813, "fa": 0.68, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It’s November 2026. I haven’t written more than 2 lines of code in a day since January 2026.\n\nSo if a framework is made so that coding agents can use it well, why is it a negative?\n\nI’m not going to be writing SolidJS by hand."}, {"id": 50547103, "au": "WuxiFingerHold", "dom": 1, "sr": 23, "sc": 3.52, "ep": 3.96, "bs": 0.0, "d": 0, "age": 0.05, "grav": 3.6, "surf": 70.7, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 185, "qw": 0, "k": 520, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "broadcast_live", "flbl": "Broadcast & Live (Team)", "urls": [], "ig": 1.64, "fa": 0.0, "gp": 0.072, "bl": 0.0, "ds": 0.0, "txt": "I really like the ideas and concepts (one graph integrating async and reactivity) and also been a fan for some while (watching (at least in parts) Ryans YT streams, having used Solid 1.0 for a smaller project). But I have some mixed feelings knowing that the majority if not all code was written by AI. I have no doubt that every line was reviewed carefully. But this is a very complex code base. And I'm old enough to know that reading is miles away from writing when it comes to understanding. So, I'm sitting here wanting to choose Solid 2.0 for every new project but on the other hand having those nagging doubts whether that project is really sustainable. By the way, those are the same doubts I have for all newly created projects and I usually don't spent a second considering them, but this is a very special case because of Ryan and the team and because of Solid 2.0 being IMO such a significant step in simplifying frontend dev. I guess I need to see a therapist helping me out of my personal AI crisis ... I'm still writing all my code myself and are not left behind like the other dozends of us ;-)."}, {"id": 50537093, "au": "rafram", "dom": 102, "sr": 24, "sc": 3.21, "ep": 3.65, "bs": 0.0, "d": 1, "age": 19.26, "grav": 245.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 68, "qw": 0, "k": 6079, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agents_gaps", "flbl": "Agents & Gaps (Knowledge)", "urls": [], "ig": 1.216, "fa": 0.0, "gp": 0.547, "bl": 0.0, "ds": 0.0, "txt": "You could say that about some libraries, but LLMs haven't made reactive frameworks obsolete; on the contrary, they're very effective at using them, and they write better, more maintainable, and more consistent code with them than when they try to hand-write JS that renders to the DOM. Anything that can \"bridge knowledge gaps in bigger teams and enforce coding patterns\" can also help write code with agents!"}, {"id": 50539356, "au": "deniska", "dom": 20, "sr": 25, "sc": 3.16, "ep": 4.04, "bs": 0.0, "d": 1, "age": 16.22, "grav": 185.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 48, "qw": 0, "k": 271, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "solid_choice", "flbl": "Solid & Choice (Return)", "urls": [], "ig": 1.282, "fa": 0.0, "gp": 0.707, "bl": 0.0, "ds": 0.0, "txt": "It's really \"fun\" how people suddenly started writing short and concise tutorials on how to use a tool or a library without too much yapping, and somehow instead of being at the beginning of the docs, it's buried deep in \"skill.md\" file, not intended to be seen by humans."}, {"id": 50538149, "au": "novacrazy", "dom": 10, "sr": 26, "sc": 3.08, "ep": 3.52, "bs": 0.0, "d": 1, "age": 17.94, "grav": 218.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 111, "kpp": 7.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agents_gaps", "flbl": "Agents & Gaps (Knowledge)", "urls": [], "ig": 1.053, "fa": 0.0, "gp": 0.719, "bl": 0.0, "ds": 0.0, "txt": "Kind of the same reason Rust works very well with agents, good error messages and strict type system. Harder to screw up for humans and bots alike."}, {"id": 50545255, "au": "Tade0", "dom": 37, "sr": 27, "sc": 2.87, "ep": 3.67, "bs": 0.0, "d": 1, "age": 2.97, "grav": 17.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 57, "qw": 0, "k": 13266, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "svelte_solid", "flbl": "Svelte & Solid (Vue)", "urls": [], "ig": 1.526, "fa": 0.0, "gp": 0.061, "bl": 0.0, "ds": 0.0, "txt": "As a frontend developer it's a solid (heh) paradigm shift.\n\nTurns out the secret to fine-grained reactivity all this time was just a tree structure describing the dependencies.\n\nI'm using signals in Angular and while they don't cover every use case cleanly, they're a huge upgrade compared to RxJS Observables - particularly due to how simple and debuggable they are in comparison."}, {"id": 50546318, "au": "imguienjoyer30", "dom": 62, "sr": 28, "sc": 2.58, "ep": 5.32, "bs": 2.52, "d": 0, "age": 1.14, "grav": 7.8, "surf": 31.3, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 45, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "renderer_state", "flbl": "Renderer & State (Universal)", "urls": ["https://mininext.dev"], "ig": 1.243, "fa": 0.62, "gp": 0.437, "bl": 0.95, "ds": 0.0, "txt": "all frameworks are easy for agents to write.\n\nthe question is are they easy to understand for humans and non bloated?\n\nthe Dear ImGui paradigm + index.php is all we need.\n\ncheck out https://mininext.dev if you want a taste of the future. No state annotation DSL's anymore!"}, {"id": 50545394, "au": "ale", "dom": 101, "sr": 29, "sc": 2.58, "ep": 3.9, "bs": 0.0, "d": 2, "age": 2.71, "grav": 16.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 75, "qw": 0, "k": 1062, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "svelte_solid", "flbl": "Svelte & Solid (Vue)", "urls": [], "ig": 1.585, "fa": 0.0, "gp": 0.123, "bl": 0.0, "ds": 0.0, "txt": "Makes sense, Signal dependency graphs can also be more easily debugged/visualuzed with a compiler in a way that does not require manual labeling. I did this with a toy compiler I built that's just a subset of Typescript with a new reactive variable operator (which personally i find to be the most sensible approach for a frontend DSL). Not sure what you mean by guards rails though, the Rust compile check mentality is exactly the type of pampering that the webdev community likes."}, {"id": 50545185, "au": "TheCapeGreek", "dom": 21, "sr": 30, "sc": 2.55, "ep": 3.65, "bs": 0.0, "d": 1, "age": 3.1, "grav": 18.8, "surf": 9.6, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 137, "qw": 0, "k": 1149, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "broadcast_live", "flbl": "Broadcast & Live (Team)", "urls": [], "ig": 1.547, "fa": 0.0, "gp": 0.011, "bl": 0.0, "ds": 0.0, "txt": "Sure, it can be marketing, but I think it's more that it has become evident that the best way to get agents to write code you can trust, at a scale that actually improves productivity, usually means adopting and enforcing best practices at a scale that the industry silently really wasn't doing at all.\n\nI've spent the last few years banging on a drum about teams installing linters, static analyzers, and similar in Laravel teams. I get nods of agreement from seniors but little willpower from managers, who just want to see the number of commits line go up.\n\nSurprise surprise, now that I am in charge of a project and have enforced these standards, the team has done incredibly well with even just partial AI adoption in their work - because the guard rails are there and agents don't get tired of hitting them."}, {"id": 50539162, "au": "pier25", "dom": 60, "sr": 31, "sc": 2.27, "ep": 3.86, "bs": 0.0, "d": 1, "age": 16.54, "grav": 191.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 28, "qw": 0, "k": 17231, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "svelte_solid", "flbl": "Svelte & Solid (Vue)", "urls": ["https://krausest.github.io/js-framework-benchmark/current.html"], "ig": 0.862, "fa": 0.62, "gp": 0.047, "bl": 0.0, "ds": 0.0, "txt": "Performance of Vapor mode is similar to Solid and Svelte.\n\nhttps://krausest.github.io/js-framework-benchmark/current.ht...\n\nBetween Solid, Vue, and Svelte it's more a matter of features and personal preference than performance at this point."}, {"id": 50538644, "au": "lemming", "dom": 3, "sr": 32, "sc": 2.2, "ep": 3.53, "bs": 0.0, "d": 1, "age": 17.26, "grav": 205.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 45, "qw": 0, "k": 5524, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "broadcast_live", "flbl": "Broadcast & Live (Team)", "urls": [], "ig": 1.054, "fa": 0.0, "gp": 0.723, "bl": 0.0, "ds": 0.0, "txt": "A friend of mine who works a lot with AI commented that working with AI was making him develop like a grownup for the first time. Turns out that all the best practices really do carry over, but the consequence of not doing it is greater with agents."}, {"id": 50537913, "au": "bottlepalm", "dom": 75, "sr": 33, "sc": 2.03, "ep": 2.76, "bs": 0.0, "d": 1, "age": 18.28, "grav": 225.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 2528, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "renderer_state", "flbl": "Renderer & State (Universal)", "urls": [], "ig": 1.091, "fa": 0.0, "gp": 0.136, "bl": 0.0, "ds": 0.0, "txt": "I also remember caring about frameworks, and having long debates on HN about what was better. Haven't cared or done that in quite awhile now. It's be like debating low level assembly instructions. We just no longer work at that level."}, {"id": 50536923, "au": "ale", "dom": 96, "sr": 34, "sc": 2.01, "ep": 2.68, "bs": 0.0, "d": 0, "age": 19.45, "grav": 249.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 59, "qw": 0, "k": 1062, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agents_gaps", "flbl": "Agents & Gaps (Knowledge)", "urls": [], "ig": 0.799, "fa": 0.0, "gp": 0.55, "bl": 0.0, "ds": 0.0, "txt": "\"Built to be written by agents\"? To me that would mean to drop the framework altogether: they've always just been an abstraction to bridge knowledge gaps in bigger teams and enforce coding patterns. But now that's just the job of the agents, and instead you can prompt it to set up a proper server in any language you want."}, {"id": 50541313, "au": "intellix", "dom": 88, "sr": 35, "sc": 1.97, "ep": 3.07, "bs": 0.0, "d": 0, "age": 11.98, "grav": 115.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 48, "qw": 0, "k": 708, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "broadcast_live", "flbl": "Broadcast & Live (Team)", "urls": [], "ig": 1.05, "fa": 0.0, "gp": 0.415, "bl": 0.0, "ds": 0.0, "txt": "Now we just need Qwik 2.0 to get released for their async resumable framework.\n\nI think with the advent of AI it doesn't matter so much about the DX and your main focus should be on better UX (the best lighthouse metrics) though I don't think their DX is bad either."}, {"id": 50546923, "au": "whizzter", "dom": 35, "sr": 36, "sc": 1.95, "ep": 2.09, "bs": 0.0, "d": 2, "age": 0.26, "grav": 4.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 3073, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.478, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Meanwhile people using Blazor shipping 50mb of .NET assemblies (maybe it's become better in newer releases but when it appeared that made me nope-out quite quickly)."}, {"id": 50536877, "au": "maxloh", "dom": 39, "sr": 37, "sc": 1.88, "ep": 2.69, "bs": 0.0, "d": 0, "age": 19.5, "grav": 250.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 4432, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "solid_choice", "flbl": "Solid & Choice (Return)", "urls": [], "ig": 0.433, "fa": 0.0, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "There are still not many component libraries for Solid. But if I needed to build something from scratch, I would definitely try Solid.\n\nIt just feels like the right way React should be."}, {"id": 50542022, "au": "skew-aberration", "dom": 29, "sr": 38, "sc": 1.71, "ep": 2.95, "bs": 0.0, "d": 3, "age": 10.13, "grav": 89.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 596, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "broadcast_live", "flbl": "Broadcast & Live (Team)", "urls": [], "ig": 1.257, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It's terse but I can make sense of this. I read it as broadcast() wrapping a single live() somehow, because invoking live() per a connection on the server would lead to viewers (clients? callers?) potentially seeing different streams."}, {"id": 50539486, "au": "ryansolid", "dom": 99, "sr": 39, "sc": 1.51, "ep": 2.83, "bs": 0.0, "d": 3, "age": 15.96, "grav": 181.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 74, "qw": 0, "k": 541, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "solid_choice", "flbl": "Solid & Choice (Return)", "urls": [], "ig": 1.204, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "You've always been able to early return in Solid it just was never going to do what you expected because components run once. That's not something to fix. A language can look at `if` and say that's a `<Show>` component, but effectively its wrapping the choice in the templating(reactive expression). It doesn't really matter because those templates run once too so nesting is fine. But ultimately supporting it is supporting sugar not much else."}, {"id": 50540188, "au": "phailhaus", "dom": 22, "sr": 40, "sc": 1.39, "ep": 2.28, "bs": 0.0, "d": 1, "age": 14.69, "grav": 158.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 48, "qw": 0, "k": 4175, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agents_gaps", "flbl": "Agents & Gaps (Knowledge)", "urls": [], "ig": 0.629, "fa": 0.28, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Have you looked at Docker's home page recently? The title is now \"Secure Sandboxes for AI Agents\". There is some insanity going around, rebranding basic tools as \"for agents\". Docker is just secure sandboxes for everyone, from that tagline you'd think they were somehow specifically made for agents."}, {"id": 50539906, "au": "0xblinq", "dom": 31, "sr": 41, "sc": 1.25, "ep": 2.2, "bs": 0.0, "d": 1, "age": 15.2, "grav": 167.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 959, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "renderer_state", "flbl": "Renderer & State (Universal)", "urls": [], "ig": 0.938, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Remix (and React router, and the folks behind it) pitch a different thing each week, and they never manage to do it because they change their mind every Tuesday."}, {"id": 50537373, "au": "wpietri", "dom": 106, "sr": 42, "sc": 1.23, "ep": 2.77, "bs": 0.0, "d": 1, "age": 18.9, "grav": 237.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 59419, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "svelte_solid", "flbl": "Svelte & Solid (Vue)", "urls": [], "ig": 0.779, "fa": 0.28, "gp": 0.1, "bl": 0.0, "ds": 0.0, "txt": "If anything, I think attention limits, token costs, and declining performance as size/complexity increase means good abstractions are more necessary than ever."}, {"id": 50537344, "au": "pier25", "dom": 68, "sr": 43, "sc": 1.21, "ep": 2.75, "bs": 0.0, "d": 1, "age": 18.93, "grav": 238.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 17231, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "svelte_solid", "flbl": "Svelte & Solid (Vue)", "urls": [], "ig": 1.082, "fa": 0.0, "gp": 0.141, "bl": 0.0, "ds": 0.0, "txt": "I used Svelte extensively since v3 but ended up switching to Solid this year. I just want to be able to write TS/TSX without needing any extra tooling around it."}, {"id": 50543812, "au": "hdjrudni", "dom": 5, "sr": 44, "sc": 1.13, "ep": 2.67, "bs": 0.0, "d": 3, "age": 5.89, "grav": 41.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 48, "qw": 0, "k": 566, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "broadcast_live", "flbl": "Broadcast & Live (Team)", "urls": [], "ig": 0.913, "fa": 0.0, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "I do TODO.md instead of TASKS.md but what's the benefit of giving each task an ID? Just easier for you to refer to a specific task? I usually just paste the whole line if I need to refer to it, but given it a short ID might not be a bad idea."}, {"id": 50539832, "au": "ryansolid", "dom": 65, "sr": 45, "sc": 1.01, "ep": 2.11, "bs": 0.0, "d": 1, "age": 15.32, "grav": 169.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 541, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "solid_choice", "flbl": "Solid & Choice (Return)", "urls": [], "ig": 0.897, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Query, Router, and Start have 2.0 pre-release branches you can install today. Every other library has open PR."}, {"id": 50537184, "au": "squidsoup", "dom": 103, "sr": 46, "sc": 0.91, "ep": 2.01, "bs": 0.0, "d": 2, "age": 19.11, "grav": 242.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 1654, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agents_gaps", "flbl": "Agents & Gaps (Knowledge)", "urls": [], "ig": 0.855, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "That's certainly been my experience, agents perform better in well maintained code bases with obvious architectural patterns reinforced by frameworks."}, {"id": 50537326, "au": "kube-system", "dom": 108, "sr": 47, "sc": 0.9, "ep": 2.44, "bs": 0.0, "d": 1, "age": 18.94, "grav": 238.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 27077, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "broadcast_live", "flbl": "Broadcast & Live (Team)", "urls": [], "ig": 0.972, "fa": 0.0, "gp": 0.108, "bl": 0.0, "ds": 0.0, "txt": "Ask Claude to write a SaaS landing page for you in React/Next.js\n\nThen ask Claude to write a SaaS landing page for you in assembly.\n\nThen compare the results."}, {"id": 50539498, "au": "gedy", "dom": 76, "sr": 48, "sc": 0.87, "ep": 2.41, "bs": 0.0, "d": 1, "age": 15.94, "grav": 180.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 5892, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "svelte_solid", "flbl": "Svelte & Solid (Vue)", "urls": [], "ig": 1.026, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I was in same position, but I picked Svelte because I really liked the older syntax.  `$: derived` values, everything reactive, etc.  But post Svelte 5, even though I get the why - it's so similar to other libs like React and Solid that Solid makes more sense for me now."}, {"id": 50539697, "au": "mihaelm", "dom": 17, "sr": 49, "sc": 0.68, "ep": 2.22, "bs": 0.0, "d": 3, "age": 15.53, "grav": 173.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 54, "qw": 0, "k": 200, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "svelte_solid", "flbl": "Svelte & Solid (Vue)", "urls": [], "ig": 0.704, "fa": 0.0, "gp": 0.391, "bl": 0.0, "ds": 0.0, "txt": "The way Rust compile times can sneak up on you as your project grows is not to be underestimated. More so if you're running multiple agents in parallel.\n\nBut frankly I don't mind it as much with agents as I did when handwriting the code. It's on the agent to endure the slower feedback loop."}, {"id": 50546467, "au": "whizzter", "dom": 6, "sr": 50, "sc": 0.67, "ep": 1.99, "bs": 0.0, "d": 4, "age": 0.94, "grav": 7.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 3073, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "renderer_state", "flbl": "Renderer & State (Universal)", "urls": [], "ig": 0.848, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "git logs are a bit of a pain to search through and also perhaps not the place to insert long instructions, I do remember looking at some repo and just browsing the list made me quickly find what was intended during development."}, {"id": 50539214, "au": "nvme0n1p1", "dom": 98, "sr": 51, "sc": 0.58, "ep": 2.12, "bs": 0.0, "d": 2, "age": 16.46, "grav": 190.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 1308, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "solid_choice", "flbl": "Solid & Choice (Return)", "urls": [], "ig": 0.435, "fa": 0.0, "gp": 0.756, "bl": 0.0, "ds": 0.0, "txt": "Hey random question, does Solid these days have anything that lets you early return? I haven't looked into that in a while"}, {"id": 50543629, "au": "phplovesong", "dom": 18, "sr": 52, "sc": 0.48, "ep": 2.02, "bs": 0.0, "d": 3, "age": 6.22, "grav": 44.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 957, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "broadcast_live", "flbl": "Broadcast & Live (Team)", "urls": [], "ig": 0.858, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "There is Lisette, thats basically Rust for Go. Been amazing for our team, we are rewriting a legacy system in Lisette. So far so good!"}, {"id": 50544086, "au": "conartist6", "dom": 30, "sr": 53, "sc": 0.47, "ep": 1.79, "bs": 0.0, "d": 2, "age": 5.33, "grav": 36.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 2739, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agents_gaps", "flbl": "Agents & Gaps (Knowledge)", "urls": [], "ig": 0.76, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I made the mistake of reading the signals code.\n\nNearly horfed right on my laptop. I won't be using that slop fest."}, {"id": 50541284, "au": "dalmo3", "dom": 92, "sr": 54, "sc": 0.37, "ep": 1.91, "bs": 0.0, "d": 1, "age": 12.06, "grav": 116.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 1260, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "renderer_state", "flbl": "Renderer & State (Universal)", "urls": [], "ig": 0.589, "fa": 0.0, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "This comment was flagged presumably as AI slop, but it was useful to me to discover that solid now has a universal renderer. For a long time that has been the differentiator in favour of react."}, {"id": 50544039, "au": "agos", "dom": 105, "sr": 55, "sc": 0.22, "ep": 1.76, "bs": 0.0, "d": 1, "age": 5.43, "grav": 36.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 1596, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agents_gaps", "flbl": "Agents & Gaps (Knowledge)", "urls": [], "ig": 0.739, "fa": 0.0, "gp": 0.015, "bl": 0.0, "ds": 0.0, "txt": "this keeps getting told but are there examples of great software written by agents without frameworks?"}, {"id": 50544945, "au": "weego", "dom": 28, "sr": 56, "sc": 0.22, "ep": 1.66, "bs": 0.0, "d": 3, "age": 3.6, "grav": 22.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 6119, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "broadcast_live", "flbl": "Broadcast & Live (Team)", "urls": [], "ig": 0.707, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Broadcast are async functions that will hydrate in the client after render.\n\nBroadcast is one result to many\nLive is many results to many"}, {"id": 50541364, "au": "pier25", "dom": 73, "sr": 57, "sc": 0.22, "ep": 1.62, "bs": 0.0, "d": 5, "age": 11.88, "grav": 113.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 17231, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "svelte_solid", "flbl": "Svelte & Solid (Vue)", "urls": [], "ig": 0.69, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "you do need a compiler but the parent comment refers to the tooling when writing solid in your editor or IDE"}, {"id": 50539250, "au": "ricardobeat", "dom": 26, "sr": 58, "sc": 0.22, "ep": 1.58, "bs": 0.0, "d": 1, "age": 16.41, "grav": 189.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 61, "k": 23099, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "broadcast_live", "flbl": "Broadcast & Live (Team)", "urls": [], "ig": 0.671, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "`broadcast` is not mentioned in the release, so I went looking for it in the docs and was hit in the face with slop:\n\n> Declares a live server function whose answer is the same for every viewer: on the client exactly live(fn) — the sharing is the server's.\n\n> See Share one live answer across viewers for what is shared, what runs per caller, and the compile-time capture rule.\n\n> live() runs one producer per connection, which is right when the answer can depend on who is asking."}, {"id": 50538415, "au": "jaapz", "dom": 104, "sr": 59, "sc": 0.22, "ep": 1.52, "bs": 0.0, "d": 3, "age": 17.57, "grav": 211.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 992, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agents_gaps", "flbl": "Agents & Gaps (Knowledge)", "urls": [], "ig": 0.645, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "How do you keep code well-maintained when agents are generating so much code nowadays? Have agents code review the agents?"}, {"id": 50537180, "au": "pwmglenn", "dom": 40, "sr": 60, "sc": 0.22, "ep": 2.11, "bs": 1.19, "d": 1, "age": 19.12, "grav": 242.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 53, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "solid_choice", "flbl": "Solid & Choice (Return)", "urls": [], "ig": 0.798, "fa": 0.0, "gp": 0.159, "bl": 0.45, "ds": 0.0, "txt": "I disagree.\n\nVercel's UI SDK just launched with Solid support.\n\nTheres also Kobalte, Ark UI, Park UI, Solid UI, Shadcn Solid, Corvu, Material Design Solid, and more."}, {"id": 50538343, "au": "snordgren", "dom": 11, "sr": 61, "sc": 0.22, "ep": 2.03, "bs": 1.19, "d": 2, "age": 17.67, "grav": 213.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 188, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "svelte_solid", "flbl": "Svelte & Solid (Vue)", "urls": [], "ig": 0.642, "fa": 0.0, "gp": 0.36, "bl": 0.45, "ds": 0.0, "txt": "If only Rust had compile times of Go. I often find myself with multiple agents stalling, all waiting for the cargo lock."}, {"id": 50538561, "au": "prajaybasu", "dom": 64, "sr": 62, "sc": 0.22, "ep": 2.01, "bs": 1.19, "d": 0, "age": 17.36, "grav": 207.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 23, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "solid_choice", "flbl": "Solid & Choice (Return)", "urls": [], "ig": 0.35, "fa": 0.0, "gp": 0.819, "bl": 0.45, "ds": 0.0, "txt": "Hoping the TanStack Solid 2 adapters are out soon. They're the only blockers for me now."}, {"id": 50539480, "au": "Vinnl", "dom": 24, "sr": 63, "sc": 0.22, "ep": 1.72, "bs": 1.19, "d": 1, "age": 15.97, "grav": 181.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 24519, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "broadcast_live", "flbl": "Broadcast & Live (Team)", "urls": [], "ig": 0.731, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "On the other hand, Nextjs has been adding debug info that is feasible for agents to parse, but are basically inscrutable to human developers with limited context widows."}, {"id": 50541754, "au": "MrJohz", "dom": 72, "sr": 64, "sc": 0.22, "ep": 1.63, "bs": 1.19, "d": 5, "age": 10.88, "grav": 99.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 3016, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "renderer_state", "flbl": "Renderer & State (Universal)", "urls": [], "ig": 0.694, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "It does, but it's not needed for static analysis at all. From an IDE's perspective, SolidJS is just completely normal JSX expressions, which it can usually already handle."}, {"id": 50539065, "au": "baxuz", "dom": 86, "sr": 65, "sc": 0.11, "ep": 3.16, "bs": 3.05, "d": 0, "age": 16.67, "grav": 194.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 896, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "solid_choice", "flbl": "Solid & Choice (Return)", "urls": [], "ig": 0.544, "fa": 0.34, "gp": 0.629, "bl": 1.15, "ds": 0.0, "txt": "Solid has been my framework of choice for the past 5 years. Haven't touched React since."}, {"id": 50544616, "au": "victorbjorklund", "dom": 9, "sr": 66, "sc": 0.07, "ep": 1.26, "bs": 1.19, "d": 2, "age": 4.19, "grav": 26.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 3361, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agents_gaps", "flbl": "Agents & Gaps (Knowledge)", "urls": [], "ig": 0.538, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Same here. Before I was too lazy on projects where I was solo developer to follow best practice and writing clean code. Now I do it."}, {"id": 50539164, "au": "nvme0n1p1", "dom": 79, "sr": 67, "sc": 0.03, "ep": 1.23, "bs": 1.19, "d": 1, "age": 16.54, "grav": 191.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 12, "k": 1308, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.522, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "> Did you want to load this TTS player conditionally? Hahah, you can't.\n\nUm, you can? Just change this:\n\n  if (tts) useState(() => loadTTS(tts))\n\nto this:\n\n  useState(() => tts && loadTTS(tts))"}, {"id": 50544991, "au": "LoganDark", "dom": 7, "sr": 68, "sc": -0.19, "ep": 1.0, "bs": 1.19, "d": 4, "age": 3.5, "grav": 21.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 4830, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agents_gaps", "flbl": "Agents & Gaps (Knowledge)", "urls": [], "ig": 0.426, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Yeah, the main benefit is being able to refer to specific items rather than ambiguously referring to patterns that might be misinterpreted by the model."}, {"id": 50544219, "au": "unlog", "dom": 66, "sr": 69, "sc": -0.28, "ep": 0.91, "bs": 1.19, "d": 0, "age": 5.05, "grav": 33.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 377, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "solid_choice", "flbl": "Solid & Choice (Return)", "urls": [], "ig": 0.267, "fa": 0.0, "gp": 0.195, "bl": 0.45, "ds": 0.0, "txt": "Im so happy about this, got around influencing it, which means a lot, this is the future of all the UI!"}, {"id": 50543823, "au": "hdjrudni", "dom": 82, "sr": 70, "sc": -0.29, "ep": 0.9, "bs": 1.19, "d": 0, "age": 5.86, "grav": 40.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 566, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agents_gaps", "flbl": "Agents & Gaps (Knowledge)", "urls": [], "ig": 0.222, "fa": 0.0, "gp": 0.263, "bl": 0.45, "ds": 0.0, "txt": "This looks like <Suspense> and Next.js SSR all over again.\n\nI didn't like it then either."}, {"id": 50536583, "au": "pier25", "dom": 58, "sr": 71, "sc": -0.35, "ep": 2.7, "bs": 3.05, "d": 0, "age": 19.85, "grav": 257.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 17231, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "broadcast_live", "flbl": "Broadcast & Live (Team)", "urls": [], "ig": 0.438, "fa": 0.0, "gp": 1.15, "bl": 1.15, "ds": 0.0, "txt": "Congrats to the Solid team. This is a monumental release."}, {"id": 50541352, "au": "intellix", "dom": 61, "sr": 72, "sc": -0.45, "ep": 0.74, "bs": 1.19, "d": 2, "age": 11.9, "grav": 114.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 708, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "broadcast_live", "flbl": "Broadcast & Live (Team)", "urls": [], "ig": 0.315, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Well yeah, unless it's resumable it's just a matter of personal preference on how you like to organise your overhead of hydration."}, {"id": 50543002, "au": "mfru", "dom": 44, "sr": 73, "sc": -0.52, "ep": 0.68, "bs": 1.19, "d": 3, "age": 7.39, "grav": 56.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 707, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.274, "fa": 0.0, "gp": 0.022, "bl": 0.45, "ds": 0.0, "txt": "You are being downvoted, but I surely don't want to be in any way associated with a genocidal monster, so your question is valid."}, {"id": 50541344, "au": "pier25", "dom": 14, "sr": 74, "sc": -0.56, "ep": 0.64, "bs": 1.19, "d": 4, "age": 11.92, "grav": 114.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 17231, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.271, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "C\u0023 and the CLR are great but the ecosystem is pretty much non existent outside of .NET"}, {"id": 50544383, "au": "slowmotarget", "dom": 33, "sr": 75, "sc": -0.59, "ep": 0.6, "bs": 1.19, "d": 1, "age": 4.68, "grav": 30.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 12, "k": 141, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "agents_gaps", "flbl": "Agents & Gaps (Knowledge)", "urls": [], "ig": 0.255, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Oh no! I was about to migrate my JS SDK to v2 and witnessed the same increase:\n\n> The +11.7KB gzip is mostly Solid 2.0’s runtime and the @solidjs/signals scheduler"}, {"id": 50540615, "au": "elxr", "dom": 41, "sr": 76, "sc": -0.63, "ep": 0.57, "bs": 1.19, "d": 2, "age": 13.76, "grav": 143.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 389, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "solid_choice", "flbl": "Solid & Choice (Return)", "urls": [], "ig": 0.241, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "What exactly does UI SDK do? The site doesn't make it clear.\n\nAppreciate the the other examples though."}, {"id": 50542474, "au": "skrebbel", "dom": 84, "sr": 77, "sc": -1.32, "ep": 1.73, "bs": 3.05, "d": 0, "age": 8.79, "grav": 72.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 37467, "kpp": 5.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "broadcast_live", "flbl": "Broadcast & Live (Team)", "urls": [], "ig": 0.576, "fa": 0.0, "gp": 0.259, "bl": 1.15, "ds": 0.0, "txt": "That async cascading dropdown example is very compelling."}, {"id": 50543004, "au": "simongray", "dom": 95, "sr": 78, "sc": -1.36, "ep": 1.69, "bs": 3.05, "d": 0, "age": 7.38, "grav": 56.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 2075, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "broadcast_live", "flbl": "Broadcast & Live (Team)", "urls": [], "ig": 0.719, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Too many things called Solid... I thought this was Tim Berners Lee's project getting an update."}, {"id": 50537059, "au": "croes", "dom": 111, "sr": 79, "sc": -2.2, "ep": 0.85, "bs": 3.05, "d": 1, "age": 19.3, "grav": 246.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 25738, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "agents_gaps", "flbl": "Agents & Gaps (Knowledge)", "urls": [], "ig": 0.362, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "So you want knowledge gaps between agents and the team."}, {"id": 50539317, "au": "thomastill", "dom": 100, "sr": 80, "sc": -2.26, "ep": 0.79, "bs": 3.05, "d": 3, "age": 16.3, "grav": 187.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 6, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "solid_choice", "flbl": "Solid & Choice (Return)", "urls": [], "ig": 0.336, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Most used of early return can be replaced with Solid's <Show>"}, {"id": 50539562, "au": "christophilus", "dom": 71, "sr": 81, "sc": -2.51, "ep": 0.54, "bs": 3.05, "d": 4, "age": 15.81, "grav": 178.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 14196, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "svelte_solid", "flbl": "Svelte & Solid (Vue)", "urls": [], "ig": 0.23, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Is it? I thought it had its own special compiler, too."}, {"id": 50538421, "au": "otherflavors", "dom": 87, "sr": 82, "sc": -2.79, "ep": 1.45, "bs": 4.24, "d": 0, "age": 17.56, "grav": 211.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 65, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "broadcast_live", "flbl": "Broadcast & Live (Team)", "urls": [], "ig": 0.209, "fa": 0.0, "gp": 0.661, "bl": 1.6, "ds": 0.0, "txt": "They've gone all in on AI and Agents, how wonderful"}, {"id": 50538489, "au": "Bolwin", "dom": 12, "sr": 83, "sc": -2.83, "ep": 1.41, "bs": 4.24, "d": 3, "age": 17.47, "grav": 209.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 425, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "svelte_solid", "flbl": "Svelte & Solid (Vue)", "urls": [], "ig": 0.31, "fa": 0.0, "gp": 0.47, "bl": 1.6, "ds": 0.0, "txt": "Try C\u0023 as a middle ground. Compiles faster than Rust, runs faster than Go"}, {"id": 50543875, "au": "hdjrudni", "dom": 78, "sr": 84, "sc": -2.99, "ep": 1.25, "bs": 4.24, "d": 1, "age": 5.73, "grav": 39.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 24, "k": 566, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "renderer_state", "flbl": "Renderer & State (Universal)", "urls": [], "ig": 0.53, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "> \"Thanks to async in the graph we can detect waterfalls, poorly constructed effect loops, poorly scaling graph shapes like wide graph fanouts and fan-ins.\"\n\nThat needs to emphasized more. Pretty sure React's Suspense suffers from waterfalls if memory serves."}, {"id": 50541675, "au": "hmry", "dom": 27, "sr": 85, "sc": -3.18, "ep": 1.06, "bs": 4.24, "d": 2, "age": 11.09, "grav": 102.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 1798, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "renderer_state", "flbl": "Renderer & State (Universal)", "urls": [], "ig": 0.284, "fa": 0.0, "gp": 0.267, "bl": 1.6, "ds": 0.0, "txt": "Incredible, not even a Claudish linguistics expert could make sense of this. This is advanced slop"}, {"id": 50537105, "au": "robertlagrant", "dom": 52, "sr": 86, "sc": -3.47, "ep": 0.77, "bs": 4.24, "d": 2, "age": 19.24, "grav": 244.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 13916, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.097, "fa": 0.0, "gp": 0.372, "bl": 1.6, "ds": 0.0, "txt": "Of course, if you want two applications to look the same."}, {"id": 50542597, "au": "skrebbel", "dom": 56, "sr": 87, "sc": -3.55, "ep": 0.69, "bs": 4.24, "d": 2, "age": 8.47, "grav": 68.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 37467, "kpp": 5.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "broadcast_live", "flbl": "Broadcast & Live (Team)", "urls": [], "ig": 0.292, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "The worst thing about AI is super inexperienced devs doing hot takes like these."}, {"id": 50537500, "au": "tancop", "dom": 69, "sr": 88, "sc": -3.65, "ep": 0.59, "bs": 4.24, "d": 2, "age": 18.79, "grav": 235.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 1424, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "svelte_solid", "flbl": "Svelte & Solid (Vue)", "urls": [], "ig": 0.249, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "What do you mean by extra tooling? It's just a basic Vite setup."}, {"id": 50538593, "au": "dbbk", "dom": 53, "sr": 89, "sc": -3.66, "ep": 0.58, "bs": 4.24, "d": 3, "age": 17.33, "grav": 206.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 2597, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "agents_gaps", "flbl": "Agents & Gaps (Knowledge)", "urls": [], "ig": 0.183, "fa": 0.0, "gp": 0.106, "bl": 1.6, "ds": 0.0, "txt": "That's a design system. You can make that for your own apps yourself."}, {"id": 50544002, "au": "supermatt", "dom": 16, "sr": 90, "sc": -3.8, "ep": 0.44, "bs": 4.24, "d": 4, "age": 5.49, "grav": 37.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 6090, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "renderer_state", "flbl": "Renderer & State (Universal)", "urls": [], "ig": 0.189, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Thanks. I have been using CoW for this but will see how kache compares."}, {"id": 50537167, "au": "squidsoup", "dom": 54, "sr": 91, "sc": -3.9, "ep": 0.34, "bs": 4.24, "d": 3, "age": 19.13, "grav": 242.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 1654, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.145, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "not only look the same, but perhaps even more importantly, behave the same."}, {"id": 50537663, "au": "pier25", "dom": 74, "sr": 92, "sc": -3.97, "ep": 0.27, "bs": 4.24, "d": 3, "age": 18.59, "grav": 231.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 17231, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "svelte_solid", "flbl": "Svelte & Solid (Vue)", "urls": [], "ig": 0.116, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "You're probably using a lot more than that to write Svelte."}, {"id": 50538383, "au": "latchkey", "dom": 55, "sr": 93, "sc": -3.99, "ep": 0.25, "bs": 4.24, "d": 3, "age": 17.62, "grav": 212.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 17299, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "agents_gaps", "flbl": "Agents & Gaps (Knowledge)", "urls": [], "ig": 0.106, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "\"make these two applications look the same\" works surprisingly well."}, {"id": 50539538, "au": "gr__or", "dom": 46, "sr": 94, "sc": -4.06, "ep": 1.11, "bs": 5.17, "d": 4, "age": 15.85, "grav": 179.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 442, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "solid_choice", "flbl": "Solid & Choice (Return)", "urls": [], "ig": 0.473, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "Imagine people believing morality and acting on it?!\n\nI literally did, for a bunch of my projects and the ones of clients. A friend even did it for a pretty big brand that had a juicy Vercel bill. Burn in hell Guillermo"}, {"id": 50538347, "au": "azangru", "dom": 45, "sr": 95, "sc": -4.54, "ep": 1.03, "bs": 5.57, "d": 3, "age": 17.66, "grav": 213.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 5045, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "renderer_state", "flbl": "Renderer & State (Universal)", "urls": [], "ig": 0.438, "fa": 0.0, "gp": 0.0, "bl": 2.1, "ds": 0.0, "txt": "Imagine people scrambling to migrate away from their nextjs or react codebases, because Guillermo Rauch met with Netanyahu..."}, {"id": 50546722, "au": "varispeed", "dom": 63, "sr": 96, "sc": -4.85, "ep": 0.59, "bs": 5.43, "d": 0, "age": 0.55, "grav": 5.4, "surf": 45.4, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 3192, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.231, "fa": 0.0, "gp": 0.029, "bl": 2.05, "ds": 0.0, "txt": "It doesn't explain what is the point of this and why would anybody use this apart from to look cool?"}, {"id": 50538229, "au": "giveaccountpls", "dom": 49, "sr": 97, "sc": -5.19, "ep": 0.37, "bs": 5.57, "d": 3, "age": 17.84, "grav": 216.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 32, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "solid_choice", "flbl": "Solid & Choice (Return)", "urls": [], "ig": 0.158, "fa": 0.0, "gp": 0.0, "bl": 2.1, "ds": 0.0, "txt": "Who's still voting Trump after he met with Netanyahu..???\n\nI'm being facetious, but what would you expect?"}, {"id": 50539645, "au": "kalualualeiamba", "dom": 50, "sr": 98, "sc": -6.2, "ep": 0.56, "bs": 6.76, "d": 1, "age": 15.62, "grav": 174.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 1, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "solid_choice", "flbl": "Solid & Choice (Return)", "urls": [], "ig": 0.238, "fa": 0.0, "gp": 0.0, "bl": 2.55, "ds": 0.0, "txt": "Dependency management inside components is much saner that's for sure."}, {"id": 50545278, "au": "mkgiga", "dom": 83, "sr": 99, "sc": -7.05, "ep": 1.43, "bs": 8.48, "d": 0, "age": 2.92, "grav": 17.6, "surf": 14.7, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 5, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "renderer_state", "flbl": "Renderer & State (Universal)", "urls": [], "ig": 0.564, "fa": 0.0, "gp": 0.072, "bl": 3.2, "ds": 0.0, "txt": "bought solidjs merch off their store, it's been months of radio silence"}, {"id": 50545518, "au": "dbbk", "dom": 57, "sr": 100, "sc": -8.15, "ep": 0.0, "bs": 6.89, "d": 3, "age": 2.48, "grav": 14.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 2597, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "agents_gaps", "flbl": "Agents & Gaps (Knowledge)", "urls": [], "ig": -0.95, "fa": 0.34, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "I have 20 years of experience."}, {"id": 50537638, "au": "salah7252", "dom": 43, "sr": 101, "sc": -8.38, "ep": 0.23, "bs": 8.61, "d": 2, "age": 18.62, "grav": 232.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 7, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "solid_choice", "flbl": "Solid & Choice (Return)", "urls": [], "ig": 0.099, "fa": 0.0, "gp": 0.0, "bl": 3.25, "ds": 0.0, "txt": "Who’s still using Vercel after they met with Netanyahu..???"}, {"id": 50544627, "au": "dankobgd", "dom": 90, "sr": 102, "sc": -9.04, "ep": 0.0, "bs": 6.89, "d": 0, "age": 4.17, "grav": 26.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 1, "qw": 0, "k": 66, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.057, "bl": 2.6, "ds": 0.0, "txt": "yawn"}, {"id": 50544093, "au": "melodyogonna", "dom": 13, "sr": 103, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 4, "age": 5.31, "grav": 35.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 4, "k": 818, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "> Runs faster than Go\n\nCitation is needed"}, {"id": 50541528, "au": "obeavs", "dom": 19, "sr": 104, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 3, "age": 11.44, "grav": 107.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 503, "kpp": 7.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Youre looking for Moonbit"}, {"id": 50541976, "au": "Shorn", "dom": 23, "sr": 105, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 10.24, "grav": 90.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 1, "qw": 7, "k": 214, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "> Docker is just secure sandboxes for everyone,\n\nSecure?  o_O"}, {"id": 50542541, "au": "tommica", "dom": 34, "sr": 106, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 8.59, "grav": 69.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 1482, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "renderer_state", "flbl": "Renderer & State (Universal)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Oh that is quite the leap"}, {"id": 50542554, "au": "tommica", "dom": 47, "sr": 107, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 5, "age": 8.56, "grav": 69.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 4, "k": 1482, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "> Burn in hell Guillermo\n\nThat is a bit of an over-reaction."}, {"id": 50542995, "au": "mfru", "dom": 48, "sr": 108, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 6, "age": 7.41, "grav": 56.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 0, "k": 707, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "I don't think so."}, {"id": 50537070, "au": "dbbk", "dom": 51, "sr": 109, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 19.29, "grav": 245.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 2597, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "solid_choice", "flbl": "Solid & Choice (Return)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "These days are component libraries even necessary"}, {"id": 50541114, "au": "conartist6", "dom": 110, "sr": 110, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 12.49, "grav": 122.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 2739, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "What a pisser"}, {"id": 50536525, "au": "ishritmadaan", "dom": 89, "sr": 111, "sc": -10.56, "ep": 0.0, "bs": 9.41, "d": 0, "age": 19.91, "grav": 258.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 2, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "solid_choice", "flbl": "Solid & Choice (Return)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.743, "bl": 3.55, "ds": 0.0, "txt": "Hurray! Solid 2.0 is finally out!"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "top_signal";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 40);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 40);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 40);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `${shown.length} of ${pool.length} comments` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const proofDrawer = document.getElementById("proofDrawer");
+  const expBtn = document.getElementById("exploreToggleBtn");
+  const eviBtn = document.getElementById("evidenceToggleBtn");
+
+  if (expBtn && labDrawer) {
+    expBtn.addEventListener("click", () => {
+      labDrawer.open = !labDrawer.open;
+    });
+    labDrawer.addEventListener("toggle", () => {
+      const isOpen = labDrawer.open;
+      expBtn.classList.toggle("active", isOpen);
+      expBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  if (eviBtn && proofDrawer) {
+    eviBtn.addEventListener("click", () => {
+      proofDrawer.open = !proofDrawer.open;
+    });
+    proofDrawer.addEventListener("toggle", () => {
+      const isOpen = proofDrawer.open;
+      eviBtn.classList.toggle("active", isOpen);
+      eviBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1375 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50496787 // Show HN: Zigzag, a native Mac browser for people leaving Arc — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .kpi-cell {
+      padding: 8px 0;
+    }
+    .kpi-label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 4px 0;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer > summary.hn-summary {
+      list-style: none;
+      cursor: pointer;
+      display: block;
+      padding: 2px 0;
+      margin: 0;
+      background: transparent;
+      border: 0;
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      user-select: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+    }
+    table.ablation th {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: normal;
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    .mode-tabs {
+      gap: 6px;
+      padding: 0 8px;
+      margin-bottom: 8px;
+    }
+    button.mode-tab {
+      appearance: none;
+      border-width: 0px;
+      border-radius: 4px;
+      background: rgb(246, 246, 239);
+      color: rgb(130, 130, 130);
+      cursor: pointer;
+      padding: 6px 14px;
+      transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+    }
+    button.mode-tab:hover {
+      background: rgb(240, 240, 235);
+      color: rgb(13, 13, 13);
+    }
+    button.mode-tab.active {
+      background: rgb(246, 246, 239);
+      color: rgb(13, 13, 13);
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      padding: 14px;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .mode-tabs button.mode-tab {
+        flex: 1;
+        text-align: center;
+        padding: 7px 8px;
+      }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; }
+      .topbar-right { font-size: 8pt; padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+  <script>
+    (function() {
+      if (window.location.pathname.includes("/items/")) {
+        var m = window.location.pathname.match(/\/items\/(\d+)\.html/);
+        if (m) {
+          var base = window.location.pathname.replace(/\/items\/\d+\.html$/, "");
+          var target = (base || "") + "/item?id=" + m[1];
+          try {
+            history.replaceState(null, "", target);
+          } catch(e) {}
+        }
+      }
+    })();
+  </script>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+      </div>
+      <div class="topbar-right">&nbsp;</div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://github.com/ZigaoWang/zigzag">Show HN: Zigzag, a native Mac browser for people leaving Arc</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=github.com"><span class="sitestr">github.com</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">54 points</span> by <a href="https://news.ycombinator.com/user?id=ZigaoWang">ZigaoWang</a> <span class="age" title="2026-11-14T13:17:10.000Z"><a href="https://news.ycombinator.com/item?id=50496787">3 days ago</a></span> | <a href="https://news.ycombinator.com/item?id=50496787">30&nbsp;comments</a> | 86.7% bullshit
+        </span>
+      </div>
+      <div class="toptext">Hello HN! I am Zigao, a high school student from Shanghai. I am new to HN so hello to y’all!<p>I used Arc everyday, and I never had any issues with it. So when The Browser Company announced that they will shut down Arc on Dec 22 I was devastated. I don’t want to switch back to boring tabs along the top. Everything else i’ve tried is either a Chromium fork or an AI integrated browser that I don’t want. Therefore, I’ve been building my own browser for the last three weeks. Its name is Zigzag, a free and open source Mac browser that works just like Arc, written in Swift and based on WebKit. It is lightweight and fast.<p>Zigzag has:<p>- The stuff you missed from Arc (obviously, that’s the point)...<p>- Import from Arc (or any other browser) brings everything (your spaces, pins, history, passwords, cookies, etc)<p>- Chrome extension support! Even though its based on WebKit, you can install them from the Chrome Web Store. Extensions such as 1Password, Bitwarden, dark reader, Return Youtube Dislike, Tampermonkey all work)<p>And most importantly:<p>- Privacy: no account, no telemetry, no analytics<p>- Free and open source: no one can shut it down, anyone can contribute and fork their own copy!<p>- It’s tiny and fast! Around 18 MB installed (Arc is over 800 MB), no Chromium, no Electron (eww)<p>Some minor features that are nice-to-haves:<p>- Built in ad blocker using uBlock origin’s and Easylist’s filter lists<p>- Cookie popups turned down for you automatically, never accepted<p>- Split view up to four pages, drag pages intuitively<p>- Install any website as apps (still polishing it)<p>- Developer mode for web devs<p>- Little Arc (called Zigzag Mini)<p>- AI apps can use your browser if you want (MCP, off by default), stop button built in<p>- AppleScript and Shortcuts support, written in the conventional way<p>Why WebKit?<p>- I once tried to fork Helium and build on that. But the source was around 100 GB and builds took 3 to 4 hours on my Mac. Shipping Chromium is nearly impossible for me as a solo dev<p>- Battery and RAM: WebKit is built for Mac by Apple, its generally easier on battery and memory than Chromium<p>- Native: Swift + WebKit = behaves like a real Mac app, explained later (e.g. Zen)<p>- Chrome extensions already works on Zigzag, so the point of using Chromium is mostly gone<p>Why not Zen or Orion?<p>I tried both before building this, because I was looking for alternatives. They are good browsers, just not what I wanted.<p>Zen is based on Firefox. It is basically an Arc replica but it’s a Firefox under the hood, so you get Firefox extensions instead of Chrome extensions, and it doesn’t really feel like a native Mac app, which was kinda backwards. If you love Firefox it’s great, but it didn’t feel like Arc to me.<p>Orion is the closest to what I wanted in terms of speed, lightweightness and nativeness (are these even words?). It is WebKit and runs Chrome extensions. But it is closed sourced, and it is nowhere like Arc. It has vertical tabs but no real spaces, pins or favorites like Arc. It feels like a Safari clone instead of an Arc clone, so I turned it down. I love how it supports Chrome extensions, so that’s why I’ve done the same in Zigzag.<p>So how do Chrome extensions work on WebKit?<p>This is probably the part people ask about the most, so here you go.<p>In macOS 15.4, Apple added web extension support to WebKit itself. Safari only takes extensions that come wrapped in an app from the App store, but the engine underneath can load a normal Chrome extension folder. So when you click “Add to Zigzag” on the Chrome Web Store, Zigzag downloads the extension straight from Google. It checks its signatures, unpacks it, and hands it to WebKit.<p>That’s the easy part, and frankly most WebKit browsers can do that easily. However, WebKit doesn’t have every Chrome API. Stuffy like history, bookmarks, downloads, side panels, notifications and a few others just aren’t there. So Zigzag fills those in itself. When an extension calls one, Zigzag answers it, but only if that extension asked for that permission. 1Password and Bitwarden works, because they talk to their Mac apps the same way they do in Chrome.<p>The hardest one was Tampermonkey. WebKit has no userScripts API at all, so I had to build my own on top of WebKit’s content scripts, with each extension’s scripts kept separate from the extension itself like in Chrome.<p>What doesn’t work yet:<p>- the debugger API (so things that control the browser like Claude for Chrome cant control the pages, but there’s MCP that you can turn on if you want)<p>- Chrome’s own Google sign in for extensions (chrome.identity)<p>- Some old way of blocking requests that some extensions still use (webRequest from manifest V2) (e.g. uBlock origin full doesn’t work, but lite version works)<p>Most popular extensions are fine though. If any extension doesn’t work, leave a comment below or open an issue and I will look into it.<p>How I build it<p>Honest up front: I built Zigzag with the help from Claude Code. But it is not another piece of AI slop app. I decide what it does and how it should feel, and every change goes through my own daily browsing before it ships. It is my daily browser now for three weeks, and I am just like any of you, I don’t want trash apps! Claude writes most of the code, but I am the one reviewing the quality, the functions and the UI/UX decisions. Try it out yourself or open a PR if you can do better!<p>What’s missing<p>It is still a beta. No sync between Macs yet (passwords sync through iCloud keychain though). No boosts or easels. Needs macOS 15.4 or newer.<p>Try it<p><a href="https://zigzagbrowser.com" rel="nofollow">https://zigzagbrowser.com</a><p><a href="https://github.com/ZigaoWang/zigzag" rel="nofollow">https://github.com/ZigaoWang/zigzag</a><p>If you try it I’d love to know what didn’t went so well (or what did went well!), which extensions you need, and any sites that break. I read every issue on GitHub and every comment below! Thank you for your time!</div>
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">Evidence</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">30</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 28 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">13.3%</div>
+          <div class="kpi-sub">4 comments (0 Gold / 0.0%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">86.7%</div>
+          <div class="kpi-sub">11 chatter &bull; 15 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">0</div>
+        <div class="kpi-sub">0% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.786</div>
+        <div class="kpi-sub">2 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">4</div>
+          <div class="kpi-sub">HN POS 1..4 (13.3% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="color: rgb(90, 90, 88); margin-top: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">Explore</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 30-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 30)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (0)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (4)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (11)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (15)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..30) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 25)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (computerfriend, 0.8h); largest subtree (@computerfriend) occupies 4 slots (HN POS 1..4).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="mode-tabs" id="modeTabs" role="tablist" aria-label="Ranking view">
+        <button type="button" class="mode-tab active" data-mode="hn_top40" role="tab" aria-selected="true">HN Top 40</button>
+        <button type="button" class="mode-tab" data-mode="top_signal" role="tab" aria-selected="false">Epistemic Top 40</button>
+      </div>
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (30)</option>
+          <option value="firefox_tabs">Firefox &amp; Tabs (Vertical) (13)</option>
+          <option value="arc_browser">Arc &amp; Browser (Zen) (11)</option>
+          <option value="general_commentary">General Commentary (6)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, zigzag, arc, browser, webkit, tabs...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50496787 + GITHUB.COM + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50496787, "story_title": "Show HN: Zigzag, a native Mac browser for people leaving Arc", "story_url": "https://github.com/ZigaoWang/zigzag", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50496787, "story_title": "Show HN: Zigzag, a native Mac browser for people leaving Arc", "story_url": "https://github.com/ZigaoWang/zigzag", "points": 54, "story_author": "ZigaoWang", "article_source": "fetched_url", "t1_ref_utc": "2026-11-17T09:41:21+00:00", "t2_ref_utc": "2026-11-17T09:41:21+00:00", "delta_minutes": 0.0, "story_anchors": ["zigzag", "arc", "browser", "webkit", "tabs", "feel", "open", "extensions", "extension", "chromium", "macos", "browsers", "user", "feels", "safari", "leaving", "mac", "native", "show", "zen", "search", "security", "firefox", "sidebar", "support"], "facet_labels": {"arc_browser": "Arc & Browser (Zen)", "firefox_tabs": "Firefox & Tabs (Vertical)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "arc_browser", "label": "Arc & Browser (Zen)", "count": 11, "top_terms": ["arc", "browser", "zen", "project"]}, {"slug": "firefox_tabs", "label": "Firefox & Tabs (Vertical)", "count": 13, "top_terms": ["firefox", "tabs", "vertical", "chrome"]}], "counts": {"total_comments": 30, "live_t2_comments": 30, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 28, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 1, "pages_fetched": 1}, "sha256": {"corpus.json": "25c64ff1ffc984f6335016cf0d25204128ce8e83cf657bbc667e1e8761e7a1a2"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"grounded_analysis": 4, "crowd_chatter": 11, "bullshit_or_flamewar": 15}, "facets": {"arc_browser": 11, "firefox_tabs": 13, "general_commentary": 6}, "facet_options": [{"slug": "firefox_tabs", "label": "Firefox & Tabs (Vertical)", "count": 13}, {"slug": "arc_browser", "label": "Arc & Browser (Zen)", "count": 11}, {"slug": "general_commentary", "label": "General Commentary", "count": 6}], "facet_diagnostics": [{"slug": "firefox_tabs", "label": "Firefox & Tabs (Vertical)", "count": 13, "useful": 0, "useful_pct": 0.0, "terms": "firefox, tabs, vertical, chrome"}, {"slug": "arc_browser", "label": "Arc & Browser (Zen)", "count": 11, "useful": 4, "useful_pct": 36.4, "terms": "arc, browser, zen, project"}, {"slug": "general_commentary", "label": "General Commentary", "count": 6, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 4}], "story_anchors": ["zigzag", "arc", "browser", "webkit", "tabs", "feel", "open", "extensions", "extension", "chromium", "macos", "browsers", "user", "feels", "safari", "leaving", "mac", "native"], "largest_root": {"root_id": 50529042, "author": "computerfriend", "slots": 4, "start_dom": 1, "end_dom": 4, "share_pct": 13.3, "top_dom1_age": 0.8, "top_dom1_author": "computerfriend"}, "buried_cutoff": 25, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50507805, "au": "ma101an", "dom": 16, "sr": 1, "sc": 4.89, "ep": 7.41, "bs": 2.52, "d": 0, "age": 41.9, "grav": 904.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 188, "qw": 0, "k": 2, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "arc_browser", "flbl": "Arc & Browser (Zen)", "urls": [], "ig": 1.291, "fa": 0.95, "gp": 1.15, "bl": 0.95, "ds": 0.0, "txt": "I used the browser for a while. I love it.\nIt's \"really\" snappy. I can actually feel it, after using chromium for a while. Idk if Safari feels faster, but I am accustomed to the UX of Arc, so the same UX, to me, feels lot faster in Zigzag. So it's definitely a plus.\n\nReally I cannot overstate how fast/responsive it is. So smooth, no jank (I have 16GB M4 Air, when using Arc I can definitely see a small jank when opening & closing sidebar or resizing sidebar, swapping across spaces...) which I don't see at all in Zigzag\n\nAlso, I like how I can use chrome extensions here. Even though it's not 100% compatible, I can use ones that I have in my chromium browrser: ublock origin, unhook, video-speed-controller etc...\n\nSome of the things I missed in safari are here, which I love: The reader mode & automatic dark mode support (removes need for me to use an extension for these \"features\")\n\noverall idk if this is made with 100% AI or made by someone who actually have lot of knowledge and experience with building browsers,\neitherways, from end user perspective, \nI love how its like Arc, but faster & uses safari engine (so its lightweight in MacOS)"}, {"id": 50528791, "au": "NetOpWibby", "dom": 27, "sr": 2, "sc": 4.83, "ep": 4.83, "bs": 0.0, "d": 0, "age": 1.44, "grav": 9.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 60, "qw": 0, "k": 2706, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "arc_browser", "flbl": "Arc & Browser (Zen)", "urls": [], "ig": 1.123, "fa": 0.68, "gp": 0.177, "bl": 0.0, "ds": 0.0, "txt": "Every Arc clone lacks the one feature I miss the most and that’s the Portrait mode.\n\nArc takes a screenshot of the current page in a minimal chrome wrapper and includes your desktop wallpaper.\n\nI noticed you have a file size comparison against common browsers but the one I’ve been using on the side is Search[1]; you browser is 18 MB, Search clocks in at 10.2 MB.\n\n   [1]: https://searchbrowser.app"}, {"id": 50529170, "au": "jawngee", "dom": 10, "sr": 3, "sc": 4.55, "ep": 4.55, "bs": 0.0, "d": 0, "age": 0.49, "grav": 5.2, "surf": 175.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 52, "qw": 0, "k": 5767, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "arc_browser", "flbl": "Arc & Browser (Zen)", "urls": ["https://byearc.com/"], "ig": 0.943, "fa": 0.62, "gp": 0.393, "bl": 0.0, "ds": 0.0, "txt": "There are at least 56 arc clones and counting: https://byearc.com/\n\nAs a hardcore Arc user, my take away is I'm not trusting anything that has significant human effort and funding behind it.  I don't have the time - nor interest - to spare to move browsers constantly so I can only choose to invest in something with structure behind it."}, {"id": 50513137, "au": "ZigaoWang", "dom": 17, "sr": 4, "sc": 3.99, "ep": 4.13, "bs": 0.0, "d": 1, "age": 31.66, "grav": 560.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 127, "qw": 0, "k": 11, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "arc_browser", "flbl": "Arc & Browser (Zen)", "urls": [], "ig": 1.346, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Thank you so much, this made my day! Funny enough, my comment on the whole project got killed, weird. Let me see if I can ask the moderator to un-kill it sometime. The smoothness is something I care a lot about, because Arc users have high bars. The sidebar, space switching and tab animations all run on Core Animation, so they stay smooth even with lots of tabs open. Glad the Chrome extensions work for you. Extension support isn't 100% yet, so if one you use breaks, please open an issue on GitHub and I'll look at it. On the AI question: yes, I use AI tools a lot when coding, but I decide what goes in and test everything myself, every day, since it's my main browser now. Thanks again for trying it!"}, {"id": 50529257, "au": "DiabloD3", "dom": 4, "sr": 5, "sc": 3.07, "ep": 3.07, "bs": 0.0, "d": 3, "age": 0.28, "grav": 4.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 84, "qw": 0, "k": 47599, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "firefox_tabs", "flbl": "Firefox & Tabs (Vertical)", "urls": [], "ig": 1.306, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I'm sorry, but that's a bit of a too little too late. Google chose Chrome's path, and copying Firefox isn't going to help them turn that ship around.\n\nLike, I'm surprised anyone takes Chrome seriously at all after Google was told to not misuse their monopoly position as the world's largest ad company and remove the ability for the world's most popular ad blocker and security extension to work, and then did it anyways.\n\n... and then promptly bullied all Chromium-based browsers to merge the Manifest V2 removal patches."}, {"id": 50529029, "au": "asdfsa32", "dom": 7, "sr": 6, "sc": 2.54, "ep": 2.54, "bs": 0.0, "d": 1, "age": 0.86, "grav": 6.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 675, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "firefox_tabs", "flbl": "Firefox & Tabs (Vertical)", "urls": [], "ig": 0.859, "fa": 0.0, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "Why is this down voted? Zen looks interesting on the surface, specially as Firefox is the last frontier of \"Open Web\" with Chrome and Safari being neutered by their respective corporate overlords and their closed gardens interests."}, {"id": 50529132, "au": "DiabloD3", "dom": 2, "sr": 7, "sc": 2.43, "ep": 2.58, "bs": 0.0, "d": 1, "age": 0.64, "grav": 5.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 47599, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "firefox_tabs", "flbl": "Firefox & Tabs (Vertical)", "urls": [], "ig": 0.686, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I came here to also say this. I've been using vertical tabs under Firefox for like 2 years now.\n\nChrome (and Chromium-based) browsers are basically DOA now, and no reason to daily driver them if they can't implement a simple feature like this."}, {"id": 50528983, "au": "rampatra", "dom": 20, "sr": 8, "sc": 2.4, "ep": 2.62, "bs": 0.0, "d": 0, "age": 0.98, "grav": 7.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 86, "qw": 0, "k": 318, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "arc_browser", "flbl": "Arc & Browser (Zen)", "urls": [], "ig": 1.017, "fa": 0.0, "gp": 0.161, "bl": 0.0, "ds": 0.0, "txt": "Thanks for such a detailed write up. Learned many things. For me, as the person developing extensions, the most impressive thing that you did is filling the gap and letting Chrome extensions be installed in a WebKit browser without the devs having to do anything. That’s cool.\n\nI am saying this because I hate having to write those conditions everywhere in my extension code to support different browsers, it’s error prone, and time taking. Now we have AI to do it and test it but earlier it was all me."}, {"id": 50529194, "au": "F3nd0", "dom": 9, "sr": 9, "sc": 2.27, "ep": 2.42, "bs": 0.0, "d": 2, "age": 0.43, "grav": 4.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": 902, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "firefox_tabs", "flbl": "Firefox & Tabs (Vertical)", "urls": [], "ig": 1.029, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Eh, Firefox can also feel pretty neutered at times. In some aspects, Safari has even done better on the ‘Open Web’ front recently; I guess having several competing corporate overlords is better than having just one.\n\nThat said, I fully agree on the importance of Firefox. Avoiding Webkit/Blink monoculture is crucial."}, {"id": 50529097, "au": "bendews", "dom": 21, "sr": 10, "sc": 2.01, "ep": 2.23, "bs": 0.0, "d": 0, "age": 0.74, "grav": 6.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 71, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "firefox_tabs", "flbl": "Firefox & Tabs (Vertical)", "urls": [], "ig": 0.861, "fa": 0.0, "gp": 0.144, "bl": 0.0, "ds": 0.0, "txt": "I think you have gone in to this with the exact mindset that I have had with the current Arc alternatives. My absolute *perfect* browser would be Safari with proper sidebar tabs and same-window profiles, and Air Control. Basically nothing else is needed.\n\nThis feels so close to that, well done!"}, {"id": 50529095, "au": "myzek", "dom": 26, "sr": 11, "sc": 1.72, "ep": 2.16, "bs": 0.0, "d": 0, "age": 0.75, "grav": 6.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 54, "qw": 0, "k": 196, "kpp": 6.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "arc_browser", "flbl": "Arc & Browser (Zen)", "urls": [], "ig": 0.865, "fa": 0.0, "gp": 0.091, "bl": 0.0, "ds": 0.0, "txt": "I don't want to be that guy, but I believe if you are looking for an Arc replacement it's much better to try out Zen (which is a Firefox underneath) than a new browser where Claude is in top contributors. Not hating, I just don't trust vibe coding and for a browser it's pretty important for it to be secure"}, {"id": 50529271, "au": "blntechie", "dom": 14, "sr": 12, "sc": 0.67, "ep": 1.11, "bs": 0.0, "d": 0, "age": 0.25, "grav": 4.3, "surf": 210.6, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 1169, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "firefox_tabs", "flbl": "Firefox & Tabs (Vertical)", "urls": [], "ig": 0.418, "fa": 0.0, "gp": 0.091, "bl": 0.0, "ds": 0.0, "txt": "Well done, I will try if and when there is a build  for Linux which I doubt considering the WebKit base."}, {"id": 50529198, "au": "ifh-hn", "dom": 8, "sr": 13, "sc": 0.61, "ep": 1.57, "bs": 0.0, "d": 2, "age": 0.42, "grav": 4.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 641, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "arc_browser", "flbl": "Arc & Browser (Zen)", "urls": [], "ig": 0.666, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Zen has some controversy a year or so ago related to security and privacy. Can remember the outcome but a lot of people here weren't happy with the dev response to it."}, {"id": 50529327, "au": "etcetcetcetceta", "dom": 12, "sr": 14, "sc": 0.23, "ep": 1.11, "bs": 0.0, "d": 0, "age": 0.08, "grav": 3.7, "surf": 242.8, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 50, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "arc_browser", "flbl": "Arc & Browser (Zen)", "urls": [], "ig": 0.398, "fa": 0.0, "gp": 0.119, "bl": 0.0, "ds": 0.0, "txt": "Ignore the haters, it's better than Arc, it's faster and renders better, you've got me at least until Ladybird 1.0."}, {"id": 50529108, "au": "sheept", "dom": 19, "sr": 15, "sc": -0.04, "ep": 0.62, "bs": 0.0, "d": 1, "age": 0.71, "grav": 6.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 894, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "firefox_tabs", "flbl": "Firefox & Tabs (Vertical)", "urls": [], "ig": 0.266, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I feel like a repackaging of Chrome has to at least be Chromium based, which this is not"}, {"id": 50529040, "au": "RalfBr", "dom": 22, "sr": 16, "sc": -0.55, "ep": 3.07, "bs": 2.52, "d": 0, "age": 0.85, "grav": 6.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "arc_browser", "flbl": "Arc & Browser (Zen)", "urls": [], "ig": 0.799, "fa": 0.34, "gp": 0.154, "bl": 0.95, "ds": 0.0, "txt": "I switched from Zen to ZigZag. Not necessarily a faster browser in terms of speed, but the ram usage on my mac is 4x as low, which is a massive improvement! Thank you for building this."}, {"id": 50529336, "au": "reuseman", "dom": 5, "sr": 17, "sc": -1.29, "ep": 2.33, "bs": 2.52, "d": 0, "age": 0.05, "grav": 3.6, "surf": 248.4, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 99, "qw": 0, "k": 1, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "arc_browser", "flbl": "Arc & Browser (Zen)", "urls": [], "ig": 0.92, "fa": 0.0, "gp": 0.117, "bl": 0.95, "ds": 0.0, "txt": "Congrats on the launch of the project, it's definitely well thought for a solo-dev.\n\nSomeone mentioned the heavy usage of Claude, but for me the concern is another one. It's about the sustainability of the project and if this is just going to be discontinued like what happened to Arc.\n\nAs a user that needs to change his browser, I would understand what's going to be the future direction of this and if it can be economically viable for you to continue to work on the project. And just because it's open it doesn't mean that someone is going to take over"}, {"id": 50528835, "au": "HelloUsername", "dom": 23, "sr": 18, "sc": -1.7, "ep": 2.23, "bs": 3.05, "d": 0, "age": 1.34, "grav": 8.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 10, "qw": 0, "k": 4226, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "firefox_tabs", "flbl": "Firefox & Tabs (Vertical)", "urls": ["https://news.ycombinator.com/item?id=49828120"], "ig": 0.425, "fa": 0.34, "gp": 0.179, "bl": 1.15, "ds": 0.0, "txt": "Related: \"Search – A small, fast WebKit browser for macOS\" 24.sep.2026 https://news.ycombinator.com/item?id=49828120 32 comments"}, {"id": 50529016, "au": "cush", "dom": 24, "sr": 19, "sc": -3.56, "ep": 0.68, "bs": 4.24, "d": 0, "age": 0.9, "grav": 6.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 2736, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.191, "fa": 0.0, "gp": 0.161, "bl": 1.6, "ds": 0.0, "txt": "This is the longest HN post I’ve ever seen"}, {"id": 50529071, "au": "atrokhymchuk", "dom": 18, "sr": 20, "sc": -5.17, "ep": 0.32, "bs": 4.24, "d": 0, "age": 0.79, "grav": 6.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 45, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "firefox_tabs", "flbl": "Firefox & Tabs (Vertical)", "urls": [], "ig": 0.057, "fa": 0.0, "gp": 0.128, "bl": 1.6, "ds": 0.0, "txt": "I just don't get why do we need so many chrome repacks?"}, {"id": 50529197, "au": "jcode1", "dom": 25, "sr": 21, "sc": -5.4, "ep": 1.27, "bs": 5.57, "d": 0, "age": 0.42, "grav": 4.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 2, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "firefox_tabs", "flbl": "Firefox & Tabs (Vertical)", "urls": [], "ig": 0.47, "fa": 0.0, "gp": 0.111, "bl": 2.1, "ds": 0.0, "txt": "whats difference between this and duckduck go ? it also uses swift and webkit"}, {"id": 50529273, "au": "mysticaltech-", "dom": 11, "sr": 22, "sc": -7.1, "ep": 0.91, "bs": 6.76, "d": 1, "age": 0.24, "grav": 4.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 5, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "firefox_tabs", "flbl": "Firefox & Tabs (Vertical)", "urls": [], "ig": 0.387, "fa": 0.0, "gp": 0.0, "bl": 2.55, "ds": 0.0, "txt": "I feel so happy seeing that Dia is nowhere close to the top of the list"}, {"id": 50529103, "au": "itmd", "dom": 28, "sr": 23, "sc": -7.39, "ep": 0.47, "bs": 6.76, "d": 0, "age": 0.72, "grav": 6.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "arc_browser", "flbl": "Arc & Browser (Zen)", "urls": [], "ig": 0.157, "fa": 0.0, "gp": 0.069, "bl": 2.55, "ds": 0.0, "txt": "I switched to Vivaldi and with some custom CSS it works very well"}, {"id": 50528845, "au": "alexgyurov", "dom": 6, "sr": 24, "sc": -9.34, "ep": 0.81, "bs": 8.61, "d": 0, "age": 1.32, "grav": 8.7, "surf": 104.5, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 10, "qw": 0, "k": 7, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "firefox_tabs", "flbl": "Firefox & Tabs (Vertical)", "urls": ["https://zen-browser.app/"], "ig": 0.177, "fa": 0.0, "gp": 0.274, "bl": 3.25, "ds": 0.0, "txt": "I would also recommend checking out https://zen-browser.app/, it's Firefox under the hood."}, {"id": 50529154, "au": "raulparada", "dom": 3, "sr": 25, "sc": -10.52, "ep": 0.0, "bs": 6.89, "d": 2, "age": 0.55, "grav": 5.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 24, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "firefox_tabs", "flbl": "Firefox & Tabs (Vertical)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Chrome has vertical tabs since April"}, {"id": 50528769, "au": "build_with_ragh", "dom": 29, "sr": 26, "sc": -11.64, "ep": 0.0, "bs": 9.41, "d": 0, "age": 1.5, "grav": 9.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 2, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.55, "ds": 0.0, "txt": "Great initiative. Cant wait to try."}, {"id": 50528826, "au": "JulieZhao00", "dom": 30, "sr": 27, "sc": -11.64, "ep": 0.0, "bs": 9.41, "d": 0, "age": 1.36, "grav": 8.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.55, "ds": 0.0, "txt": "You're doing great job!"}, {"id": 50529343, "au": "fouc", "dom": 13, "sr": 28, "sc": -13.22, "ep": 0.0, "bs": 11.13, "d": 0, "age": 0.05, "grav": 3.6, "surf": 248.4, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 1, "qw": 0, "k": 6997, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.1, "bl": 4.2, "ds": 0.0, "txt": "[delayed]"}, {"id": 50529042, "au": "computerfriend", "dom": 1, "sr": 29, "sc": -13.72, "ep": 0.0, "bs": 11.13, "d": 0, "age": 0.85, "grav": 6.6, "surf": 137.6, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 0, "qw": 11, "k": 1594, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://www.firefox.com/en-US/features/vertical-tabs/"], "ig": -0.95, "fa": 0.0, "gp": 0.206, "bl": 4.2, "ds": 0.0, "txt": "> I don’t want to switch back to boring tabs along the top.\n\nhttps://www.firefox.com/en-US/features/vertical-tabs/"}, {"id": 50529351, "au": "fouc", "dom": 15, "sr": 30, "sc": -23.41, "ep": 0.0, "bs": 18.02, "d": 1, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 1, "qw": 0, "k": 6997, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 6.8, "ds": 0.0, "txt": "[delayed]"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 40);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 40);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 40);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `${shown.length} of ${pool.length} comments` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1401 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50535885 // MAI Code 2 and Code 2 Flash — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+      text-transform: lowercase;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      text-transform: lowercase;
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .kpi-cell {
+      padding: 8px 0;
+    }
+    .kpi-label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 4px 0;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer:not([open]) {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary,
+    details.proof-drawer > summary {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+    }
+    table.ablation th {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: normal;
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    button.nav-btn,
+    button.mode-tab,
+    button.topbar-toggle {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: rgb(0, 0, 0);
+      cursor: pointer;
+      text-decoration: none;
+      line-height: inherit;
+      vertical-align: baseline;
+      transition: color 0.12s ease;
+      text-transform: lowercase;
+    }
+    button.nav-btn:hover,
+    button.nav-btn.active,
+    button.mode-tab:hover,
+    button.mode-tab.active,
+    button.topbar-toggle:hover,
+    button.topbar-toggle.active {
+      color: rgb(255, 255, 255);
+      text-decoration: none;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      padding: 14px;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; row-gap: 4px; }
+      .topbar-right { font-size: 8pt; padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+  <script>
+    (function() {
+      if (window.location.pathname.includes("/items/")) {
+        var m = window.location.pathname.match(/\/items\/(\d+)\.html/);
+        if (m) {
+          var base = window.location.pathname.replace(/\/items\/\d+\.html$/, "");
+          var target = (base || "") + "/item?id=" + m[1];
+          try {
+            history.replaceState(null, "", target);
+          } catch(e) {}
+        }
+      }
+    })();
+  </script>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+        <span class="pagetop" id="modeTabs">
+          <button type="button" class="nav-btn mode-tab active" data-mode="top_signal" role="tab" aria-selected="true">Top 40</button> | <button type="button" class="nav-btn mode-tab" data-mode="hn_top40" role="tab" aria-selected="false">HN Top 40</button>
+        </span>
+      </div>
+      <div class="topbar-right">
+        <button type="button" class="nav-btn topbar-toggle" id="exploreToggleBtn" aria-expanded="false">explore</button> | <button type="button" class="nav-btn topbar-toggle" id="evidenceToggleBtn" aria-expanded="false">evidence</button>
+      </div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://microsoft.ai/news/introducing-mai-code-2-and-mai-code-2-flash/">MAI Code 2 and Code 2 Flash</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=microsoft.ai"><span class="sitestr">microsoft.ai</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">406 points</span> by <a href="https://news.ycombinator.com/user?id=lemonish97">lemonish97</a> <span class="age" title="2026-11-17T18:25:13.000Z"><a href="https://news.ycombinator.com/item?id=50535885">22 hours ago</a></span> | <a href="https://news.ycombinator.com/item?id=50535885">146&nbsp;comments</a> | 84.9% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Evidence</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">146</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 112 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">15.1%</div>
+          <div class="kpi-sub">22 comments (7 Gold / 4.8%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">84.9%</div>
+          <div class="kpi-sub">78 chatter &bull; 43 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">3</div>
+        <div class="kpi-sub">10% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.879</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">47</div>
+          <div class="kpi-sub">HN POS 1..47 (32.2% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="color: rgb(90, 90, 88); margin-top: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Explore</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 146-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 146)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (7)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (15)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (78)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (3)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (43)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..146) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 44)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (pseudosavant, 20.8h); largest subtree (@pseudosavant) occupies 47 slots (HN POS 1..47).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (146)</option>
+          <option value="models_openai">Models &amp; Openai (Anthropic) (35)</option>
+          <option value="windows_flash">Windows &amp; Flash (Code) (34)</option>
+          <option value="copilot_claude">Copilot &amp; Claude (Microsoft) (31)</option>
+          <option value="serif_body">Serif &amp; Body (Text) (15)</option>
+          <option value="sol_opus">Sol &amp; Opus (Codex) (14)</option>
+          <option value="general_commentary">General Commentary (17)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, code, mai, flash, coding, performance...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50535885 + MICROSOFT.AI + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50535885, "story_title": "MAI Code 2 and Code 2 Flash", "story_url": "https://microsoft.ai/news/introducing-mai-code-2-and-mai-code-2-flash/", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50535885, "story_title": "MAI Code 2 and Code 2 Flash", "story_url": "https://microsoft.ai/news/introducing-mai-code-2-and-mai-code-2-flash/", "points": 406, "story_author": "lemonish97", "article_source": "fetched_url", "t1_ref_utc": "2026-11-18T16:18:37+00:00", "t2_ref_utc": "2026-11-18T16:18:37+00:00", "delta_minutes": 0.0, "story_anchors": ["code", "mai", "flash", "coding", "performance", "microsoft", "cost", "prices", "benchmarks", "sol", "enterprise", "tasks", "price", "github", "opus", "pricing", "copilot", "models", "azure", "based", "comparing", "offer", "api", "interesting", "harness"], "facet_labels": {"windows_flash": "Windows & Flash (Code)", "copilot_claude": "Copilot & Claude (Microsoft)", "models_openai": "Models & Openai (Anthropic)", "sol_opus": "Sol & Opus (Codex)", "serif_body": "Serif & Body (Text)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "windows_flash", "label": "Windows & Flash (Code)", "count": 34, "top_terms": ["windows", "flash", "code", "mai"]}, {"slug": "copilot_claude", "label": "Copilot & Claude (Microsoft)", "count": 31, "top_terms": ["copilot", "claude", "microsoft", "github"]}, {"slug": "models_openai", "label": "Models & Openai (Anthropic)", "count": 35, "top_terms": ["models", "openai", "anthropic", "coding"]}, {"slug": "sol_opus", "label": "Sol & Opus (Codex)", "count": 14, "top_terms": ["sol", "opus", "codex", "wish"]}, {"slug": "serif_body", "label": "Serif & Body (Text)", "count": 15, "top_terms": ["serif", "body", "text", "sans-serif"]}], "counts": {"total_comments": 146, "live_t2_comments": 146, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 112, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "dce66badb126ca32558d6dfa35d77e6a4a395993167966ac26b4ea203b3fdc20"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 7, "grounded_analysis": 15, "crowd_chatter": 78, "bullshit_or_flamewar": 43, "meme_or_snark": 3}, "facets": {"windows_flash": 34, "models_openai": 35, "sol_opus": 14, "copilot_claude": 31, "serif_body": 15, "general_commentary": 17}, "facet_options": [{"slug": "models_openai", "label": "Models & Openai (Anthropic)", "count": 35}, {"slug": "windows_flash", "label": "Windows & Flash (Code)", "count": 34}, {"slug": "copilot_claude", "label": "Copilot & Claude (Microsoft)", "count": 31}, {"slug": "serif_body", "label": "Serif & Body (Text)", "count": 15}, {"slug": "sol_opus", "label": "Sol & Opus (Codex)", "count": 14}, {"slug": "general_commentary", "label": "General Commentary", "count": 17}], "facet_diagnostics": [{"slug": "models_openai", "label": "Models & Openai (Anthropic)", "count": 35, "useful": 6, "useful_pct": 17.1, "terms": "models, openai, anthropic, coding"}, {"slug": "windows_flash", "label": "Windows & Flash (Code)", "count": 34, "useful": 7, "useful_pct": 20.6, "terms": "windows, flash, code, mai"}, {"slug": "copilot_claude", "label": "Copilot & Claude (Microsoft)", "count": 31, "useful": 5, "useful_pct": 16.1, "terms": "copilot, claude, microsoft, github"}, {"slug": "serif_body", "label": "Serif & Body (Text)", "count": 15, "useful": 1, "useful_pct": 6.7, "terms": "serif, body, text, sans-serif"}, {"slug": "sol_opus", "label": "Sol & Opus (Codex)", "count": 14, "useful": 3, "useful_pct": 21.4, "terms": "sol, opus, codex, wish"}, {"slug": "general_commentary", "label": "General Commentary", "count": 17, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 6}, {"category": "arxiv_preprint", "count": 3}], "story_anchors": ["code", "mai", "flash", "coding", "performance", "microsoft", "cost", "prices", "benchmarks", "sol", "enterprise", "tasks", "price", "github", "opus", "pricing", "copilot", "models"], "largest_root": {"root_id": 50536908, "author": "pseudosavant", "slots": 47, "start_dom": 1, "end_dom": 47, "share_pct": 32.2, "top_dom1_age": 20.8, "top_dom1_author": "pseudosavant"}, "buried_cutoff": 44, "rescue_top_k": 29, "ablations": [], "tournament": [], "comments": [{"id": 50537587, "au": "rbehrends", "dom": 27, "sr": 1, "sc": 13.73, "ep": 13.73, "bs": 0.0, "d": 4, "age": 19.98, "grav": 260.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 93, "qw": 19, "k": 3291, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": ["https://arxiv.org/abs/2608.09867"], "ig": 1.461, "fa": 3.05, "gp": 1.103, "bl": 0.0, "ds": 0.0, "txt": "> Indication for this are for example that Chinese models think they are another model: \"chinese model think its claude\".\n\nThere is evidence that some Chinese labs have been training on frontier model CoT (in particular from the analysis of reasoning traces [1]), but what models claim about their identity is pretty much worthless as evidence. LLMs are not self-aware. These claims come from whatever is in their training data, and Claude/GPT output including such statements is all over the public web, including in some huggingface data dumps. Consider that people got Opus claiming to be Qwen or DeepSeek when asked in Chinese, and you'll see how weak this particular evidence is.\n\n[1] E.g. https://arxiv.org/abs/2608.09867"}, {"id": 50538932, "au": "cmrx64", "dom": 28, "sr": 2, "sc": 13.15, "ep": 13.3, "bs": 0.0, "d": 5, "age": 18.18, "grav": 223.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 198, "qw": 0, "k": 2395, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": ["https://arxiv.org/abs/2509.14223", "https://arxiv.org/abs/2403.09613", "https://arxiv.org/abs/2606.00995"], "ig": 2.175, "fa": 2.35, "gp": 1.03, "bl": 0.0, "ds": 0.0, "txt": "So you’ve been completely ignoring all the work on introspective awareness, situational awareness, training set ordering awareness (https://arxiv.org/abs/2509.14223  & https://arxiv.org/abs/2403.09613), subliminal transfer (https://arxiv.org/abs/2606.00995), workspace formation, learning mechanics/theory of grokking, etc? The “objective” that mid and posttraining optimize is so powerful because pretraining already induced factorized worldmodels which have so much predictive and generative power that they snowball with even mild trajectory optimization (very different training objective than pretraining).\n\nhttps://arxiv.org/abs/2602.02385\n\n(Functional) small-s latent self awareness is a reliable shortcut (this is a principle you can derive from proof theory, the metric is deductive distance and that induces geometric morphisms). State compression from accurate selfmodeling pays rent.\n\nhttps://arxiv.org/abs/2611.02047\n\nhttps://arxiv.org/abs/2502.01954\n\nPhase transitions from statistical lookup to latent basin hopping: \nhttps://arxiv.org/abs/2405.15071\n\nPosttraining finds (https://arxiv.org/abs/2505.11711) and amplifies (https://arxiv.org/abs/2504.07912) these lottery tickets.\n\nThe frontier moves fast, but \"LLMs are not self aware\" is folklore. By now the basic model-organism science explaining how and the extent to which this is wrong, is substantial.\n\nLLMs lack reliable verbaliz"}, {"id": 50537413, "au": "hugmynutus", "dom": 98, "sr": 3, "sc": 11.5, "ep": 11.5, "bs": 0.0, "d": 1, "age": 20.17, "grav": 264.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 28, "qw": 30, "k": 92, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": ["https://arxiv.org/html/2610.18868v1"], "ig": 1.128, "fa": 2.77, "gp": 0.655, "bl": 0.0, "ds": 0.0, "txt": "> Which means these models are flying in the face of an orthodoxy that says the only way to make a model better at coding is to make it better at everything.\n\nFair amount of research has already shown this isn't the case. The latest example is -> https://arxiv.org/html/2610.18868v1\n\nPost training a model for a specific task can give a non-trivial boost when done correctly."}, {"id": 50539594, "au": "spwa4", "dom": 59, "sr": 4, "sc": 10.96, "ep": 10.96, "bs": 0.0, "d": 2, "age": 17.02, "grav": 200.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 287, "qw": 0, "k": 1186, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 2.163, "fa": 1.73, "gp": 0.653, "bl": 0.0, "ds": 0.0, "txt": "After evaluating this a bit more thoroughly ... the big MAI model (not the flash one) is somewhere between to Qwen3-flash-next and Qwen3.8-Max (ie. previous generation qwen flash model). Both models are significantly worse than Qwen3.8-Max and Qwen4-Max, and are blown out of the water by Deepseek v4.1 (including the Flash version tbh, frankly they're worse than last year's Deepseek):\n\n    Benchmark          MAI-2  MAI-Flash  Qwen4-Max  Q3.8-Max  Q3.8-Next  DS-V4.1\n    -----------------  -----  ---------  ---------  --------  ---------  -------\n    Params (total)     50-100B  5-15B      2.4T       2.4T      176B       748B\n    Params (active)      80B      12B       71B        95B        6B      8-16B\n    -----------------  -----  ---------  ---------  --------  ---------  -------\n    DeepSWE 1.1        73.2     59.9       75.7      69.3*      58.7*     77.0*\n    Terminal-Bench 2.1 84.6     78.3         -       86.6*      86.1*     90.6*\n    SWE-Atlas          43.1     44.8         -          -          -         -\n    FrontierCode 1.1     -        -          -          -          -         -\n    Terminal-Bench 4.0 26.3      2.5       48.5      38.9*      25.3*     42.3*\n\n    * Same benchmark version, potentially different harness/settings.\n    Scores in %, higher is better. Not a controlled comparison.\n\n    MAI-2/Flash: Microsoft MAI Code 2 / Code 2 Flash.\n    Q3.8-Next: Qwen3."}, {"id": 50540620, "au": "rbehrends", "dom": 55, "sr": 5, "sc": 10.52, "ep": 10.66, "bs": 0.0, "d": 1, "age": 15.05, "grav": 164.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 148, "qw": 15, "k": 3291, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "sol_opus", "flbl": "Sol & Opus (Codex)", "urls": [], "ig": 1.626, "fa": 1.93, "gp": 0.926, "bl": 0.0, "ds": 0.0, "txt": "> Does anyone use both Claude and Codex and can compare what that's like in practice?\n\nBe aware that this can vary greatly by benchmark to the poin where it is not possible to make a general comparison. Generally, however, Opus is considerably more expensive than Sol even for the benchmarks where it does best. That said, this comes with slightly better performance on benchmarks.\n\nFor subscriptions, it matters that Anthropic offers much higher discounts than OpenAI, partly or totally offsetting it. In my case, with $20 subscriptions for both (which is the worst-case scenario for OpenAI, they give bigger discounts on their $100/$200 plans), and on some tasks that I tried on both, 5h usage percentage is mostly a wash on average, with considerable variations either way. Again, I need to emphasize that this is for my tasks and cannot be generalized.\n\nFor example, on one task Sol decided to do extensive fuzzing to check its implementation while Opus didn't, so that drove up the usage for Sol a bit."}, {"id": 50537464, "au": "rbehrends", "dom": 25, "sr": 6, "sc": 8.13, "ep": 8.43, "bs": 0.0, "d": 3, "age": 20.12, "grav": 263.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 229, "qw": 0, "k": 3291, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": ["https://xxcancel.com/PatrickToulme/status/2069211575437627743", "https://thinkingmachines.ai/news/introducing-inkling/"], "ig": 1.926, "fa": 0.9, "gp": 0.921, "bl": 0.0, "ds": 0.0, "txt": "Yeah, there is a limit to how much you can get from capturing reasoning traces. (Traditional distillation of weights is not possible via the API.)\n\nPatrick Toulme noted a while ago that the biggest advantage of that in his opinion came from bootstrapping the post-training process: https://xxcancel.com/PatrickToulme/status/206921157543762774...\n\nAt Thinking Machines, they explicitly said that they used open-weights models for bootstrapping post-training, including Kimi K2.5: https://thinkingmachines.ai/news/introducing-inkling/\n\nSpeaking of Thinking Machines, that's another data point. Their Inkling Small 2 model is just a bit behind DeepSeek V4.1 Flash 1017 in benchmark, and in my tests, that seems to be accurate, but mostly because they used less training data for pre-training, so they have less of a knowledge base, while similar reasoning capabilities. (One of the most interesting parts of Inkling Small 2 is that their training must have been very cost-efficient, apparently using less, but higher quality training data.)\n\nAnd we're now seeing more and more Western near-frontier models from labs other than Anthropic and OpenAI to question whether distilling reasoning traces is really much of a difference maker.\n\nPersonally, my theory is that the gap is primarily due to Chinese labs having a harder time getting the necessary compute (especially top of the line GPUs) for training"}, {"id": 50537434, "au": "Wheen", "dom": 95, "sr": 7, "sc": 7.76, "ep": 8.13, "bs": 0.0, "d": 1, "age": 20.15, "grav": 264.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 93, "qw": 0, "k": 112, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 1.842, "fa": 0.95, "gp": 0.752, "bl": 0.0, "ds": 0.0, "txt": "DeepSeek v4.1 1017 and Qwen 3.8-Flash already proved that, IMO.\n\nIt also points to a major issue with Artificial Analysis, which weighs knowledge recall heavily (30% of the engineering index and 45% of the general intelligence index, splitting HLE-Diamond in half for its knowledge questions). DSv4.1F can handle all my work faster than Fable, but Fable is supposedly twice as \"intelligent\" in both the general intelligence index and the engineering index primarily because DS is a fraction of the size and fails on trivia questions (which, in practice, can be shored up by a harness with web search)."}, {"id": 50537060, "au": "contextfree", "dom": 126, "sr": 8, "sc": 7.07, "ep": 7.07, "bs": 0.0, "d": 1, "age": 20.61, "grav": 274.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 68, "qw": 0, "k": 1921, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": ["https://blogs.microsoft.com/blog/2026/10/28/introducing-the-microsoft-copilot-harness-unlocking-the-potential-of-truly-multi-model-agentic-work/"], "ig": 1.487, "fa": 0.96, "gp": 0.581, "bl": 0.0, "ds": 0.0, "txt": "I think Copilot is now meant to mean a specific harness (the one that originated with Github Copilot CLI). They're pulling back from applying the Copilot brand to anything vaguely AI-related. I guess this is sort of like how .NET was originally a brand that got randomly tacked on to every Microsoft product (Windows Server 2003 was going to be called Windows Server .NET) before it came to mean a specific programming framework.\n\nhttps://blogs.microsoft.com/blog/2026/10/28/introducing-the-..."}, {"id": 50539869, "au": "cycomanic", "dom": 20, "sr": 9, "sc": 6.36, "ep": 6.8, "bs": 0.0, "d": 1, "age": 16.56, "grav": 192.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 154, "qw": 22, "k": 12470, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "sol_opus", "flbl": "Sol & Opus (Codex)", "urls": [], "ig": 1.634, "fa": 0.42, "gp": 1.217, "bl": 0.0, "ds": 0.0, "txt": "> I'd hate to be OpenAI and Anthropic. They are better than the rest of the available models currently, but only by a few months.\n\nI sort of agree with you on Claude, but I've recently started using gpt-sol 6.1 and it took me a lot more iteration to get what I want than with Claude.Admittedly I was using Claude code and gpt with pi, but if the difference is the agent, then the situation is even more dire for open ai and anthropic. Today I looked at some code that got generated and it's an absolute Horrorshow. It's just some quick prototyping, but the code structure is a horrible mess.\n\nI ended up pointing my local Qwen 3.8 FN (Halogen on Ryzen 395) to the code and it was solving a bunch of basic issues that gpt introduced to the code. And I feel it's running faster as well.\n\nAll that to say, I now feel that openai (sol at least), is worse at coding tasks then a  local 180B parameter model (while Claude seems still ahead, but I'm unsure how much of that is the framework). They really are falling behind."}, {"id": 50536994, "au": "kennywinker", "dom": 94, "sr": 10, "sc": 5.92, "ep": 6.22, "bs": 0.0, "d": 0, "age": 20.67, "grav": 275.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 69, "qw": 0, "k": 11600, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 1.06, "fa": 0.68, "gp": 1.234, "bl": 0.0, "ds": 0.0, "txt": "The claimed 20% the cost suggests that the models are 20% the size. Which means these models are flying in the face of an orthodoxy that says the only way to make a model better at coding is to make it better at everything. I think this coming year is when we'll see that orthodoxy fall, as people realize you can make a model better at coding by making it better at coding."}, {"id": 50537289, "au": "throwaw12", "dom": 114, "sr": 11, "sc": 5.85, "ep": 5.85, "bs": 0.0, "d": 0, "age": 20.29, "grav": 267.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 96, "qw": 0, "k": 2362, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 1.455, "fa": 0.34, "gp": 1.008, "bl": 0.0, "ds": 0.0, "txt": "What annoys me a lot about MSFT releases are, that is not possible to find how to use these models and where to try them.\n\nI didn't hear anyone in my circle using MAI models, none.\n\nBecause even on this blog post, they are talking about pricing, but there is no Pricing page on that website, neither way to create API keys, nor playground.\n\nWith this success, I can also say, I am releasing a model which costs 0.0001$ / input/output MTok with 100x cheaper cache read and write which is on part with Opus 5.5. (its your problem to find that model)"}, {"id": 50537274, "au": "origini", "dom": 26, "sr": 12, "sc": 5.73, "ep": 6.17, "bs": 0.0, "d": 3, "age": 20.3, "grav": 267.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 117, "qw": 0, "k": 214, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 1.534, "fa": 0.5, "gp": 0.788, "bl": 0.0, "ds": 0.0, "txt": "I don't think there is perfect proof, but its taken as truth.\n\nIndication for this are for example that Chinese models think they are another model: \"chinese model think its claude\".\n\nMy assumption is, that Chinese model found things Frontierlabs already had but didn't share. There was this paper were i had the feeling that this was a real and significant Research Result from Deepseek \"DeepSeek-V4.1-Flash: Pushing the Limits of KV Cache Compression\" but otherwise its just unclear.\n\nThe main issue is, that as long as it seems plausable that they do distillation, its hard to determine how big the gap is.\n\nNot saying they can't catch up but they are also potentially limited by resources (money & nvidia GPUs)"}, {"id": 50539969, "au": "AnotherGoodName", "dom": 16, "sr": 13, "sc": 5.48, "ep": 6.36, "bs": 0.0, "d": 1, "age": 16.39, "grav": 189.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 100, "qw": 0, "k": 9712, "kpp": 5.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 1.564, "fa": 0.28, "gp": 1.299, "bl": 0.0, "ds": 0.0, "txt": "The worst thing for them would be if someone made reasonably priced hardware that could run the ‘near enough’ models like kimi or glm 5.3 or whatever the equivalent is in the future that\nthe home user could buy.\n\nI think it’s inevitable. Hardware manufacturing will ramp up to meet a demand and the demand from consumers is there. The big providers can’t monopolize a commodity forever.\n\nThe biggest hope is HBF (high bandwidth flash) which has the bandwidth of HBM with the density of flash. It has much more latency but when you’re repeatedly pumping weights through a compute unit it’s not a blocker."}, {"id": 50537364, "au": "com2kid", "dom": 2, "sr": 14, "sc": 5.46, "ep": 5.9, "bs": 0.0, "d": 1, "age": 20.21, "grav": 265.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 90, "qw": 0, "k": 13085, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 1.488, "fa": 0.0, "gp": 1.657, "bl": 0.0, "ds": 0.0, "txt": "Claude has pushed hard on productization. Day to day I use codex for everything, I went to watch my wife use Claude and the way it works is so different. I was shocked when she was modifying an artifact through the Claude website and it was able to make changes to a local file on her desktop.\n\nMicrosoft didn't win spreadsheets by having the most advanced or releasing the most often. They made a really good, easy to use product, and got it in front of everyone. (Though Office's p-code was a huge advantage to portability)"}, {"id": 50537504, "au": "adrian_b", "dom": 130, "sr": 15, "sc": 5.38, "ep": 5.38, "bs": 0.0, "d": 1, "age": 20.09, "grav": 262.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 161, "qw": 0, "k": 20185, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "serif_body", "flbl": "Serif & Body (Text)", "urls": [], "ig": 1.881, "fa": 0.0, "gp": 0.661, "bl": 0.0, "ds": 0.0, "txt": "In traditional typography, i.e. for texts printed on paper, the reverse was typically used, i.e. the body text used a serif typeface, while the headings used a sans-serif typeface for contrast.\n\nThe origin of sans-serif typefaces was in advertising, e.g. in posters and product labels, so it was natural to adopt them for headings. In this context an advantage of sans-serif fonts it is that it is easy to change their weight, e.g. to make them bold or extra-bold, without this making them uglier.\n\nWith the passing to computer displays, which have much worse resolution than printed paper, this has changed, because sans-serif typefaces became preferred for body text, since they are less damaged by low-quality displays.\n\nTo preserve a higher contrast between body text and headings, with pages intended to be seen on digital displays it has become quite frequent to use this reverse combination, of sans-serif for the body text with a serif typeface for headings, which will be rendered at a higher quality even on bad displays."}, {"id": 50538591, "au": "LaurensBER", "dom": 61, "sr": 16, "sc": 5.29, "ep": 5.29, "bs": 0.0, "d": 0, "age": 18.64, "grav": 232.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 109, "qw": 0, "k": 1806, "kpp": 5.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 1.494, "fa": 0.0, "gp": 1.225, "bl": 0.0, "ds": 0.0, "txt": "We just cancelled our Github Copilot subscription.\n\nIt was hard to even justify the 19,- dollar tier. All it gave us was some credits (at API prices) which most people burned through in days, some in hours, code reviews (that we couldn't customize) and another service to manage. Having AI integrated in Github is a decent idea but just like Microsoft Copilot, it's just not good enough at the moment.\n\nThese two models might help, I will definitely give it a try but while they're cheap they still do not compare to what feels like nearly unlimited usage offered by Claude Code and Codex (if you stick to the lower tier models)."}, {"id": 50539821, "au": "abixb", "dom": 3, "sr": 17, "sc": 4.53, "ep": 4.97, "bs": 0.0, "d": 2, "age": 16.65, "grav": 193.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 82, "qw": 0, "k": 4368, "kpp": 7.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 1.686, "fa": 0.0, "gp": 0.696, "bl": 0.0, "ds": 0.0, "txt": "I started using Claude in Chrome three weeks ago (after switching to Chrome after almost a decade) and I've been bloody impressed. It's able to invoke the desktop app for desktop stuff, use my browser for browser tools related stuff, and finally, uses MCP for all the apps I've given it gated access to using 'connectors.'\n\nAnthropic's productization is an order of magnitude better than OpenAI, imo, even if OpenAI has nearly the same, if not better, raw model performance. UX wins every time."}, {"id": 50541360, "au": "chopete3", "dom": 48, "sr": 18, "sc": 4.5, "ep": 5.16, "bs": 0.0, "d": 0, "age": 13.2, "grav": 134.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 57, "qw": 0, "k": 262, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 1.483, "fa": 0.34, "gp": 0.485, "bl": 0.0, "ds": 0.0, "txt": "Github Copilot offered MAI Code 2 at 50% today.\n\nI switched it to that model and it was able to resolve tricky python build issues within Windows WSL/ubuntu and also generated a good number of test cases and ensured all of them pass.\n\nIt resolved all the Azure deploy (bicep) issues as well. Didn't feel the difference from Claude Opus."}, {"id": 50538313, "au": "GenerWork", "dom": 80, "sr": 19, "sc": 4.18, "ep": 4.18, "bs": 0.0, "d": 0, "age": 19.03, "grav": 240.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 0, "k": 1217, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "sol_opus", "flbl": "Sol & Opus (Codex)", "urls": [], "ig": 1.071, "fa": 0.34, "gp": 0.481, "bl": 0.0, "ds": 0.0, "txt": "I wish they would've talked more about the visual coding. The fact that the visuals this produces is preferable to 6.1 Sol over 60% of the time is heartening, but I would've loved to see them go against Opus 5.5 which as far as I can tell is the king for UIs at this price point."}, {"id": 50539018, "au": "andai", "dom": 54, "sr": 20, "sc": 4.18, "ep": 4.69, "bs": 0.0, "d": 0, "age": 18.05, "grav": 220.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 100, "k": 18117, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 0.903, "fa": 0.42, "gp": 0.948, "bl": 0.0, "ds": 0.0, "txt": "> MAI Code 2 delivers 98% of GPT-6.1 Sol’s performance at 40% of the cost, and 96% of Claude Opus 5.5’s at 5%\n\nInteresting. Does this imply it's a smaller model specialized for coding?\n\nI remember OpenAI was experimenting with that back in the day but they ditched it for the One Model to Rule Them All strategy before long.\n\n---\n\nOn a related note, how is Sol ten times cheaper than Opus in these graphs? I know MS has a share in  OpenAI, are they cherry picking those numbers?\n\nEdit: It's about the same ratio on AA. That's nuts.\n\nThe per-token price difference is exactly 2x (on all fronts incl. caching, though I'm assuming the caching mechanisms differ). I guess Sol uses way fewer tokens then. (About 4x according to AA. Math checks out.)\n\nDoes anyone use both Claude and Codex and can compare what that's like in practice?"}, {"id": 50537654, "au": "giancarlostoro", "dom": 18, "sr": 21, "sc": 4.11, "ep": 4.77, "bs": 0.0, "d": 1, "age": 19.91, "grav": 258.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 23190, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 1.32, "fa": 0.0, "gp": 1.15, "bl": 0.0, "ds": 0.0, "txt": "I think Google and Microsoft have the benefit of time as you say, and already being profitable without AI.\n\nHonestly, this line up is impressive, I wanted to try MAI since v1 came out, but Microsoft locked down Copilot subscriptions. If they gave me a comparable plan to Claude Max I'd consider it."}, {"id": 50541052, "au": "elxr", "dom": 87, "sr": 22, "sc": 3.69, "ep": 3.69, "bs": 0.0, "d": 1, "age": 13.99, "grav": 146.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 48, "qw": 5, "k": 389, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "serif_body", "flbl": "Serif & Body (Text)", "urls": [], "ig": 0.967, "fa": 0.42, "gp": 0.152, "bl": 0.0, "ds": 0.0, "txt": "> I talk to it as Qwen\n\nWhy would you ever need to do this? Is this some multi-model orchestration thing where you pass off responses from a model to another?\n\nI usually just tell the agent an instruction, or if I need its opinion I just say \"you\". Can't think of a situation where using \"you\" wasn't clear enough."}, {"id": 50537037, "au": "origini", "dom": 49, "sr": 23, "sc": 3.6, "ep": 4.04, "bs": 0.0, "d": 0, "age": 20.63, "grav": 274.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 64, "qw": 0, "k": 214, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 1.073, "fa": 0.28, "gp": 0.497, "bl": 0.0, "ds": 0.0, "txt": "If these benchmarks can hold up in real life, we are seeing again and again an intelligence explosion in front of our eyes and devaluation of intelligence.\n\nAnyone has more background how they were able to catch up that fast? Distillation of GPT due to their OpenAI acess to the model might make most sense but they probably are not allowed to do that."}, {"id": 50537086, "au": "a11r", "dom": 112, "sr": 24, "sc": 3.3, "ep": 3.96, "bs": 0.0, "d": 0, "age": 20.57, "grav": 273.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 59, "qw": 0, "k": 640, "kpp": 7.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 1.392, "fa": 0.0, "gp": 0.477, "bl": 0.0, "ds": 0.0, "txt": "It is interesting to see M$ trying to compete on price, in the most half-hearted way possible. There is a huge opportunity for a hyperscaler to offer competitive models at prices that actually compete with Luna. Google has left the field with their desire to raise prices so it is either OAI Luna or open weight models offered by neoclouds/neo-inference-providers."}, {"id": 50541849, "au": "hauntingseaweed", "dom": 99, "sr": 25, "sc": 3.19, "ep": 3.19, "bs": 0.0, "d": 0, "age": 11.91, "grav": 114.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 13, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sol_opus", "flbl": "Sol & Opus (Codex)", "urls": [], "ig": 1.314, "fa": 0.0, "gp": 0.069, "bl": 0.0, "ds": 0.0, "txt": "I hope Anthropic goes bankrupt eventually for trying to regulate open-weight models out of existence. Absolutely disgusting. I honestly never thought I’d hate someone more than Altman and Zuckerberg but nowadays I wish Amodei that his IPO flops!"}, {"id": 50538030, "au": "thisisit", "dom": 38, "sr": 26, "sc": 3.16, "ep": 4.04, "bs": 0.0, "d": 1, "age": 19.41, "grav": 248.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 112, "qw": 0, "k": 7790, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 1.532, "fa": 0.0, "gp": 0.306, "bl": 0.0, "ds": 0.0, "txt": "Openai and Anthropic are better at making models easily available too. Both Google and Microsoft are using promotional pricing to push their models and that should tell you how far they are from actually competing.\n\nAlso model availability is not easy. Google newest models are unavailable on some pro accounts and perform best only with Antigravity. Trying to plug it in some other harness and its terrible. If you try to connect your subscription with Hermes etc you might get banned.\n\nMicrosoft models are hidden away in Azure.\n\nSo every time I read Google/MS announcements I just shrug. If I want to use models like these I might as well get DeepSeek on Openrouter instead."}, {"id": 50542620, "au": "nl", "dom": 84, "sr": 27, "sc": 3.1, "ep": 3.1, "bs": 0.0, "d": 1, "age": 9.72, "grav": 83.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 67, "qw": 0, "k": 34263, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "serif_body", "flbl": "Serif & Body (Text)", "urls": [], "ig": 1.317, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "You are the first person anywhere on the internet that I've seen who rated Phi at all.\n\nI think the general impression was that it was one of the most benchmaxxed models around (presumably not deliberately - probably because of all synthetic data they used).\n\nI certainly found that as soon as you went slightly out of the distribution it was trained on (text book type data) it was terrible."}, {"id": 50536433, "au": "ssgodderidge", "dom": 131, "sr": 28, "sc": 3.07, "ep": 3.22, "bs": 0.0, "d": 1, "age": 21.32, "grav": 289.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 37, "qw": 0, "k": 1368, "kpp": 6.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "serif_body", "flbl": "Serif & Body (Text)", "urls": ["https://www.canva.com/learn/the-ultimate-guide-to-font-pairing/"], "ig": 0.552, "fa": 0.62, "gp": 0.106, "bl": 0.0, "ds": 0.0, "txt": "It's a common design paradigm to pair serif and sans-serif fonts. Lots of examples and blog posts out there for why this is the case, but here's a decent enough starting place from canva with lots of font combos\n\nhttps://www.canva.com/learn/the-ultimate-guide-to-font-pairi..."}, {"id": 50536908, "au": "pseudosavant", "dom": 1, "sr": 29, "sc": 2.89, "ep": 4.21, "bs": 0.0, "d": 0, "age": 20.77, "grav": 277.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 56, "qw": 0, "k": 3737, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 1.172, "fa": 0.0, "gp": 1.001, "bl": 0.0, "ds": 0.0, "txt": "I'd hate to be OpenAI and Anthropic. They are better than the rest of the available models currently, but only by a few months.\n\nThat is a very tenuous lead and doesn't speak to much of a sustainable competitive moat for either company. The have to keep sprinting as fast as possible on the hamster wheel to just stay ahead."}, {"id": 50538247, "au": "nxtfari", "dom": 86, "sr": 30, "sc": 2.74, "ep": 3.77, "bs": 0.0, "d": 0, "age": 19.11, "grav": 242.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 63, "qw": 0, "k": 444, "kpp": 6.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 1.26, "fa": 0.0, "gp": 0.557, "bl": 0.0, "ds": 0.0, "txt": "Probably would be a good time to rename it “Mai” (like the name) instead of the corporate “MAI” if they’re gonna be serious players. I don’t think any research has really been done into this, but in my anecdotal usage a coherent persona seems to help the models achieve more. Even Qwen seems to perform better when I talk to it as Qwen instead of generically."}, {"id": 50536992, "au": "user43928", "dom": 74, "sr": 31, "sc": 2.69, "ep": 2.91, "bs": 0.0, "d": 1, "age": 20.67, "grav": 275.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 1404, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sol_opus", "flbl": "Sol & Opus (Codex)", "urls": [], "ig": 0.824, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "While showing MAI Code 2 at a 50% promotional discount, and comparing to Max reasoning effort for Opus 5.5 and 6.1 Sol..."}, {"id": 50536356, "au": "CharlieDigital", "dom": 143, "sr": 32, "sc": 2.62, "ep": 3.72, "bs": 0.0, "d": 1, "age": 21.42, "grav": 291.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 7182, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 1.092, "fa": 0.28, "gp": 0.248, "bl": 0.0, "ds": 0.0, "txt": "Price and performance look good based on benchmarks.\n\nAm definitely interested in trying this to see given a lot of my workload of actual coding is handed over to Haiku/Luna right now."}, {"id": 50537351, "au": "ac29", "dom": 97, "sr": 33, "sc": 2.59, "ep": 3.69, "bs": 0.0, "d": 2, "age": 20.22, "grav": 265.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 10, "k": 7426, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 1.061, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> or MS is paying the bill to gain market shares.\n\nYeah, Anthropic has a huge gross margin on inference per their S1, there's no reason to believe Microsoft couldn't offer better pricing even if the model is as large/cost as much to host"}, {"id": 50541424, "au": "SillyUsername", "dom": 83, "sr": 34, "sc": 2.43, "ep": 2.8, "bs": 0.0, "d": 0, "age": 13.03, "grav": 131.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 1071, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "serif_body", "flbl": "Serif & Body (Text)", "urls": [], "ig": 1.108, "fa": 0.0, "gp": 0.133, "bl": 0.0, "ds": 0.0, "txt": "Whatever happened to the Microsoft Phi series?\n\nI felt that the training data and behaviours for this at the time were very OpenAI like, due to responses similar in structure to ChatGPT (like how ChatGPT now usually has a section at the end \"Why this matters\")"}, {"id": 50542004, "au": "analog_daddy", "dom": 4, "sr": 35, "sc": 2.43, "ep": 3.31, "bs": 0.0, "d": 3, "age": 11.47, "grav": 107.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 55, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sol_opus", "flbl": "Sol & Opus (Codex)", "urls": [], "ig": 1.408, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Yeah, had the same experience. Left claude since it rambles too much and so far loving Luna/Sol. But, man the codex cloud environment setup sucks.\nLiking the chat’s ux though since it can make github edits directly, so hopefully the cloud experience was one off."}, {"id": 50539168, "au": "spwa4", "dom": 58, "sr": 36, "sc": 2.35, "ep": 3.9, "bs": 0.0, "d": 1, "age": 17.84, "grav": 216.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 1186, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 0.978, "fa": 0.56, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "They did the trick the Chinese models didn't use. They used older versions of the Benchmarks.\n\nAccording to almost the same benchmarks Qwen4 Max is Opus 5.2 level, so it would only be slightly worse than this model."}, {"id": 50537844, "au": "giancarlostoro", "dom": 105, "sr": 37, "sc": 2.25, "ep": 3.35, "bs": 0.0, "d": 0, "age": 19.67, "grav": 253.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 70, "qw": 0, "k": 23190, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 1.331, "fa": 0.0, "gp": 0.157, "bl": 0.0, "ds": 0.0, "txt": "Alright, I'm going to say it. Microsoft, if your model's so good, can it make a genuinely good version of Windows for people who don't want all the garbage you include with Windows? Not asking to be a jerk, hoping to bait Microsoft into making Windows suck less.\n\nAsking for everybody else who wishes Windows would return to its better days. :)\n\nAll that said, this is a very impressive line up they released today."}, {"id": 50540431, "au": "mrinterweb", "dom": 17, "sr": 38, "sc": 2.2, "ep": 3.74, "bs": 0.0, "d": 2, "age": 15.47, "grav": 172.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 87, "qw": 0, "k": 2171, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 1.538, "fa": 0.0, "gp": 0.088, "bl": 0.0, "ds": 0.0, "txt": "Qwen 3.8 flash next is pretty good. It is a pretty large MOE model that can be ran with Strata. That's the best local model I can run for now. I wish I could run deepseek v4.1 flash (1017), but that one is too big for my machine to run.\n\nI swear people forget about inference providers that serve open weight models. It is hard to beat their prices. They are usually barely more expensive than electricity, so running local inference barely wins on cost (if you don't factor in the upfront hardware costs)."}, {"id": 50542115, "au": "mchusma", "dom": 56, "sr": 39, "sc": 2.17, "ep": 3.27, "bs": 0.0, "d": 1, "age": 11.19, "grav": 103.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 4685, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sol_opus", "flbl": "Sol & Opus (Codex)", "urls": [], "ig": 0.981, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I use both subscription $200 plan and Claude in general gives you way Fable vs Astra and I’d say similar Sol v Opus, so I don’t use codex much (mostly to review)"}, {"id": 50537875, "au": "bensyverson", "dom": 51, "sr": 40, "sc": 2.15, "ep": 3.18, "bs": 0.0, "d": 2, "age": 19.62, "grav": 252.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 58, "qw": 0, "k": 1491, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 1.014, "fa": 0.28, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Owning the iron has got to be a massive advantage. It's interesting that the advantage has so far been pretty theoretical, but based on these benchmarks, it may be starting to pay off. It has to be hard to hire in the talent to train these models (even if you're Microsoft) when you're competing with established labs."}, {"id": 50538680, "au": "halJordan", "dom": 64, "sr": 41, "sc": 2.06, "ep": 3.3, "bs": 0.0, "d": 1, "age": 18.51, "grav": 229.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 1691, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 1.316, "fa": 0.0, "gp": 0.144, "bl": 0.0, "ds": 0.0, "txt": "There's zero reason why these must be tied to a proprietary model & api. It should just be a matter of adding an openapi compatible endpoint, and an api key. It's even worse that gitlab is also tying ai integration to paid enterprise licenses"}, {"id": 50537513, "au": "upbeat_general", "dom": 70, "sr": 42, "sc": 1.99, "ep": 3.09, "bs": 0.0, "d": 0, "age": 20.07, "grav": 262.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 654, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 1.017, "fa": 0.0, "gp": 0.481, "bl": 0.0, "ds": 0.0, "txt": "I really hope they keep writing technical reports even as their models get better.\n\nMAI-Thinking-1 is far more in depth than anything else recent I could find, and very valuable to those outside the labs."}, {"id": 50537419, "au": "d-sanoj", "dom": 85, "sr": 43, "sc": 1.93, "ep": 5.55, "bs": 2.52, "d": 0, "age": 20.16, "grav": 264.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 73, "qw": 0, "k": 0, "kpp": 0.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 1.303, "fa": 0.56, "gp": 0.613, "bl": 0.95, "ds": 0.0, "txt": "I don't put much weight on launch benchmarks for coding models anymore. I think most of us use OpenAI and Anthropic models anyway. These models will catch up sometime with the OpenAI and Anthropic and maybe then there could be a difference where we could actually reply on. For example, if we consider image generation, nano banana was better and so were image models like Qwen and Flux which provide same if not sometimes better outputs."}, {"id": 50536272, "au": "dude250711", "dom": 139, "sr": 44, "sc": 1.87, "ep": 3.12, "bs": 0.0, "d": 0, "age": 21.5, "grav": 293.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 419, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 0.908, "fa": 0.0, "gp": 0.679, "bl": 0.0, "ds": 0.0, "txt": "Concerning, as they might persuade an average enterprise to stop paying for proper Anthropic models and switch to them instead for cost saving..."}, {"id": 50540543, "au": "nico", "dom": 7, "sr": 45, "sc": 1.84, "ep": 3.38, "bs": 0.0, "d": 2, "age": 15.25, "grav": 168.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 47, "qw": 15, "k": 4557, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 0.657, "fa": 0.42, "gp": 0.445, "bl": 0.0, "ds": 0.0, "txt": "> Microsoft didn't win spreadsheets by having the most advanced or releasing the most often. They\n\nThey won by owning the distribution. Essentially making it the default option for businesses. Bundling with Office, owning the operating system (eg. Making competing products error out), licensing deals and many other things very similar to their Embrace, Extend, Extinguish strategy (which they used against open standards)"}, {"id": 50537302, "au": "oofbaroomf", "dom": 77, "sr": 46, "sc": 1.84, "ep": 2.72, "bs": 0.0, "d": 0, "age": 20.27, "grav": 266.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 581, "kpp": 8.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sol_opus", "flbl": "Sol & Opus (Codex)", "urls": [], "ig": 0.909, "fa": 0.0, "gp": 0.405, "bl": 0.0, "ds": 0.0, "txt": "They are comparing to Sol 6.1's API prices. With Sol 6.2, and especially if you consider subsidization from Codex subscriptions, it's probably no longer on the Pareto frontier."}, {"id": 50537791, "au": "giancarlostoro", "dom": 35, "sr": 47, "sc": 1.79, "ep": 3.33, "bs": 0.0, "d": 3, "age": 19.73, "grav": 255.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 61, "qw": 0, "k": 23190, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 1.398, "fa": 0.0, "gp": 0.031, "bl": 0.0, "ds": 0.0, "txt": "All it would take is Nvidia finally releasing the 6090's instead of trying to milk enterprise GPUs. I don't understand the blind love for Jensen, he's clearly been screwing over all the consumers who made him and Nvidia wealthy.\n\nSomeone somewhere really needs to build a RAM startup that not only makes RAM but disrupts the stronghold AI has over it, it's a little absurd."}, {"id": 50546320, "au": "pvdebbe", "dom": 103, "sr": 48, "sc": 1.77, "ep": 2.87, "bs": 0.0, "d": 1, "age": 2.44, "grav": 14.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 43, "qw": 0, "k": 797, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 1.219, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "One idea: in six months they want the compute capacity for a new thing. That time they could nerf the current models (much like people accuse Anthropic of doing), or eat the extra expenses, or apply this preannounced price hike. Seems... neat to me."}, {"id": 50537894, "au": "quard8", "dom": 115, "sr": 49, "sc": 1.73, "ep": 2.32, "bs": 0.0, "d": 1, "age": 19.61, "grav": 252.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 10, "k": 9, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "serif_body", "flbl": "Serif & Body (Text)", "urls": [], "ig": 0.902, "fa": 0.0, "gp": 0.136, "bl": 0.0, "ds": 0.0, "txt": ">I didn't hear anyone in my circle using MAI models, none.\n\nI'm using MAI-Transcribe 2 via OpenRouter for captions generation: cheap, supports a lot of languages and I see great results"}, {"id": 50536507, "au": "poisonborz", "dom": 140, "sr": 50, "sc": 1.7, "ep": 3.1, "bs": 0.0, "d": 1, "age": 21.24, "grav": 287.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 3524, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 1.239, "fa": 0.0, "gp": 0.128, "bl": 0.0, "ds": 0.0, "txt": "If you mean software, every large corporation has Github, thus Copilot, thus most western models. MAI will be perhaps relevant for Office Copilot, which is currently almost unusably bad (because probably very not cost efficient for MS since the OpenAI fallout)."}, {"id": 50548155, "au": "Gallows4574", "dom": 57, "sr": 51, "sc": 1.59, "ep": 3.13, "bs": 0.0, "d": 2, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 60, "qw": 0, "k": 12, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sol_opus", "flbl": "Sol & Opus (Codex)", "urls": [], "ig": 0.921, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Interesting. I'm on the $100 plan of each and feel the opposite. I'm constantly using Astra and Sol because of how much more usage I get vs Anthropic models. I usually just run Sol 6.1 on ultra or extra high. I do use Codex most of the time as the harness, but I have one nuc that I run hermes on and haven't approached any Sol limits there either."}, {"id": 50537854, "au": "origini", "dom": 37, "sr": 52, "sc": 1.57, "ep": 3.11, "bs": 0.0, "d": 3, "age": 19.65, "grav": 253.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 104, "qw": 0, "k": 214, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 1.325, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I currently do not bother with chinese models. I try them out, i use the small ones for small experiments but the price point difference matters so little that I want 'the current best'.\n\nAnd 6 month feels still very different.\n\nIts for sure an option or might have some kind of impact but if you have some kind of restrictions on what you should use and the price is not that big but the quality and possibilites are better, I can see companies just staying with Anthropic or OpenAI.\n\nYou also don't just switch out a model, they might need prompt updates etc.\n\nBut we will see I don't mind competition"}, {"id": 50537277, "au": "eldenring", "dom": 39, "sr": 53, "sc": 1.57, "ep": 3.11, "bs": 0.0, "d": 1, "age": 20.3, "grav": 267.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 336, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 1.2, "fa": 0.0, "gp": 0.199, "bl": 0.0, "ds": 0.0, "txt": "I disagree, I think distillation hides the true technical advantage since you can always get within X% of Claude by ex: training on newly created code on Github, but the underlying intelligence is harder to replicate."}, {"id": 50538426, "au": "johnfn", "dom": 53, "sr": 54, "sc": 1.48, "ep": 2.87, "bs": 0.0, "d": 1, "age": 18.86, "grav": 237.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 59, "qw": 0, "k": 13440, "kpp": 6.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 1.221, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "TBH, DeepSWE 1.1 has been busted for a while (is anyone out there arguing Gemini 3.8 Flash is as good as Astra lol?), and TB2.1 as a top line when they are currently at 4 (which is substantially harder) and FrontierCode at 1.1 when it's currently at 2.0 does not bring a lot of confidence.\n\nOf course I always want to see more competition in this space, though!"}, {"id": 50537174, "au": "adrian_b", "dom": 24, "sr": 55, "sc": 1.47, "ep": 3.01, "bs": 0.0, "d": 2, "age": 20.43, "grav": 270.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 198, "qw": 0, "k": 20185, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 0.621, "fa": 0.28, "gp": 0.519, "bl": 0.0, "ds": 0.0, "txt": "For now I have not seen any credible evidence for \"But chinese models use distillation of Frontiermodels...\".\n\nOf course, I would not be surprised if they also do this, mainly because after OpenAI and Anthropic have succeeded to gather most training information that was easily accessible in the past and now it has become much more difficult to do the same. For some information that was hoarded by OpenAI and Anthropic, public access may have become impossible otherwise than through their LLMs.\n\nNonetheless, distillation cannot be the main source of improvement for the Chinese models, among other reasons because even assuming that they may have access to a great number of fake accounts, there still is not enough time for a lot of distillation, taking into consideration the timeline of the releases, and it is not believable that the attempts to do distillation would not be detected quickly by OpenAI and Anthropic, leading to the banning of the fake accounts. While OpenAI and Anthropic provide negligible information about their models, the Chinese AI companies are much more transparent about their methods and we can see that there is a lot of diversity among their models and a lot of innovations with each new version."}, {"id": 50537064, "au": "origini", "dom": 23, "sr": 56, "sc": 1.47, "ep": 2.8, "bs": 0.0, "d": 1, "age": 20.6, "grav": 273.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 214, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 0.839, "fa": 0.0, "gp": 0.572, "bl": 0.0, "ds": 0.0, "txt": "I would counter argue with \"But chinese models use distillation of Frontiermodels...\" which is different than being a Frontierlab or not clear how different it is.\n\nBut Microsoft coming from the side like this might be very different if it holds up."}, {"id": 50542790, "au": "LaurensBER", "dom": 68, "sr": 57, "sc": 1.47, "ep": 2.77, "bs": 0.0, "d": 2, "age": 9.31, "grav": 78.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 53, "qw": 0, "k": 1806, "kpp": 5.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 1.18, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "We've found that the challenge with code review is that you have very limited ability to customise it.\n\nWe've replaced it with a bot that does the same thing, except we fully control it now. So we can route crucial parts of the codebase to SOTA models, tag security if needed, etc."}, {"id": 50538684, "au": "LaurensBER", "dom": 63, "sr": 58, "sc": 1.47, "ep": 2.77, "bs": 0.0, "d": 2, "age": 18.51, "grav": 229.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 1806, "kpp": 5.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 1.179, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I agree, either they need to be incredible cheap (like Deepseek at OpenCode Go where you really have to push it to see the quota move) or they need to switch to a similar approach as Devin/Cursor are implementing.\n\nGithub Copilot just isn't competitive, at the moment."}, {"id": 50547999, "au": "p_l", "dom": 10, "sr": 59, "sc": 1.47, "ep": 3.56, "bs": 0.85, "d": 5, "age": 0.21, "grav": 4.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 74, "qw": 0, "k": 10128, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 1.1, "fa": 0.34, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "Yes, I fully agree - I do remember the 1990s :)\n\nI am just saying that it was not just that which let them win in the market.\n\nIn fact, some markets they were lagging behind before windows 2000, but Active Directory just wiped out competitors' offerings in many ways - and even before there was part of \"Run a server on NT4 and have less worries about hardware support\" compared to alternatives (which in turn was encroaches by Linux with Samba)"}, {"id": 50538394, "au": "whh", "dom": 91, "sr": 60, "sc": 1.47, "ep": 2.63, "bs": 0.0, "d": 1, "age": 18.91, "grav": 238.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 248, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 1.036, "fa": 0.0, "gp": 0.136, "bl": 0.0, "ds": 0.0, "txt": "I think in this case it's fine. But, I'd really like them to stop renaming/rebranding things and instead focus their energy on simplifying things.\n\nWhy Azure AD had to be renamed \"Entra\" is still beyond me... and it sounds like a butt thing."}, {"id": 50537439, "au": "hugmynutus", "dom": 111, "sr": 61, "sc": 1.47, "ep": 2.53, "bs": 0.0, "d": 0, "age": 20.14, "grav": 263.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 92, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 0.973, "fa": 0.0, "gp": 0.169, "bl": 0.0, "ds": 0.0, "txt": "Confusing. You think the people who let you rent GPUs would just give you the weights, platform, and inference code - to make it as easy as possible to run it on their platform where they can bill you for ingress/egress, etc."}, {"id": 50547157, "au": "nico", "dom": 12, "sr": 62, "sc": 1.47, "ep": 2.36, "bs": 0.0, "d": 4, "age": 1.24, "grav": 8.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 69, "qw": 0, "k": 4557, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 1.006, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Yes, I remember we used to have DR DOS (Digital Research DOS). And at some point the latest version of windows at that time (I know it was before 3.11), just would install or wouldn’t run. My dad knew that MS made it hard to have windows in non MS DOS, so he tried a bunch of times, but in the end gave up and removed DR DOS so we could have Windows"}, {"id": 50543118, "au": "ticoombs", "dom": 69, "sr": 63, "sc": 1.47, "ep": 2.35, "bs": 0.0, "d": 3, "age": 8.42, "grav": 68.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 199, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 0.999, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I would love to know more about this. Even with other SOTA models doing a \"review\". It won't find anything and then Copilot Review will find 3 other things. It seems weird that they swing from yep we fixed everything to completely missing two of the same columns in an SQL query."}, {"id": 50541582, "au": "slyall", "dom": 11, "sr": 64, "sc": 1.47, "ep": 4.32, "bs": 1.99, "d": 3, "age": 12.61, "grav": 124.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 36, "qw": 0, "k": 8574, "kpp": 6.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": ["https://raywoodcockslatest.wordpress.com/2021/06/09/dos-lotus/"], "ig": 0.884, "fa": 0.62, "gp": 0.327, "bl": 0.75, "ds": 0.0, "txt": "There were even stories they deliberately sabotaged Lotus 123 (spreadsheet application) on Dos. There is an infamous quote:\n\n\" DOS Isn’t Done Until Lotus Won’t Run \"\n\nalthough this article and others say it probably never happened in reality\n\nhttps://raywoodcockslatest.wordpress.com/2021/06/09/dos-lotu..."}, {"id": 50539762, "au": "epolanski", "dom": 44, "sr": 65, "sc": 1.47, "ep": 2.33, "bs": 0.0, "d": 1, "age": 16.74, "grav": 195.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 13682, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 0.9, "fa": 0.0, "gp": 0.146, "bl": 0.0, "ds": 0.0, "txt": "Why would you hate and why would anybody care?\n\nTime and time again it's been clear that LLMs are commodities with no winners. You'll jump where wallet and performance in your applications will bring you."}, {"id": 50537101, "au": "origini", "dom": 96, "sr": 66, "sc": 1.47, "ep": 2.3, "bs": 0.0, "d": 1, "age": 20.55, "grav": 272.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 214, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 0.98, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Or architectual optimizations for inferencing or optimized inferencing or MS is paying the bill to gain market shares.\n\nOne thing big models are def better at is holding more complex abstractions in context and I do find better results."}, {"id": 50539754, "au": "stingraycharles", "dom": 67, "sr": 67, "sc": 1.47, "ep": 2.3, "bs": 0.0, "d": 1, "age": 16.75, "grav": 195.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 17290, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 0.712, "fa": 0.22, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Isn’t Copilot Code Review using OpenAI’s models? As in, if it’s currently not good enough, these two new models are unlikely to make any impact?"}, {"id": 50541713, "au": "viraptor", "dom": 106, "sr": 68, "sc": 1.47, "ep": 2.27, "bs": 0.0, "d": 1, "age": 12.32, "grav": 120.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 48138, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 0.967, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Windows being garbage today has very little to do with technical skills at this point. There's a tonne of business / design stuff to address that people have to actually decide to address. They could make it great, LLMs or not."}, {"id": 50536407, "au": "srameshc", "dom": 136, "sr": 69, "sc": 1.47, "ep": 2.27, "bs": 0.0, "d": 1, "age": 21.35, "grav": 290.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 6596, "kpp": 6.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "sol_opus", "flbl": "Sol & Opus (Codex)", "urls": [], "ig": 0.967, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It is called 'font pairing' where the designer choses the best font based on different parameters to make the blog design interesting."}, {"id": 50537497, "au": "eli", "dom": 34, "sr": 70, "sc": 1.47, "ep": 2.17, "bs": 0.0, "d": 2, "age": 20.1, "grav": 262.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 30524, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 0.7, "fa": 0.0, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "Even if OpenAI/Anthropic remain \"a few months\" ahead of open weight models indefinitely that still is not great news for them."}, {"id": 50537977, "au": "rcarmo", "dom": 116, "sr": 71, "sc": 1.47, "ep": 2.15, "bs": 0.0, "d": 1, "age": 19.49, "grav": 250.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 31828, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 0.858, "fa": 0.0, "gp": 0.091, "bl": 0.0, "ds": 0.0, "txt": "They're on OpenRouter, I think. And on the GitHub Copilot CLI, and I am reasonably sure you can pop over to Azure and provision an endpoint in a few hours (depending on region, I've been using it for a bit)"}, {"id": 50543841, "au": "ezrabuenk", "dom": 81, "sr": 72, "sc": 1.47, "ep": 2.1, "bs": 0.0, "d": 0, "age": 7.13, "grav": 53.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 7, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 0.828, "fa": 0.0, "gp": 0.106, "bl": 0.0, "ds": 0.0, "txt": "Very cool to see these new contenders. Does anyone know how it compares in terms or performance to pricing ratio compared to deepseek flash 1017?"}, {"id": 50543337, "au": "spwa4", "dom": 60, "sr": 73, "sc": 1.47, "ep": 2.1, "bs": 0.0, "d": 3, "age": 8.03, "grav": 63.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 1186, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 0.892, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Wow, this model might be distilled from Qwen3-flash-next, after trying it. Certainly to an extent that's true. That would make the training cost much less if true.\n\nI wonder if I could do something similar."}, {"id": 50539662, "au": "quixoticelixer-", "dom": 29, "sr": 74, "sc": 1.47, "ep": 2.08, "bs": 0.0, "d": 4, "age": 16.9, "grav": 198.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 271, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 0.544, "fa": 0.28, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The thing that makes me think they do it is that you can tell there is more of a difference in personality between Gemini and Opus for example, than between Opus and most other models"}, {"id": 50539335, "au": "outside1234", "dom": 32, "sr": 75, "sc": 1.47, "ep": 2.06, "bs": 0.0, "d": 3, "age": 17.57, "grav": 211.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 8290, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 0.464, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Do they need to stay in front though?  Because if it is 25% the cost, I'm happy to be one leg behind the leader."}, {"id": 50537632, "au": "doomroot13", "dom": 118, "sr": 76, "sc": 1.47, "ep": 2.06, "bs": 0.0, "d": 1, "age": 19.94, "grav": 259.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 56, "qw": 0, "k": 243, "kpp": 4.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 0.876, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It's right on the page at the bottom:\n\n\"Get started\n\nMAI Code 2 and Code 2 Flash are available in GitHub Copilot, and Code 2 Flash is in limited-access preview in Microsoft Foundry. Soon, we’ll be releasing it on Open Router, Vercel, Hermes, Open Code, and Kilo.\n\nLearn more about customizing MAI Code 2 on our Custom Models page.\""}, {"id": 50538660, "au": "InsideOutSanta", "dom": 62, "sr": 77, "sc": 1.47, "ep": 1.98, "bs": 0.0, "d": 1, "age": 18.54, "grav": 230.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 7637, "kpp": 4.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 0.767, "fa": 0.0, "gp": 0.122, "bl": 0.0, "ds": 0.0, "txt": "I think they won't help if they're billed at the announced rate on your Copilot quota. Microsoft would need to do something like Devin does and offer its own models with separate limits."}, {"id": 50537644, "au": "jbkkd", "dom": 117, "sr": 78, "sc": 1.47, "ep": 1.97, "bs": 0.0, "d": 1, "age": 19.93, "grav": 259.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 207, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 0.838, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "True. With all the criticism against Google, they at least offer the Google AI studio for Gemini models.\n\nI haven't seen anything equivalent from Microsoft."}, {"id": 50542807, "au": "LaurensBER", "dom": 66, "sr": 79, "sc": 1.47, "ep": 1.84, "bs": 0.0, "d": 2, "age": 9.27, "grav": 78.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 1806, "kpp": 5.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 0.783, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Sure, but so is practically every other provider. Codex and Claude have it enabled by default as well.\n\nIn Openrouter/OpenCode it's a switch in the settings, might even be on by default."}, {"id": 50538712, "au": "metalliqaz", "dom": 100, "sr": 80, "sc": 1.47, "ep": 1.83, "bs": 0.0, "d": 0, "age": 18.48, "grav": 229.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 5870, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 0.692, "fa": 0.0, "gp": 0.139, "bl": 0.0, "ds": 0.0, "txt": "I don't see any mention of the phi models on microsoft.ai.  Have they given up on it?  It was one of the only local models that could work quickly on my consumer hardware."}, {"id": 50543466, "au": "skc", "dom": 82, "sr": 81, "sc": 1.47, "ep": 1.81, "bs": 0.0, "d": 0, "age": 7.81, "grav": 61.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 1836, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 0.739, "fa": 0.0, "gp": 0.053, "bl": 0.0, "ds": 0.0, "txt": "Seems pretty good for coding, which these days just means there isn't any meaningful difference from the SOTA for the average use case."}, {"id": 50540098, "au": "niltecedu", "dom": 65, "sr": 82, "sc": 1.47, "ep": 1.79, "bs": 0.0, "d": 1, "age": 16.18, "grav": 185.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 34, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 0.76, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The entire point of gh copilot right now is model from all providers with ZDR already setup. If you don’t care about ZDR then no point in using it"}, {"id": 50537111, "au": "VulgarExigency", "dom": 142, "sr": 83, "sc": 1.47, "ep": 1.74, "bs": 0.0, "d": 1, "age": 20.54, "grav": 272.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 430, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 0.669, "fa": 0.0, "gp": 0.117, "bl": 0.0, "ds": 0.0, "txt": "If you're an enterprise and not getting a discount on API pricing from Anthropic you're better served by Github Copilot, which has both Anthropic and OpenAI models."}, {"id": 50537305, "au": "markasoftware", "dom": 40, "sr": 84, "sc": 1.47, "ep": 1.71, "bs": 0.0, "d": 2, "age": 20.27, "grav": 266.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 1025, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "serif_body", "flbl": "Serif & Body (Text)", "urls": [], "ig": 0.729, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "based on the behavior of the chinese labs it seems like training on chain-of-thought is extremely important for distillation, and you can't get that by training on llm generated text."}, {"id": 50536458, "au": "daemonologist", "dom": 132, "sr": 85, "sc": 1.47, "ep": 1.49, "bs": 0.0, "d": 1, "age": 21.29, "grav": 289.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 64, "qw": 0, "k": 2676, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "serif_body", "flbl": "Serif & Body (Text)", "urls": [], "ig": 0.634, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Fairly common typography decision for websites/computers - sans-serif fonts are held to be more readable on low resolution displays (at small sizes).  For the larger headers you have the pixels to cleanly render serifs if you want.\n\nYou can also just do it because you want to. It's just as common in other mediums to see the opposite (sans headers and serif body text)."}, {"id": 50538138, "au": "nozzlegear", "dom": 119, "sr": 86, "sc": 1.35, "ep": 1.35, "bs": 0.0, "d": 0, "age": 19.27, "grav": 245.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 5814, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 0.478, "fa": 0.0, "gp": 0.159, "bl": 0.0, "ds": 0.0, "txt": "Since it's from Microsoft, I wonder if there's any chance of it not sucking ass at F\u0023 like most of the models I use."}, {"id": 50539259, "au": "pseudosavant", "dom": 31, "sr": 87, "sc": 1.34, "ep": 1.34, "bs": 0.0, "d": 2, "age": 17.71, "grav": 214.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 60, "qw": 0, "k": 3737, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 0.57, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "That isn't countering though. Pointing out that distillation makes it \"easy\" for other labs to catch up, in a matter of months, supports the lack of a moat.\n\nIt's like they're runners drafting behind the lead runner. It is easier to run in their wake. If the lead wants to stay in front, they have to keep running into the wind."}, {"id": 50536467, "au": "abraxas", "dom": 75, "sr": 88, "sc": 1.25, "ep": 1.25, "bs": 0.0, "d": 0, "age": 21.28, "grav": 288.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 4043, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 0.24, "fa": 0.0, "gp": 0.47, "bl": 0.0, "ds": 0.0, "txt": "What are the foundations of these models? Are they Microsoft's own or an RL of some open models?"}, {"id": 50538047, "au": "jtolmar", "dom": 41, "sr": 89, "sc": 1.17, "ep": 1.17, "bs": 0.0, "d": 1, "age": 19.4, "grav": 248.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 2272, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 0.396, "fa": 0.0, "gp": 0.166, "bl": 0.0, "ds": 0.0, "txt": "They’ve been ahead of the pack by 3-6 months for years now. I doubt that’s sustainable in the long term, but it’s apparently sustainable on the order of a few years."}, {"id": 50544172, "au": "p_l", "dom": 8, "sr": 90, "sc": 0.87, "ep": 0.87, "bs": 0.0, "d": 3, "age": 6.47, "grav": 46.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 10128, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "serif_body", "flbl": "Serif & Body (Text)", "urls": [], "ig": 0.372, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It's common spiel, but for many cases they really had a superior product, even if it was combined with anti-competetive approaches, the competitor were often deficient even if there were no such approaches"}, {"id": 50537652, "au": "tomatoandbasil", "dom": 102, "sr": 91, "sc": 0.35, "ep": 2.87, "bs": 2.52, "d": 0, "age": 19.91, "grav": 259.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 3, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 0.716, "fa": 0.34, "gp": 0.152, "bl": 0.95, "ds": 0.0, "txt": "The promotional period lasts until May 2027. Why not just make the price lower if they'll be irrelevant by the time the \"real\" price kicks in?"}, {"id": 50539265, "au": "spwa4", "dom": 15, "sr": 92, "sc": 0.21, "ep": 1.4, "bs": 1.19, "d": 2, "age": 17.7, "grav": 213.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 1186, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 0.597, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "So you mean if the CEO is using claude shouting \"give Bob a raise\" will actually work?"}, {"id": 50536306, "au": "eddythompson80", "dom": 145, "sr": 93, "sc": 0.21, "ep": 1.4, "bs": 1.19, "d": 1, "age": 21.46, "grav": 292.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 3449, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 0.595, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "If you’ve used them you’d know they are not persuading any actual user. Clueless CTOs however are Microsoft main customer."}, {"id": 50536462, "au": "therein", "dom": 125, "sr": 94, "sc": 0.07, "ep": 1.26, "bs": 1.19, "d": 0, "age": 21.29, "grav": 288.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 2981, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 0.454, "fa": 0.0, "gp": 0.136, "bl": 0.45, "ds": 0.0, "txt": "Did they finally give up on the Copilot branding?\nIf so, good riddance. They were shoving it down our throats."}, {"id": 50541668, "au": "viraptor", "dom": 88, "sr": 95, "sc": -0.15, "ep": 1.04, "bs": 1.19, "d": 1, "age": 12.4, "grav": 121.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 48138, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.406, "fa": 0.0, "gp": 0.06, "bl": 0.45, "ds": 0.0, "txt": "I think nano banana has already proven that a good service is a good service and will get users, regardless how silly the name is."}, {"id": 50536207, "au": "zf00002", "dom": 72, "sr": 96, "sc": -0.26, "ep": 2.79, "bs": 3.05, "d": 0, "age": 21.56, "grav": 295.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 182, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 0.524, "fa": 0.28, "gp": 0.522, "bl": 1.15, "ds": 0.0, "txt": "skeptical but I like they went for it and put the benchmarks against the top stuff."}, {"id": 50537098, "au": "esafak", "dom": 137, "sr": 97, "sc": -0.28, "ep": 0.91, "bs": 1.19, "d": 2, "age": 20.56, "grav": 272.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 8779, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "serif_body", "flbl": "Serif & Body (Text)", "urls": [], "ig": 0.388, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "He's asking why the pairing isn't reversed; body is usually serif while titles are sans serif."}, {"id": 50539774, "au": "epolanski", "dom": 33, "sr": 98, "sc": -0.35, "ep": 0.84, "bs": 1.19, "d": 3, "age": 16.71, "grav": 194.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 13682, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "serif_body", "flbl": "Serif & Body (Text)", "urls": [], "ig": 0.357, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "The distillation argument is stupid in any case and only people that don't understand training, post training or RL can make such asinine arguments."}, {"id": 50538081, "au": "cbg0", "dom": 124, "sr": 99, "sc": -0.4, "ep": 0.79, "bs": 1.19, "d": 1, "age": 19.35, "grav": 247.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 4602, "kpp": 4.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 0.338, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "How exactly are they mocking you? If that model is the best for design and you have access to it, why wouldn't you use it?"}, {"id": 50538312, "au": "LeBit", "dom": 36, "sr": 100, "sc": -0.45, "ep": 0.75, "bs": 1.19, "d": 4, "age": 19.03, "grav": 240.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 513, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.317, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Every week I ask ChatGPT an update on when the 6090 is going to get released.\n\nDon’t hold your breath."}, {"id": 50536475, "au": "gltwelv", "dom": 122, "sr": 101, "sc": -0.51, "ep": 2.01, "bs": 2.52, "d": 0, "age": 21.27, "grav": 288.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 2, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 0.771, "fa": 0.0, "gp": 0.136, "bl": 0.95, "ds": 0.0, "txt": "Microsoft announces MAI Code on a vibe-coded Claude website. At this point they just openly mock us."}, {"id": 50539296, "au": "spwa4", "dom": 19, "sr": 102, "sc": -0.59, "ep": 0.6, "bs": 1.19, "d": 2, "age": 17.64, "grav": 212.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 1186, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 0.255, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "They've also probably been trading credits on their clouds for shares in OpenAI and Anthropic (ie. not money)."}, {"id": 50540346, "au": "singpolyma3", "dom": 43, "sr": 103, "sc": -0.63, "ep": 0.56, "bs": 1.19, "d": 1, "age": 15.65, "grav": 175.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 1607, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 0.155, "fa": 0.0, "gp": 0.136, "bl": 0.45, "ds": 0.0, "txt": "Are they ahead in any way that matters? I've never run into something DeepSeek can't do"}, {"id": 50536873, "au": "6thbit", "dom": 107, "sr": 104, "sc": -0.96, "ep": 2.09, "bs": 3.05, "d": 0, "age": 20.82, "grav": 278.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 1050, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 0.785, "fa": 0.0, "gp": 0.169, "bl": 1.15, "ds": 0.0, "txt": "Yikes, oAI included spreadsheet and slide examples on their launch today and microsoft didn't?"}, {"id": 50539622, "au": "rcarmo", "dom": 110, "sr": 105, "sc": -0.97, "ep": 1.07, "bs": 2.04, "d": 3, "age": 16.97, "grav": 199.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 31828, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 0.456, "fa": 0.0, "gp": 0.0, "bl": 0.77, "ds": 0.0, "txt": "The model names have links. I can’t really fathom how they’re that easy to miss, since they’re underlined for me."}, {"id": 50537577, "au": "osti", "dom": 104, "sr": 106, "sc": -1.29, "ep": 1.75, "bs": 3.05, "d": 0, "age": 20.0, "grav": 260.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 587, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.307, "fa": 0.28, "gp": 0.161, "bl": 1.15, "ds": 0.0, "txt": "Somehow they still show Terminal Bench 2.1 as a benchmark, doesn't look good for them."}, {"id": 50539925, "au": "asa123", "dom": 21, "sr": 107, "sc": -1.45, "ep": 1.6, "bs": 3.05, "d": 2, "age": 16.47, "grav": 190.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 82, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 0.679, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "I had similar issues with verbosity when comparing astra + pi with claude + claude code."}, {"id": 50536539, "au": "eminence32", "dom": 144, "sr": 108, "sc": -1.55, "ep": 1.5, "bs": 3.05, "d": 1, "age": 21.2, "grav": 286.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 1489, "kpp": 5.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "sol_opus", "flbl": "Sol & Opus (Codex)", "urls": [], "ig": 0.639, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "\"Concerning\" for who?  Anthropic?   Consumers should be encouraging efforts to bring down costs"}, {"id": 50539621, "au": "okasaki", "dom": 121, "sr": 109, "sc": -1.83, "ep": 1.22, "bs": 3.05, "d": 0, "age": 16.98, "grav": 199.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 4683, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "sol_opus", "flbl": "Sol & Opus (Codex)", "urls": [], "ig": 0.47, "fa": 0.0, "gp": 0.082, "bl": 1.15, "ds": 0.0, "txt": "This trend of American models only comparing to other American models is pretty interesting."}, {"id": 50536951, "au": "UncleOxidant", "dom": 73, "sr": 110, "sc": -1.84, "ep": 1.21, "bs": 3.05, "d": 1, "age": 20.72, "grav": 276.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 11702, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 0.514, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Would also like to see a comparison (including prices) to Deepseek, GLM and Qwen models."}, {"id": 50547006, "au": "bluebands", "dom": 22, "sr": 111, "sc": -1.87, "ep": 1.17, "bs": 3.05, "d": 1, "age": 1.45, "grav": 9.3, "surf": 29.5, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 53, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "sol_opus", "flbl": "Sol & Opus (Codex)", "urls": [], "ig": 0.497, "fa": 0.0, "gp": 0.003, "bl": 1.15, "ds": 0.0, "txt": "the gap is bigger than you think and widens on niche tasks"}, {"id": 50537161, "au": "yread", "dom": 120, "sr": 112, "sc": -1.99, "ep": 1.06, "bs": 3.05, "d": 0, "age": 20.46, "grav": 270.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 19773, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 0.357, "fa": 0.0, "gp": 0.152, "bl": 1.15, "ds": 0.0, "txt": "Oh so MAI Code is a model? What would they call the harness MAI Code Code?"}, {"id": 50538832, "au": "hocuspocus", "dom": 141, "sr": 113, "sc": -2.32, "ep": 0.72, "bs": 3.05, "d": 2, "age": 18.31, "grav": 225.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 3034, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 0.308, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "If MAI Code 2 beats Luna, it'll be relevant for many more things."}, {"id": 50536889, "au": "InsideOutSanta", "dom": 127, "sr": 114, "sc": -2.41, "ep": 0.64, "bs": 3.05, "d": 1, "age": 20.8, "grav": 278.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 7637, "kpp": 4.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 0.273, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "\"MAI Code 2 and Code 2 Flash are available in GitHub Copilot.\""}, {"id": 50537760, "au": "TiredOfLife", "dom": 47, "sr": 115, "sc": -3.0, "ep": 1.24, "bs": 4.24, "d": 1, "age": 19.77, "grav": 255.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 12046, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 0.527, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Anti distillation efforts have greatly increased the difference between open and closed models"}, {"id": 50547113, "au": "porridgeraisin", "dom": 6, "sr": 116, "sc": -3.03, "ep": 1.21, "bs": 4.24, "d": 4, "age": 1.3, "grav": 8.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 3418, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 0.517, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Many important APIs like the filesystem API don't exist on firefox."}, {"id": 50536542, "au": "steve1977", "dom": 133, "sr": 117, "sc": -3.27, "ep": 0.97, "bs": 4.24, "d": 2, "age": 21.19, "grav": 286.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 4600, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "sol_opus", "flbl": "Sol & Opus (Codex)", "urls": [], "ig": 0.414, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Which is interesting, because in print, the common pairing is often the opposite."}, {"id": 50538522, "au": "andriy_koval", "dom": 42, "sr": 118, "sc": -3.51, "ep": 0.73, "bs": 4.24, "d": 1, "age": 18.72, "grav": 234.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 16, "k": 452, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 0.197, "fa": 0.0, "gp": 0.183, "bl": 1.6, "ds": 0.0, "txt": "> They are better than the rest of the available models currently, but only by a few months.\n\nI think only google is catching up, and others plateaued."}, {"id": 50536966, "au": "VulgarExigency", "dom": 134, "sr": 119, "sc": -3.58, "ep": 0.66, "bs": 4.24, "d": 3, "age": 20.7, "grav": 276.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 430, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "serif_body", "flbl": "Serif & Body (Text)", "urls": [], "ig": 0.282, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "I believe serif fonts are considered more readable in print"}, {"id": 50538044, "au": "aesthesia", "dom": 71, "sr": 120, "sc": -3.6, "ep": 0.64, "bs": 4.24, "d": 1, "age": 19.4, "grav": 248.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 1164, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 0.272, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Yeah, I was disappointed not to see a technical report linked."}, {"id": 50543048, "au": "barrenko", "dom": 52, "sr": 121, "sc": -3.61, "ep": 0.63, "bs": 4.24, "d": 1, "age": 8.57, "grav": 69.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 1376, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": 0.27, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Holiday season is going to be a little bit crazy."}, {"id": 50541022, "au": "m3kw9", "dom": 46, "sr": 122, "sc": -3.61, "ep": 0.63, "bs": 4.24, "d": 1, "age": 14.08, "grav": 148.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 3505, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.267, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "brand trust is real, infra is real - moat."}, {"id": 50536537, "au": "coffeebeqn", "dom": 123, "sr": 123, "sc": -3.62, "ep": 0.62, "bs": 4.24, "d": 1, "age": 21.2, "grav": 286.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 4369, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 0.186, "fa": 0.0, "gp": 0.125, "bl": 1.6, "ds": 0.0, "txt": "It does look better than any other MS website I’ve seen"}, {"id": 50537607, "au": "Jessiejia11", "dom": 13, "sr": 124, "sc": -3.8, "ep": 1.76, "bs": 5.57, "d": 2, "age": 19.96, "grav": 260.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 1, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.251, "fa": 0.34, "gp": 0.141, "bl": 2.1, "ds": 0.0, "txt": "Agree 100%. Would love to try out their interactive artifact"}, {"id": 50542418, "au": "steve1977", "dom": 135, "sr": 125, "sc": -3.87, "ep": 0.37, "bs": 4.24, "d": 4, "age": 10.26, "grav": 91.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 4600, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.157, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "They are, that's actually kind of the point of the serifs AFAIK."}, {"id": 50538441, "au": "6thbit", "dom": 109, "sr": 126, "sc": -3.94, "ep": 0.3, "bs": 4.24, "d": 2, "age": 18.85, "grav": 236.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 1050, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 0.127, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "what do you mean? nothing to click in ms announcement"}, {"id": 50540311, "au": "ls612", "dom": 5, "sr": 127, "sc": -3.97, "ep": 0.27, "bs": 4.24, "d": 3, "age": 15.72, "grav": 176.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 3256, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": 0.115, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Now if only they could have one of their innumerable agents make a Firefox version."}, {"id": 50539271, "au": "mrtesthah", "dom": 14, "sr": 128, "sc": -4.04, "ep": 0.2, "bs": 4.24, "d": 2, "age": 17.7, "grav": 213.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 22, "k": 884, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.085, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": ">she was modifying an artifact through the Claude website and it was able to make changes to a local file on her desktop\n\nAnd people wonder why we have so many things being attacked by agents…"}, {"id": 50536329, "au": "liuliu", "dom": 129, "sr": 129, "sc": -4.08, "ep": 1.48, "bs": 5.57, "d": 0, "age": 21.44, "grav": 292.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 3350, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "serif_body", "flbl": "Serif & Body (Text)", "urls": [], "ig": 0.217, "fa": 0.0, "gp": 0.67, "bl": 2.1, "ds": 0.0, "txt": "Can someone explain to me why the headings use serif while the body uses sans (font)?"}, {"id": 50547417, "au": "nico", "dom": 9, "sr": 130, "sc": -4.2, "ep": 0.97, "bs": 5.17, "d": 4, "age": 0.91, "grav": 6.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 45, "qw": 0, "k": 4557, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.411, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "I’m sure there were plenty of crappy competitors. That still doesn’t mean MS didn’t do all of those things. They were a pretty ruthless corporation, which was even deemed a monopoly and ordered by the govt to split up (which they appealed and won, so it never happened)"}, {"id": 50539767, "au": "stingraycharles", "dom": 93, "sr": 131, "sc": -4.5, "ep": 1.06, "bs": 5.57, "d": 1, "age": 16.73, "grav": 195.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 17290, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 0.451, "fa": 0.0, "gp": 0.0, "bl": 2.1, "ds": 0.0, "txt": "You know this won’t happen and the marketing department will soon rename this to Copilot somehow. /s"}, {"id": 50536549, "au": "vchiriac", "dom": 128, "sr": 132, "sc": -5.5, "ep": 1.26, "bs": 6.76, "d": 0, "age": 21.18, "grav": 286.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "copilot_claude", "flbl": "Copilot & Claude (Microsoft)", "urls": [], "ig": 0.452, "fa": 0.0, "gp": 0.133, "bl": 2.55, "ds": 0.0, "txt": "Deprecated within minutes - we're on 6.2 now. Nice try though Microsoft, keep it up."}, {"id": 50537333, "au": "nzd", "dom": 30, "sr": 133, "sc": -5.87, "ep": 0.88, "bs": 6.76, "d": 3, "age": 20.24, "grav": 266.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 4, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.376, "fa": 0.0, "gp": 0.0, "bl": 2.55, "ds": 0.0, "txt": "Heck, they destroyed some rare physical books after scanning them. Something to show their mentality."}, {"id": 50537203, "au": "christophilus", "dom": 138, "sr": 134, "sc": -6.47, "ep": 0.95, "bs": 7.42, "d": 3, "age": 20.39, "grav": 269.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 14196, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "serif_body", "flbl": "Serif & Body (Text)", "urls": [], "ig": 0.403, "fa": 0.0, "gp": 0.0, "bl": 2.8, "ds": 0.0, "txt": "Not on the web. It’s usually serif body, at least in my experience."}, {"id": 50537228, "au": "jwpapi", "dom": 78, "sr": 135, "sc": -8.41, "ep": 0.0, "bs": 6.89, "d": 0, "age": 20.36, "grav": 268.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 881, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "serif_body", "flbl": "Serif & Body (Text)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.49, "bl": 2.6, "ds": 0.0, "txt": "Is it not available via API?"}, {"id": 50537116, "au": "esafak", "dom": 45, "sr": 136, "sc": -8.81, "ep": 0.0, "bs": 6.89, "d": 1, "age": 20.53, "grav": 272.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 8779, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "models_openai", "flbl": "Models & Openai (Anthropic)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.212, "bl": 2.6, "ds": 0.0, "txt": "Not when new models substantially increase productivity."}, {"id": 50537137, "au": "lostmsu", "dom": 101, "sr": 137, "sc": -8.87, "ep": 0.0, "bs": 6.89, "d": 0, "age": 20.5, "grav": 271.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 6654, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.177, "bl": 2.6, "ds": 0.0, "txt": "Not open?"}, {"id": 50538474, "au": "onebitwise", "dom": 89, "sr": 138, "sc": -8.93, "ep": 0.0, "bs": 6.89, "d": 1, "age": 18.79, "grav": 235.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 22, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "windows_flash", "flbl": "Windows & Flash (Code)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.136, "bl": 2.6, "ds": 0.0, "txt": "Also “mai” that is “never” in italian"}, {"id": 50542642, "au": "nl", "dom": 79, "sr": 139, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 9.68, "grav": 83.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 0, "qw": 35, "k": 34263, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "> MAI Code 2 and Code 2 Flash are available in GitHub Copilot, and Code 2 Flash is in limited-access preview in Microsoft Foundry. Soon, we’ll be releasing it on Open Router, Vercel, Hermes, Open Code, and Kilo."}, {"id": 50540355, "au": "lyton", "dom": 90, "sr": 140, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 15.62, "grav": 175.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 21, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "it's mother in Shona(spoken in Zimbabwe)"}, {"id": 50538506, "au": "rickydroll", "dom": 92, "sr": 141, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 18.76, "grav": 234.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 872, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Is this another name for God's loophole?"}, {"id": 50537967, "au": "rcarmo", "dom": 108, "sr": 142, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 19.51, "grav": 250.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 31828, "kpp": 4.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "You didn't click through."}, {"id": 50539023, "au": "hocuspocus", "dom": 113, "sr": 143, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 18.05, "grav": 220.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 3034, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Muse Ember is there too."}, {"id": 50537563, "au": "doomroot13", "dom": 50, "sr": 144, "sc": -10.6, "ep": 0.0, "bs": 8.88, "d": 1, "age": 20.02, "grav": 261.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 6, "qw": 0, "k": 243, "kpp": 4.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://microsoft.ai/news/frontier-pre-training-at-microsoft-ai/"], "ig": -0.95, "fa": 0.0, "gp": 0.35, "bl": 3.35, "ds": 0.0, "txt": "It seems they trained from scratch: https://microsoft.ai/news/frontier-pre-training-at-microsoft..."}, {"id": 50538360, "au": "avelone", "dom": 146, "sr": 145, "sc": -11.64, "ep": 0.0, "bs": 9.41, "d": 0, "age": 18.96, "grav": 239.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 0, "qw": 0, "k": 1, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.55, "ds": 0.0, "txt": "че это?"}, {"id": 50536518, "au": "tomatoandbasil", "dom": 76, "sr": 146, "sc": -13.63, "ep": 0.0, "bs": 11.39, "d": 1, "age": 21.22, "grav": 287.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 2, "qw": 0, "k": 3, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://microsoft.ai/news/frontier-pre-training-at-microsoft-ai/"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 4.3, "ds": 0.0, "txt": "Their own https://microsoft.ai/news/frontier-pre-training-at-microsoft..."}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "top_signal";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 40);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 40);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 40);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `${shown.length} of ${pool.length} comments` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const proofDrawer = document.getElementById("proofDrawer");
+  const expBtn = document.getElementById("exploreToggleBtn");
+  const eviBtn = document.getElementById("evidenceToggleBtn");
+
+  if (expBtn && labDrawer) {
+    expBtn.addEventListener("click", () => {
+      labDrawer.open = !labDrawer.open;
+    });
+    labDrawer.addEventListener("toggle", () => {
+      const isOpen = labDrawer.open;
+      expBtn.classList.toggle("active", isOpen);
+      expBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  if (eviBtn && proofDrawer) {
+    eviBtn.addEventListener("click", () => {
+      proofDrawer.open = !proofDrawer.open;
+    });
+    proofDrawer.addEventListener("toggle", () => {
+      const isOpen = proofDrawer.open;
+      eviBtn.classList.toggle("active", isOpen);
+      eviBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

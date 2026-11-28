@@ -1,0 +1,1401 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>50526023 // Show HN: I made an audio-to-MIDI model 60x more efficient - Better Signal News</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+      text-transform: lowercase;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      text-transform: lowercase;
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .kpi-cell {
+      padding: 8px 0;
+    }
+    .kpi-label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 4px 0;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer:not([open]) {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary,
+    details.proof-drawer > summary {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+    }
+    table.ablation th {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: normal;
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    button.nav-btn,
+    button.mode-tab,
+    button.topbar-toggle {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: rgb(0, 0, 0);
+      cursor: pointer;
+      text-decoration: none;
+      line-height: inherit;
+      vertical-align: baseline;
+      transition: color 0.12s ease;
+      text-transform: lowercase;
+    }
+    button.nav-btn:hover,
+    button.nav-btn.active,
+    button.mode-tab:hover,
+    button.mode-tab.active,
+    button.topbar-toggle:hover,
+    button.topbar-toggle.active {
+      color: rgb(255, 255, 255);
+      text-decoration: none;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      padding: 14px;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; row-gap: 4px; }
+      .topbar-right { padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+  <script>
+    (function() {
+      if (window.location.pathname.includes("/items/")) {
+        var m = window.location.pathname.match(/\/items\/(\d+)\.html/);
+        if (m) {
+          var base = window.location.pathname.replace(/\/items\/\d+\.html$/, "");
+          var target = (base || "") + "/item?id=" + m[1];
+          try {
+            history.replaceState(null, "", target);
+          } catch(e) {}
+        }
+      }
+    })();
+  </script>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">BS</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Better Signal News</a>
+        <span class="pagetop" id="modeTabs">
+          <button type="button" class="nav-btn mode-tab active" data-mode="top_signal" role="tab" aria-selected="true">Top 40</button> | <button type="button" class="nav-btn mode-tab" data-mode="hn_top40" role="tab" aria-selected="false">HN Top 40</button>
+        </span>
+      </div>
+      <div class="topbar-right">
+        <button type="button" class="nav-btn topbar-toggle" id="exploreToggleBtn" aria-expanded="false">explore</button> | <button type="button" class="nav-btn topbar-toggle" id="evidenceToggleBtn" aria-expanded="false">evidence</button>
+      </div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://kobi.music/research/dettato">Show HN: I made an audio-to-MIDI model 60x more efficient</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=kobi.music"><span class="sitestr">kobi.music</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">277 points</span> by <a href="https://news.ycombinator.com/user?id=hidude562">hidude562</a> <span class="age" title="2026-11-17T01:03:05.000Z"><a href="https://news.ycombinator.com/item?id=50526023">4 days ago</a></span> | <a href="https://news.ycombinator.com/item?id=50526023">57&nbsp;comments</a> | 87.7% bullshit
+        </span>
+      </div>
+      <div class="toptext">I released dettato, my open weight audio to midi transcription model. It beats muscriptor 1.3b on every set and is roughly 60x smaller, without training on copyrighted recordings. Feel free to ask questions</div>
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Evidence</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">57</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 47 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">12.3%</div>
+          <div class="kpi-sub">7 comments (2 Gold / 3.5%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">87.7%</div>
+          <div class="kpi-sub">30 chatter &bull; 20 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">3</div>
+        <div class="kpi-sub">10% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.984</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">4</div>
+          <div class="kpi-sub">HN POS 31..34 (7.0% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="color: rgb(90, 90, 88); margin-top: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Explore</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">CALIBRATE</div>
+              <h2>Signal Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 57-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Bullshit (Y) // Signal (X) </span>
+                <span class="sig">TAP POINT (N = 57)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (2)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (5)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (30)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (20)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>HN POS (1..57) (Y) // Age (Hours) (X)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 25)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (peaseagee, 17.5h); largest subtree (@locusofself) occupies 4 slots (HN POS 31..34).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (57)</option>
+          <option value="audio_midi">Audio &amp; Midi (Music) (13)</option>
+          <option value="muscriptor_model">Muscriptor &amp; Model (12tet) (12)</option>
+          <option value="note_multiple">Note &amp; Multiple (Daw) (12)</option>
+          <option value="piano_output">Piano &amp; Output (Impressive) (9)</option>
+          <option value="recordings_generative">Recordings &amp; Generative (Virtual) (5)</option>
+          <option value="general_commentary">General Commentary (6)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, model, midi, muscriptor, recordings, audio...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT</span>
+    <span>SOURCE: HN 50526023 + KOBI.MUSIC + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50526023, "story_title": "Show HN: I made an audio-to-MIDI model 60x more efficient", "story_url": "https://kobi.music/research/dettato", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50526023, "story_title": "Show HN: I made an audio-to-MIDI model 60x more efficient", "story_url": "https://kobi.music/research/dettato", "points": 277, "story_author": "hidude562", "article_source": "fetched_url", "t1_ref_utc": "2026-11-21T07:34:33+00:00", "t2_ref_utc": "2026-11-21T07:34:33+00:00", "delta_minutes": 0.0, "story_anchors": ["model", "midi", "muscriptor", "recordings", "audio", "music", "instruments", "recording", "solo", "source", "open", "significantly", "synthetic", "60x", "audio-to", "efficient", "show", "models", "guitar", "classical", "data", "smaller", "system", "training", "check"], "facet_labels": {"audio_midi": "Audio & Midi (Music)", "muscriptor_model": "Muscriptor & Model (12tet)", "note_multiple": "Note & Multiple (Daw)", "piano_output": "Piano & Output (Impressive)", "recordings_generative": "Recordings & Generative (Virtual)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "audio_midi", "label": "Audio & Midi (Music)", "count": 13, "top_terms": ["audio", "midi", "music", "classical"]}, {"slug": "muscriptor_model", "label": "Muscriptor & Model (12tet)", "count": 12, "top_terms": ["muscriptor", "model", "12tet", "awesome"]}, {"slug": "note_multiple", "label": "Note & Multiple (Daw)", "count": 12, "top_terms": ["note", "multiple", "daw", "instruments"]}, {"slug": "piano_output", "label": "Piano & Output (Impressive)", "count": 9, "top_terms": ["piano", "output", "impressive", "system"]}, {"slug": "recordings_generative", "label": "Recordings & Generative (Virtual)", "count": 5, "top_terms": ["recordings", "generative", "virtual", "ways"]}], "counts": {"total_comments": 57, "live_t2_comments": 57, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 47, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "c33fb28d7edd27b71a86bad787924e2670945c3a0e93a30202cf2d7df31a3f32"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 2, "grounded_analysis": 5, "crowd_chatter": 30, "bullshit_or_flamewar": 20}, "facets": {"muscriptor_model": 12, "piano_output": 9, "note_multiple": 12, "audio_midi": 13, "recordings_generative": 5, "general_commentary": 6}, "facet_options": [{"slug": "audio_midi", "label": "Audio & Midi (Music)", "count": 13}, {"slug": "muscriptor_model", "label": "Muscriptor & Model (12tet)", "count": 12}, {"slug": "note_multiple", "label": "Note & Multiple (Daw)", "count": 12}, {"slug": "piano_output", "label": "Piano & Output (Impressive)", "count": 9}, {"slug": "recordings_generative", "label": "Recordings & Generative (Virtual)", "count": 5}, {"slug": "general_commentary", "label": "General Commentary", "count": 6}], "facet_diagnostics": [{"slug": "audio_midi", "label": "Audio & Midi (Music)", "count": 13, "useful": 1, "useful_pct": 7.7, "terms": "audio, midi, music, classical"}, {"slug": "muscriptor_model", "label": "Muscriptor & Model (12tet)", "count": 12, "useful": 2, "useful_pct": 16.7, "terms": "muscriptor, model, 12tet, awesome"}, {"slug": "note_multiple", "label": "Note & Multiple (Daw)", "count": 12, "useful": 3, "useful_pct": 25.0, "terms": "note, multiple, daw, instruments"}, {"slug": "piano_output", "label": "Piano & Output (Impressive)", "count": 9, "useful": 1, "useful_pct": 11.1, "terms": "piano, output, impressive, system"}, {"slug": "recordings_generative", "label": "Recordings & Generative (Virtual)", "count": 5, "useful": 0, "useful_pct": 0.0, "terms": "recordings, generative, virtual, ways"}, {"slug": "general_commentary", "label": "General Commentary", "count": 6, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "code_repository", "count": 3}, {"category": "low_cred_or_joke", "count": 2}, {"category": "general_web", "count": 1}], "story_anchors": ["model", "midi", "muscriptor", "recordings", "audio", "music", "instruments", "recording", "solo", "source", "open", "significantly", "synthetic", "60x", "audio-to", "efficient", "show", "models"], "largest_root": {"root_id": 50579207, "author": "locusofself", "slots": 4, "start_dom": 31, "end_dom": 34, "share_pct": 7.0, "top_dom1_age": 17.5, "top_dom1_author": "peaseagee"}, "buried_cutoff": 25, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50581445, "au": "alin23", "dom": 11, "sr": 1, "sc": 10.35, "ep": 10.35, "bs": 0.0, "d": 0, "age": 11.19, "grav": 103.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 66, "qw": 0, "k": 5141, "kpp": 6.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "muscriptor_model", "flbl": "Muscriptor & Model (12tet)", "urls": ["https://github.com/FuzzyIdeas/Muskey"], "ig": 1.324, "fa": 2.08, "gp": 0.907, "bl": 0.0, "ds": 0.0, "txt": "What a coincidence! I was just in the process of integrating MuScriptor on a personal macOS app [0] I work on and off for helping me practice my guitar, kaval and trumpet skills.\n\nI'm so glad to see a smaller model being so accurate, MuScriptor is especially bad on the Romanian kaval, can't wait to try this in-app. I do it with already separated stems through BS-RoFormer so I'm hoping this can improve accuracy a bit.\n\n[0] https://github.com/FuzzyIdeas/Muskey"}, {"id": 50583701, "au": "ldkjhg", "dom": 24, "sr": 2, "sc": 8.74, "ep": 8.74, "bs": 0.0, "d": 1, "age": 8.37, "grav": 67.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 63, "qw": 0, "k": 1, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "piano_output", "flbl": "Piano & Output (Impressive)", "urls": ["https://github.com/ld9999999999/AudioToMidi"], "ig": 1.195, "fa": 2.08, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I have local program that you can use to output to a single track. It was done a month ago because I needed to extract different compositions. It can use various models, and if this new model works well, then I'll add to it. I've fed it real recordings and also the Doom original tracks, and they came out ok. Piano was an easy task for it.\n\nhttps://github.com/ld9999999999/AudioToMidi"}, {"id": 50585602, "au": "bolangi", "dom": 32, "sr": 3, "sc": 6.08, "ep": 6.08, "bs": 0.0, "d": 1, "age": 4.17, "grav": 26.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 32, "qw": 0, "k": 360, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "note_multiple", "flbl": "Note & Multiple (Daw)", "urls": ["https://github.com/bolangi/nama"], "ig": 0.428, "fa": 1.78, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "What's your DAW about, with so many others? I ask as a DAW author myself, written in, ohmygod, perl :-). Mine is in at https://github.com/bolangi/nama, offering an accessible, terminal interface with a simple Tk GUI as well."}, {"id": 50580395, "au": "dekhn", "dom": 13, "sr": 4, "sc": 5.65, "ep": 5.65, "bs": 0.0, "d": 0, "age": 12.2, "grav": 118.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 82, "qw": 0, "k": 33783, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "note_multiple", "flbl": "Note & Multiple (Daw)", "urls": [], "ig": 1.46, "fa": 0.56, "gp": 0.426, "bl": 0.0, "ds": 0.0, "txt": "I tried this on a Phish guitar track that I have and while GPU failed with an error, CPU eventually finished and it did a pretty good job!  The recording is 45 minutes long, so getting GPU working is my next interest.\n\nUnfortunately, Phish live recordings are copyrighted, so it's unlikely you can put them in the training corpus.  Demonstrating that you can deconvolute and transcribe multiple different instruments with highly overlapping frequencies and sounds faster than an expert human would be a great demonstrate of the capabilities."}, {"id": 50575463, "au": "epiccoleman", "dom": 7, "sr": 5, "sc": 4.56, "ep": 4.56, "bs": 0.0, "d": 0, "age": 16.7, "grav": 194.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 119, "qw": 0, "k": 2097, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "muscriptor_model", "flbl": "Muscriptor & Model (12tet)", "urls": [], "ig": 1.469, "fa": 0.0, "gp": 0.763, "bl": 0.0, "ds": 0.0, "txt": "That is awesome! I'll definitely have to check it out. I was very impressed with muscriptor when I used it in a recent project (a conference talk I gave). It was an AI talk with a musical component, and the final \"scene\" in the talk involved my own guitar playing. I used Muscriptor to transcribe that playing for categorization as part of a \"guitar solo generator\" that recut a new solo out of my stock phrases each time. Really fun little demo for a bigger project.\n\nAnyway, it would be awesome to be able to do those sorts of transcriptions better and faster - so I'll definitely give this a whirl. Maybe I can dig up the pipeline scripts from processing my licks for that talk and see how dettato slots in."}, {"id": 50586090, "au": "locusofself", "dom": 33, "sr": 6, "sc": 4.53, "ep": 4.68, "bs": 0.0, "d": 2, "age": 2.55, "grav": 15.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 93, "qw": 0, "k": 1252, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "note_multiple", "flbl": "Note & Multiple (Daw)", "urls": [], "ig": 1.437, "fa": 0.28, "gp": 0.348, "bl": 0.0, "ds": 0.0, "txt": "I wanted to see just how performant I could make a DAW for Apple Silicon, particularly to see if I can track reliably through plugins at ultra low latency without external DSP. I have used REAPER for 17+ years and found despite it's reputation for being really \"light on CPU\" it is in fact not, and so I switched to Logic Pro for a while, and that was fine but also bugged me in some ways. So its like a super light weight, REAPER-inspired DAW for M-series macs only, primarily for recording real instruments/ voices through plugins and really good editing features."}, {"id": 50584487, "au": "mewse-hn", "dom": 5, "sr": 7, "sc": 4.41, "ep": 4.41, "bs": 0.0, "d": 0, "age": 6.85, "grav": 50.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 1596, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "audio_midi", "flbl": "Audio & Midi (Music)", "urls": [], "ig": 1.186, "fa": 0.34, "gp": 0.45, "bl": 0.0, "ds": 0.0, "txt": "Impressive, I ran nine inch nails - march of the pigs through this, which is an extremely messy, noisy song with random tempo changes, and it came up with a remarkable accurate 26 KB(!!) midi file that sounds like the original song using only 6 instruments. Crazy."}, {"id": 50539823, "au": "gregzem", "dom": 43, "sr": 8, "sc": 3.98, "ep": 3.98, "bs": 0.0, "d": 0, "age": 79.91, "grav": 2779.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 2, "kpp": 0.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "note_multiple", "flbl": "Note & Multiple (Daw)", "urls": [], "ig": 0.76, "fa": 0.0, "gp": 1.51, "bl": 0.0, "ds": 0.0, "txt": "Congrats with SOTA model. How good is it in recognition of the instruments which are overlapping by frequencies? Does is provide note offset and velocity in the transcribed MIDI? Thanks!"}, {"id": 50582652, "au": "hidude562", "dom": 36, "sr": 9, "sc": 3.9, "ep": 3.9, "bs": 0.0, "d": 1, "age": 9.84, "grav": 85.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 67, "qw": 0, "k": 2, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "muscriptor_model", "flbl": "Muscriptor & Model (12tet)", "urls": [], "ig": 1.32, "fa": 0.28, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The full benchmarks can be checked out on the GitHub. The strongest model point is onset - which is similar to pitch. The weakest being 'offset', which is length. Both scores still edge out Mirelo's closed source model, and significantly beat MuScriptor.\n\nI haven't tried anything outside of 12TET, but probably not good (it predicts in 12TET). Alternative tunings should work fine (it re-tunes to a440 for the model)."}, {"id": 50574959, "au": "piltdownman", "dom": 2, "sr": 10, "sc": 3.86, "ep": 3.86, "bs": 0.0, "d": 1, "age": 17.31, "grav": 206.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 94, "qw": 0, "k": 1771, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "audio_midi", "flbl": "Audio & Midi (Music)", "urls": [], "ig": 1.578, "fa": 0.0, "gp": 0.103, "bl": 0.0, "ds": 0.0, "txt": "TBF it's by far the best corpus for this use case anyway.\n\nClassical Music as an academic concern is very pedantic in the best way, and has the lions share of the research hours and funding compared to any other genre. As a result the best 1:1 approximations of multi-instrument Audio into multi-channel MIDI files is done simply by OCR of the established Gesamtausgabe in each case. Computer based scoring and playback has been solid since Finale/Sibelius/Score came on the market, and democratized at a wide consumer level somewhere between Amiga mod-trackers and Macintosh Quicktime 2.0."}, {"id": 50579978, "au": "gw32", "dom": 3, "sr": 11, "sc": 3.85, "ep": 3.85, "bs": 0.0, "d": 0, "age": 12.6, "grav": 124.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 77, "qw": 0, "k": 19, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "recordings_generative", "flbl": "Recordings & Generative (Virtual)", "urls": [], "ig": 1.329, "fa": 0.0, "gp": 0.499, "bl": 0.0, "ds": 0.0, "txt": "This is fantastic. I love the commitment to train only on PD recordings. In my opinion, that is an essential to maintaining the favor of musicians - building technology not to take from their work and replace them, but rather to celebrate human-written music by making it accessible.\n\nThis is why I believe (AMT, OMR) and MIR-adjacent projects to be so much more meaningful than generative models (e.g. Suno). I'm looking forward to hearing more from kobi music - congrats on the launch!"}, {"id": 50574753, "au": "oever", "dom": 27, "sr": 12, "sc": 3.42, "ep": 3.42, "bs": 0.0, "d": 0, "age": 17.59, "grav": 211.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 85, "qw": 0, "k": 1654, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "audio_midi", "flbl": "Audio & Midi (Music)", "urls": [], "ig": 1.303, "fa": 0.0, "gp": 0.25, "bl": 0.0, "ds": 0.0, "txt": "Audio-to-MIDI sounds very ambitious. How do you verify that the midi fits the audio? Does it result in useful beat detection? E.g. I'd very much like to have a way to map audio offset in a recording to labels in sheet music. But even beat detection in fairly standard jazz recordings fails often.\n\nDoes the model know when a piece (whole piece, not a section) is 3/4 or 4/4 th and can it give the onsets of all measures? Or all the midi notes just based on time and not organized rhythmically?"}, {"id": 50585511, "au": "keymasta", "dom": 4, "sr": 13, "sc": 3.03, "ep": 3.03, "bs": 0.0, "d": 0, "age": 4.44, "grav": 28.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 79, "qw": 0, "k": 112, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "piano_output", "flbl": "Piano & Output (Impressive)", "urls": [], "ig": 1.204, "fa": 0.0, "gp": 0.136, "bl": 0.0, "ds": 0.0, "txt": "This is encouraging! I've been watching the space for some number of years. I remember rigging up a system that used librosa which has some nice built-in algorithms which got me pretty close!\n\nI've got a use-case for this, but I'm wondering how \"stuck\" in this format this is. By format I mean, basically, python runtime, etc. Would it be possible to extract into something more usable by a consumer, like into a standalone rust module? Can anyone poitn me to how this would be easy?"}, {"id": 50585664, "au": "hidude562", "dom": 17, "sr": 14, "sc": 2.79, "ep": 2.79, "bs": 0.0, "d": 1, "age": 3.95, "grav": 24.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 2, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "recordings_generative", "flbl": "Recordings & Generative (Virtual)", "urls": [], "ig": 1.189, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Using virtual instruments, also mixed with public domain recordings (like URMP), no gen ai. Using the ~30 sound banks I have I use a method I published (check out the soundfont babies blog) for mixing them together. For cc recordings I split and stretch them to play target midi notes."}, {"id": 50577667, "au": "thih9", "dom": 8, "sr": 15, "sc": 2.58, "ep": 2.58, "bs": 0.0, "d": 0, "age": 14.77, "grav": 160.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 10141, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "muscriptor_model", "flbl": "Muscriptor & Model (12tet)", "urls": [], "ig": 0.75, "fa": 0.0, "gp": 0.565, "bl": 0.0, "ds": 0.0, "txt": "Congrats on the launch!\n\nThe top illustration looks like an Angry Birds character with an ear. Fine for a one time blog post but if you plan to reuse it then you may want to change the design."}, {"id": 50575812, "au": "mycall", "dom": 39, "sr": 16, "sc": 2.43, "ep": 2.65, "bs": 0.0, "d": 2, "age": 16.33, "grav": 187.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 6, "k": 1863, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "note_multiple", "flbl": "Note & Multiple (Daw)", "urls": [], "ig": 0.619, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> Trained on your own percussive sounds\n\nThis is probably where I would find it limiting range of sounds can be huge, much more than just 6 sounds (10000+) and not all of them percussive.  Worth an eval though, thanks!"}, {"id": 50581923, "au": "raffraffraff", "dom": 30, "sr": 17, "sc": 2.4, "ep": 2.4, "bs": 0.0, "d": 0, "age": 10.67, "grav": 96.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 4443, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "piano_output", "flbl": "Piano & Output (Impressive)", "urls": [], "ig": 0.96, "fa": 0.0, "gp": 0.103, "bl": 0.0, "ds": 0.0, "txt": "Interesting. Aside from conversion of tracks to midi, it looks like i could run my music collection through this and use the output to create a recommendation system (along with existing metadata and lyrics)"}, {"id": 50575084, "au": "jsphweid", "dom": 29, "sr": 18, "sc": 2.34, "ep": 2.34, "bs": 0.0, "d": 0, "age": 17.13, "grav": 202.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 188, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "piano_output", "flbl": "Piano & Output (Impressive)", "urls": [], "ig": 0.846, "fa": 0.0, "gp": 0.246, "bl": 0.0, "ds": 0.0, "txt": "I've been out of the loop since Magenta's MT3 model. This feels a lot better and significantly smaller. Very impressive, dude. And thank you!"}, {"id": 50586919, "au": "bolangi", "dom": 34, "sr": 19, "sc": 2.26, "ep": 3.4, "bs": 0.85, "d": 3, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 161, "qw": 0, "k": 360, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "audio_midi", "flbl": "Audio & Midi (Music)", "urls": [], "ig": 1.448, "fa": 0.0, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "So, you take audio streams from, say, one or more microphones, run them through plugins, and record them to disk? Is that also with live monitoring?\n\nWhat do you use for the audio engine? I see that ardour, developed for linux, also runs on MacOS, although it is less tested on your platform.\n\nProbably you're well along already, and it may not be the time to discuss\narchitecture, but...\n\nEcasound, which I use for audio processing, compiles on MacOS. It is a very efficient library for audio processing, however it is limited to internal, LADSPA and LV2 plugins. If you use the JACK audio framework, there are hosts such as Carla that accommodate VST and VST3 plugins, however I can't say how well tested they are on MacOS.\n\nWhen you include MIDI, automation, etc. there is a huge feature set. Probably you can get away with the minimum necessary for your use case.\n\nInterested to hear whatever you'd like to share.\n\nCheers and good luck!"}, {"id": 50574815, "au": "peaseagee", "dom": 1, "sr": 20, "sc": 2.14, "ep": 2.73, "bs": 0.0, "d": 0, "age": 17.51, "grav": 210.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 96, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "note_multiple", "flbl": "Note & Multiple (Daw)", "urls": [], "ig": 0.734, "fa": 0.0, "gp": 0.69, "bl": 0.0, "ds": 0.0, "txt": "Congrats on training on open and public domain recordings. Thanks for proving this kind of work can be done in a more ethical way."}, {"id": 50585684, "au": "randyrand", "dom": 12, "sr": 21, "sc": 2.05, "ep": 2.05, "bs": 0.0, "d": 0, "age": 3.87, "grav": 24.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 4369, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "recordings_generative", "flbl": "Recordings & Generative (Virtual)", "urls": [], "ig": 0.829, "fa": 0.0, "gp": 0.069, "bl": 0.0, "ds": 0.0, "txt": "Shows we still have a ways to go. In the Grandioso of Stars and Stripes (great song!) it completely misses the flute part.\n\nThat said, this is awesome."}, {"id": 50582580, "au": "thomspoon", "dom": 44, "sr": 22, "sc": 1.88, "ep": 2.25, "bs": 0.0, "d": 1, "age": 9.94, "grav": 86.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 44, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "muscriptor_model", "flbl": "Muscriptor & Model (12tet)", "urls": [], "ig": 0.957, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I started playing with it to make a song to GP5 converter and it works pretty well on solo instruments, but definitely gets confused when multiple instruments are played at the same time. Detatto does provide offset and velocity in the midi."}, {"id": 50579487, "au": "dimmuborgir", "dom": 23, "sr": 23, "sc": 1.88, "ep": 2.25, "bs": 0.0, "d": 0, "age": 13.12, "grav": 132.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 390, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "piano_output", "flbl": "Piano & Output (Impressive)", "urls": [], "ig": 0.85, "fa": 0.0, "gp": 0.172, "bl": 0.0, "ds": 0.0, "txt": "Is there a way to force it to a single instrument? I uploaded audio files of pure piano music and the output midi files are split into piano, guitar and drum parts."}, {"id": 50575523, "au": "IAmGraydon", "dom": 54, "sr": 24, "sc": 1.8, "ep": 2.02, "bs": 0.0, "d": 0, "age": 16.64, "grav": 193.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 5406, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "audio_midi", "flbl": "Audio & Midi (Music)", "urls": [], "ig": 0.724, "fa": 0.0, "gp": 0.221, "bl": 0.0, "ds": 0.0, "txt": "Excellent! I'll try this tonight. The timing couldn't be better as I've been researching audio->MIDI models for some personal projects recently."}, {"id": 50579207, "au": "locusofself", "dom": 31, "sr": 25, "sc": 1.55, "ep": 2.65, "bs": 0.0, "d": 0, "age": 13.43, "grav": 137.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 1252, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "note_multiple", "flbl": "Note & Multiple (Daw)", "urls": [], "ig": 1.031, "fa": 0.0, "gp": 0.154, "bl": 0.0, "ds": 0.0, "txt": "Very cool, I have been working on a DAW for several months that is getting close to a beta release. I'd love to incorporate this.\n\nAs a guitarist who can't play keys well, I'd love to use something like this to help me transcribe string arrangements."}, {"id": 50580460, "au": "hdb2", "dom": 21, "sr": 26, "sc": 1.5, "ep": 1.94, "bs": 0.0, "d": 0, "age": 12.14, "grav": 117.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 37, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "piano_output", "flbl": "Piano & Output (Impressive)", "urls": [], "ig": 0.73, "fa": 0.0, "gp": 0.152, "bl": 0.0, "ds": 0.0, "txt": "I just signed up and fed it a piano solo from a Dixie Dregs tune, and it nailed it.  this is very impressive for players like myself to transcribe things very, very quickly."}, {"id": 50579485, "au": "SoleilAbsolu", "dom": 35, "sr": 27, "sc": 1.47, "ep": 2.05, "bs": 0.0, "d": 0, "age": 13.12, "grav": 132.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 556, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "muscriptor_model", "flbl": "Muscriptor & Model (12tet)", "urls": [], "ig": 0.777, "fa": 0.0, "gp": 0.157, "bl": 0.0, "ds": 0.0, "txt": "Curious what's the performance for both note duration, and note pitch? How does it do for tunings/temperaments outside 12TET? Very refreshing to not violate copyright in this day and age amongst all the greedy grabbers!"}, {"id": 50577440, "au": "rogerdickey", "dom": 18, "sr": 28, "sc": 1.43, "ep": 1.87, "bs": 0.0, "d": 0, "age": 14.95, "grav": 163.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 326, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "audio_midi", "flbl": "Audio & Midi (Music)", "urls": [], "ig": 0.666, "fa": 0.0, "gp": 0.21, "bl": 0.0, "ds": 0.0, "txt": "all the examples seem to be classical music or largely instrumental stuff. how well does it work for things like pop music, rap?"}, {"id": 50575893, "au": "gpugreg", "dom": 40, "sr": 29, "sc": 1.2, "ep": 2.08, "bs": 0.0, "d": 0, "age": 16.27, "grav": 186.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 414, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "note_multiple", "flbl": "Note & Multiple (Daw)", "urls": [], "ig": 0.762, "fa": 0.0, "gp": 0.197, "bl": 0.0, "ds": 0.0, "txt": "Nice! Worked surprisingly well.\n\nYou might want to implement deduplication for your website so impatient users do not convert the same mp3 multiple times (at multiple times the price) when they click \"run audio to midi\" and the server takes a bit longer to respond."}, {"id": 50585156, "au": "bryzaguy", "dom": 16, "sr": 30, "sc": 1.17, "ep": 1.32, "bs": 0.0, "d": 0, "age": 5.44, "grav": 37.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 9, "k": 150, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "recordings_generative", "flbl": "Recordings & Generative (Virtual)", "urls": [], "ig": 0.533, "fa": 0.0, "gp": 0.043, "bl": 0.0, "ds": 0.0, "txt": "> we trained dettato on a mix of synthetic instrument recordings\n\ncan you go into more detail here? how did you make synthetic instrument recordings? with virtual instruments or generative AI?"}, {"id": 50582445, "au": "hidude562", "dom": 45, "sr": 31, "sc": 1.0, "ep": 1.95, "bs": 0.0, "d": 1, "age": 10.08, "grav": 88.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 2, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "audio_midi", "flbl": "Audio & Midi (Music)", "urls": [], "ig": 0.83, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I would say it performs okay, but not perfect by any means. In music it tends to flip on and off similar sounding tracks.\n\nYes! Offset and velocity both are provided."}, {"id": 50579454, "au": "simedw", "dom": 46, "sr": 32, "sc": 0.77, "ep": 1.65, "bs": 0.0, "d": 0, "age": 13.15, "grav": 133.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 756, "kpp": 10.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "audio_midi", "flbl": "Audio & Midi (Music)", "urls": [], "ig": 0.631, "fa": 0.0, "gp": 0.117, "bl": 0.0, "ds": 0.0, "txt": "Very cool, I wonder if my MIDI generation model would improve if I trained it on the MIDI files your model generates."}, {"id": 50581944, "au": "smrtinsert", "dom": 57, "sr": 33, "sc": -0.73, "ep": 0.46, "bs": 1.19, "d": 0, "age": 10.64, "grav": 96.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 2462, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.196, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Very excited to try this.  Been looking for something exactly like this for my composition hobby"}, {"id": 50584935, "au": "shraiwi", "dom": 10, "sr": 34, "sc": -0.96, "ep": 0.38, "bs": 1.19, "d": 1, "age": 5.95, "grav": 41.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 222, "kpp": 20.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.163, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "I kind of like it. I don't know how litigious Rovio(?) is though, if that's the risk you were alluding to."}, {"id": 50574831, "au": "mycall", "dom": 37, "sr": 35, "sc": -1.11, "ep": 1.33, "bs": 1.19, "d": 0, "age": 17.48, "grav": 209.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 1863, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "audio_midi", "flbl": "Audio & Midi (Music)", "urls": [], "ig": 0.414, "fa": 0.0, "gp": 0.244, "bl": 0.45, "ds": 0.0, "txt": "I'm still waiting for someone to convert beatboxing to midi in realtime.  That would be a game changer for that art."}, {"id": 50583053, "au": "lachlan_gray", "dom": 6, "sr": 36, "sc": -1.77, "ep": 2.91, "bs": 3.58, "d": 0, "age": 9.36, "grav": 79.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": -1, "lu": 1, "w": 38, "qw": 0, "k": 503, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "note_multiple", "flbl": "Note & Multiple (Daw)", "urls": ["https://www.youtube.com/watch?v=8XD4m_l8bgY"], "ig": 1.043, "fa": 0.0, "gp": 0.318, "bl": 1.35, "ds": 0.0, "txt": "Wow! Gave it a try on this\nhttps://www.youtube.com/watch?v=8XD4m_l8bgY\n\nAnd it pretty much nailed it note for note, including drums. Only fault is some mix up of instruments, e.g. electric bass turns into electric guitar in higher registers which is totally excusable."}, {"id": 50581189, "au": "tough", "dom": 14, "sr": 37, "sc": -1.94, "ep": 0.5, "bs": 1.19, "d": 1, "age": 11.43, "grav": 107.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 3303, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "note_multiple", "flbl": "Note & Multiple (Daw)", "urls": [], "ig": 0.211, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "could you have personal use fine-tunes for copyrighted material as long as you don't publish it"}, {"id": 50575048, "au": "pikann22", "dom": 53, "sr": 38, "sc": -2.01, "ep": 1.7, "bs": 3.05, "d": 0, "age": 17.18, "grav": 203.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 65, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "muscriptor_model", "flbl": "Muscriptor & Model (12tet)", "urls": [], "ig": 0.588, "fa": 0.0, "gp": 0.219, "bl": 1.15, "ds": 0.0, "txt": "crazy how a 20m param model actually beats the 1,3b muscriptor. awesome work!"}, {"id": 50583143, "au": "lachlan_gray", "dom": 19, "sr": 39, "sc": -2.02, "ep": 0.42, "bs": 1.19, "d": 1, "age": 9.23, "grav": 77.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 503, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "audio_midi", "flbl": "Audio & Midi (Music)", "urls": [], "ig": 0.18, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "I tried it on some pretty aggressive jazz and it was solid, I'm guessing it'll do well on other stuff"}, {"id": 50576506, "au": "gunalx", "dom": 28, "sr": 40, "sc": -2.26, "ep": 1.6, "bs": 3.05, "d": 1, "age": 15.76, "grav": 177.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 503, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "piano_output", "flbl": "Piano & Output (Impressive)", "urls": [], "ig": 0.68, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Its definetly a problem where generating the trivial version of synthetic data is easy though."}, {"id": 50583349, "au": "dekhn", "dom": 15, "sr": 41, "sc": -2.94, "ep": 1.28, "bs": 3.05, "d": 2, "age": 8.93, "grav": 74.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 33783, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "muscriptor_model", "flbl": "Muscriptor & Model (12tet)", "urls": [], "ig": 0.544, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "I think you need labelled data to fine-tune this model, which is prohibitevly expensive."}, {"id": 50577367, "au": "cocodill", "dom": 41, "sr": 42, "sc": -3.32, "ep": 0.97, "bs": 3.05, "d": 1, "age": 15.01, "grav": 164.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 127, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "audio_midi", "flbl": "Audio & Midi (Music)", "urls": [], "ig": 0.414, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "I guess impatient users could run audio to midi local."}, {"id": 50577624, "au": "pier25", "dom": 26, "sr": 43, "sc": -3.54, "ep": 0.92, "bs": 4.24, "d": 0, "age": 14.81, "grav": 160.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 17231, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "recordings_generative", "flbl": "Recordings & Generative (Virtual)", "urls": [], "ig": 0.27, "fa": 0.0, "gp": 0.197, "bl": 1.6, "ds": 0.0, "txt": "Very cool. This is the sort of stuff I want to see from AI."}, {"id": 50577608, "au": "pier25", "dom": 48, "sr": 44, "sc": -3.84, "ep": 0.4, "bs": 4.24, "d": 1, "age": 14.82, "grav": 160.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 17231, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.17, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "yeah I was thinking that DAWs should be implementing this"}, {"id": 50575459, "au": "ch_sm", "dom": 42, "sr": 45, "sc": -4.39, "ep": 0.95, "bs": 4.24, "d": 0, "age": 16.71, "grav": 194.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 1188, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "audio_midi", "flbl": "Audio & Midi (Music)", "urls": [], "ig": 0.281, "fa": 0.0, "gp": 0.197, "bl": 1.6, "ds": 0.0, "txt": "Just tried it with some home-recorded songs (pop/rock) — this works great!"}, {"id": 50576778, "au": "eduardoagarcia", "dom": 52, "sr": 46, "sc": -4.61, "ep": 0.73, "bs": 4.24, "d": 0, "age": 15.53, "grav": 173.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 50, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "muscriptor_model", "flbl": "Muscriptor & Model (12tet)", "urls": [], "ig": 0.192, "fa": 0.0, "gp": 0.19, "bl": 1.6, "ds": 0.0, "txt": "super interesting, I'll have to check this out tonight when I get home!"}, {"id": 50577731, "au": "th1nhng0", "dom": 55, "sr": 47, "sc": -4.72, "ep": 0.4, "bs": 4.24, "d": 0, "age": 14.72, "grav": 159.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 29, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "piano_output", "flbl": "Piano & Output (Impressive)", "urls": [], "ig": 0.054, "fa": 0.0, "gp": 0.186, "bl": 1.6, "ds": 0.0, "txt": "just in time when I need it. Thank you so much"}, {"id": 50582299, "au": "hidude562", "dom": 20, "sr": 48, "sc": -4.99, "ep": 0.66, "bs": 4.24, "d": 1, "age": 10.24, "grav": 90.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 2, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "audio_midi", "flbl": "Audio & Midi (Music)", "urls": [], "ig": 0.28, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Rap I haven't tried. For pop it works decent, but vocals can get mushy"}, {"id": 50582583, "au": "hidude562", "dom": 25, "sr": 49, "sc": -5.06, "ep": 0.57, "bs": 4.24, "d": 1, "age": 9.93, "grav": 86.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 2, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "note_multiple", "flbl": "Note & Multiple (Daw)", "urls": [], "ig": 0.242, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Nope, you'd have to edit the instruments in-post"}, {"id": 50579110, "au": "ohmahjong", "dom": 9, "sr": 50, "sc": -7.13, "ep": 0.89, "bs": 6.62, "d": 1, "age": 13.52, "grav": 139.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": -1, "lu": 1, "w": 8, "qw": 0, "k": 194, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "muscriptor_model", "flbl": "Muscriptor & Model (12tet)", "urls": ["https://knowyourmeme.com/photos/3226156-angry-bird-ear-angry-birds-ear"], "ig": 0.174, "fa": 0.0, "gp": 0.33, "bl": 2.5, "ds": 0.0, "txt": "It is a reference to an Angry Birds meme: https://knowyourmeme.com/photos/3226156-angry-bird-ear-angry..."}, {"id": 50576618, "au": "hongyong", "dom": 56, "sr": 51, "sc": -7.36, "ep": 0.5, "bs": 6.76, "d": 0, "age": 15.66, "grav": 175.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 1, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "piano_output", "flbl": "Piano & Output (Impressive)", "urls": [], "ig": 0.086, "fa": 0.0, "gp": 0.206, "bl": 2.55, "ds": 0.0, "txt": "nice, this is what i've been looking for"}, {"id": 50576750, "au": "awinter-py", "dom": 50, "sr": 52, "sc": -8.85, "ep": 0.0, "bs": 6.89, "d": 0, "age": 15.55, "grav": 173.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 5905, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.19, "bl": 2.6, "ds": 0.0, "txt": "at long last we have solved karaoke"}, {"id": 50574816, "au": "JodieBenitez", "dom": 47, "sr": 53, "sc": -9.39, "ep": 0.0, "bs": 6.89, "d": 0, "age": 17.51, "grav": 210.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 1465, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.244, "bl": 2.6, "ds": 0.0, "txt": "I need this in Bitwig !"}, {"id": 50582757, "au": "seedlessmike", "dom": 22, "sr": 54, "sc": -9.71, "ep": 0.0, "bs": 6.89, "d": 1, "age": 9.73, "grav": 84.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 0, "k": 10, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "T Lavitz? Which one?"}, {"id": 50577475, "au": "thatmf", "dom": 49, "sr": 55, "sc": -10.52, "ep": 0.0, "bs": 6.89, "d": 1, "age": 14.93, "grav": 162.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 375, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "muscriptor_model", "flbl": "Muscriptor & Model (12tet)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "my exact thought. hmm. weekend project?"}, {"id": 50574935, "au": "chahmed312", "dom": 51, "sr": 56, "sc": -11.29, "ep": 0.0, "bs": 9.41, "d": 0, "age": 17.34, "grav": 206.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 1, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "note_multiple", "flbl": "Note & Multiple (Daw)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.24, "bl": 3.55, "ds": 0.0, "txt": "Is it fully open source?"}, {"id": 50574841, "au": "maxgraf96", "dom": 38, "sr": 57, "sc": -13.63, "ep": 0.0, "bs": 11.39, "d": 1, "age": 17.47, "grav": 209.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 4, "qw": 0, "k": 1, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "muscriptor_model", "flbl": "Muscriptor & Model (12tet)", "urls": ["https://vochlea.com/"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 4.3, "ds": 0.0, "txt": "You should check out https://vochlea.com/ :)"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "top_signal";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Signal Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("SIGNAL (INFO + FALSIFIABILITY) →", W - 295, H - 7);
+    pCtx.fillText("↑ BULLSHIT", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 40);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 40);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 40);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `${shown.length} of ${pool.length} comments` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const proofDrawer = document.getElementById("proofDrawer");
+  const expBtn = document.getElementById("exploreToggleBtn");
+  const eviBtn = document.getElementById("evidenceToggleBtn");
+
+  if (expBtn && labDrawer) {
+    expBtn.addEventListener("click", () => {
+      labDrawer.open = !labDrawer.open;
+    });
+    labDrawer.addEventListener("toggle", () => {
+      const isOpen = labDrawer.open;
+      expBtn.classList.toggle("active", isOpen);
+      expBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  if (eviBtn && proofDrawer) {
+    eviBtn.addEventListener("click", () => {
+      proofDrawer.open = !proofDrawer.open;
+    });
+    proofDrawer.addEventListener("toggle", () => {
+      const isOpen = proofDrawer.open;
+      eviBtn.classList.toggle("active", isOpen);
+      eviBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

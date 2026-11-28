@@ -1,0 +1,1370 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50507553 // Emacs Is My Browser — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      border: 1px solid rgb(13, 13, 13);
+      background: rgb(255, 255, 253);
+    }
+    .kpi-cell {
+      padding: 16px 16px 14px;
+      border-right: 1px solid rgb(205, 205, 200);
+    }
+    .kpi-cell:last-child { border-right: 0; }
+    .kpi-label {
+      font: 600 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 8px 0 4px;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      font-size: 12px;
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 6px;
+      corner-shape: bevel;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer > summary.hn-summary {
+      list-style: none;
+      cursor: pointer;
+      display: block;
+      padding: 2px 0;
+      margin: 0;
+      background: transparent;
+      border: 0;
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      user-select: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: rgb(255, 255, 253);
+      border: 1px solid rgb(13, 13, 13);
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+    }
+    table.ablation th {
+      background: rgb(236, 236, 231);
+      font: 700 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgb(60, 60, 58);
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 6px;
+      corner-shape: bevel;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-decoration: ;
+      text-transform: lowercase;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      border-top: 3px solid rgb(13, 13, 13);
+      padding-top: 14px;
+      margin-top: 36px;
+      font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpi-cell { border-bottom: 1px solid rgb(205, 205, 200); }
+      .filter-bar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in {
+        width: 100%;
+      }
+      .filter-bar input.search-in {
+        grid-column: span 2;
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; }
+      .topbar-right { font-size: 8pt; padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+  <script>
+    (function() {
+      if (window.location.pathname.includes("/items/")) {
+        var m = window.location.pathname.match(/\/items\/(\d+)\.html/);
+        if (m) {
+          var base = window.location.pathname.replace(/\/items\/\d+\.html$/, "");
+          var target = (base || "") + "/item?id=" + m[1];
+          try {
+            history.replaceState(null, "", target);
+          } catch(e) {}
+        }
+      }
+    })();
+  </script>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+      </div>
+      <div class="topbar-right">&nbsp;</div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://joshblais.com/blog/emacs-as-my-browser/">Emacs Is My Browser</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=joshblais.com"><span class="sitestr">joshblais.com</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">170 points</span> by <a href="https://news.ycombinator.com/user?id=nyc111">nyc111</a> <span class="age" title="2026-11-15T15:21:21.000Z"><a href="https://news.ycombinator.com/item?id=50507553">9 hours ago</a></span> | <a href="https://news.ycombinator.com/item?id=50507553">88&nbsp;comments</a> | 78.4% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">01 // EVIDENCE</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">88</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 56 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">21.6%</div>
+          <div class="kpi-sub">19 comments (4 Gold / 4.5%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">78.4%</div>
+          <div class="kpi-sub">54 chatter &bull; 15 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">3</div>
+        <div class="kpi-sub">3% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.929</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">24</div>
+          <div class="kpi-sub">HN POS 30..53 (27.3% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="margin-top:10px;font:600 11px/1.5 ui-monospace,Menlo,monospace;color:rgb(70,70,68)"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">02 // EXPLORE</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 88-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 88)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (4)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (15)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (54)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (15)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..88) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 26)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (kmstout, 3.9h); largest subtree (@ohaodha) occupies 24 slots (HN POS 30..53).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="modeSelect" class="sel-in" aria-label="Ranking view">
+          <option value="hn_top40">HN Top 40</option>
+          <option value="top_signal">Epistemic Top 50</option>
+          <option value="buried_gems">Buried Gems (HN POS &gt; 26)</option>
+          <option value="bullshit_traps">High-Karma / URL Traps Caught</option>
+          <option value="mod_morgue">Mod Rebukes &amp; Downvoted Morgue</option>
+          <option value="c5a_rescues">c5A Heterodox Rescues</option>
+        </select>
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (88)</option>
+          <option value="ads_web">Ads &amp; Web (Firefox) (20)</option>
+          <option value="useful_bindings">Useful &amp; Bindings (Whole) (17)</option>
+          <option value="editor_text">Editor &amp; Text (Typing) (15)</option>
+          <option value="browser_side">Browser &amp; Side (Main) (15)</option>
+          <option value="modern_pinky">Modern &amp; Pinky (Shenanigans) (11)</option>
+          <option value="general_commentary">General Commentary (10)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, browser, eww, web, open, url...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50507553 + JOSHBLAIS.COM + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50507553, "story_title": "Emacs Is My Browser", "story_url": "https://joshblais.com/blog/emacs-as-my-browser/", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50507553, "story_title": "Emacs Is My Browser", "story_url": "https://joshblais.com/blog/emacs-as-my-browser/", "points": 170, "story_author": "nyc111", "article_source": "fetched_url", "t1_ref_utc": "2026-11-16T00:09:52+00:00", "t2_ref_utc": "2026-11-16T00:09:52+00:00", "delta_minutes": 0.0, "story_anchors": ["browser", "eww", "web", "open", "url", "easy", "javascript", "modern", "internet", "page", "default", "layer", "mode", "fully", "search", "emacs", "consider", "render", "rest", "truly", "cool", "desktop", "form", "recently", "view"], "facet_labels": {"ads_web": "Ads & Web (Firefox)", "useful_bindings": "Useful & Bindings (Whole)", "editor_text": "Editor & Text (Typing)", "modern_pinky": "Modern & Pinky (Shenanigans)", "browser_side": "Browser & Side (Main)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "ads_web", "label": "Ads & Web (Firefox)", "count": 20, "top_terms": ["ads", "web", "firefox", "window"]}, {"slug": "useful_bindings", "label": "Useful & Bindings (Whole)", "count": 17, "top_terms": ["useful", "bindings", "whole", "page"]}, {"slug": "editor_text", "label": "Editor & Text (Typing)", "count": 15, "top_terms": ["editor", "text", "typing", "spend"]}, {"slug": "modern_pinky", "label": "Modern & Pinky (Shenanigans)", "count": 11, "top_terms": ["modern", "pinky", "shenanigans", "nice"]}, {"slug": "browser_side", "label": "Browser & Side (Main)", "count": 15, "top_terms": ["browser", "side", "main", "form"]}], "counts": {"total_comments": 88, "live_t2_comments": 88, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 56, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 2, "pages_fetched": 1}, "sha256": {"corpus.json": "cfff9d2895902ebc9225a02de9e764532a1deb4b86a86e84129db1c0d14140c2"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 4, "grounded_analysis": 15, "crowd_chatter": 54, "bullshit_or_flamewar": 15}, "facets": {"editor_text": 15, "ads_web": 20, "modern_pinky": 11, "useful_bindings": 17, "browser_side": 15, "general_commentary": 10}, "facet_options": [{"slug": "ads_web", "label": "Ads & Web (Firefox)", "count": 20}, {"slug": "useful_bindings", "label": "Useful & Bindings (Whole)", "count": 17}, {"slug": "editor_text", "label": "Editor & Text (Typing)", "count": 15}, {"slug": "browser_side", "label": "Browser & Side (Main)", "count": 15}, {"slug": "modern_pinky", "label": "Modern & Pinky (Shenanigans)", "count": 11}, {"slug": "general_commentary", "label": "General Commentary", "count": 10}], "facet_diagnostics": [{"slug": "ads_web", "label": "Ads & Web (Firefox)", "count": 20, "useful": 6, "useful_pct": 30.0, "terms": "ads, web, firefox, window"}, {"slug": "useful_bindings", "label": "Useful & Bindings (Whole)", "count": 17, "useful": 4, "useful_pct": 23.5, "terms": "useful, bindings, whole, page"}, {"slug": "editor_text", "label": "Editor & Text (Typing)", "count": 15, "useful": 3, "useful_pct": 20.0, "terms": "editor, text, typing, spend"}, {"slug": "browser_side", "label": "Browser & Side (Main)", "count": 15, "useful": 3, "useful_pct": 20.0, "terms": "browser, side, main, form"}, {"slug": "modern_pinky", "label": "Modern & Pinky (Shenanigans)", "count": 11, "useful": 3, "useful_pct": 27.3, "terms": "modern, pinky, shenanigans, nice"}, {"slug": "general_commentary", "label": "General Commentary", "count": 10, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 7}, {"category": "code_repository", "count": 3}, {"category": "low_cred_or_joke", "count": 2}], "story_anchors": ["browser", "eww", "web", "open", "url", "easy", "javascript", "modern", "internet", "page", "default", "layer", "mode", "fully", "search", "emacs", "consider", "render"], "largest_root": {"root_id": 50508340, "author": "ohaodha", "slots": 24, "start_dom": 30, "end_dom": 53, "share_pct": 27.3, "top_dom1_age": 3.9, "top_dom1_author": "kmstout"}, "buried_cutoff": 26, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50510675, "au": "iLemming", "dom": 40, "sr": 1, "sc": 8.83, "ep": 12.41, "bs": 3.58, "d": 3, "age": 3.2, "grav": 19.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 1, "w": 289, "qw": 55, "k": 3095, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "editor_text", "flbl": "Editor & Text (Typing)", "urls": ["https://www.youtube.com/watch?v=BDn8ak-8yIs", "https://github.com/agzam/browser-hist.el"], "ig": 1.834, "fa": 2.5, "gp": 0.67, "bl": 1.35, "ds": 0.0, "txt": "> I’m curious what the difference is between that and having pinned windows in Ubuntu\n\nThe difference is the text consumption. Can you easily retrieve any text you're seeing on the screen into your editor?\n\nInserting any piece of text I see on the screen into my notes? A couple of keystrokes. I can grab text in any form, even if it's a frame in a YT video - I'd just select the area, snapshot it - Emacs OCRs the text out of it, which takes milliseconds. I fully control the playback of said video directly from my editor - rewind, pause, mute, speed up, extract transcript, etc. It is enormously liberating and empowering.\n\nI have complete and utter control over text - I can send a query to an LLM in the middle of typing this very comment, without ever missing a beat. I can ask for anything - fact-check it, spell check it, reword it, explain it, give me different variations of the same sentence. I can replace part of it with diffing in-place. I can even start changing the behavior of Emacs itself, right there on the spot.\n\nI can directly grab any part of the log of a process running in the terminal. Grep through it, semantically search through it with an LLM, whatever. Similarly, I can directly grab a piece of any text in Emacs and send it over to another app, e.g., as a command to run in the terminal.\n\n> Everything You describe is possible without emacs\n\nEverything is possible with"}, {"id": 50511243, "au": "mtlmtlmtlmtl", "dom": 36, "sr": 2, "sc": 8.15, "ep": 8.3, "bs": 0.0, "d": 3, "age": 2.25, "grav": 13.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 765, "qw": 0, "k": 5631, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "ads_web", "flbl": "Ads & Web (Firefox)", "urls": [], "ig": 1.943, "fa": 0.9, "gp": 0.808, "bl": 0.0, "ds": 0.0, "txt": "I mean, I get what you're saying. There's an element of that with Emacs and super bespoke setups in general, of course.\n\nBut also, consider this: maybe they just have very specific, unusual needs that you're unable to relate to because they're very different from your lived experience. I'm not saying this as a criticism. I feel like most people struggle to comprehend just how different someone else's lived experience can be from their own. I certainly do. Usually, when I read these emacs setup blog posts, I'll dislike most of their setup, but often there will be some nugget in there I'll absolutely love, and then I might add that nugget to my init.org.\n\nLet me try to explain my singular point of view. I have very severe ADHD-C, and GUIs always felt horrible for me to use. Especially big complex GUIs. Things like MS Office, Photoshop, big IDEs etc.\n\nWhy? Multiple things:\n\n1. Visual processing:\n\nADHD can include strange visual processing or spatial reasoning problems. It's very hard for me to describe this one in a detailed manner, but suffice it to say, Icons don't make sense to me. Text does. I am capable of learning some icons, certainly, but certain ones never stick. For example, the protonmail web client has the reply and forward button displayed as arrows pointing in opposite directions, I always click the wrong one. Every time. And everytime I'm positive it's the right one"}, {"id": 50508531, "au": "armitron", "dom": 88, "sr": 3, "sc": 7.47, "ep": 7.47, "bs": 0.0, "d": 1, "age": 7.08, "grav": 53.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 162, "qw": 0, "k": 991, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "modern_pinky", "flbl": "Modern & Pinky (Shenanigans)", "urls": ["https://monadicsheep.org/blog/an-introduction-to-canvas-in-emacs.html"], "ig": 1.704, "fa": 0.9, "gp": 0.619, "bl": 0.0, "ds": 0.0, "txt": "Emacs has asynchronous IO support which is more than sufficient for networking. It is up to the relevant mode or application that runs on top of Emacs to take advantage of it and not all of them do (for example, Gnus).\n\nThere are also various multi-processing configurations for even more flexibility: multiple Emacs processes that can coordinate, Emacs modules over a C API which can create native threads outside of Emacs and so on. What Emacs lacks is parallelism inside a single Emacs process, which is arguably not needed and would be a net negative from a safety, ease of development and debugging point of view.\n\nLook at the recently introduced canvas API (https://monadicsheep.org/blog/an-introduction-to-canvas-in-e...) for some examples of what's possible via that flexibility.\n\nLem is nice but nowhere near as nice as modern Emacs (and probably never will be). Emacs Lisp isn't Common Lisp but has evolved significantly and the remaining differences don't really matter in practice because Emacs momentum, massive user base and ecosystem are a tremendous advantage."}, {"id": 50507975, "au": "Arubis", "dom": 3, "sr": 4, "sc": 7.06, "ep": 7.06, "bs": 0.0, "d": 0, "age": 8.09, "grav": 64.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 94, "qw": 0, "k": 6022, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "modern_pinky", "flbl": "Modern & Pinky (Shenanigans)", "urls": ["https://emacsdocs.org/docs/emacs/Embedded-WebKit-Widgets"], "ig": 1.362, "fa": 0.62, "gp": 1.441, "bl": 0.0, "ds": 0.0, "txt": "The most important part of this is toward the end, and whether you consider it a limitation or a feature is a matter of perspective: the modern commercial web does not play nice with this. So static HTML and blogs yes, Reddit and most anything commercial no.\n\nYou can actually get other close-to-browser experiences with stuff like xwidget and embedded WebKit (https://emacsdocs.org/docs/emacs/Embedded-WebKit-Widgets) but generally it’s not worth the fight for commercial sites these days; everything is vibed and only tested against Chrome, so if you’re lucky they’ll load in other Chromium browsers and _maybe_ Firefox."}, {"id": 50512066, "au": "iLemming", "dom": 42, "sr": 5, "sc": 6.51, "ep": 7.65, "bs": 0.85, "d": 5, "age": 0.56, "grav": 5.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 475, "qw": 10, "k": 3095, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "epistemic_gold", "facet": "editor_text", "flbl": "Editor & Text (Typing)", "urls": [], "ig": 1.886, "fa": 0.7, "gp": 0.844, "bl": 0.32, "ds": 0.0, "txt": "> The example you describe\n\nIt's just a drop in a vast ocean of things. Your close-minded thinking just sees one thing and makes generalized assumptions.\n\n> where people want to spend time\n\nYou're reading it completely backwards. This is the thing that I never understood about the majority of programmers. For whatever reason they just readily accept the status quo. Here's a typical example:\n\nSo often do I feel like rolling my eyes whenever I pair with my colleagues - I'd do something trivial, like fetching a list of PRs related to a specific ticket number at the cursor. They'd be like \"whoa, that's cool\", and then never do anything about it - they stick to their \"learned helplessness\" paradigm - copy the ticket number, switch to browser, navigate to Jira, pass through SSO, look around for the phone just to push the button, paste the ticket number, find the linked PRs, etc. The other teammate watching all that may say something like: \"you could do it faster directly on GitHub\"... And here I am - pressing a key, voila - the list. Why the heck don't they do anything about it, I just don't get it. Trained engineers, they spend years dealing with cranky software, why in the world are they unwilling to do anything about these seemingly small yet everyday annoyances? Why do so many programmers treat software as if it's magic? And I think I know the answer: because the software you use"}, {"id": 50512351, "au": "iLemming", "dom": 79, "sr": 6, "sc": 6.21, "ep": 6.21, "bs": 0.0, "d": 2, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 103, "qw": 7, "k": 3095, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "useful_bindings", "flbl": "Useful & Bindings (Whole)", "urls": [], "ig": 1.754, "fa": 0.42, "gp": 0.615, "bl": 0.0, "ds": 0.0, "txt": "> Can you be more specific about this?\n\nNo, they can't. People like to play this kind of fear-mongering and \"cybersecurity theater\" without even questioning first the cybersec posture, network perimeter - vpn, firewall, malware protections, etc. Everything the article describes is perfectly possible even without Emacs. OSA layer on Mac been doing even weirder things for odd thirty years.\n\nIt's not like people giving Emacs root shell access. It's culturally fitting for HN - signaling caution is always socially safe. Nobody ever got criticized for saying \"that sounds risky\". But \"I evaluated the risks and accepted the tradeoffs for my situation\" is the actual, pragmatic engineering. Security is risk management, not risk elimination."}, {"id": 50509319, "au": "TacticalCoder", "dom": 85, "sr": 7, "sc": 6.13, "ep": 6.13, "bs": 0.0, "d": 0, "age": 5.75, "grav": 39.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 88, "qw": 37, "k": 10539, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "useful_bindings", "flbl": "Useful & Bindings (Whole)", "urls": [], "ig": 1.433, "fa": 0.76, "gp": 0.411, "bl": 0.0, "ds": 0.0, "txt": "> I have seen in my own use of the modern browser (chromium/firefox) that it is far too easy to get distracted - too easy to get off track and fall down rabbit holes that take over my day.\n\nI have a very easy solution for that: zero sound output from my main desktop/workstation computer. I mean: technically I leave the sound drivers and the sound on, but there's nothing connected to the output (so speakers / no headphone).\n\nThe deep underlying philosophical question being: \"If a PC outputs audio to nothing plugged into it, does it make a sound?\"\n\nThe answer doesn't really matters though. What matters is that it's a great way to not get distracted.\n\nMy main desktop emits, on purpose, no sound since... 20 years?\n\nFor the rest, I've got laptops."}, {"id": 50510246, "au": "kmstout", "dom": 1, "sr": 8, "sc": 5.75, "ep": 5.75, "bs": 0.0, "d": 0, "age": 3.94, "grav": 24.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 57, "qw": 0, "k": 861, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "browser_side", "flbl": "Browser & Side (Main)", "urls": ["https://www.reindeereffect.com/0002"], "ig": 1.412, "fa": 0.62, "gp": 0.462, "bl": 0.0, "ds": 0.0, "txt": "Shameless plug time: About a year and a half ago, I wrote [1] about a way of squeezing more text onto the screen, using Emacs, that plays well with eww and does a reasonable job of preserving readability.  Basically, it's a hack that builds on follow-mode to quickly convert a frame into a columnar display for long buffers, with interactive adjustment of the number of columns.\n\n[1] https://www.reindeereffect.com/0002"}, {"id": 50509137, "au": "graemep", "dom": 4, "sr": 9, "sc": 5.66, "ep": 5.8, "bs": 0.0, "d": 1, "age": 6.06, "grav": 42.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 67, "qw": 0, "k": 9660, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "ads_web", "flbl": "Ads & Web (Firefox)", "urls": [], "ig": 1.377, "fa": 0.28, "gp": 1.219, "bl": 0.0, "ds": 0.0, "txt": "I use Firefox and cannot remember the last time I had to switch to Chrome. Most site work with JS off too (especially if you use reader view).\n\nQuite a lot of sites work well with other browser engines too. I have tried PaleMoon, Netsurf. Users of Apple mobile devices seem to be fine with Safari.\n\nReally light or unusual browsers might be a problem. Dillo, for example (its very fast though)."}, {"id": 50511410, "au": "iLemming", "dom": 87, "sr": 10, "sc": 5.64, "ep": 5.79, "bs": 0.0, "d": 1, "age": 1.93, "grav": 11.8, "surf": 4.5, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 174, "qw": 8, "k": 3095, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "modern_pinky", "flbl": "Modern & Pinky (Shenanigans)", "urls": [], "ig": 1.652, "fa": 0.42, "gp": 0.492, "bl": 0.0, "ds": 0.0, "txt": "> ends in either weird hacks or uncomfortable pauses\n\nNot true in practice. It is absolutely useful in real, battle-tested scenarios. If this were a deal-breaking problem, we'd keep seeing it discussed and eventually fixed. Like the issue with long lines, which was a problem in Emacs for decades and is now mitigated. Nobody complains about it anymore.\n\nLem is very cool, yet too young to be pragmatically compared with the 40-year package ecosystem of Emacs. Let's be honest, with all the \"better\" stuff, we're not witnessing herds of Lispers switching to it. Another decade may pass before we see it make more than a blip on the radar. Aside from a number of devoted Common Lispers, there's not much usage of it in the real world.\n\nMeanwhile, Emacs is seeing another uptick. First it was Spacemacs, then Doom, now LLMs are making it very appealing, and we see HN submissions every other week. Don't get me wrong, I'm betting on both of these horses, even on Neomacs, and whichever wins, I'd be happy to see it. Emacs for now remains the uncontested king of Lisp-based text editors."}, {"id": 50508655, "au": "zahlman", "dom": 31, "sr": 11, "sc": 5.62, "ep": 6.06, "bs": 0.0, "d": 1, "age": 6.89, "grav": 51.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 168, "qw": 49, "k": 8568, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "ads_web", "flbl": "Ads & Web (Firefox)", "urls": [], "ig": 1.406, "fa": 0.7, "gp": 0.524, "bl": 0.0, "ds": 0.0, "txt": "> you learn that the benefit in question is actually that the method is less useful than conventional means. … hope for … an actually useful feature of the unconventional method in question.\n\nPeople write these things, and use these methods, specifically because they don't conceive of usefulness the same way you do.\n\nIn this case, the justification offered doesn't mention all the various keybinds that have been pushed down to the \"how\" section. But clearly the simplicity is a feature:\n\n> D will download images locally, b goes back a page, a will save bookmarks. All of this makes browsing in eww truly enjoyable.\n\nThe point is the same as usual for TUIs: you don't have to switch over to the mouse and hunt out a button, as the necessary key is always literally at hand.\n\nPeople who find this sort of thing \"truly enjoyable\" (what clearer statement is there of featurefulness!) commonly take it for granted and don't explain the virtues of it very well. That sort of explanation is found in think pieces about TUI design more generally.\n\nTFA describes a goal of avoiding distraction. That is not at all the same thing as \"inconvenience and impracticality\". Clearly the author finds these keybinds quite convenient and practical. It's just that they don't cover a bunch of web interactions that you perhaps value, but the author doesn't."}, {"id": 50508647, "au": "AndrewKemendo", "dom": 39, "sr": 12, "sc": 5.61, "ep": 6.05, "bs": 0.0, "d": 2, "age": 6.91, "grav": 51.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 29, "k": 23752, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "ads_web", "flbl": "Ads & Web (Firefox)", "urls": [], "ig": 1.194, "fa": 0.7, "gp": 0.863, "bl": 0.0, "ds": 0.0, "txt": ">You can have your code/notes open in one buffer and have the website in another, which is useful for documentation, or an article you're following along, etc.\n\nI’m curious what the difference is between that and having pinned windows in Ubuntu\n\nFor example I’ll have sublime text, one terminal, a notepad, and a firefox window with multiple tabs, pinned to the four corners of my desktop\n\nEverything You describe is possible without emacs so I’m genuinely trying to understand the appeal"}, {"id": 50510887, "au": "iLemming", "dom": 47, "sr": 13, "sc": 5.45, "ep": 5.89, "bs": 0.0, "d": 7, "age": 2.82, "grav": 16.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 202, "qw": 18, "k": 3095, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "editor_text", "flbl": "Editor & Text (Typing)", "urls": [], "ig": 1.579, "fa": 0.42, "gp": 0.675, "bl": 0.0, "ds": 0.0, "txt": "> The example you describe is something I would rarely do\n\nThere is some tacit knowledge in here that is nearly impossible to convey in words. Your \"rarely do\" is the thought that subconsciously ignores the principle of least effort; there's an affordability gap, e.g., I am more likely to use a thesaurus simply because I have it built into my text editor, versus someone who has to reach for it in the browser/separate app.\n\n> building a process around it would be inefficient for me\n\nThat's what you're missing. Emacs makes it incredibly cheap. It's a Lisp REPL. When you understand what it means in practice, it opens up incredible opportunities for exploratory computing. You're not \"building processes around\", you're essentially living in one mega-process, a simulation, a digital universe where you are a god, commanding change at will. Right now, as I'm typing this very comment, I noticed a tiny gap in the way how I'm using LLMs, so I'm changing this stuff on the fly, with the agent running things in the adjacent buffer while I'm finishing this comment. The crazy thing is that it doesn't have to compile, restart, ask me to pause typing, etc. It's applying changes to my editor live. By the time I finish typing the comment, it will probably have already built this feature, tested it out, and it will be ready for me to use, instantly."}, {"id": 50508563, "au": "kkylin", "dom": 11, "sr": 14, "sc": 5.32, "ep": 5.61, "bs": 0.0, "d": 1, "age": 7.03, "grav": 52.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 77, "qw": 0, "k": 1413, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "browser_side", "flbl": "Browser & Side (Main)", "urls": [], "ig": 1.309, "fa": 0.5, "gp": 0.766, "bl": 0.0, "ds": 0.0, "txt": "I think that's absolutely right: whether this works or not depends on what you do.\n\nI tried xwidget-webkit as main browser briefly, but very quickly gave up.  When a collaborator sends me a Google Doc, for example, I really still need a browser to work on it.  I still use xwidget-webkit daily -- it's a great PDF viewer, and really nice to be able to have Jupyter notebooks open side by side with code buffers -- but for most tasks involving the web I'll switch to a browser."}, {"id": 50508340, "au": "ohaodha", "dom": 30, "sr": 15, "sc": 5.27, "ep": 5.71, "bs": 0.0, "d": 0, "age": 7.42, "grav": 56.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 163, "qw": 0, "k": 57, "kpp": 5.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "useful_bindings", "flbl": "Useful & Bindings (Whole)", "urls": [], "ig": 1.421, "fa": 0.28, "gp": 1.084, "bl": 0.0, "ds": 0.0, "txt": "I don't want to hate on this particular post, but I really dislike the great number of blog posts, videos, and articles that have a title which says \"Why I do X in <some unconventional way>\" where upon reading the blog post hoping to learn some useful feature that say, browsing the web in Emacs affords you (like closer integration between research and writing for example), you learn that the benefit in question is actually that the method is less useful than conventional means.\n\nI think the idea that you do something in a more difficult or less convenient manner for the sake of \"mindfulness\" or \"focus\" is well-established, and what I hope for (and am always disappointed by the lack of) when reading such blog posts is an actually useful feature of the unconventional method in question.\n\nThe title of this blog post promises some usefulness from using Emacs as your browser, and upon reading, you discover that the \"usefulness\" is the inconvenience and impracticality of using it that way."}, {"id": 50508302, "au": "jmclnx", "dom": 81, "sr": 16, "sc": 5.24, "ep": 5.24, "bs": 0.0, "d": 0, "age": 7.49, "grav": 57.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 55, "qw": 0, "k": 6976, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "browser_side", "flbl": "Browser & Side (Main)", "urls": ["https://news.ycombinator.com"], "ig": 1.165, "fa": 0.62, "gp": 0.506, "bl": 0.0, "ds": 0.0, "txt": "FWIW, you can login to here (https://news.ycombinator.com) using eww.  The only minor issue is you are really limited to 1 line if you want to comment.  And seems you cannot vote either.\n\nI have yet to figure out how to get around those issues.\n\nAnd a big plus, eww is great for resource limited systems like old 32bit laptops."}, {"id": 50508381, "au": "v9v", "dom": 38, "sr": 17, "sc": 5.11, "ep": 5.55, "bs": 0.0, "d": 1, "age": 7.35, "grav": 55.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 132, "qw": 0, "k": 700, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "useful_bindings", "flbl": "Useful & Bindings (Whole)", "urls": ["https://nickdrozd.github.io/2018/10/17/web-scraping.html"], "ig": 1.421, "fa": 0.62, "gp": 0.309, "bl": 0.0, "ds": 0.0, "txt": "I'll go through some personal upsides to using eww.\n\nThe main utility I see in browsing the web through emacs is the potential to integrate it into your workflow. You can have your code/notes open in one buffer and have the website in another, which is useful for documentation, or an article you're following along, etc.\n\nWith gptel, it's easy to highlight part of a blogpost and ask an llm a question about it, or get it to rewrite or annotate the whole page.\n\nWith macros you can do basic automation, like this webscraping example here: https://nickdrozd.github.io/2018/10/17/web-scraping.html\n\nAn added bonus is that your keybindings for the rest of emacs are also valid here. (Though for that I've recently started using Glide, a firefox fork, and set all of its keymap to match my emacs bindings)"}, {"id": 50508588, "au": "jll29", "dom": 16, "sr": 18, "sc": 4.56, "ep": 4.78, "bs": 0.0, "d": 0, "age": 6.98, "grav": 52.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 43, "qw": 0, "k": 6024, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "ads_web", "flbl": "Ads & Web (Firefox)", "urls": [], "ig": 1.199, "fa": 0.34, "gp": 0.688, "bl": 0.0, "ds": 0.0, "txt": "Richard Stallman (RMS) also uses the Web from Emacs. But I believe he pastes URLs into a program that sends him a screen copy by email (at least as of approx. 20 years ago, when I last saw him in person).\n\nHis motive is not mindfulness, but ideology."}, {"id": 50510298, "au": "krylon", "dom": 25, "sr": 19, "sc": 3.93, "ep": 3.93, "bs": 0.0, "d": 0, "age": 3.83, "grav": 23.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 85, "qw": 0, "k": 7903, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "browser_side", "flbl": "Browser & Side (Main)", "urls": [], "ig": 1.436, "fa": 0.0, "gp": 0.381, "bl": 0.0, "ds": 0.0, "txt": "I have an old - and I mean old - laptop sit in my bathroom I use for reading random-ish Wikipedia articles, and it's too puny to run any mainstream browser. I used to use Dillo, which is fine resource-wise, but I grew annoyed over time that it does not have session management.\n\nThen, recently, it hit me - w3m-mode has both tabs and session management. It somehow even displays images more reliably than Dillo. I wouldn't use it as my main browser on the desktop, but for my specific use case, it's perfect."}, {"id": 50510749, "au": "shevy-java", "dom": 80, "sr": 20, "sc": 3.87, "ep": 3.87, "bs": 0.0, "d": 0, "age": 3.08, "grav": 18.6, "surf": 3.1, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 72, "qw": 33, "k": 2084, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "editor_text", "flbl": "Editor & Text (Typing)", "urls": [], "ig": 1.107, "fa": 0.42, "gp": 0.05, "bl": 0.0, "ds": 0.0, "txt": "> The internet is just a delivery mechanism, and for people that see it for what it really is, the internet has never been more alive. I truly recommend using the internet as if it was 1999.\n\nWell, he has a point - Google controlling so much of the www is bad.\n\nOn the other hand, it's not all bad only. While more and more youtube videos are crap, there are useful youtube videos. Many people use it for learning too and often that works as well. Using emacs as browser really does not fix the issue. Also, emacs needs a proper editor if it ever wants to be a good operating system."}, {"id": 50508790, "au": "skydhash", "dom": 43, "sr": 21, "sc": 3.85, "ep": 4.73, "bs": 0.0, "d": 3, "age": 6.67, "grav": 48.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 51, "qw": 14, "k": 6709, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "ads_web", "flbl": "Ads & Web (Firefox)", "urls": [], "ig": 1.247, "fa": 0.42, "gp": 0.416, "bl": 0.0, "ds": 0.0, "txt": "> Everything You describe is possible without emacs so I’m genuinely trying to understand the appeal\n\nThe advantage is that it’s a single program with multiple windows with a shared list of buffers. So you can save transform your layout and save it, manipulate the content without any real boundary, unified bookmarks,…\n\nYour WM can’t access sublime and firefox internals. And the last two can’t talk with each other."}, {"id": 50508668, "au": "skydhash", "dom": 75, "sr": 22, "sc": 3.65, "ep": 3.87, "bs": 0.0, "d": 1, "age": 6.88, "grav": 50.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 56, "qw": 8, "k": 6709, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "browser_side", "flbl": "Browser & Side (Main)", "urls": [], "ig": 1.139, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> but the emacs pinky shenanigans are such a turn-off\n\nDo you touch type? You’re meant to use the modifier keys on the opposite side (so use both hands) rather than stretching your pinky to press them. Also there are packages such as god-mode which help.\n\nBut the most helpful thing is doing navigation by page instead of line which reduce the use of keybindings."}, {"id": 50509868, "au": "moritzwarhier", "dom": 27, "sr": 23, "sc": 3.34, "ep": 4.0, "bs": 0.0, "d": 1, "age": 4.67, "grav": 30.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 113, "qw": 0, "k": 1843, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ads_web", "flbl": "Ads & Web (Firefox)", "urls": [], "ig": 1.701, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Seems like the end game is forcing all ad-financed and tracking-financed content behind login walls.\n\nFeels like we were already almost there because of ad blocking, without even considering AI agents and summaries. And I take no offense in ad blockers, I use them myself.\n\nSad thing about current public web \"content\" apps (be it newspapers or other formats) is that the paid versions often share all tracking features with the ad-financed version of the same service, when both are behind a login wall. Only fewer ads, at least hopefully no ads from other vendors / no intrusive brokered ads.\n\nSelf-advertisement going through the roof when accepting an offer for a paid subscription is another frequent annoyance though."}, {"id": 50509824, "au": "dunham", "dom": 5, "sr": 24, "sc": 3.27, "ep": 3.71, "bs": 0.0, "d": 2, "age": 4.76, "grav": 31.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 61, "qw": 0, "k": 2613, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "modern_pinky", "flbl": "Modern & Pinky (Shenanigans)", "urls": [], "ig": 1.441, "fa": 0.0, "gp": 0.22, "bl": 0.0, "ds": 0.0, "txt": "The two things that I'm missing in Safari are auto dark mode (re-coloring pages) and toggling javascript per-site. Currently I'm using the \"Quiche\" browser (paid) for that, but github is suddenly hating it (requiring a login). I like that desktop chrome lets me toggle javascript per site out of the box.\n\nIt sounds like the dark mode thing is coming in the next Safari release."}, {"id": 50509295, "au": "jolmg", "dom": 37, "sr": 25, "sc": 3.21, "ep": 3.87, "bs": 0.0, "d": 1, "age": 5.81, "grav": 40.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 63, "qw": 137, "k": 6471, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "useful_bindings", "flbl": "Useful & Bindings (Whole)", "urls": [], "ig": 1.058, "fa": 0.42, "gp": 0.128, "bl": 0.0, "ds": 0.0, "txt": "> I really dislike the great number of blog posts, videos, and articles that have a title which says \"Why I do X in <some unconventional way>\" where upon reading the blog post hoping to learn some useful feature that say, browsing the web in Emacs affords you (like closer integration between research and writing for example), you learn that the benefit in question is actually that the method is less useful than conventional means.\n\nIt wouldn't be unconventional if most found it useful. That doesn't mean the author themself doesn't find it useful:\n\n>> I have seen in my own use of the modern browser (chromium/firefox) that it is far too easy to get distracted\n\nThey find EWW useful to cut distractions.\n\n>> In addition to this, my belief is that we should make strides toward leaving behind Layer 8 of the internet - the limiting frontends of social platforms and locked away corners of the net that limit actual discourse (Discord, I’m looking at you). [...] The internet is just a delivery mechanism.\n\nThey also find it a useful way to stick to their ideals which I understand to be that they should be in control of the front-end and the internet is only to be treated as a delivery mechanism of information."}, {"id": 50509314, "au": "leoc", "dom": 14, "sr": 26, "sc": 2.96, "ep": 3.4, "bs": 0.0, "d": 0, "age": 5.76, "grav": 40.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 66, "qw": 0, "k": 7029, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "browser_side", "flbl": "Browser & Side (Main)", "urls": [], "ig": 1.153, "fa": 0.0, "gp": 0.474, "bl": 0.0, "ds": 0.0, "txt": "The one thing above all that is urgently necessary is a content-addressable replacement for (or layer above) HTTP(S) which is genuinely ready to go and has adoption which is meaningful and moving in the right direction. Unfortunately we seem to be going in the wrong direction there right now. Cute browser setups and retro-chic web servers are fun and a nice gesture but they won't get us there."}, {"id": 50510017, "au": "sammy0910", "dom": 55, "sr": 27, "sc": 2.95, "ep": 3.39, "bs": 0.0, "d": 1, "age": 4.38, "grav": 28.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 67, "qw": 0, "k": 291, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "useful_bindings", "flbl": "Useful & Bindings (Whole)", "urls": [], "ig": 1.362, "fa": 0.0, "gp": 0.13, "bl": 0.0, "ds": 0.0, "txt": "the idea is to open a webpage in a headless browser, run all the javascript and whatnot, and then ai-generate a program to translate the page as-displayed into a textonly format.\n\nnot great for everything, and it does, unfortunately need an LLM call to generate the translation program, but if you truly want to live in emacs, I've found it as a good stop-gap for certain pages that EWW cannot effectively render."}, {"id": 50509170, "au": "BeetleB", "dom": 74, "sr": 28, "sc": 2.83, "ep": 3.19, "bs": 0.0, "d": 1, "age": 6.01, "grav": 42.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 51, "qw": 8, "k": 18351, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "editor_text", "flbl": "Editor & Text (Typing)", "urls": [], "ig": 0.85, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> but the emacs pinky shenanigans are such a turn-off\n\nI've never had this. I'm either lucky, or I know to use both Ctrl keys on the keyboard.\n\nIf you're typing C-x, you should use the right control key. The standard ergonomics advice is to use both hands when doing multiple key combinations.\n\nAlso, just use the usual cursor keys for navigation!"}, {"id": 50509207, "au": "BeetleB", "dom": 7, "sr": 29, "sc": 2.57, "ep": 3.67, "bs": 0.0, "d": 2, "age": 5.97, "grav": 41.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 76, "qw": 0, "k": 18351, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "useful_bindings", "flbl": "Useful & Bindings (Whole)", "urls": [], "ig": 1.339, "fa": 0.0, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "Even before I had much of the Internet ban me because I was playing with a bot, my FF profile on Linux was giving me a lot of trouble. About 6 months ago a lot of web sites barely functioned for me. I can't log in to E-trade. Home Depot and Lowes search doesn't work for me.\n\nIf I open a brand new FF profile, some of these sites do work. But I guess the combination of FF, on Linux, with my addons is triggering something."}, {"id": 50509799, "au": "mimischi", "dom": 23, "sr": 30, "sc": 2.54, "ep": 3.35, "bs": 0.0, "d": 2, "age": 4.8, "grav": 31.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 63, "qw": 0, "k": 182, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "browser_side", "flbl": "Browser & Side (Main)", "urls": [], "ig": 1.426, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "You should read some of the Emacs mailing lists. There’s been a recent (~last 12 months) discussion about changing the default Emacs logo. The proposed  new logo, an SVG, was attached to the mail parent. A side thread ensued when RMS asked how to open an SVG and view it in its image form.\n\nI love my Emacs. And yet here I am completely dumbfounded by this interaction!"}, {"id": 50508425, "au": "Arubis", "dom": 71, "sr": 31, "sc": 2.49, "ep": 3.66, "bs": 0.0, "d": 2, "age": 7.27, "grav": 55.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 6022, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ads_web", "flbl": "Ads & Web (Firefox)", "urls": [], "ig": 1.02, "fa": 0.34, "gp": 0.204, "bl": 0.0, "ds": 0.0, "txt": "+100 here. Going full evil+spacemacs (for self-documenting arpeggios instead of chord sets) a bit over a decade ago transformed Emacs from a fun toy to a fulltime environment for me."}, {"id": 50510936, "au": "agumonkey", "dom": 28, "sr": 32, "sc": 2.48, "ep": 2.7, "bs": 0.0, "d": 0, "age": 2.76, "grav": 16.6, "surf": 3.4, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 31694, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "modern_pinky", "flbl": "Modern & Pinky (Shenanigans)", "urls": [], "ig": 1.001, "fa": 0.0, "gp": 0.238, "bl": 0.0, "ds": 0.0, "txt": "Tried gemini browsers again recently, and while I appreciate the zen / distraction free system, all I was thinking about was bringing emacs ux around it. Modern web doesn't mesh well with my brain."}, {"id": 50509805, "au": "meken", "dom": 26, "sr": 33, "sc": 2.39, "ep": 2.98, "bs": 0.0, "d": 0, "age": 4.78, "grav": 31.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 997, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "editor_text", "flbl": "Editor & Text (Typing)", "urls": [], "ig": 1.031, "fa": 0.0, "gp": 0.384, "bl": 0.0, "ds": 0.0, "txt": "It makes me think that having a local semantic AI layer in your browser would be cool, to strip away ads and just show you the content you want to see (like reader mode).\n\nPaired with a local on-device model would be pretty sweet."}, {"id": 50509212, "au": "gib444", "dom": 59, "sr": 34, "sc": 2.24, "ep": 3.12, "bs": 0.0, "d": 0, "age": 5.96, "grav": 41.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 603, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "browser_side", "flbl": "Browser & Side (Main)", "urls": [], "ig": 1.017, "fa": 0.0, "gp": 0.506, "bl": 0.0, "ds": 0.0, "txt": "If you're on MacOS and tempted by Emacs, the homebrew emacs-plus package will make it slightly less painful but bear in mind it really works best and fastest on proper *nix machines"}, {"id": 50509177, "au": "ohaodha", "dom": 32, "sr": 35, "sc": 2.11, "ep": 3.43, "bs": 0.0, "d": 2, "age": 6.0, "grav": 42.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 162, "qw": 0, "k": 57, "kpp": 5.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "useful_bindings", "flbl": "Useful & Bindings (Whole)", "urls": [], "ig": 1.462, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "You mischaracterise me. I am an Emacs user and I use qutebrowser as my web browser, which uses Vi-like bindings and Python configuration. When forced by circumstance to use other browsers, I use browser extensions to add Vi-like bindings. I find it extremely efficient and enjoyable.\n\nThe keybindings aren't mentioned in the \"Why?\" section of this blog post, and clearly aren't the point of the post. You can get extensions to add Emacs bindings to full-featured browsers, and there's even the Nyxt browser which has Emacs keybinds and Lisp configuration.\n\nThe core reason listed in this blogpost for browsing this way is the very fact that it is less featureful and less convenient. As someone who uses Emacs, I know that eww isn't as convenient as a fully-fledged web browser and I know that sometimes the hard way of doing things can be beneficial. I found this blog post disappointing because it doesn't afford you any new information, nor tell anyone about any actually useful features about browsing in eww."}, {"id": 50508311, "au": "cmrdporcupine", "dom": 86, "sr": 36, "sc": 2.03, "ep": 3.42, "bs": 0.0, "d": 0, "age": 7.47, "grav": 57.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 49, "qw": 0, "k": 23621, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ads_web", "flbl": "Ads & Web (Firefox)", "urls": [], "ig": 1.234, "fa": 0.0, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "Unfortunately GNU Emacs is single-threaded and blocking by design and not well suited for this kind of thing. Using it for things like browser or window manager usually ends in either weird hacks or uncomfortable pauses.\n\nI have more hope in projects like lem which implement new emacsen from scratch."}, {"id": 50510759, "au": "shevy-java", "dom": 13, "sr": 37, "sc": 1.95, "ep": 2.39, "bs": 0.0, "d": 1, "age": 3.06, "grav": 18.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 6, "k": 2084, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.508, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> Reddit and most anything commercial no.\n\nNot long ago reddit killed old.reddit.com effectively by forcing\nlog ins to it. That totally defeated the point of it so I stopped\nusing reddit. I also no longer read it since the platform is so\ncensorship-heavy."}, {"id": 50508333, "au": "juujian", "dom": 66, "sr": 38, "sc": 1.89, "ep": 2.78, "bs": 0.0, "d": 0, "age": 7.43, "grav": 56.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 3080, "kpp": 4.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "modern_pinky", "flbl": "Modern & Pinky (Shenanigans)", "urls": [], "ig": 0.663, "fa": 0.0, "gp": 0.839, "bl": 0.0, "ds": 0.0, "txt": "Would love to try to explore emacs again, but the emacs pinky shenanigans are such a turn-off. Simultaneously the most efficient and possibly the least ergonomic way to navigate a computer?"}, {"id": 50509991, "au": "sammy0910", "dom": 54, "sr": 39, "sc": 1.89, "ep": 3.14, "bs": 0.0, "d": 0, "age": 4.42, "grav": 28.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 15, "qw": 0, "k": 291, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "browser_side", "flbl": "Browser & Side (Main)", "urls": ["https://github.com/sstraust/simpleweb"], "ig": 0.356, "fa": 0.45, "gp": 0.705, "bl": 0.0, "ds": 0.0, "txt": "I've been working on some open source tools for this that you might find interesting:\n\nhttps://github.com/sstraust/simpleweb"}, {"id": 50509330, "au": "AndrewKemendo", "dom": 46, "sr": 40, "sc": 1.86, "ep": 2.96, "bs": 0.0, "d": 6, "age": 5.73, "grav": 39.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 33, "k": 23752, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "editor_text", "flbl": "Editor & Text (Typing)", "urls": [], "ig": 0.527, "fa": 0.42, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "> Tell me: How would you select some text, and with a keystroke, send the selected text to yourself via email, with the URL included and the title of the page in the subject line?\n\nI think the takeaway for me is that emacs is for people who get enjoyment out of building their own custom computing environment\n\nThe example you describe is something I would rarely do so building a process around it would be inefficient for me but if that’s where people want to spend time then great"}, {"id": 50510768, "au": "brabel", "dom": 6, "sr": 41, "sc": 1.79, "ep": 3.33, "bs": 0.0, "d": 2, "age": 3.04, "grav": 18.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 81, "qw": 0, "k": 8687, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "browser_side", "flbl": "Browser & Side (Main)", "urls": [], "ig": 1.149, "fa": 0.22, "gp": 0.006, "bl": 0.0, "ds": 0.0, "txt": "It really, really depends on what sort of websites you visit. I use FireFox as my main browser, but at least once a week I have trouble trying to do something on some website that only works on Chrome and its descendants. I'm sure you're not lying, but given you also say \"most sites work with JS off too\" I can absolutely tell you're not the average internet user. But yeah, we're discussing using eww here, so I'll accept none of us are."}, {"id": 50508853, "au": "AndrewKemendo", "dom": 44, "sr": 42, "sc": 1.76, "ep": 3.3, "bs": 0.0, "d": 4, "age": 6.58, "grav": 47.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 17, "k": 23752, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "ads_web", "flbl": "Ads & Web (Firefox)", "urls": [], "ig": 0.671, "fa": 0.42, "gp": 0.36, "bl": 0.0, "ds": 0.0, "txt": "> Your WM can’t access sublime and firefox internals. And the last two can’t talk with each other.\n\nBut why would I want them to as the default interaction?\n\nI can ctrl-c > ctrl-v from one to the other trivially and ffx has console and inspector internals visible with one Function key press"}, {"id": 50509004, "au": "skydhash", "dom": 49, "sr": 43, "sc": 1.68, "ep": 4.07, "bs": 0.85, "d": 5, "age": 6.3, "grav": 45.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 88, "qw": 10, "k": 6709, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "ads_web", "flbl": "Ads & Web (Firefox)", "urls": [], "ig": 1.223, "fa": 0.42, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "> But why would I want them to as the default interaction?\n\nSome find it useful. One can write code in vim or sublime, the only differences are the specific actions to get it done and the user experience. People will lean towards one another, not for the capability to write code, but for how it’s done.\n\nSo what I’m trying to showcase is not the capability, but the Emacs ways of getting it done. You can also implement something with a WM setup or tmux (with w3m). But it’s a different feel and effort, so people like ones and dislike the others."}, {"id": 50509948, "au": "agumonkey", "dom": 22, "sr": 44, "sc": 1.67, "ep": 1.96, "bs": 0.0, "d": 3, "age": 4.51, "grav": 29.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 31694, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.834, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Long ago some sales dept colleagues did this with large excel spreadsheet. I couldn't stop insulting them in my head (treehugger me fully triggered). Maybe they were all math geniuses .."}, {"id": 50511658, "au": "keyle", "dom": 64, "sr": 45, "sc": 1.44, "ep": 2.1, "bs": 0.0, "d": 0, "age": 1.45, "grav": 9.3, "surf": 6.2, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 17251, "kpp": 4.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "modern_pinky", "flbl": "Modern & Pinky (Shenanigans)", "urls": [], "ig": 0.867, "fa": 0.0, "gp": 0.046, "bl": 0.0, "ds": 0.0, "txt": "Might be a skill issue, but I never could get emacs to run fast. I ended up switching to vim, years ago though.\n\nBut emacs always felt like a whale."}, {"id": 50511434, "au": "iLemming", "dom": 56, "sr": 46, "sc": 1.31, "ep": 2.71, "bs": 0.0, "d": 2, "age": 1.86, "grav": 11.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 40, "qw": 0, "k": 3095, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "useful_bindings", "flbl": "Useful & Bindings (Whole)", "urls": [], "ig": 0.977, "fa": 0.0, "gp": 0.283, "bl": 0.0, "ds": 0.0, "txt": "You don't need AI for that, this all can be done deterministically. I'm currently using Mac and using OSA layer I can easily grab the readable text out of DOM as it's rendered on the page to display in an Emacs buffer."}, {"id": 50508826, "au": "AndrewKemendo", "dom": 33, "sr": 47, "sc": 1.29, "ep": 2.83, "bs": 0.0, "d": 2, "age": 6.63, "grav": 48.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 86, "qw": 0, "k": 23752, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "useful_bindings", "flbl": "Useful & Bindings (Whole)", "urls": [], "ig": 1.203, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "This is why I find the whole emacs conversation confusing\n\nYou’ll have people who demonstrate their whole set up and interactions and hot keys and shortcuts and everything and then when you say OK well why would you do it like that it all boils down to:\n\n“This extremely precise implementation works for only me and my specific workflow”\n\nI found that it’s almost more useful to think about emacs users showing off their org mode bindings are basically like Warhammer players showing off their painted figurines"}, {"id": 50509487, "au": "Shellban", "dom": 77, "sr": 48, "sc": 1.15, "ep": 2.4, "bs": 0.0, "d": 1, "age": 5.43, "grav": 37.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 46, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "browser_side", "flbl": "Browser & Side (Main)", "urls": [], "ig": 1.02, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Maybe I am not up to date on my browser threats, but exactly how much damage can a website without JavaScript do? The most I can think of is cross-site form requests and cookie shenanigans, but that is a problem primarily solved by web hosts, not browser providers."}, {"id": 50509143, "au": "BeetleB", "dom": 45, "sr": 49, "sc": 1.09, "ep": 2.41, "bs": 0.0, "d": 5, "age": 6.05, "grav": 42.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 63, "qw": 0, "k": 18351, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "editor_text", "flbl": "Editor & Text (Typing)", "urls": [], "ig": 1.027, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "If you don't want to, then you don't want to. Understand you may want things others don't, and vice versa.\n\nAlthough I don't browse the web with Emacs, I see the utility.\n\nTell me: How would you select some text, and with a keystroke, send the selected text to yourself via email, with the URL included and the title of the page in the subject line?"}, {"id": 50510554, "au": "stevenfoster", "dom": 29, "sr": 50, "sc": 1.08, "ep": 2.18, "bs": 0.0, "d": 0, "age": 3.39, "grav": 20.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 224, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ads_web", "flbl": "Ads & Web (Firefox)", "urls": [], "ig": 0.762, "fa": 0.0, "gp": 0.266, "bl": 0.0, "ds": 0.0, "txt": "I appreciate the post though I am not an eMacs user. The spirit is much aligned with my own desire to use the web this way. Well done getting Laborem Exercens on the homepage."}, {"id": 50509410, "au": "Shellban", "dom": 72, "sr": 51, "sc": 0.94, "ep": 2.26, "bs": 0.0, "d": 1, "age": 5.57, "grav": 38.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 46, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "modern_pinky", "flbl": "Modern & Pinky (Shenanigans)", "urls": [], "ig": 0.897, "fa": 0.0, "gp": 0.106, "bl": 0.0, "ds": 0.0, "txt": "Funnily enough, I am the opposite: I tried Vim, but I preferred the \"pinky shenanigans\" of Emacs to reduce trying to figure out what mode I was in to just edit files."}, {"id": 50509389, "au": "jrootabega", "dom": 76, "sr": 52, "sc": 0.92, "ep": 2.32, "bs": 0.0, "d": 0, "age": 5.62, "grav": 38.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 1975, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "browser_side", "flbl": "Browser & Side (Main)", "urls": [], "ig": 0.429, "fa": 0.34, "gp": 0.234, "bl": 0.0, "ds": 0.0, "txt": "I think you're in for a lot of trouble if you do this without heavy-duty sandboxing in 2026. There is going to be an Emacs security apocalypse soon."}, {"id": 50510816, "au": "brabel", "dom": 20, "sr": 53, "sc": 0.83, "ep": 2.37, "bs": 0.0, "d": 3, "age": 2.94, "grav": 17.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 8687, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ads_web", "flbl": "Ads & Web (Firefox)", "urls": [], "ig": 1.008, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I love how the people who basically invented computing prefer doing things using pen and paper, or go really out of their way (emailing screenshots of websites) to avoid certain widespread technologies they helped create."}, {"id": 50509353, "au": "SoftTalker", "dom": 69, "sr": 54, "sc": 0.79, "ep": 2.33, "bs": 0.0, "d": 2, "age": 5.68, "grav": 39.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 26686, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ads_web", "flbl": "Ads & Web (Firefox)", "urls": [], "ig": 0.991, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "CTRL-A seems awkward in that mapping. I still prefer swapping Caps Lock and Left-Ctrl; this gives you similar Ctrl key positioning to the old terminals (VT100, ADM-3A, early PC keyboards) that were used in the early days of emacs and are the reason for all those C- keybindings."}, {"id": 50508354, "au": "ohaodha", "dom": 70, "sr": 55, "sc": 0.73, "ep": 2.27, "bs": 0.0, "d": 1, "age": 7.4, "grav": 56.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 57, "kpp": 5.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "useful_bindings", "flbl": "Useful & Bindings (Whole)", "urls": [], "ig": 0.879, "fa": 0.0, "gp": 0.141, "bl": 0.0, "ds": 0.0, "txt": "You can use \"evil mode\" for Vi-like bindings if you prefer. There are a number of Emacs \"distributions\" like Spacemacs and Doom Emacs which come preconfigured for Vi-like editing."}, {"id": 50509761, "au": "fancyfredbot", "dom": 8, "sr": 56, "sc": 0.73, "ep": 2.1, "bs": 0.0, "d": 3, "age": 4.88, "grav": 32.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 3734, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "useful_bindings", "flbl": "Useful & Bindings (Whole)", "urls": [], "ig": 0.831, "fa": 0.0, "gp": 0.1, "bl": 0.0, "ds": 0.0, "txt": "These days, when I think I've got a Firefox issue and try switching to chrome the usual outcome is that I discover the website was broken and Chrome doesn't work either."}, {"id": 50509253, "au": "semilin", "dom": 68, "sr": 57, "sc": 0.73, "ep": 2.04, "bs": 0.0, "d": 1, "age": 5.88, "grav": 41.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 124, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "editor_text", "flbl": "Editor & Text (Typing)", "urls": [], "ig": 0.799, "fa": 0.0, "gp": 0.111, "bl": 0.0, "ds": 0.0, "txt": "Easy fix, and better than Caps-Ctrl in my opinion: swap Lalt and Lctrl. That way ctrl is under your left thumb, alt under your right. No need for pinkies at all.\n\nYou can use software like Kanata to accomplish this if you don't have a programmable keyboard."}, {"id": 50508740, "au": "ixsploit", "dom": 67, "sr": 58, "sc": 0.73, "ep": 2.01, "bs": 0.0, "d": 1, "age": 6.74, "grav": 49.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 51, "qw": 0, "k": 50, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "modern_pinky", "flbl": "Modern & Pinky (Shenanigans)", "urls": [], "ig": 0.758, "fa": 0.0, "gp": 0.154, "bl": 0.0, "ds": 0.0, "txt": "I've bound CTRL to Capslock and don't have much problems with it. Given that in emacs you have dired, magit, org, org-babel and now ghostel (and many more) I can't think of any more ergonomic way in using my computer.\nI have all my plugins like flash-jump or gptel available everywhere, it's amazing."}, {"id": 50509443, "au": "BeetleB", "dom": 48, "sr": 59, "sc": 0.73, "ep": 2.73, "bs": 0.85, "d": 7, "age": 5.51, "grav": 37.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 31, "k": 18351, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "useful_bindings", "flbl": "Useful & Bindings (Whole)", "urls": [], "ig": 0.652, "fa": 0.42, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "> I think the takeaway for me is that emacs is for people who get enjoyment out of building their own custom computing environment\n\nFor long time users, that's the whole point of Emacs.\n\n> The example you describe is something I would rarely do\n\nI used to do it at work all the time (not with Emacs, but with AutoHotKey). Find a long article I'd really like to read, but don't want to waste time at work. With a keystroke, I'd quickly send the email to me with the URL etc."}, {"id": 50510846, "au": "brabel", "dom": 24, "sr": 60, "sc": 0.73, "ep": 1.8, "bs": 0.0, "d": 3, "age": 2.89, "grav": 17.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 8687, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "modern_pinky", "flbl": "Modern & Pinky (Shenanigans)", "urls": [], "ig": 0.767, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "SVG is 21st century tech!\n\nEDIT: eww can render SVG quite well!\n\nEDIT 2: but no SVG animations..."}, {"id": 50509659, "au": "lta", "dom": 9, "sr": 61, "sc": 0.73, "ep": 1.52, "bs": 0.0, "d": 3, "age": 5.07, "grav": 33.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 394, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ads_web", "flbl": "Ads & Web (Firefox)", "urls": [], "ig": 0.645, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I can't remember the last time I had to open chromium. Everything works fine with FF for me. Couldn't be happier about it"}, {"id": 50510476, "au": "hollerith", "dom": 58, "sr": 62, "sc": 0.73, "ep": 1.47, "bs": 0.0, "d": 1, "age": 3.49, "grav": 21.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 8135, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "useful_bindings", "flbl": "Useful & Bindings (Whole)", "urls": [], "ig": 0.624, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I like to give my AI assistant a URL and ask it to tell me what the page says — and my preferred way to talk to the assistant is in Emacs."}, {"id": 50508492, "au": "bygosh", "dom": 73, "sr": 63, "sc": 0.73, "ep": 1.39, "bs": 0.0, "d": 1, "age": 7.16, "grav": 53.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 12, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ads_web", "flbl": "Ads & Web (Firefox)", "urls": [], "ig": 0.5, "fa": 0.0, "gp": 0.152, "bl": 0.0, "ds": 0.0, "txt": "many people use homerow mods, but I haven't tried them personally.\n\nif you happen to use a thinkpad and don't use the trackpoint, you can remap the two mouse buttons above the trackpad to ctrl and alt using keyd on linux. this completely solved RSI on my laptop."}, {"id": 50509999, "au": "01HNNWZ0MV43FF", "dom": 15, "sr": 64, "sc": 0.73, "ep": 0.77, "bs": 0.0, "d": 1, "age": 4.4, "grav": 28.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 14, "qw": 0, "k": 4214, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://github.com/n0-computer/iroh-blobs"], "ig": 0.329, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "iroh-blobs is in progress: https://github.com/n0-computer/iroh-blobs\n\nI believe some of the old IPFS folks moved to Iroh"}, {"id": 50510623, "au": "marttt", "dom": 2, "sr": 65, "sc": 0.7, "ep": 7.85, "bs": 7.16, "d": 1, "age": 3.27, "grav": 19.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 2, "w": 146, "qw": 0, "k": 2722, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "editor_text", "flbl": "Editor & Text (Typing)", "urls": ["https://www.youtube.com/watch?v=9YNiPUTGO28", "https://www.youtube.com/watch?v=xkED6Mv_4bc", "https://www.vim.org/scripts/script.php?script_id=4835"], "ig": 1.596, "fa": 1.3, "gp": 0.272, "bl": 2.7, "ds": 0.0, "txt": "I used Emacs around 2010-2012 or so as a journalist, and I remember asking help on Stackoverflow regarding this exact same thing. I've lost my elisp multi-column-mode snippet; thanks for sharing yours. It was a really good way to edit a longer story; it's actually quite surprising that using something like this in a text editor is not that common. I later moved over to Plan9 Acme editor and IIRC implemented a similar solution there as well.\n\nIf you want to put the multi-column mode on massive steroids, check out an old Vim add-on called microViche for inspiration -- \"text editing on an infinite pane\": https://www.youtube.com/watch?v=9YNiPUTGO28 and https://www.youtube.com/watch?v=xkED6Mv_4bc\n\nThe addon itself, FWIW (no idea if it works on a current Vim): https://www.vim.org/scripts/script.php?script_id=4835\n\nI remember trying to use this one as well, because the paradigm/concept is really cool and IMO unusual. I couldn't really get used to it, but it was a fun and inspirational way to make one's brain explode."}, {"id": 50511741, "au": "gib444", "dom": 61, "sr": 66, "sc": 0.58, "ep": 1.77, "bs": 1.19, "d": 2, "age": 1.32, "grav": 8.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 603, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "browser_side", "flbl": "Browser & Side (Main)", "urls": [], "ig": 0.755, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Sarcasm is the lowest form of wit\n\nI didn't mean any snark or insult by my original comment btw, just meant non MacOS Unixes"}, {"id": 50509412, "au": "graemep", "dom": 10, "sr": 67, "sc": 0.3, "ep": 1.49, "bs": 1.19, "d": 3, "age": 5.56, "grav": 38.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 9660, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "ads_web", "flbl": "Ads & Web (Firefox)", "urls": [], "ig": 0.635, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Possibly, I use Firefox on Linux. I am in the UK so maybe British sites are better? Maybe just luck or usage patterns. Very likely the addons."}, {"id": 50509282, "au": "SoftTalker", "dom": 19, "sr": 68, "sc": 0.25, "ep": 1.44, "bs": 1.19, "d": 2, "age": 5.83, "grav": 40.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 26686, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "editor_text", "flbl": "Editor & Text (Typing)", "urls": [], "ig": 0.304, "fa": 0.0, "gp": 0.501, "bl": 0.45, "ds": 0.0, "txt": "Donald Knuth has his secretary print his email. He'll handwrite replies on the paper, and she'll send them out."}, {"id": 50510833, "au": "pwillia7", "dom": 65, "sr": 69, "sc": 0.11, "ep": 1.51, "bs": 1.39, "d": 0, "age": 2.91, "grav": 17.6, "surf": 3.3, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 892, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ads_web", "flbl": "Ads & Web (Firefox)", "urls": [], "ig": 0.574, "fa": 0.0, "gp": 0.108, "bl": 0.526, "ds": 0.0, "txt": "I went through trying to use emacs for everything years ago and had a blast but ultimately it just didn't work out. You'd have to be stallman level crazy to really do it but I applaud anyone trying or doing it."}, {"id": 50512211, "au": "Buttons840", "dom": 57, "sr": 70, "sc": -0.0, "ep": 1.19, "bs": 1.19, "d": 2, "age": 0.27, "grav": 4.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 14851, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ads_web", "flbl": "Ads & Web (Firefox)", "urls": [], "ig": 0.507, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Is the web going to swing back to a place where you exchange information in text?\n\nGoodbye ads, and good riddance."}, {"id": 50509546, "au": "gib444", "dom": 63, "sr": 71, "sc": -0.11, "ep": 1.09, "bs": 1.19, "d": 2, "age": 5.29, "grav": 35.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 603, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "useful_bindings", "flbl": "Useful & Bindings (Whole)", "urls": [], "ig": 0.462, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "There is the cost of spawning a subprocess on Mac though compared to forking, and Emacs does a lot of spawning"}, {"id": 50510354, "au": "krylon", "dom": 60, "sr": 72, "sc": -0.33, "ep": 0.87, "bs": 1.19, "d": 1, "age": 3.71, "grav": 23.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 10, "k": 7903, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.368, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "> it really works best and fastest on proper *nix machines\n\nLast I heard, Apple has each version of macOS certified for POSIX/SUS compliance. Did they stop doing that?"}, {"id": 50508926, "au": "ehecatl42", "dom": 17, "sr": 73, "sc": -0.43, "ep": 0.76, "bs": 1.19, "d": 1, "age": 6.44, "grav": 46.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 155, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "ads_web", "flbl": "Ads & Web (Firefox)", "urls": [], "ig": 0.324, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Love him or hate him, but I shudder to think of a world without him. The Tech Trinity is: Thompson, Stallman and Torvalds."}, {"id": 50511995, "au": "bluebarbet", "dom": 21, "sr": 74, "sc": -0.62, "ep": 0.58, "bs": 1.19, "d": 4, "age": 0.72, "grav": 6.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 742, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "editor_text", "flbl": "Editor & Text (Typing)", "urls": [], "ig": 0.246, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "It's they who best understand what their inventions are capable of. It paradoxically stands to reason."}, {"id": 50509299, "au": "LordGrey", "dom": 62, "sr": 75, "sc": -1.61, "ep": 1.44, "bs": 3.05, "d": 1, "age": 5.81, "grav": 40.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 14, "qw": 0, "k": 369, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "useful_bindings", "flbl": "Useful & Bindings (Whole)", "urls": ["https://emacsformacosx.com"], "ig": 0.611, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "I use Emacs For Mac OS X. Up to date and installs via a .dmg. Great experience.\n\nhttps://emacsformacosx.com"}, {"id": 50511804, "au": "AndrewKemendo", "dom": 41, "sr": 76, "sc": -2.02, "ep": 1.24, "bs": 3.26, "d": 4, "age": 1.18, "grav": 8.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 0, "k": 23752, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "editor_text", "flbl": "Editor & Text (Typing)", "urls": [], "ig": 0.527, "fa": 0.0, "gp": 0.0, "bl": 1.231, "ds": 0.0, "txt": "I think the takeaway for me is that emacs is for people who get enjoyment out of building their own custom computing environment\n\nThe example you describe is something I would rarely do so building a process around it would be inefficient for me but if that’s where people want to spend time then great"}, {"id": 50509311, "au": "bunabhucan", "dom": 53, "sr": 77, "sc": -3.2, "ep": 1.04, "bs": 4.24, "d": 1, "age": 5.77, "grav": 40.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 613, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "editor_text", "flbl": "Editor & Text (Typing)", "urls": [], "ig": 0.443, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "\"I use emacs to brush my teeth\" or whatever is like catnip for hacker news."}, {"id": 50508879, "au": "hughw", "dom": 34, "sr": 78, "sc": -3.25, "ep": 0.99, "bs": 4.24, "d": 3, "age": 6.53, "grav": 47.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 1866, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "useful_bindings", "flbl": "Useful & Bindings (Whole)", "urls": [], "ig": 0.206, "fa": 0.0, "gp": 0.351, "bl": 1.6, "ds": 0.0, "txt": "You can possibly learn some new setting you can add to your own flow."}, {"id": 50509019, "au": "BeetleB", "dom": 35, "sr": 79, "sc": -3.41, "ep": 0.83, "bs": 4.24, "d": 3, "age": 6.28, "grav": 44.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 18351, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.142, "fa": 0.0, "gp": 0.342, "bl": 1.6, "ds": 0.0, "txt": "My config is loaded with things from posts like these.\n\nThat's their value."}, {"id": 50512108, "au": "kogasa240p", "dom": 12, "sr": 80, "sc": -3.44, "ep": 0.8, "bs": 4.24, "d": 1, "age": 0.48, "grav": 5.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 114, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.343, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "my distro didn't compile emacs with xwidget support so i can't try this :(."}, {"id": 50509962, "au": "agumonkey", "dom": 52, "sr": 81, "sc": -8.15, "ep": 0.0, "bs": 6.89, "d": 2, "age": 4.49, "grav": 29.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 31694, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.34, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "In 2026 it's almost a healthcare requirement to me."}, {"id": 50508948, "au": "enjoyyourlife", "dom": 18, "sr": 82, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 6.4, "grav": 46.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 1066, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "This almost seems like satire to me"}, {"id": 50509525, "au": "bagacrap", "dom": 51, "sr": 83, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 5.33, "grav": 36.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 3866, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "modern_pinky", "flbl": "Modern & Pinky (Shenanigans)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Less distraction is a feature"}, {"id": 50509418, "au": "empthought", "dom": 78, "sr": 84, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 5.55, "grav": 38.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 1403, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Can you be more specific about this?"}, {"id": 50509155, "au": "kreyenborgi", "dom": 82, "sr": 85, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 6.04, "grav": 42.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 924, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "browser_side", "flbl": "Browser & Side (Main)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "1 line? Did you try C-q RET?"}, {"id": 50509452, "au": "jmclnx", "dom": 84, "sr": 86, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 3, "age": 5.5, "grav": 37.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 6976, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "No, it did not work :("}, {"id": 50509338, "au": "AndrewKemendo", "dom": 50, "sr": 87, "sc": -10.82, "ep": 0.0, "bs": 8.59, "d": 6, "age": 5.72, "grav": 39.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 23752, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 5, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "editor_text", "flbl": "Editor & Text (Typing)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.24, "ds": 0.0, "txt": "Makes sense!"}, {"id": 50509435, "au": "jmclnx", "dom": 83, "sr": 88, "sc": -20.25, "ep": 0.0, "bs": 18.02, "d": 2, "age": 5.52, "grav": 37.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 6976, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "browser_side", "flbl": "Browser & Side (Main)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 6.8, "ds": 0.0, "txt": "This is line 2 after C-q RET"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 60);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 50);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 50);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 50);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `Showing ${shown.length} of ${pool.length} matching comments (mode: ${activeMode})` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeSelect = document.getElementById("modeSelect");
+  modeSelect.addEventListener("change", () => {
+    activeMode = modeSelect.value;
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

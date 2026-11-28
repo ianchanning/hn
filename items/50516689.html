@@ -1,0 +1,1376 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50516689 // Do Repeat Yourself — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .kpi-cell {
+      padding: 8px 0;
+    }
+    .kpi-label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 4px 0;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer > summary.hn-summary {
+      list-style: none;
+      cursor: pointer;
+      display: block;
+      padding: 2px 0;
+      margin: 0;
+      background: transparent;
+      border: 0;
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      user-select: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+    }
+    table.ablation th {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: normal;
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    .mode-tabs {
+      gap: 6px;
+      padding: 0 8px;
+      margin-bottom: 8px;
+    }
+    button.mode-tab {
+      appearance: none;
+      border-width: 0px;
+      border-radius: 4px;
+      background: rgb(246, 246, 239);
+      color: rgb(130, 130, 130);
+      cursor: pointer;
+      padding: 6px 14px;
+      transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+    }
+    button.mode-tab:hover {
+      background: rgb(240, 240, 235);
+      color: rgb(13, 13, 13);
+    }
+    button.mode-tab.active {
+      background: rgb(246, 246, 239);
+      color: rgb(13, 13, 13);
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      padding: 14px;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .mode-tabs button.mode-tab {
+        flex: 1;
+        text-align: center;
+        padding: 7px 8px;
+      }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; }
+      .topbar-right { font-size: 8pt; padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+  <script>
+    (function() {
+      if (window.location.pathname.includes("/items/")) {
+        var m = window.location.pathname.match(/\/items\/(\d+)\.html/);
+        if (m) {
+          var base = window.location.pathname.replace(/\/items\/\d+\.html$/, "");
+          var target = (base || "") + "/item?id=" + m[1];
+          try {
+            history.replaceState(null, "", target);
+          } catch(e) {}
+        }
+      }
+    })();
+  </script>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+      </div>
+      <div class="topbar-right">&nbsp;</div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://arcentry.com/blog/do-repeat-yourself/">Do Repeat Yourself</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=arcentry.com"><span class="sitestr">arcentry.com</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">108 points</span> by <a href="https://news.ycombinator.com/user?id=max_sendfeld">max_sendfeld</a> <span class="age" title="2026-11-16T12:06:46.000Z"><a href="https://news.ycombinator.com/item?id=50516689">1 day ago</a></span> | <a href="https://news.ycombinator.com/item?id=50516689">37&nbsp;comments</a> | 91.9% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">Evidence</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">37</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 37 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">8.1%</div>
+          <div class="kpi-sub">3 comments (0 Gold / 0.0%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">91.9%</div>
+          <div class="kpi-sub">20 chatter &bull; 14 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">0</div>
+        <div class="kpi-sub">0% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.783</div>
+        <div class="kpi-sub">3 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">13</div>
+          <div class="kpi-sub">HN POS 23..35 (35.1% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="color: rgb(90, 90, 88); margin-top: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">Explore</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 37-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 37)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (0)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (3)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (20)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (14)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..37) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 25)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (pmg101, 4.8h); largest subtree (@parpfish) occupies 13 slots (HN POS 23..35).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="mode-tabs" id="modeTabs" role="tablist" aria-label="Ranking view">
+        <button type="button" class="mode-tab active" data-mode="hn_top40" role="tab" aria-selected="true">HN Top 40</button>
+        <button type="button" class="mode-tab" data-mode="top_signal" role="tab" aria-selected="false">Epistemic Top 40</button>
+      </div>
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (37)</option>
+          <option value="code_coincidence">Code &amp; Coincidence (Everything) (14)</option>
+          <option value="team_move">Team &amp; Move (Platform) (11)</option>
+          <option value="abstractions_usually">Abstractions &amp; Usually (Fix) (8)</option>
+          <option value="general_commentary">General Commentary (4)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, repeat, team, shared, teams, platform...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50516689 + ARCENTRY.COM + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50516689, "story_title": "Do Repeat Yourself", "story_url": "https://arcentry.com/blog/do-repeat-yourself/", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50516689, "story_title": "Do Repeat Yourself", "story_url": "https://arcentry.com/blog/do-repeat-yourself/", "points": 108, "story_author": "max_sendfeld", "article_source": "fetched_url", "t1_ref_utc": "2026-11-17T12:39:19+00:00", "t2_ref_utc": "2026-11-17T12:39:19+00:00", "delta_minutes": 0.0, "story_anchors": ["repeat", "team", "shared", "teams", "platform", "components", "data", "php", "experience", "library", "three", "design", "react", "technologies", "single", "code", "company", "duplication", "instead", "tend", "everything"], "facet_labels": {"team_move": "Team & Move (Platform)", "abstractions_usually": "Abstractions & Usually (Fix)", "code_coincidence": "Code & Coincidence (Everything)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "team_move", "label": "Team & Move (Platform)", "count": 11, "top_terms": ["team", "move", "platform", "design"]}, {"slug": "abstractions_usually", "label": "Abstractions & Usually (Fix)", "count": 8, "top_terms": ["abstractions", "usually", "fix", "bugs"]}, {"slug": "code_coincidence", "label": "Code & Coincidence (Everything)", "count": 14, "top_terms": ["code", "coincidence", "everything", "three"]}], "counts": {"total_comments": 37, "live_t2_comments": 37, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 37, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "03766470275a21666c3d812b6d7dd55798d407e0ef18003d52e527dfd3f9798e"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"grounded_analysis": 3, "crowd_chatter": 20, "bullshit_or_flamewar": 14}, "facets": {"code_coincidence": 14, "team_move": 11, "abstractions_usually": 8, "general_commentary": 4}, "facet_options": [{"slug": "code_coincidence", "label": "Code & Coincidence (Everything)", "count": 14}, {"slug": "team_move", "label": "Team & Move (Platform)", "count": 11}, {"slug": "abstractions_usually", "label": "Abstractions & Usually (Fix)", "count": 8}, {"slug": "general_commentary", "label": "General Commentary", "count": 4}], "facet_diagnostics": [{"slug": "code_coincidence", "label": "Code & Coincidence (Everything)", "count": 14, "useful": 1, "useful_pct": 7.1, "terms": "code, coincidence, everything, three"}, {"slug": "team_move", "label": "Team & Move (Platform)", "count": 11, "useful": 2, "useful_pct": 18.2, "terms": "team, move, platform, design"}, {"slug": "abstractions_usually", "label": "Abstractions & Usually (Fix)", "count": 8, "useful": 0, "useful_pct": 0.0, "terms": "abstractions, usually, fix, bugs"}, {"slug": "general_commentary", "label": "General Commentary", "count": 4, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 3}], "story_anchors": ["repeat", "team", "shared", "teams", "platform", "components", "data", "php", "experience", "library", "three", "design", "react", "technologies", "single", "code", "company", "duplication"], "largest_root": {"root_id": 50526035, "author": "parpfish", "slots": 13, "start_dom": 23, "end_dom": 35, "share_pct": 35.1, "top_dom1_age": 4.8, "top_dom1_author": "pmg101"}, "buried_cutoff": 25, "rescue_top_k": 20, "ablations": [], "tournament": [], "comments": [{"id": 50526116, "au": "gnabgib", "dom": 24, "sr": 1, "sc": 6.43, "ep": 6.43, "bs": 0.0, "d": 1, "age": 11.41, "grav": 107.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 61, "qw": 0, "k": 25940, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "code_coincidence", "flbl": "Code & Coincidence (Everything)", "urls": ["https://news.ycombinator.com/item?id=819982", "https://news.ycombinator.com/item?id=11805945"], "ig": 1.161, "fa": 1.3, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It's a fairly old acronym replacement after everyone realized \"don't repeat yourself\" was like \"premature optimization\" - and misleading people.  Nothing wrong with a little repetition and a perfect abstraction is likely a wasted investment.  There was also \"do repeat yourself twice\" and \"don't repeat yourself thrice\" (on the third copy.. think about optimizing)\n\n2009 Unit Testing - Do Repeat Yourself (8 points) https://news.ycombinator.com/item?id=819982\n\n2016 DRY: Do Repeat Yourself (6 points,  6 comments) https://news.ycombinator.com/item?id=11805945"}, {"id": 50530044, "au": "jimbo_joe", "dom": 20, "sr": 2, "sc": 5.14, "ep": 5.14, "bs": 0.0, "d": 0, "age": 1.17, "grav": 8.0, "surf": 13.8, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 330, "qw": 55, "k": 9, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "team_move", "flbl": "Team & Move (Platform)", "urls": [], "ig": 1.67, "fa": 0.42, "gp": 0.011, "bl": 0.0, "ds": 0.0, "txt": "The sentiment is somewhat understandable, especially in the world of fast-moving AI-enabled companies all around us. The example doesn't really sound motivating out of the gate.\n\n> All three teams adhered to the corporate branding guidelines, so their products look and feel reasonably similar. They also work fairly well and were shipped on time.\nThis is the opposite of how things play out in most of the world's large companies, from any major bank to supposedly tech-savvy giants like Google. Every time you cross an app boundary or even a team boundary within a single product, all bets are off. At best, the UI differs in small, annoying ways (button styling, UI element rounding radii), or at worst, you need to go through separate login and payment flows.\n\n> whenever the user switches from the account view to the investing tab, a whole new JS framework is loaded. But, given all other factors, this is an acceptable trade-off.\nI guess it's acceptable if you are going from one major product to another, but accepting this when switching between parts of an application that are supposed to be coherent (same banking app, same money involved) tells the customer that you don't care about their experience that much. Accepting this also massively increases the chances that the UX will be different, since frameworks tend to come with their own patterns that shape developer thinking.\n\nOf cou"}, {"id": 50526630, "au": "gavmor", "dom": 36, "sr": 3, "sc": 4.47, "ep": 4.47, "bs": 0.0, "d": 0, "age": 10.24, "grav": 90.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 142, "qw": 28, "k": 1009, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "team_move", "flbl": "Team & Move (Platform)", "urls": [], "ig": 1.267, "fa": 0.42, "gp": 0.204, "bl": 0.0, "ds": 0.0, "txt": "> Except maybe for the investment banking team. They really need their Erlang architecture for decentralized networking - after all, they process fast-moving market data, order execution, and the like.\n\nI don't know... it seems to me that Go might actually be perfectly adequate for these workloads. The goroutine scheduler is a reliable way to handle concurrent market feeds AFAIK.\n\nGo can also do MVC just as well as PHP. Hell, the standard library has net/http and html/template, or you can reach for Using gsx (or templ) and your UI components are just compiled Go functions.\n\nI think the real problem in this scenario is that there's a bottleneck \"platform\" team. This takes the \"dev\" right out of devops.\n\nI'm just not sure that \"you can't do everything in golang and react\" holds water. You can do pretty much anything in anything, these days.\n\nDRY is supposed to be about reducing connascence, IMHO. You don't need a \"platform\" team to do that. You need transparency between teams so there's no duplicate effort. Something like a shared backlog."}, {"id": 50526084, "au": "jedbrooke", "dom": 8, "sr": 4, "sc": 3.87, "ep": 3.87, "bs": 0.0, "d": 0, "age": 11.48, "grav": 107.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 635, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_coincidence", "flbl": "Code & Coincidence (Everything)", "urls": [], "ig": 0.804, "fa": 0.0, "gp": 1.37, "bl": 0.0, "ds": 0.0, "txt": "reminds me of WET: Write Everything Twice. Instead of immediately jumping to DRY, actually write out the two similar tools, then see what actually makes sense to combine into a shared dependency."}, {"id": 50529828, "au": "donatj", "dom": 5, "sr": 5, "sc": 3.73, "ep": 3.73, "bs": 0.0, "d": 0, "age": 1.75, "grav": 10.8, "surf": 10.1, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 201, "qw": 0, "k": 22797, "kpp": 4.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "team_move", "flbl": "Team & Move (Platform)", "urls": [], "ig": 1.369, "fa": 0.0, "gp": 0.355, "bl": 0.0, "ds": 0.0, "txt": "We are exactly where the hypothetical bank is. Our large outer company gobbled up nine or ten smaller companies with disparate stacks (PHP, Haskell, C\u0023, a few others). After a couple years of integrating through shared APIs, new management is trying to force us all into a single platform - Go and Node+React.\n\nWe have thousands of years of combined experience in our various technologies and we are to throw that away in the name of \"unity\" for a stack literally no one in the company was using but \"it should be good for AI\"\n\nA bigger part of the positives of repeating yourself is that yourself is plural in this case and other people kind of suck and solving your own problems should be easy.\n\nAs an example, I put in a request with the platform team to set the UI toolkit to internal instead of private so it can be more easily accessed cross organization. I have been waiting like six months. No one knew who was in charge of it. ALL our repos have been mandated internal for years so our disparate orgs can read each others code. AFAIK we're the only team that actually lives up to it.\n\nI am annoyed by the lot of it."}, {"id": 50529405, "au": "jillesvangurp", "dom": 7, "sr": 6, "sc": 3.56, "ep": 3.56, "bs": 0.0, "d": 1, "age": 2.81, "grav": 16.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 233, "qw": 0, "k": 21952, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "abstractions_usually", "flbl": "Abstractions & Usually (Fix)", "urls": [], "ig": 1.414, "fa": 0.0, "gp": 0.164, "bl": 0.0, "ds": 0.0, "txt": "I got rid of about six years worth of technical debt on exactly this in our frontend last Friday. All it took was a few AI prompts. These types of issues are just melting away now.\n\nCode duplication is fine as long the duplicates don't drift apart. Keeping them in sync is a bit tedious for people. And people tend to cut corners. So there's a potential to end up having to fix the same kinds of issues several times. But with AIs doing all the tedious work, staying on top of that is pretty doable. It's more a question of whether that's a good use of time and tokens. You could just make it fix things properly.\n\nIn the code base I mentioned, we had a few different component libraries that at some point were selected, used, and then later abandoned. We also had taken into use tailwind at some point but we never completed the upgrade to tailwind 4. And we had a bunch of manually styled html as well. It's an application with a lot of different functionality, lots of different screens, etc. So there was a bit of pressure to not break things. I fixed all of that in a few prompts. The application still looks and feels the same but is much more consistent in terms of look and feel (we had several varieties of buttons and input fields with subtly different behavior). We found and fixed a few minor issues since then."}, {"id": 50528629, "au": "pmg101", "dom": 1, "sr": 7, "sc": 3.09, "ep": 3.09, "bs": 0.0, "d": 0, "age": 4.81, "grav": 31.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 65, "qw": 0, "k": 751, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "team_move", "flbl": "Team & Move (Platform)", "urls": [], "ig": 1.073, "fa": 0.0, "gp": 0.394, "bl": 0.0, "ds": 0.0, "txt": "Sometimes syntactic duplication can give you a hint to underlying semantic duplication. But it's no more than a hint.\n\nDRY doesn't mean don't repeat a similar looking block of code, it means try to structure your code so that each element of the design has a single representation.\n\nThere's no shortcut to good design where no thinking is required, much as a lot of people seem to wish there were."}, {"id": 50527342, "au": "kijin", "dom": 16, "sr": 8, "sc": 2.76, "ep": 2.91, "bs": 0.0, "d": 1, "age": 8.44, "grav": 68.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 69, "qw": 0, "k": 11266, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "abstractions_usually", "flbl": "Abstractions & Usually (Fix)", "urls": [], "ig": 0.953, "fa": 0.0, "gp": 0.461, "bl": 0.0, "ds": 0.0, "txt": "Yes, writing it twice is the perfect way to figure out the right level of abstraction for your project, and how extensible your components need to be. Try to do it with only one instance in front of you, and you end up with all sorts of unnecessary abstractions \"just in case\".\n\nIf you find yourself writing it a third time, on the other hand, you should seriously start consolidating."}, {"id": 50529294, "au": "kstenerud", "dom": 6, "sr": 9, "sc": 2.57, "ep": 2.93, "bs": 0.0, "d": 0, "age": 3.14, "grav": 19.0, "surf": 5.8, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 105, "qw": 0, "k": 22352, "kpp": 4.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "team_move", "flbl": "Team & Move (Platform)", "urls": [], "ig": 1.104, "fa": 0.0, "gp": 0.234, "bl": 0.0, "ds": 0.0, "txt": "I was with them right up until the admonition against standardizing the UI components. This is not an all-or-nothing proposition. You build a standardized library incrementally, and you slowly migrate codebases over to use them. I've seen some pretty horrendous UI mish-mash in what should appear to be a single application, because each piece was done independently and then stitched together.\n\nYou end up with drifting implementations that may or may not come from the same root at different points, where the same fix has to be applied multiple times as each team learns the lessons for what not to do, etc. Effectively what DRY is about."}, {"id": 50526097, "au": "hungryhobbit", "dom": 34, "sr": 10, "sc": 2.45, "ep": 2.59, "bs": 0.0, "d": 1, "age": 11.45, "grav": 107.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 86, "qw": 0, "k": 1720, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_coincidence", "flbl": "Code & Coincidence (Everything)", "urls": [], "ig": 1.103, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Even the DRY principle isn't a hard and fast rule, and in fact most experienced engineers will say that two copies of duplicate code shouldn't be \"DRY-ed up\". Most set the max at three copies, because \"DRY-ing up\" code before that point ends up being counter-productive.\n\nSimilarly here, except the author isn't talking about code, but systems made out of code.  And they're not saying \"don't get rid of repetition\" ... they're just saying sometimes repetition serves a good purpose, so don't try to \"DRY\" everything up."}, {"id": 50529160, "au": "drunkboxer", "dom": 19, "sr": 11, "sc": 2.11, "ep": 2.11, "bs": 0.0, "d": 0, "age": 3.49, "grav": 21.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 20, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_coincidence", "flbl": "Code & Coincidence (Everything)", "urls": [], "ig": 0.71, "fa": 0.0, "gp": 0.301, "bl": 0.0, "ds": 0.0, "txt": "I've always found DRY to be more useful when applied to data rather than code. Eg don't have two versions of an enum, or a mapping, or the information in some database."}, {"id": 50526499, "au": "phptogowasfinet", "dom": 22, "sr": 12, "sc": 1.89, "ep": 4.84, "bs": 2.52, "d": 0, "age": 10.51, "grav": 94.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 84, "qw": 39, "k": 2, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "team_move", "flbl": "Team & Move (Platform)", "urls": [], "ig": 1.082, "fa": 0.7, "gp": 0.21, "bl": 0.95, "ds": 0.0, "txt": "I've seen this story many times, and most of them, these inefficiencies are kind of made up by the team not wanting to move. Generally, the UI team has good excuses related to Not-Built-Here, and the article provides precisely one such. Not saying Backend does not also have good excuses but\n\n>  They just need a simple model-view-controller architecture like PHP provides. Having pointers to memory addresses and managing concurrency via goroutines rather than just writing linear PHP that Apache runs in parallel is really much more than they bargained for\n\nIs the kind that I've seen be the team's fault, with at least two instances of a guy going in and fixing the problem according to the new spec within three work days."}, {"id": 50528417, "au": "dsego", "dom": 26, "sr": 13, "sc": 1.78, "ep": 2.29, "bs": 0.0, "d": 3, "age": 5.43, "grav": 37.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 10910, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_coincidence", "flbl": "Code & Coincidence (Everything)", "urls": [], "ig": 0.976, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I constantly have to push Claude to refactor code and extract pieces, not because the nesting is too deep or there is too many lines in a single function, but just to name things and give them meaning. LLMs tend to produce obscure code that doesn't aid understanding."}, {"id": 50526180, "au": "davnicwil", "dom": 28, "sr": 14, "sc": 1.6, "ep": 2.04, "bs": 0.0, "d": 2, "age": 11.28, "grav": 105.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 43, "qw": 0, "k": 6681, "kpp": 4.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "abstractions_usually", "flbl": "Abstractions & Usually (Fix)", "urls": [], "ig": 0.869, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "As I often like to say when DRY comes up, the fact is I've wasted way more time over the years fixing unforeseen bugs in abstraction layers than I would have making changes in two places sometimes. After a while you realise simple is usually better."}, {"id": 50527321, "au": "SoftTalker", "dom": 30, "sr": 15, "sc": 0.73, "ep": 1.61, "bs": 0.0, "d": 4, "age": 8.48, "grav": 68.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 56, "qw": 0, "k": 26686, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_coincidence", "flbl": "Code & Coincidence (Everything)", "urls": [], "ig": 0.683, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "But conversely, with two implementations you can change one if needed without affecting the other.\n\nI've had this happen a few times, you DRY an abstraction and then discover that the cases you thought were the same are slightly different. Now you have to add parameters or logic and change or at least test everything it touches."}, {"id": 50529877, "au": "Nnnes", "dom": 3, "sr": 16, "sc": 0.59, "ep": 0.74, "bs": 0.0, "d": 2, "age": 1.62, "grav": 10.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 54, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "abstractions_usually", "flbl": "Abstractions & Usually (Fix)", "urls": [], "ig": 0.314, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "You know what they say. The first 50 percent of the restructure accounts for the first 50 percent of the development tokens. The remaining 50 percent of the restructure is approached asymptotically as tokens→∞."}, {"id": 50527234, "au": "hankbond", "dom": 21, "sr": 17, "sc": 0.54, "ep": 1.2, "bs": 0.0, "d": 0, "age": 8.72, "grav": 71.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 559, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "team_move", "flbl": "Team & Move (Platform)", "urls": [], "ig": 0.412, "fa": 0.0, "gp": 0.157, "bl": 0.0, "ds": 0.0, "txt": "I thought this was ancestry.com and I was like \"yeah repeat yourself by having kids i guess, thats kinda how ancestry works\", why is this on hackernews?\n\nThen I clicked and read and nodded a bunch."}, {"id": 50530596, "au": "rhdunn", "dom": 27, "sr": 18, "sc": 0.39, "ep": 1.5, "bs": 0.0, "d": 4, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 1410, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_coincidence", "flbl": "Code & Coincidence (Everything)", "urls": [], "ig": 0.636, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I view refactoring as steering the code in a particular direction. You have to know where you want to end up, or you'll wander aimlessly or end up somewhere else, making it harder to get things right. And each refactor is documentation of that journey."}, {"id": 50526243, "au": "AnimalMuppet", "dom": 35, "sr": 19, "sc": -0.07, "ep": 0.59, "bs": 0.0, "d": 2, "age": 11.13, "grav": 103.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 29332, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "abstractions_usually", "flbl": "Abstractions & Usually (Fix)", "urls": [], "ig": 0.252, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Well... remembering to ask \"did you fix it everywhere?\" is strictly harder than having only one place, if you don't introduce too much contortions to bring that about.\n\nIf."}, {"id": 50529259, "au": "N_Lens", "dom": 2, "sr": 20, "sc": -1.16, "ep": 1.2, "bs": 1.19, "d": 1, "age": 3.24, "grav": 19.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 1765, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "team_move", "flbl": "Team & Move (Platform)", "urls": [], "ig": 0.512, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "What do you mean, Claude just told me my architectural ideas were terrific and we're halfway through implementing a restructure of the company's codebase!"}, {"id": 50528139, "au": "fiddlerwoaroof", "dom": 31, "sr": 21, "sc": -1.44, "ep": 0.63, "bs": 1.19, "d": 5, "age": 6.1, "grav": 43.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 6539, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "abstractions_usually", "flbl": "Abstractions & Usually (Fix)", "urls": [], "ig": 0.269, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "If you have good taste in abstractions, fixing a bad abstraction is usually just copy/paste/rename/modify."}, {"id": 50528740, "au": "TwisterK", "dom": 15, "sr": 22, "sc": -1.56, "ep": 2.35, "bs": 2.52, "d": 1, "age": 4.54, "grav": 29.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 1, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "team_move", "flbl": "Team & Move (Platform)", "urls": [], "ig": 0.848, "fa": 0.0, "gp": 0.244, "bl": 0.95, "ds": 0.0, "txt": "my version of this is that, as it is getting closer to user perceived layer, use WET, as it move away from user preceveid layer and toward system level, use DRY."}, {"id": 50528430, "au": "tejtm", "dom": 18, "sr": 23, "sc": -1.82, "ep": 0.7, "bs": 1.19, "d": 1, "age": 5.41, "grav": 36.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 1876, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_coincidence", "flbl": "Code & Coincidence (Everything)", "urls": [], "ig": 0.297, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "WET will always be \"We enjoy typing!\"  to me.\n\nAlthough in reality I wrote some things thrice before\ndeciding to condense them and I considered it decently DRY."}, {"id": 50526494, "au": "prmph", "dom": 25, "sr": 24, "sc": -2.36, "ep": 0.37, "bs": 1.19, "d": 2, "age": 10.53, "grav": 94.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 3989, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "code_coincidence", "flbl": "Code & Coincidence (Everything)", "urls": [], "ig": 0.158, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "An abstraction is not only for avoiding repetition; it's for gaining deeper insight into what you are actually doing."}, {"id": 50526035, "au": "parpfish", "dom": 23, "sr": 25, "sc": -3.5, "ep": 1.09, "bs": 3.05, "d": 0, "age": 11.58, "grav": 109.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 5115, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "code_coincidence", "flbl": "Code & Coincidence (Everything)", "urls": [], "ig": 0.109, "fa": 0.0, "gp": 0.572, "bl": 1.15, "ds": 0.0, "txt": "So, instead of DRY code we should have DRY code?"}, {"id": 50526402, "au": "caller9", "dom": 9, "sr": 26, "sc": -4.43, "ep": 1.35, "bs": 4.24, "d": 1, "age": 10.76, "grav": 97.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 40, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "team_move", "flbl": "Team & Move (Platform)", "urls": [], "ig": 0.194, "fa": 0.0, "gp": 0.615, "bl": 1.6, "ds": 0.0, "txt": "I like HUMID \"Hold off Until Many Instances of Duplication\""}, {"id": 50526408, "au": "umvi", "dom": 4, "sr": 27, "sc": -4.49, "ep": 1.64, "bs": 5.04, "d": 0, "age": 10.73, "grav": 97.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 13, "qw": 0, "k": 18974, "kpp": 4.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "code_coincidence", "flbl": "Code & Coincidence (Everything)", "urls": ["https://go-proverbs.github.io/"], "ig": 0.223, "fa": 0.0, "gp": 0.771, "bl": 1.9, "ds": 0.0, "txt": "Or as the go proverb goes \"a little copying is better than a little dependency\" (https://go-proverbs.github.io/)"}, {"id": 50526503, "au": "jagged-chisel", "dom": 10, "sr": 28, "sc": -4.92, "ep": 0.86, "bs": 4.24, "d": 2, "age": 10.51, "grav": 94.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 5435, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "code_coincidence", "flbl": "Code & Coincidence (Everything)", "urls": [], "ig": 0.365, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "MOIST: \"Mull Over Instances, Seek Third\"\n\nTwo is a coincidence, three is a pattern."}, {"id": 50527493, "au": "davnicwil", "dom": 32, "sr": 29, "sc": -4.96, "ep": 1.31, "bs": 5.17, "d": 5, "age": 8.06, "grav": 63.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 125, "qw": 0, "k": 6681, "kpp": 4.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "abstractions_usually", "flbl": "Abstractions & Usually (Fix)", "urls": [], "ig": 0.557, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "this is my main point, yes.\n\nN (initially) copied implementions does introduce the risk of 'forgot to update this one' bugs, but these bugs are about as simple as it gets to find and fix.\n\nAbstractions on the other hand introduce the risk of 'what random thing am I going to break by changing this?' bugs which are typically much harder and more time consuming to find and fix. Further, the risk is recursive, as the fix might break yet another thing.\n\nI'd maybe agree with the gp that instances of the former are as common as the latter. But to my original point, they just waste far less time.\n\nI certainly know which class of bug I'd prefer to have to fix in a hurry, like a production incident, for example."}, {"id": 50526877, "au": "joshmoody24", "dom": 29, "sr": 30, "sc": -5.2, "ep": 0.36, "bs": 4.24, "d": 3, "age": 9.57, "grav": 82.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 73, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "abstractions_usually", "flbl": "Abstractions & Usually (Fix)", "urls": [], "ig": 0.152, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Personally, I've seen just as many bugs from two implementations drifting."}, {"id": 50530431, "au": "euroderf", "dom": 11, "sr": 31, "sc": -5.93, "ep": 1.05, "bs": 5.43, "d": 3, "age": 0.32, "grav": 4.6, "surf": 8.4, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 4171, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "code_coincidence", "flbl": "Code & Coincidence (Everything)", "urls": [], "ig": 0.446, "fa": 0.0, "gp": 0.0, "bl": 2.05, "ds": 0.0, "txt": "Related: attributed to Ian Fleming:\n\n\"Once is happenstance, twice is coincidence, three times is enemy action.\""}, {"id": 50529540, "au": "ginko", "dom": 17, "sr": 32, "sc": -6.08, "ep": 0.49, "bs": 5.04, "d": 1, "age": 2.52, "grav": 15.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 8, "qw": 0, "k": 7965, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "code_coincidence", "flbl": "Code & Coincidence (Everything)", "urls": ["https://en.wikipedia.org/wiki/Rule_of_three_(computer_programming)"], "ig": 0.21, "fa": 0.0, "gp": 0.0, "bl": 1.9, "ds": 0.0, "txt": "I believe that's also called the Rule of Three.\n\nhttps://en.wikipedia.org/wiki/Rule_of_three_(computer_progra..."}, {"id": 50528373, "au": "Timwi", "dom": 12, "sr": 33, "sc": -9.56, "ep": 0.0, "bs": 6.89, "d": 3, "age": 5.55, "grav": 38.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 1496, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "DAMP: Do As Mf Please"}, {"id": 50528516, "au": "seanhunter", "dom": 13, "sr": 34, "sc": -9.56, "ep": 0.0, "bs": 6.89, "d": 4, "age": 5.17, "grav": 34.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 15792, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "SWAMPY\n\nSoftware will always metastasise. Probably yeet!"}, {"id": 50528504, "au": "naruhodo", "dom": 14, "sr": 35, "sc": -9.56, "ep": 0.0, "bs": 6.89, "d": 4, "age": 5.21, "grav": 35.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 703, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "MUD: Maybe... Uh, Dunno"}, {"id": 50526409, "au": "AspireOne", "dom": 33, "sr": 36, "sc": -9.56, "ep": 0.0, "bs": 6.89, "d": 3, "age": 10.73, "grav": 97.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 80, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Ain't this the truth."}, {"id": 50527902, "au": "Jackobrien", "dom": 37, "sr": 37, "sc": -10.51, "ep": 0.0, "bs": 6.89, "d": 0, "age": 6.82, "grav": 50.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 106, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "team_move", "flbl": "Team & Move (Platform)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Would have sworn it said ancestry.com"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 40);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 40);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 40);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `${shown.length} of ${pool.length} comments` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

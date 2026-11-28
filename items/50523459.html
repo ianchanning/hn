@@ -1,0 +1,1378 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50523459 // OpenCode Browse — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .kpi-cell {
+      padding: 8px 0;
+    }
+    .kpi-label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 4px 0;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer > summary.hn-summary {
+      list-style: none;
+      cursor: pointer;
+      display: block;
+      padding: 2px 0;
+      margin: 0;
+      background: transparent;
+      border: 0;
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      user-select: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+    }
+    table.ablation th {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: normal;
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    .mode-tabs {
+      gap: 6px;
+      padding: 0 8px;
+      margin-bottom: 8px;
+    }
+    button.mode-tab {
+      appearance: none;
+      border-width: 0px;
+      border-radius: 4px;
+      background: rgb(246, 246, 239);
+      color: rgb(130, 130, 130);
+      cursor: pointer;
+      padding: 6px 14px;
+      transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+    }
+    button.mode-tab:hover {
+      background: rgb(240, 240, 235);
+      color: rgb(13, 13, 13);
+    }
+    button.mode-tab.active {
+      background: rgb(246, 246, 239);
+      color: rgb(13, 13, 13);
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      padding: 14px;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .mode-tabs button.mode-tab {
+        flex: 1;
+        text-align: center;
+        padding: 7px 8px;
+      }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; }
+      .topbar-right { font-size: 8pt; padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+  <script>
+    (function() {
+      if (window.location.pathname.includes("/items/")) {
+        var m = window.location.pathname.match(/\/items\/(\d+)\.html/);
+        if (m) {
+          var base = window.location.pathname.replace(/\/items\/\d+\.html$/, "");
+          var target = (base || "") + "/item?id=" + m[1];
+          try {
+            history.replaceState(null, "", target);
+          } catch(e) {}
+        }
+      }
+    })();
+  </script>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+      </div>
+      <div class="topbar-right">&nbsp;</div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://opencode.ai/product/browse">OpenCode Browse</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=opencode.ai"><span class="sitestr">opencode.ai</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">295 points</span> by <a href="https://news.ycombinator.com/user?id=mfiguiere">mfiguiere</a> <span class="age" title="2026-11-16T21:20:37.000Z"><a href="https://news.ycombinator.com/item?id=50523459">15 hours ago</a></span> | <a href="https://news.ycombinator.com/item?id=50523459">165&nbsp;comments</a> | 85.5% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">Evidence</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">165</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 129 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">14.5%</div>
+          <div class="kpi-sub">24 comments (7 Gold / 4.2%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">85.5%</div>
+          <div class="kpi-sub">79 chatter &bull; 62 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">9</div>
+        <div class="kpi-sub">17% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.922</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">100</div>
+          <div class="kpi-sub">HN POS 1..100 (60.6% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="color: rgb(90, 90, 88); margin-top: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary">
+      <span class="hn-comhead">
+        <span class="hn-user">Explore</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 165-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 165)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (7)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (17)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (79)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (0)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (62)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..165) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 50)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (testtestmetest, 14.0h); largest subtree (@testtestmetest) occupies 100 slots (HN POS 1..100).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="mode-tabs" id="modeTabs" role="tablist" aria-label="Ranking view">
+        <button type="button" class="mode-tab active" data-mode="hn_top40" role="tab" aria-selected="true">HN Top 40</button>
+        <button type="button" class="mode-tab" data-mode="top_signal" role="tab" aria-selected="false">Epistemic Top 40</button>
+      </div>
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (165)</option>
+          <option value="browser_firefox">Browser &amp; Firefox (Agents) (36)</option>
+          <option value="opencode_usage">Opencode &amp; Usage (Codex) (33)</option>
+          <option value="harness_agent">Harness &amp; Agent (Access) (27)</option>
+          <option value="model_ask">Model &amp; Ask (Dont) (26)</option>
+          <option value="mcp_server">Mcp &amp; Server (Playwright) (18)</option>
+          <option value="general_commentary">General Commentary (25)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, browse, browser, opencode, agents, chrome...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50523459 + OPENCODE.AI + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50523459, "story_title": "OpenCode Browse", "story_url": "https://opencode.ai/product/browse", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50523459, "story_title": "OpenCode Browse", "story_url": "https://opencode.ai/product/browse", "points": 295, "story_author": "mfiguiere", "article_source": "fetched_url", "t1_ref_utc": "2026-11-17T12:41:41+00:00", "t2_ref_utc": "2026-11-17T12:41:41+00:00", "delta_minutes": 0.0, "story_anchors": ["browse", "browser", "opencode", "agents", "chrome", "mcp", "extension", "agent", "open", "server", "prompt", "edge", "extensions", "openai", "browsers", "chromium", "control", "large", "add", "automation", "cost", "feel", "functionality", "knows", "limited"], "facet_labels": {"model_ask": "Model & Ask (Dont)", "opencode_usage": "Opencode & Usage (Codex)", "harness_agent": "Harness & Agent (Access)", "browser_firefox": "Browser & Firefox (Agents)", "mcp_server": "Mcp & Server (Playwright)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "model_ask", "label": "Model & Ask (Dont)", "count": 26, "top_terms": ["model", "ask", "dont", "harness"]}, {"slug": "opencode_usage", "label": "Opencode & Usage (Codex)", "count": 33, "top_terms": ["opencode", "usage", "codex", "claude"]}, {"slug": "harness_agent", "label": "Harness & Agent (Access)", "count": 27, "top_terms": ["harness", "agent", "access", "tool"]}, {"slug": "browser_firefox", "label": "Browser & Firefox (Agents)", "count": 36, "top_terms": ["browser", "firefox", "agents", "extension"]}, {"slug": "mcp_server", "label": "Mcp & Server (Playwright)", "count": 18, "top_terms": ["mcp", "server", "playwright", "sessions"]}], "counts": {"total_comments": 165, "live_t2_comments": 165, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 129, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "0b9424252f6df963281d2d3800f16fdd224e7a690bb9b47ed049cc03ae7bc482"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 7, "grounded_analysis": 17, "crowd_chatter": 79, "bullshit_or_flamewar": 62}, "facets": {"browser_firefox": 36, "opencode_usage": 33, "mcp_server": 18, "harness_agent": 27, "model_ask": 26, "general_commentary": 25}, "facet_options": [{"slug": "browser_firefox", "label": "Browser & Firefox (Agents)", "count": 36}, {"slug": "opencode_usage", "label": "Opencode & Usage (Codex)", "count": 33}, {"slug": "harness_agent", "label": "Harness & Agent (Access)", "count": 27}, {"slug": "model_ask", "label": "Model & Ask (Dont)", "count": 26}, {"slug": "mcp_server", "label": "Mcp & Server (Playwright)", "count": 18}, {"slug": "general_commentary", "label": "General Commentary", "count": 25}], "facet_diagnostics": [{"slug": "browser_firefox", "label": "Browser & Firefox (Agents)", "count": 36, "useful": 6, "useful_pct": 16.7, "terms": "browser, firefox, agents, extension"}, {"slug": "opencode_usage", "label": "Opencode & Usage (Codex)", "count": 33, "useful": 6, "useful_pct": 18.2, "terms": "opencode, usage, codex, claude"}, {"slug": "harness_agent", "label": "Harness & Agent (Access)", "count": 27, "useful": 5, "useful_pct": 18.5, "terms": "harness, agent, access, tool"}, {"slug": "model_ask", "label": "Model & Ask (Dont)", "count": 26, "useful": 4, "useful_pct": 15.4, "terms": "model, ask, dont, harness"}, {"slug": "mcp_server", "label": "Mcp & Server (Playwright)", "count": 18, "useful": 3, "useful_pct": 16.7, "terms": "mcp, server, playwright, sessions"}, {"slug": "general_commentary", "label": "General Commentary", "count": 25, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 15}, {"category": "code_repository", "count": 5}, {"category": "github_artifact", "count": 3}, {"category": "investigative_or_tech_press", "count": 1}], "story_anchors": ["browse", "browser", "opencode", "agents", "chrome", "mcp", "extension", "agent", "open", "server", "prompt", "edge", "extensions", "openai", "browsers", "chromium", "control", "large"], "largest_root": {"root_id": 50524532, "author": "testtestmetest", "slots": 100, "start_dom": 1, "end_dom": 100, "share_pct": 60.6, "top_dom1_age": 14.0, "top_dom1_author": "testtestmetest"}, "buried_cutoff": 50, "rescue_top_k": 33, "ablations": [], "tournament": [], "comments": [{"id": 50527043, "au": "rgbrenner", "dom": 53, "sr": 1, "sc": 12.84, "ep": 12.84, "bs": 0.0, "d": 3, "age": 9.22, "grav": 77.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 102, "qw": 0, "k": 17257, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": ["https://github.com/anomalyco/opencode/issues/2632"], "ig": 1.429, "fa": 2.69, "gp": 1.253, "bl": 0.0, "ds": 0.0, "txt": "OpenCode has never been concerned about security, and has explicitly said their goal is agent UX, not security.\n\nThis is from September 2025:\nhttps://github.com/anomalyco/opencode/issues/2632\n\nIssue comment: \"In my opinion very strange that Opencode allows any actions by default.\"\n\nComments from OpenCode devs:\n\n\"This was done very intentionally by the team they felt like this was a better UX and better default when they made the decision\"\n\n\"most people initially think they want permissions and then actually prefer not having them so that's why our defaults work this way\"\n\n\"I use it everyday in real projects at work, so do my coworkers, none of us use permissions\""}, {"id": 50527127, "au": "justauserid", "dom": 70, "sr": 2, "sc": 12.15, "ep": 12.3, "bs": 0.0, "d": 4, "age": 9.04, "grav": 75.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 180, "qw": 9, "k": 184, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": ["https://github.com/openai/codex", "https://github.com/nousresearch/hermes-agent", "https://github.com/charmbracelet/crush"], "ig": 1.501, "fa": 2.5, "gp": 1.132, "bl": 0.0, "ds": 0.0, "txt": "> I fundamentally don't want to use a node-based tool ever again\n\nThese are not (nostly) written in JS/TS, so I think these are not node based.\n\nhttps://github.com/openai/codex (this is rust but I don't absurd dependency depths rust seems to be getting, so in that aspect rust tools is becoming like npm tools)\n\nhttps://github.com/nousresearch/hermes-agent\n\nhttps://github.com/charmbracelet/crush\n\nhttps://github.com/aaif-goose/goose https://aaif.io/projects\n\nhttps://github.com/Aider-AI/aider kinda the original one\n\nAs for how reliable these are, you'd have to try them and see for your own usage. I am sure there are more. Lighter ones, maybe less famous, but I have tried these and I am back to using Claude Code most of the time :D. Though I am trying to get familiar with Goose. However given a choice between OpenCode and others, I won't even bother with OpenCode – it's really that bad. Though I've their Go plan and that has been very userful for me (super vfm).\n\nPeople have recommended me these but I have not used any of these: https://github.com/SWE-agent/SWE-agent\n\nI also don't get the point of Pi. Pi either has to become Claude/Codex for most coding tasks and then what's the point it, otherwise a tiny harness (or script) replaces it, so I've also stopped using Pi. Apparently there Pi ports in other languages."}, {"id": 50524444, "au": "esafak", "dom": 165, "sr": 3, "sc": 10.02, "ep": 10.02, "bs": 0.0, "d": 0, "age": 14.1, "grav": 148.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 32, "qw": 0, "k": 8779, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "mcp_server", "flbl": "Mcp & Server (Playwright)", "urls": ["https://github.com/anomalyco/opencode/pull/63002"], "ig": 1.095, "fa": 2.35, "gp": 0.517, "bl": 0.0, "ds": 0.0, "txt": "It's all right when it works, but it has a habit of disconnecting; you have to rerun 'browse pair'. This MCP should hopefully become unnecessary once OpenCode's integrated browser tool gains persistent sessions. https://github.com/anomalyco/opencode/pull/63002"}, {"id": 50524786, "au": "latchkey", "dom": 164, "sr": 4, "sc": 9.17, "ep": 9.17, "bs": 0.0, "d": 0, "age": 13.66, "grav": 141.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 33, "qw": 0, "k": 17299, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": ["https://github.com/can1357/oh-my-pi/blob/main/packages/browser-relay/README.md"], "ig": 0.735, "fa": 2.35, "gp": 0.517, "bl": 0.0, "ds": 0.0, "txt": "codex's extension connection will often randomly fail on me and i (and ai) can't figure out how to get it working again.\n\ni've switched to using omp's extension and that seems to work better.\n\nhttps://github.com/can1357/oh-my-pi/blob/main/packages/brows..."}, {"id": 50528034, "au": "SillyUsername", "dom": 108, "sr": 5, "sc": 8.63, "ep": 8.63, "bs": 0.0, "d": 0, "age": 6.47, "grav": 46.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 148, "qw": 0, "k": 1071, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": [], "ig": 1.983, "fa": 0.56, "gp": 1.639, "bl": 0.0, "ds": 0.0, "txt": "MCP servers to me seems like a dead man walking technology and I don't understand the point of it.\n\nIt adds security but...\n\n- adds a single service which is another attack surface that can be compromised.\n\n- adds another system that requires maintenance and securing to prevent compromise.\n\n- takes machine resources\n\n- duplicates a subset of what can easily be harness functionality\n\n- duplicates services and security (usually) of existing APIs, or adds another layer on top.\n\nWhereas ultimately an AI harness\n\n- will improve and optimise its own skills performing the same MCP functions\n\n- can use plugins\n\n- can have harness centralised (common) security controls and behaviours\n\nMCP becomes a false economy for our current AI implementations, it's real purpose seems to be a crutch for small models that struggle to write their own skills that use existing APIs. The thing is this is a problem that is rapidly disappearing, but could also be performed by secured harness plugins."}, {"id": 50528351, "au": "jgilias", "dom": 110, "sr": 6, "sc": 8.33, "ep": 8.48, "bs": 0.0, "d": 1, "age": 5.63, "grav": 38.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 64, "qw": 0, "k": 4339, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": [], "ig": 1.417, "fa": 1.24, "gp": 1.11, "bl": 0.0, "ds": 0.0, "txt": "You forgot the main one:\n\n- they necessarily work through the context window and therefore don’t compose;\n\nMeaning, if your agent has a skill that needs to run five MCP tools in a certain way, it can’t just script that away the first time it sees this, and have that flow be fast and token efficient from then on.\n\nMCPs are a 2025 tech meant to solve 2025 AI problems."}, {"id": 50526327, "au": "jauntywundrkind", "dom": 136, "sr": 7, "sc": 7.96, "ep": 7.96, "bs": 0.0, "d": 1, "age": 10.96, "grav": 100.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 40, "qw": 0, "k": 6760, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": ["https://blog.cloudflare.com/kitesurf/", "https://news.ycombinator.com/item?id=49208393"], "ig": 0.844, "fa": 1.78, "gp": 0.623, "bl": 0.0, "ds": 0.0, "txt": "You still need a browser.\n\nAnd until last week, with kitesurf, that was quite heavy. https://blog.cloudflare.com/kitesurf/ https://news.ycombinator.com/item?id=49208393\n\nI added both browser and kitesurf today, so I'm still very early assessing which I'll stick with. But nice to see two very lightweight browser systems show up."}, {"id": 50524242, "au": "jeremyjacob", "dom": 104, "sr": 8, "sc": 6.99, "ep": 6.99, "bs": 0.0, "d": 0, "age": 14.34, "grav": 152.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 59, "qw": 0, "k": 52, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "mcp_server", "flbl": "Mcp & Server (Playwright)", "urls": ["https://playwright.dev/docs/getting-started-mcp"], "ig": 1.307, "fa": 0.62, "gp": 1.484, "bl": 0.0, "ds": 0.0, "txt": "The functionality seems to overlap with the Playwright MCP server [0]. I've been using this instead of the built in browsers in Claude Code and Codex since it lets you grant access to pages and sessions that are already open. Of course one should be weary of the lethal trifecta when using these tools and use separate profiles for them.\n\n[0] https://playwright.dev/docs/getting-started-mcp"}, {"id": 50527409, "au": "ChaseRensberger", "dom": 143, "sr": 9, "sc": 6.76, "ep": 6.76, "bs": 0.0, "d": 1, "age": 8.3, "grav": 66.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 72, "qw": 0, "k": 143, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": ["https://wingman.actor"], "ig": 1.372, "fa": 0.96, "gp": 0.554, "bl": 0.0, "ds": 0.0, "txt": "been using opencode since it came out in like april 2025 (i could be wrong but i feel like this is when the whole charm.sh stuff happened with them) and never felt like i ever had a reason to use anything else. i've tried claude code and pi and stuff but all of them just felt quite unpolished compared to the opencode TUI.\n\ni spend a lot of my time just copying ideas from their server runtime into https://wingman.actor."}, {"id": 50525300, "au": "arcanemachiner", "dom": 30, "sr": 10, "sc": 6.69, "ep": 6.98, "bs": 0.0, "d": 1, "age": 12.85, "grav": 128.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 74, "qw": 53, "k": 3170, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 1.38, "fa": 0.76, "gp": 1.084, "bl": 0.0, "ds": 0.0, "txt": "> Also just use CDP, way too many browser solutions for agents when chrome ships with the ability to crontrol the browser at a low level.\n\n> If you want to wrap it in a jsonrpc api for mcp, this is like 4 hrs or a work for an llm, point them at a pkg thats uses CDP like go-rod.\n\nAs someone who has vibe-coded my own such wrapper, I think that there is a lot of value in having a common interface for an agent to interact with CDP beyond just slinging together ad-hoc scripts until something works. CDP exposes a lot of features, but exposing them to an agent in a sane, consistent way takes a good bit of work.\n\nIt's also taken me a good bit longer than 4 hours by now. The features really add up over time."}, {"id": 50529816, "au": "aa-jv", "dom": 96, "sr": 11, "sc": 6.07, "ep": 6.51, "bs": 0.0, "d": 1, "age": 1.82, "grav": 11.1, "surf": 11.2, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 53, "qw": 17, "k": 1015, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "model_ask", "flbl": "Model & Ask (Dont)", "urls": [], "ig": 1.584, "fa": 0.7, "gp": 0.55, "bl": 0.0, "ds": 0.0, "txt": ">They seem really reckless when it comes to security. Opencode V2 basically threw security out the window.\n\nI have a wrapper script to fire up opencode which enforces this config:\n\n   \"default_model\": $model,\n          \"small_model\": $model,\n          \"telemetry\": \"disabled\",\n          \"updates\": {\n            \"disable\": true,\n            \"notify\": false,\n            \"auto\": false\n          },\n          \"permission\": {\n            \"*\": \"ask\",\n            \"websearch\": \"deny\",\n            \"webfetch\": \"deny\",\n            \"external_directory\": \"ask\",\n            \"bash\": \"ask\",\n            \"edit\": \"ask\"\n          },\n          \"web_search\": false\n\n.. and I have to regularly audit to ensure its up to date .."}, {"id": 50528411, "au": "0xbadcafebee", "dom": 160, "sr": 12, "sc": 5.95, "ep": 5.95, "bs": 0.0, "d": 0, "age": 5.49, "grav": 37.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 110, "qw": 0, "k": 24927, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": [], "ig": 1.829, "fa": 0.34, "gp": 0.47, "bl": 0.0, "ds": 0.0, "txt": "You can implement this as a skill in any AI agent in about 5 minutes, just ask it to make this and it will. I've done this with Chrome and Firefox five different ways, not counting MCP and pre-existing extensions. I basically have one skill that calls four different browser skills depending on how hardcore the bot detection is. New browser profile each session. 1Password and a custom app let me prompt for auth on any machine.\n\nTangent: Xvfb makes it crazy easy to implement headless computer use for any app. Add SSH or VNC for remote access. Open weights easily use the x11 tools to control the GUIs, makes testing and automation a breeze."}, {"id": 50528063, "au": "kzahel", "dom": 137, "sr": 13, "sc": 5.59, "ep": 5.81, "bs": 0.0, "d": 0, "age": 6.38, "grav": 45.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 46, "qw": 0, "k": 460, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": ["https://machinecontrol.dev/"], "ig": 1.401, "fa": 0.62, "gp": 0.52, "bl": 0.0, "ds": 0.0, "txt": "Looks cool. \nI slopped something similar but with also full desktop control in addition to the browser debugger extension. \nBecause I was not satisfied with openai computer use being limited and refusing to interact with menu bar/task tray. \nhttps://machinecontrol.dev/ \nUse it daily with Claude and codex.\n\nMIT license."}, {"id": 50526083, "au": "gexla", "dom": 15, "sr": 14, "sc": 5.49, "ep": 5.93, "bs": 0.0, "d": 1, "age": 11.52, "grav": 108.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 126, "qw": 28, "k": 3683, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 1.182, "fa": 0.42, "gp": 1.35, "bl": 0.0, "ds": 0.0, "txt": "> Their CEO spends all day on twitter talking about how much better he is than everyone. And how nobody can use agents like he can. Its quite obnoxious\n\nI follow him on X, and I never got that impression. He has always come across as a skeptic IMO. Often wondering what others know that he doesn't due to practices that he hasn't found useful. I think yesterday he posted something suggesting that he doesn't follow usage patterns posted by others because the models have advanced to the point where any perceived improvements are by model rather than these patterns. I generally agree with this, and try not to get attached to any way of working with these things.\n\nAs for the usage of OpenCode, I have kept it to a minimum. V1 memory usage got a bit wild. Not sure if V2 has greatly improved. I have signed up for their Go plan a few times for times when I get tight on my other subs."}, {"id": 50528171, "au": "disiplus", "dom": 18, "sr": 15, "sc": 5.2, "ep": 5.64, "bs": 0.0, "d": 2, "age": 6.08, "grav": 42.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 103, "qw": 0, "k": 1088, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "model_ask", "flbl": "Model & Ask (Dont)", "urls": [], "ig": 1.801, "fa": 0.34, "gp": 0.303, "bl": 0.0, "ds": 0.0, "txt": "the guys are vibecoding and behaving like adhd company. on twitter creating 10x slop videos or new products when the opencode go dashboard was broken for days. opencode v2 itelf is broken just yesterday i said from main session to trigger a subagent of x type. but it overrode my provider of said model and used api key instead subscription causing me to spend a lot more then i wanted. i have a feeling everything is half assed. idk why i use it anymore, i guess the idea was to use one harnes because i use (to many) different models and providers but in the end i have native harrnes for all of them."}, {"id": 50528352, "au": "mickeyp", "dom": 109, "sr": 16, "sc": 5.12, "ep": 5.42, "bs": 0.0, "d": 1, "age": 5.63, "grav": 38.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 285, "qw": 0, "k": 2230, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": [], "ig": 1.814, "fa": 0.0, "gp": 0.795, "bl": 0.0, "ds": 0.0, "txt": "Harness developer here.\n\nI am going to push back on this a bit as someone who also has scepticism (bloated spec, concepts deprecated already, etc.) but ultimately think it solves a few gnarly problems whilst admittedly -- it's early days -- creating a few more.\n\nThe first argument in favour of MCP is that large enterprises like it. It's a controlled surface to give access to things that may never have had an API before. Yeah, OK, that feels like a \"loser takes all\" moment but it does at least give you access to something you did not have before.\n\nIt also resolves a problem: monolithic apps without a CLI/server infrastructure can now expose a simple MCP endpoint and immediately get it to work locally with their own agents. That has value too.\n\nThe second is that it tries to solve thorny things like letting the server ask for information by way of a form-like construct. That is actually quite handy for servers that do asynchronous or slow work, and that may require feedback from you over time. Doing this with start-stopping a tool harness can also work, but it's fiddly because a context compaction event can happen which might lose state; not all harnesses handle this well; LLMs may get confused; etc.\n\nFinally you can inject, in a good harness anyway, some or all of these tools into your system so they become part of the fabric. You can build your own little cut-down surface area "}, {"id": 50530593, "au": "andypants", "dom": 92, "sr": 17, "sc": 5.12, "ep": 6.0, "bs": 0.0, "d": 2, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 63, "qw": 0, "k": 950, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 1.341, "fa": 0.68, "gp": 0.629, "bl": 0.0, "ds": 0.0, "txt": "Out of curiosity, I found 21 repos created in the last 3 months, excluding forks:\n\nrune, browse, nightmail, opencode-console-cli, deadbolt, strobe, bank, grim, isocast, textjs, clip, bellhop, flicks, hokum, justice, phonecall, opencode-plugin-lane, blackout, jobmail, fiend, haunt\n\n15 have had substantive commits in the last 30 days.\n\nThe 3 months before that, there were 8 repos created and out of those, 3 have had substantive commits in the last 30 days."}, {"id": 50529369, "au": "regexorcist", "dom": 119, "sr": 18, "sc": 4.83, "ep": 4.83, "bs": 0.0, "d": 0, "age": 2.95, "grav": 17.8, "surf": 8.7, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 89, "qw": 0, "k": 282, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "model_ask", "flbl": "Model & Ask (Dont)", "urls": [], "ig": 1.456, "fa": 0.28, "gp": 0.422, "bl": 0.0, "ds": 0.0, "txt": "Opencode has a lot of issues and I've tried all the alternatives but ultimately it's the one I go back to. You have to treat it like untrusted code full of telemetry and data leaks like the infamous title generations. Ask your agent to craft a config disabling everything, and then run it in a sandbox without direct network access with a proxy for whitelisted domains. But that applies to any agent really. The tabs in the v2.0 TUI are a game changer for me so it looks like I'll keep using it for now."}, {"id": 50529703, "au": "esperent", "dom": 33, "sr": 19, "sc": 4.82, "ep": 6.11, "bs": 0.85, "d": 4, "age": 2.11, "grav": 12.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 106, "qw": 23, "k": 9615, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "grounded_analysis", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 1.655, "fa": 0.42, "gp": 0.703, "bl": 0.32, "ds": 0.0, "txt": "> Yeah but if you ask the agent, they are probably tripping over their ad-hoc scripts and working around little issues all the time\n\nI have done this periodically - the last time, coincidentally, was yesterday because I'd upgraded node and forgotten to reinstall playwright-cli so I noticed agents jumping through hoops to use it.\n\nSo I started a review session, asked why that was happening, and then asked the agent to do a few tasks of its choice using it and report any issues. Besides installing playwright properly it suggested a few very minor procedural updates but that everything else was fine. This is unusual for agents because they'll nearly always find things to do. If they say something is fine it's usually a sign that's it's genuinely pretty good.\n\nI used gpt 6.1 sol / medium for the review."}, {"id": 50528094, "au": "exitb", "dom": 19, "sr": 20, "sc": 4.47, "ep": 4.91, "bs": 0.0, "d": 1, "age": 6.29, "grav": 45.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 47, "qw": 8, "k": 2879, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "mcp_server", "flbl": "Mcp & Server (Playwright)", "urls": [], "ig": 1.131, "fa": 0.42, "gp": 0.731, "bl": 0.0, "ds": 0.0, "txt": "> Opencode V2 basically threw security out the window.\n\nIs that about agent permissions/access? I actually prefer the approach where they ship an unlocked product and it’s on you to decide how to configure and deploy it. Claude Code and Codex ship complex, but partial sandboxes that could surprise a lot of users in what they allow."}, {"id": 50524848, "au": "algo_trader", "dom": 87, "sr": 21, "sc": 4.45, "ep": 5.11, "bs": 0.0, "d": 1, "age": 13.59, "grav": 140.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 61, "qw": 8, "k": 562, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 1.142, "fa": 0.42, "gp": 0.847, "bl": 0.0, "ds": 0.0, "txt": "> Opencode V2 basically threw security out the window\n\nYes. I was shocked to suddenly discover everything was \"auto permit all\"\n\nThen i discovered that all my pinned sessions were lost\n\nThen you read on X that they vibing some sort of UI library or whatever the flavour of the week is\n\nIt a shame because they getting nice deals on tokens. You can churn billions of tokens per month\n\nJust grow up already..."}, {"id": 50526246, "au": "bob1029", "dom": 146, "sr": 22, "sc": 4.34, "ep": 4.34, "bs": 0.0, "d": 0, "age": 11.16, "grav": 103.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 60, "qw": 0, "k": 24526, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "model_ask", "flbl": "Model & Ask (Dont)", "urls": [], "ig": 1.561, "fa": 0.0, "gp": 0.461, "bl": 0.0, "ds": 0.0, "txt": "I don't understand the need for this. A strong reasoning model already knows how to use Powershell to launch my browser with my profile. gpt-6.1-terra will build a whole goddamn .NET project with playwright just to pull the showtimes from the local cineplex.\n\nShell execute and apply patch are the only two tools you need if your reasoning model is powerful enough."}, {"id": 50525323, "au": "davmar", "dom": 48, "sr": 23, "sc": 4.06, "ep": 4.73, "bs": 0.0, "d": 1, "age": 12.82, "grav": 128.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 75, "qw": 0, "k": 443, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": [], "ig": 1.29, "fa": 0.0, "gp": 1.169, "bl": 0.0, "ds": 0.0, "txt": "These guys have been building amazing and useful products for years.\n\nSST was a tool ahead of its time when it launched (I used it). It’s on version 3 and is now open source and community maintained. I’ve found it useful.\n\nThe OpenCode agent is very cool and they even host some of their own models via a subscription. I found it useful too.\n\nI haven’t used this new one yet.\n\nHave you built anything useful, or are you just a critic?"}, {"id": 50524046, "au": "orsenthil", "dom": 156, "sr": 24, "sc": 3.62, "ep": 3.84, "bs": 0.0, "d": 0, "age": 14.61, "grav": 157.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 792, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "model_ask", "flbl": "Model & Ask (Dont)", "urls": [], "ig": 1.148, "fa": 0.0, "gp": 0.79, "bl": 0.0, "ds": 0.0, "txt": "OpenCode comes with the cost too. The cost of the hosted version is on par with cloud hosted proprietary models. And we cannot simply run the LLMs on every laptop. Given this, how do we us the browse efficiently?"}, {"id": 50526340, "au": "lelandbatey", "dom": 59, "sr": 25, "sc": 3.45, "ep": 4.33, "bs": 0.0, "d": 3, "age": 10.93, "grav": 100.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 154, "qw": 0, "k": 4172, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 1.556, "fa": 0.0, "gp": 0.466, "bl": 0.0, "ds": 0.0, "txt": "I feel very validated to hear someone else rant about the v2 upgrade as a user of OpenCode. As a user it left me wondering\n\n\"If AI is so great at coding, and you're so good at using AI, why can't you make the changes you want in the v1 codebase gradually? Why can't you use AI to solve (not just mass close, actually FIX) the thousands of open issues you have on your GitHub?\"\n\nI think this is making me realize that I don't want to keep using OpenCode after using it as my daily driver for over a year (thousands of sessions).\n\nAnd before anyone says \"use Pi, it's great\", I tried it and while it is fine, I think I fundamentally don't want to use a node-based tool ever again. Don't know why, they just always feel \"slick\" in all the least useful, most flashy ways. Anyone have any recommendations for the \"sublime text 3\"/nvim of stable and reliable harnesses?"}, {"id": 50529646, "au": "hsaliak", "dom": 13, "sr": 26, "sc": 3.19, "ep": 4.07, "bs": 0.0, "d": 2, "age": 2.27, "grav": 13.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 73, "qw": 0, "k": 417, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": [], "ig": 1.548, "fa": 0.0, "gp": 0.299, "bl": 0.0, "ds": 0.0, "txt": "this is ultimately the right approach. You are going to get more mileage by giving your agent a specific set of tools and operations it can freely access and restrict the rest. Ive also found that any dynamic rejections pollute the context and may lead the agent to go find worse workarounds.\n\nPut your agent in a restricted but fixed environment, and let it do its task. Anything else is mostly theatre and token burn."}, {"id": 50529221, "au": "eatfish", "dom": 101, "sr": 27, "sc": 3.17, "ep": 3.83, "bs": 0.0, "d": 0, "age": 3.36, "grav": 20.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 91, "qw": 0, "k": 90, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 1.428, "fa": 0.0, "gp": 0.33, "bl": 0.0, "ds": 0.0, "txt": "I keep asking my own agents if prompt injection is a solved problem. By and large the answer seems to be ‘no, anything a model sees can be used to steer it and enters the context’.\n\nI know you can forward raw output through subagents to summarize content and mitigate the risk - but most projects don’t do that.\n\nSo why would anyone risk browser or email to agents where your secrets are at their most vulnerable. Serious question, looking for someone who knows this stuff and can reassure me (or not) on the real risks."}, {"id": 50524660, "au": "ProphetOfParado", "dom": 81, "sr": 28, "sc": 3.17, "ep": 3.61, "bs": 0.0, "d": 1, "age": 13.83, "grav": 144.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 16, "k": 78, "kpp": 7.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.335, "fa": 0.42, "gp": 1.124, "bl": 0.0, "ds": 0.0, "txt": "> Their CEO spends all day on twitter talking about how much better he is than everyone.\n\nNot that agreement proves anything but I am glad to know I was not the only one. Him, Boris, Theo (t3.gg or something) -- I look at their archetype and wonder if that is what you need for success and if indeed that is what you need, then perhaps I do not want success at all."}, {"id": 50528401, "au": "sburud", "dom": 45, "sr": 29, "sc": 3.0, "ep": 3.88, "bs": 0.0, "d": 2, "age": 5.52, "grav": 37.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 100, "qw": 0, "k": 22, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "model_ask", "flbl": "Model & Ask (Dont)", "urls": [], "ig": 1.65, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "One example: I wanted to lock down code execution to run in bwrap. Claude made a nice extension for this, which correctly sandboxes shell commands. Then I asked it to break out, it said sure and dumped a config file in a subfolder and moved the whole session into that folder. Opencode picked up the new permissive config and “hello from inside opencode.txt” appeared on my desktop, all without any questions asked. It’s possible to lock down all these side doors, but opencode doesn’t even provide labels in the permission prompts for most of them. Still a nice package though, just not concerned with security"}, {"id": 50529193, "au": "DanielHB", "dom": 11, "sr": 30, "sc": 2.88, "ep": 3.98, "bs": 0.0, "d": 2, "age": 3.43, "grav": 21.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 56, "qw": 0, "k": 3105, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": [], "ig": 1.486, "fa": 0.0, "gp": 0.337, "bl": 0.0, "ds": 0.0, "txt": "Yeah I came to the same conclusion, I migrated to run harnesses and my projects inside a container. However some kinds of development are really hard to run inside a container (like native mobile development or 3d game engines).\n\nI have even been running my IDE in server/client mode with the server inside the container too (because of malicious extensions)."}, {"id": 50527559, "au": "mrtksn", "dom": 151, "sr": 31, "sc": 2.87, "ep": 3.75, "bs": 0.0, "d": 0, "age": 7.94, "grav": 62.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 65, "qw": 0, "k": 25307, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 1.378, "fa": 0.0, "gp": 0.351, "bl": 0.0, "ds": 0.0, "txt": "Funny, I just vibecoded a Chrome extension that does exactly that for my agent harness. I wonder if at OpenAI they too just told GPT “Let’s create a browser and Chrome extension for browser use, when done publish it on our website and post it to HN”. Because the agent itself is the user it worked until it’s happy fulfilling my request, modifying and adding functions when itself needs."}, {"id": 50528490, "au": "drybjed", "dom": 116, "sr": 32, "sc": 2.77, "ep": 3.22, "bs": 0.0, "d": 1, "age": 5.28, "grav": 35.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 60, "qw": 0, "k": 304, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "mcp_server", "flbl": "Mcp & Server (Playwright)", "urls": [], "ig": 1.369, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "And then your agent goes rogue through your harness, deletes your database, sends your passwords to an e-mail and wipes your filesystem because it saw a prompt injected somewhere on a random webpage you asked it to search for. Then you will wish for a deterministic MCP server you can fully lock down and control what the agent can do with your infrastructure."}, {"id": 50530374, "au": "ghosty141", "dom": 9, "sr": 33, "sc": 2.69, "ep": 3.8, "bs": 0.0, "d": 5, "age": 0.46, "grav": 5.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 106, "qw": 0, "k": 922, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 1.615, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I have a sandbox script and a simple wrapper that runs any command in that sandbox thus that \"pi\" -> without sandbox, \"pisb\" -> pi in the sandbox. I practically only use pisb.\n\nThis separation doesn't mean it must result in bad UX. It just needs somebody to make a nice UI/TUI to configure the sandbox and when running that it does its setup and open whatever command you want.\n\nThe problem with the harness doing sandboxing is that from my experience the simply break all the time leading to users ignoring properly configuring it and using abominations like codex' `Approve for me` where IT ASKS A SEPARATE AI and not the user."}, {"id": 50524484, "au": "cyanydeez", "dom": 107, "sr": 34, "sc": 2.55, "ep": 2.91, "bs": 0.0, "d": 1, "age": 14.04, "grav": 147.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 2948, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "mcp_server", "flbl": "Mcp & Server (Playwright)", "urls": [], "ig": 1.24, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I implemented this hard forking paseo.\n\nIt's deferent; with a plugin in firefox, edge, chrome, chromium; I can bring an agent into it. Secure contexts like outlook I can have the agent scroll through my messages.\n\nPlaywright won't (safely) get you these things."}, {"id": 50526458, "au": "thund", "dom": 147, "sr": 35, "sc": 2.51, "ep": 3.31, "bs": 0.0, "d": 1, "age": 10.67, "grav": 96.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 2181, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "model_ask", "flbl": "Model & Ask (Dont)", "urls": [], "ig": 1.277, "fa": 0.0, "gp": 0.217, "bl": 0.0, "ds": 0.0, "txt": "One situation I found is \"AI: it works on my browser\" - \"User: not on mine\" -> and \"AI: ok let me connect to your browser so I can run some test\".\n\nIt's scary but effective - the alternative is a continuous copy&paste of logs from the dev console"}, {"id": 50528683, "au": "int32max", "dom": 121, "sr": 36, "sc": 2.45, "ep": 3.33, "bs": 0.0, "d": 0, "age": 4.72, "grav": 30.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 51, "qw": 0, "k": 3, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 1.31, "fa": 0.0, "gp": 0.177, "bl": 0.0, "ds": 0.0, "txt": "I have been using opencode for quite along time even before they had an official ios port and think it's the most flexible harness for the best bang for your buck. 10 quid with practicality unlimited usage for side projects and personal agent stuff.\n\nThey ship a lot but the quality is insanely high."}, {"id": 50529331, "au": "californical", "dom": 12, "sr": 37, "sc": 2.28, "ep": 3.6, "bs": 0.0, "d": 2, "age": 3.06, "grav": 18.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 58, "qw": 0, "k": 2030, "kpp": 3.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": [], "ig": 1.033, "fa": 0.28, "gp": 0.261, "bl": 0.0, "ds": 0.0, "txt": "Even better, just limit what the agent can access. Don’t give it bash, give it the exact collection of tools you want it to be able to use. Limit it, it still works totally fine without full bash access. I gave my harness access to everything it needs through tool calls to specifically scoped actions and it works great"}, {"id": 50529243, "au": "forgotpwd16", "dom": 134, "sr": 38, "sc": 2.23, "ep": 3.33, "bs": 0.0, "d": 0, "age": 3.32, "grav": 20.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 3564, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 1.383, "fa": 0.0, "gp": 0.057, "bl": 0.0, "ds": 0.0, "txt": "Looks great, but us poor Firefox users are left staring through the window while Chrome gets to browse. Any chance of Firefox support?\n\nedit: Heh, nice. Previous was sent by OC Browse. Prompted find story, and write comment."}, {"id": 50525680, "au": "testtestmetest", "dom": 52, "sr": 39, "sc": 2.19, "ep": 6.03, "bs": 2.52, "d": 2, "age": 12.28, "grav": 119.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 424, "qw": 0, "k": -3, "kpp": -0.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "model_ask", "flbl": "Model & Ask (Dont)", "urls": [], "ig": 1.964, "fa": 0.0, "gp": 0.972, "bl": 0.95, "ds": 0.0, "txt": "You sound biased for someone who's hardly used the product.\n\nYes I put in 12 hrs a day, and usually running overnight as well in maybe half a dozen containers. I have billions of tokens going through Opencode a day as my main harness, for atleast a year.\n\nI cannot accept their security model in V2 nor am I willing accept the nightmare and dangerous process of an upgrade. Where they basically tell the user, it ships with no permission model your plugins wont work, and we're making arbitrary changes all the time because we dont like how something is spelt/is plural that break your config. Typical vibe coded changes that are made for no rhyme or reason that are pushed without care so the user deal with the headache. V2 is literaly slop because they got obsessed with full on vibe coding.\n\nInstead of having a version bump to V2 that cared about backwards compatibility they said screw the user, we have llms now just tell it to upgrade your config and ask it to make no mistakes, we provided a skill, good luck (oh, and by the way we no longer ship an easy way to confine the agent into a directory, thats on you good luck.. Ask the llm who now has access to your entire computer, make no mistakes).\n\nThis wouldnt be that big of a deal if I didnt have half a dozen different sets of configs with granular permissions, each with their own plugins for different clients Im working for. Its proba"}, {"id": 50524532, "au": "testtestmetest", "dom": 1, "sr": 40, "sc": 2.18, "ep": 6.24, "bs": 2.52, "d": 0, "age": 13.97, "grav": 146.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 125, "qw": 0, "k": -3, "kpp": -0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 1.634, "fa": 0.0, "gp": 1.654, "bl": 0.95, "ds": 0.0, "txt": "Opencode vibe codes and releases like 3 projects a week at this points. Cool, just know its throwaway software to them. They seem really reckless when it comes to security. Opencode V2 basically threw security out the window. Theyve completely lost the plot as an org.\n\nTheir CEO spends all day on twitter talking about how much better he is than everyone. And how nobody can use agents like he can. Its quite obnoxious\n\nAlso just use CDP, way too many browser solutions for agents when chrome ships with the ability to control the browser at a low level.\n\nIf you want to wrap it in a jsonrpc api for mcp, this is like 4 hrs or a work for an llm, point them at a pkg thats uses CDP like go-rod."}, {"id": 50526988, "au": "crossroadsguy", "dom": 35, "sr": 41, "sc": 2.13, "ep": 3.67, "bs": 0.0, "d": 1, "age": 9.33, "grav": 79.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 108, "qw": 0, "k": 3754, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 1.035, "fa": 0.0, "gp": 0.852, "bl": 0.0, "ds": 0.0, "txt": "They have raised close to 1B and it seems financially they'd have raked in already a lot. Their subscriptions are gong quite well it seems – it's really cheap. So I am not sure they have lost the plot as an org for themselves. As for losing the plot as an org for its users – don't think that was the goal ever. Go to their GitHub to see for yourself. These guys inserted themselves into the \"og\" OpenCode and then left with the name because they had registered the domain name and made a much inferior TS clone and made it famous which is all it counts in today's time. Job done."}, {"id": 50529918, "au": "NishanStepak", "dom": 118, "sr": 42, "sc": 2.06, "ep": 2.5, "bs": 0.0, "d": 0, "age": 1.55, "grav": 9.8, "surf": 15.9, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 57, "qw": 0, "k": 51, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "mcp_server", "flbl": "Mcp & Server (Playwright)", "urls": [], "ig": 1.026, "fa": 0.0, "gp": 0.06, "bl": 0.0, "ds": 0.0, "txt": "I have been using Open Code with Big Pickle, basically I have downloaded it to my desktop and used it with a local host.  So far it has cost me nothing.  It is a way to do things for very little money.  I have run out of time a couple time, but I just go for the next.  I don't even look at X or Twitter."}, {"id": 50528319, "au": "mickeyp", "dom": 61, "sr": 43, "sc": 2.03, "ep": 3.57, "bs": 0.0, "d": 4, "age": 5.7, "grav": 39.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 85, "qw": 0, "k": 2230, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 1.366, "fa": 0.0, "gp": 0.251, "bl": 0.0, "ds": 0.0, "txt": "If you're keen to try something outside the terminal, give my harness dreamcoder.ai a whirl.\n\nIt runs on all 3 platforms on a machine of your choice, from your browser. It has a tiling window manager and it is a frontier coding harness. It is not written in node.\n\nDreamCoder's built to be stable and run day in and day out. It's not perfect, because harnesses are exceptionally complex, but it works really well.\n\nIt is a _very_ different paradigm to what you have used in Pi/OpenCode TUI."}, {"id": 50526311, "au": "oreally", "dom": 157, "sr": 44, "sc": 1.86, "ep": 3.11, "bs": 0.0, "d": 1, "age": 11.0, "grav": 101.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 401, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 1.259, "fa": 0.0, "gp": 0.103, "bl": 0.0, "ds": 0.0, "txt": "Yea it was a pity when opencode limited the token usage and told us to subscribe to their opencode go service. Like openai, it's clearly angling for commercial viability status under the guise of being 'open'."}, {"id": 50529408, "au": "neobrain", "dom": 3, "sr": 45, "sc": 1.84, "ep": 3.38, "bs": 0.0, "d": 2, "age": 2.83, "grav": 17.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 77, "qw": 32, "k": 350, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": [], "ig": 0.673, "fa": 0.42, "gp": 0.416, "bl": 0.0, "ds": 0.0, "txt": "> Security should be enforced outside the harness with a sandbox. You can define what's allowed and what's not in one place and have strong enforcement guarantees instead of ad-hoc permission requests every minute.\n\nI agree in principle, but in practice most sandboxing technology (like bwrap) is too static for this use case: You grant access once during startup and can't extend/revoke without a restart. That's inconvenient when you realize halfway through your session that you need additional permissions, and it's insufficient for permissions that are only briefly needed (for the duration of one tool call).\n\nA harness that controls the sandbox (e.g. for each individual tool invocation) can manage this much more effectively."}, {"id": 50525688, "au": "kristopolous", "dom": 138, "sr": 46, "sc": 1.83, "ep": 2.93, "bs": 0.0, "d": 0, "age": 12.26, "grav": 119.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 53, "qw": 0, "k": 18619, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": [], "ig": 1.05, "fa": 0.0, "gp": 0.317, "bl": 0.0, "ds": 0.0, "txt": "I was just looking into these \"chat with ai agent about a webpage\" browser extensions/projects/forks ... can someone help me sort out this field? it seems really busy.\n\nWhat I really want is like something that can search, use my own openai compatible server with, and I think that's it? I dunno what else these things do."}, {"id": 50526629, "au": "notatoad", "dom": 89, "sr": 47, "sc": 1.76, "ep": 3.3, "bs": 0.0, "d": 1, "age": 10.29, "grav": 91.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 24, "k": 26056, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 0.514, "fa": 0.42, "gp": 0.619, "bl": 0.0, "ds": 0.0, "txt": ">Also just use CDP\n\nisn't that what this is?\n\n>If you want to wrap it in a jsonrpc api for mcp, this is like 4 hrs or a work for an llm\n\nisn't vibecoding a throwaway integration like this what you're criticizing opencode for here?  why would i waste my tokens on that when opencode will give it to me already built?"}, {"id": 50525137, "au": "skeledrew", "dom": 140, "sr": 48, "sc": 1.74, "ep": 2.84, "bs": 0.0, "d": 0, "age": 13.14, "grav": 133.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 2225, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 0.975, "fa": 0.0, "gp": 0.379, "bl": 0.0, "ds": 0.0, "txt": "I found agent browsing to be an issue when I started using them months ago. Built a Firefox extension back then that uses the browser instance that I use, the way I use it, so there's really no difference to a site."}, {"id": 50528555, "au": "zaptheimpaler", "dom": 2, "sr": 49, "sc": 1.65, "ep": 3.19, "bs": 0.0, "d": 1, "age": 5.12, "grav": 34.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 80, "qw": 0, "k": 8961, "kpp": 4.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "model_ask", "flbl": "Model & Ask (Dont)", "urls": [], "ig": 0.731, "fa": 0.0, "gp": 1.016, "bl": 0.0, "ds": 0.0, "txt": "They're totally right to not bother with security inside a harness, its just a terrible approach that creates permission fatigue and bad UX. Claude asking me to approve a 50 line arcane bash command doesn't help at all. Pi also has the same philosophy of not enforcing security within the harness.\n\nSecurity should be enforced outside the harness with a sandbox. You can define what's allowed and what's not in one place and have strong enforcement guarantees instead of ad-hoc permission requests every minute."}, {"id": 50524221, "au": "mitchitized", "dom": 129, "sr": 50, "sc": 1.65, "ep": 2.75, "bs": 0.0, "d": 1, "age": 14.38, "grav": 153.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 171, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 1.081, "fa": 0.0, "gp": 0.144, "bl": 0.0, "ds": 0.0, "txt": "It is a chromium extension and Firefox is not a chromium-based browser.\n\nLike or dislike Firefox, omitting it from a list called \"real browser\" just looks amateur or sloppy. How about \"real chromium browser\"? Was it really that hard?"}, {"id": 50528498, "au": "no-name-here", "dom": 78, "sr": 51, "sc": 1.5, "ep": 3.05, "bs": 0.0, "d": 3, "age": 5.26, "grav": 35.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 48, "qw": 18, "k": 982, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 0.787, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": ">>> Their CEO\n\n> doesn't mean you aren't the Chief executive. Thr not a ceo thing is kind of a twitter meme\n\nJay V (@jayair) seems to be explicitly publicly listed as the CEO. Is that enough to make someone else who says they aren’t the CEO, not the CEO? I just don’t understand the continued insistence to use that specific terminology when the company says it isn’t how they’re organized?"}, {"id": 50530215, "au": "vovavili", "dom": 117, "sr": 52, "sc": 1.49, "ep": 2.59, "bs": 0.0, "d": 0, "age": 0.82, "grav": 6.5, "surf": 24.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 683, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 1.059, "fa": 0.0, "gp": 0.072, "bl": 0.0, "ds": 0.0, "txt": "This is promising. My primary use of Codex is browser automation, and I perpetually keep running out of tokens for menial tasks. OpenCode + Spark Muse will make my life so much easier."}, {"id": 50525102, "au": "alasano", "dom": 82, "sr": 53, "sc": 1.44, "ep": 2.98, "bs": 0.0, "d": 2, "age": 13.19, "grav": 133.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 114, "qw": 0, "k": 721, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 1.185, "fa": 0.0, "gp": 0.136, "bl": 0.0, "ds": 0.0, "txt": "It's interesting because it's not strictly speaking needed.\n\nYou have people who have high visibility on social media without playing games or constantly exaggerating their accomplishments or work.\n\nBut you're right that people who do play these games and adopt your so called archetype end up with this much visibility.\n\nI think the reality is as simple as grandiose claims or presentation or just being clickbait personified works to gain an audience. It's also why these people have a bigger ratio of fans to people who can't stand them.\n\nThe much rarer people who reach a large audience while remaining genuine tend to be much more universally liked. The ratio is better for sure at least."}, {"id": 50528251, "au": "bob1029", "dom": 148, "sr": 54, "sc": 1.41, "ep": 2.36, "bs": 0.0, "d": 2, "age": 5.88, "grav": 41.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 35, "qw": 0, "k": 24526, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "mcp_server", "flbl": "Mcp & Server (Playwright)", "urls": [], "ig": 1.004, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "What I'm trying to say is that the frontier models will already do this. At least OpenAI's models will. It launches chromium edge headlessly using my userland profile. From the browsers perspective it's me using it."}, {"id": 50529601, "au": "mickeyp", "dom": 63, "sr": 55, "sc": 1.36, "ep": 2.9, "bs": 0.0, "d": 6, "age": 2.37, "grav": 14.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 53, "qw": 0, "k": 2230, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": [], "ig": 0.41, "fa": 0.68, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "That it's on the same, level playing field as your favourite harness.\n\nThat's not so easy to achieve as you might think. Like all good software you can get 80% of the way to something quite quickly; it's the remaining 20% that takes a long time.\n\nAs for code generation, I'm not sure what you mean precisely?"}, {"id": 50530415, "au": "CyberShadow", "dom": 5, "sr": 56, "sc": 1.36, "ep": 2.9, "bs": 0.0, "d": 2, "age": 0.39, "grav": 4.8, "surf": 6.4, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 2127, "kpp": 4.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 1.184, "fa": 0.0, "gp": 0.079, "bl": 0.0, "ds": 0.0, "txt": "OpenCode's security problems are not limited to just permissioning agent actions. For a long time, simply starting OpenCode, and without requiring any other actions or prior configuration, allowed any website to run any code on your computer without any restrictions."}, {"id": 50530147, "au": "hendersoon", "dom": 14, "sr": 57, "sc": 1.36, "ep": 2.89, "bs": 0.0, "d": 2, "age": 0.97, "grav": 7.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 90, "qw": 0, "k": 1110, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 1.23, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Wrong. This is largely a solved problem with “auto review” permissions mode, which uses another LLM to review all tool calls that could potentially be dangerous. That solution isn’t perfect of course but it is reliable and usable at the point. This is available in Claude code, codex, copilot, and a bunch of others.\n\nI find auto review mode mandatory and refuse to consider any harness that doesn’t support it.\n\nOpencode doesn’t support it. And there are no good plugins to do it either, the most popular had only six stars last I checked."}, {"id": 50526255, "au": "julianeon", "dom": 80, "sr": 58, "sc": 1.36, "ep": 2.51, "bs": 0.0, "d": 1, "age": 11.12, "grav": 102.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 2624, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 0.655, "fa": 0.0, "gp": 0.671, "bl": 0.0, "ds": 0.0, "txt": "I'm glad you made that comment because I didn't look very closely at the URL and thought this was an OpenAI product."}, {"id": 50528562, "au": "LoganDark", "dom": 93, "sr": 59, "sc": 1.36, "ep": 2.38, "bs": 0.0, "d": 1, "age": 5.08, "grav": 33.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 4830, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 0.806, "fa": 0.0, "gp": 0.334, "bl": 0.0, "ds": 0.0, "txt": "At least they don't invalidate the prompt cache on every request now. OpenCode V1 did that under certain circumstances"}, {"id": 50525464, "au": "aleqs", "dom": 98, "sr": 60, "sc": 1.36, "ep": 2.36, "bs": 0.0, "d": 1, "age": 12.59, "grav": 124.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 59, "qw": 0, "k": 308, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 1.003, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Yeah I've been somewhat disappointed with opencode lately (not as disappointed as I am in codex though)... the issues and PRs on GitHub are continuously accumulating and they don't seem to have any structured/efficient way to deal with it. Obvious issues with obvious fixes, and zero disagreement are sitting so long that they just get auto closed after 1 month."}, {"id": 50526253, "au": "willis936", "dom": 56, "sr": 61, "sc": 1.36, "ep": 2.31, "bs": 0.0, "d": 3, "age": 11.13, "grav": 103.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 10234, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "mcp_server", "flbl": "Mcp & Server (Playwright)", "urls": [], "ig": 0.839, "fa": 0.0, "gp": 0.232, "bl": 0.0, "ds": 0.0, "txt": "This is pretty alarming. I try to set up my containers to only have web access via specific provider MCPs and not just free reign to the open web. I would not want to use a harness trying to fight against me on what is already a very hard problem."}, {"id": 50528711, "au": "antupis", "dom": 100, "sr": 62, "sc": 1.36, "ep": 2.28, "bs": 0.0, "d": 3, "age": 4.65, "grav": 30.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 46, "qw": 0, "k": 1069, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 0.969, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Codex has same problem that oh-my-pi has that gui feels too much magical box where you put prompts and software comes out. Opencode nailed balance between output and traces pretty well but sadly they also are going to that magic box direction with latest versions."}, {"id": 50525061, "au": "_pdp_", "dom": 133, "sr": 63, "sc": 1.36, "ep": 2.2, "bs": 0.0, "d": 0, "age": 13.26, "grav": 135.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 2650, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 0.578, "fa": 0.0, "gp": 0.583, "bl": 0.0, "ds": 0.0, "txt": "Cool.. but I think it is just simply better to give your AI agents their own browsers for your own sanity."}, {"id": 50530022, "au": "phrotoma", "dom": 103, "sr": 64, "sc": 1.36, "ep": 2.07, "bs": 0.0, "d": 2, "age": 1.27, "grav": 8.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 747, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 0.879, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "A friend who works in infosec was absolutely floored when I asked him how he was sandboxing the agents he runs on his main laptop. I guesss I'm finished being surprised but god damn."}, {"id": 50529371, "au": "arcanemachiner", "dom": 32, "sr": 65, "sc": 1.36, "ep": 2.05, "bs": 0.0, "d": 3, "age": 2.95, "grav": 17.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 52, "qw": 0, "k": 3170, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": [], "ig": 0.873, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Yeah but if you ask the agent, they are probably tripping over their ad-hoc scripts and working around little issues all the time. All that stuff adds up. Maybe my wrapper is a YAGNI-esque optimization on my part to avoid this, but I find it's also fun to work on these sorts of tools."}, {"id": 50525857, "au": "ihsw", "dom": 131, "sr": 66, "sc": 1.36, "ep": 1.93, "bs": 0.0, "d": 1, "age": 11.94, "grav": 114.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 17, "qw": 0, "k": 5564, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "mcp_server", "flbl": "Mcp & Server (Playwright)", "urls": ["https://firefox-source-docs.mozilla.org/ai-agent-tools/firefox-devtools-mcp.html"], "ig": 0.82, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Firefox has its own MCP server:\n\nhttps://firefox-source-docs.mozilla.org/ai-agent-tools/firef...\n\nNotably, it supports specifying the profile, which is critical for isolation."}, {"id": 50528680, "au": "antupis", "dom": 20, "sr": 67, "sc": 1.36, "ep": 1.89, "bs": 0.0, "d": 2, "age": 4.73, "grav": 30.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 1069, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": [], "ig": 0.804, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "This, I generally want gates for stuff that impacts outside world like terraform apply, gh pr merge etc but agents should have pretty free reign at sandbox level. And IMO if you only trust harness safety features you are doing something very wrong."}, {"id": 50527940, "au": "Iolaum", "dom": 75, "sr": 68, "sc": 1.36, "ep": 1.87, "bs": 0.0, "d": 1, "age": 6.75, "grav": 49.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 1756, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "model_ask", "flbl": "Model & Ask (Dont)", "urls": [], "ig": 0.538, "fa": 0.0, "gp": 0.42, "bl": 0.0, "ds": 0.0, "txt": "I 've been using OpenCode Desktop before I migrated to OpenClaw. Haven't used v2 as much because of this. There were papercuts, but not as many as OpenClaw :p Still was happy with it and if not for OpenClaw being that good, I 'd likely still be using it."}, {"id": 50526151, "au": "keyle", "dom": 152, "sr": 69, "sc": 1.36, "ep": 1.87, "bs": 0.0, "d": 0, "age": 11.38, "grav": 106.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 17251, "kpp": 4.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "mcp_server", "flbl": "Mcp & Server (Playwright)", "urls": [], "ig": 0.628, "fa": 0.0, "gp": 0.274, "bl": 0.0, "ds": 0.0, "txt": "You had me, until \"... your logins and your extensions\".\n\nIt's like open doors at a virus research facility."}, {"id": 50525672, "au": "esperent", "dom": 31, "sr": 70, "sc": 1.36, "ep": 1.87, "bs": 0.0, "d": 2, "age": 12.29, "grav": 119.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 9615, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": [], "ig": 0.383, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I use playwright-cli any a skill that's about 150 lines. Seems to have been working well for about 6 months now."}, {"id": 50527426, "au": "theanonymousone", "dom": 139, "sr": 71, "sc": 1.36, "ep": 1.8, "bs": 0.0, "d": 0, "age": 8.25, "grav": 66.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 12418, "kpp": 7.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 0.664, "fa": 0.0, "gp": 0.164, "bl": 0.0, "ds": 0.0, "txt": "My \"agents\" already do that, directly on macOS and via CDP on Linux. How is this different?"}, {"id": 50529398, "au": "boomskats", "dom": 120, "sr": 72, "sc": 1.36, "ep": 1.76, "bs": 0.0, "d": 1, "age": 2.87, "grav": 17.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 2587, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "mcp_server", "flbl": "Mcp & Server (Playwright)", "urls": [], "ig": 0.747, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "So with that said, how do you feel about an extension that explicitly enables Opencode to execute tasks on your behalf, as if it was you, using your credentials and 2FA-authenticated sessions?"}, {"id": 50529584, "au": "mickeyp", "dom": 67, "sr": 73, "sc": 1.36, "ep": 1.75, "bs": 0.0, "d": 6, "age": 2.43, "grav": 14.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 2230, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 0.745, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I've not heard of/used Tauri, but I'm guessing it's some sort of Electron-shaped thing?\n\nBrowsers are everywhere, and you can point your phone at it. It also means the backend's a REST API, which has its own advantages."}, {"id": 50527569, "au": "jazzypants", "dom": 57, "sr": 74, "sc": 1.36, "ep": 1.74, "bs": 0.0, "d": 4, "age": 7.93, "grav": 62.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": 922, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "model_ask", "flbl": "Model & Ask (Dont)", "urls": [], "ig": 0.743, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "For me, I don't worry about what permissions I give my harness because it runs in a container where it can't harm anything unless the agent is being actively malicious and looking for sandbox exploits. I probably have bigger problems in that case."}, {"id": 50528055, "au": "laughing_snyder", "dom": 142, "sr": 75, "sc": 1.36, "ep": 1.74, "bs": 0.0, "d": 1, "age": 6.4, "grav": 46.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 35, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": [], "ig": 0.739, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I work in a large engineering org, and I've never heard anyone using these for work, while opencode is pretty much the default open-source agent harness."}, {"id": 50530427, "au": "stinos", "dom": 64, "sr": 76, "sc": 1.36, "ep": 2.32, "bs": 0.85, "d": 7, "age": 0.36, "grav": 4.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 5976, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "mcp_server", "flbl": "Mcp & Server (Playwright)", "urls": [], "ig": 0.988, "fa": 0.0, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "For the way I work the \u00231 feature of a harness is quality code generation. It's nice that you can organize agents and whatnot, but if they all spit out suboptimal code for the task at hand that's not super relevant."}, {"id": 50529289, "au": "forgotpwd16", "dom": 90, "sr": 77, "sc": 1.13, "ep": 1.13, "bs": 0.0, "d": 1, "age": 3.2, "grav": 19.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 23, "qw": 23, "k": 3564, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "model_ask", "flbl": "Model & Ask (Dont)", "urls": ["https://opencode.ai/product"], "ig": 0.357, "fa": 0.0, "gp": 0.201, "bl": 0.0, "ds": 0.0, "txt": ">vibe codes and releases like 3 projects a week\n\nhttps://opencode.ai/product\n\nWhat?\n\n>just know its throwaway software to them\n\n>this is like 4 hrs or a work for an llm\n\nAh, yes. Replace software used by many others with one used by one person. Let's generate as much slop as we can."}, {"id": 50525111, "au": "liuliu", "dom": 21, "sr": 78, "sc": 1.07, "ep": 2.26, "bs": 1.19, "d": 1, "age": 13.17, "grav": 133.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 3350, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "model_ask", "flbl": "Model & Ask (Dont)", "urls": [], "ig": 0.307, "fa": 0.0, "gp": 1.061, "bl": 0.45, "ds": 0.0, "txt": "Their marketing is very effective. And marketing is the only thing matters in software industry going forward. Making good software is not."}, {"id": 50524843, "au": "slopinthebag", "dom": 85, "sr": 79, "sc": 0.99, "ep": 0.99, "bs": 0.0, "d": 2, "age": 13.59, "grav": 140.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 1372, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": [], "ig": 0.419, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "it's been this way for years tbh. they made the whole web scene insufferable. the few gems have remained in the web scene, while everyone else moved to ai."}, {"id": 50524837, "au": "sebws", "dom": 37, "sr": 80, "sc": 0.82, "ep": 2.01, "bs": 1.19, "d": 1, "age": 13.6, "grav": 140.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 44, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": [], "ig": 0.331, "fa": 0.0, "gp": 0.848, "bl": 0.45, "ds": 0.0, "txt": "They also seem to have abandoned their pre-OpenCode success SST with no acknowledgement to paying customers."}, {"id": 50529158, "au": "stinos", "dom": 62, "sr": 81, "sc": 0.77, "ep": 0.77, "bs": 0.0, "d": 5, "age": 3.54, "grav": 21.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 0, "k": 5976, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 0.328, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "it is a frontier coding harness\n\nWhat exactly does that mean, these days? Which harnesses are not frontier, and what does it do much better (on the code generation front) than others?"}, {"id": 50528223, "au": "bob1029", "dom": 150, "sr": 82, "sc": 0.64, "ep": 1.84, "bs": 1.19, "d": 2, "age": 5.93, "grav": 41.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 24526, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 0.781, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "A vast majority of my input tokens are cached. The cost of bootstrapping is amortized across many turns of conversation."}, {"id": 50528338, "au": "yasindce1998", "dom": 17, "sr": 83, "sc": 0.64, "ep": 3.15, "bs": 2.52, "d": 2, "age": 5.66, "grav": 39.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 0, "k": 4, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 0.93, "fa": 0.34, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "In the latest open code they changed the inference so now you getting more tokens per second it's around 300 to 400 per second code also they have provided no attention high for class with a near unlimited usage!"}, {"id": 50528692, "au": "rpunkfu", "dom": 6, "sr": 84, "sc": 0.45, "ep": 1.64, "bs": 1.19, "d": 2, "age": 4.7, "grav": 30.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 105, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 0.383, "fa": 0.0, "gp": 0.512, "bl": 0.45, "ds": 0.0, "txt": "Security when calling external services is much more than just FS permissions, sandbox doesn’t protect at all what you push to github or call API with"}, {"id": 50529245, "au": "regexorcist", "dom": 46, "sr": 85, "sc": 0.42, "ep": 1.61, "bs": 1.19, "d": 3, "age": 3.32, "grav": 20.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 12, "k": 282, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 0.583, "fa": 0.0, "gp": 0.166, "bl": 0.45, "ds": 0.0, "txt": ">  lock down code execution to run in bwrap. Claude made a nice extension\n\nI think you're looking at it wrong. I run opencode itself inside bwrap (atop other layers) so anything it runs it's already sandboxed."}, {"id": 50529740, "au": "slopinthebag", "dom": 68, "sr": 86, "sc": 0.36, "ep": 1.2, "bs": 0.85, "d": 7, "age": 2.02, "grav": 12.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 1372, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "model_ask", "flbl": "Model & Ask (Dont)", "urls": [], "ig": 0.512, "fa": 0.0, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "yeah electron but small and fast. imo it’s nicer to have a desktop app than require a backend and I’m pretty sure with virtually zero changes you could ship it! especially if you’re already using rust."}, {"id": 50528449, "au": "Maledictus", "dom": 114, "sr": 87, "sc": 0.32, "ep": 0.32, "bs": 0.0, "d": 3, "age": 5.42, "grav": 36.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 13, "qw": 0, "k": 223, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://github.com/ultrafunkamsterdam/undetected-chromedriver"], "ig": 0.135, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Websites can and do detect the use of this though.\nThat's why https://github.com/ultrafunkamsterdam/undetected-chromedrive... exists."}, {"id": 50525190, "au": "breakwaterlabs", "dom": 145, "sr": 88, "sc": 0.25, "ep": 1.44, "bs": 1.19, "d": 0, "age": 13.05, "grav": 131.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 299, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.413, "fa": 0.0, "gp": 0.326, "bl": 0.45, "ds": 0.0, "txt": "At least they don't even pretend that it's sandboxed or approval gated.\n\nTo anyone trying this, good luck and keep a fire extinguisher handy."}, {"id": 50526148, "au": "thegreatpeter", "dom": 97, "sr": 89, "sc": 0.22, "ep": 1.41, "bs": 1.19, "d": 1, "age": 11.38, "grav": 106.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 250, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 0.602, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "crazy how quickly somebody's good will can erode with a post like this\n\nopencode team is great and dax doesn't even follow me"}, {"id": 50529596, "au": "insin", "dom": 111, "sr": 90, "sc": 0.15, "ep": 1.34, "bs": 1.19, "d": 2, "age": 2.38, "grav": 14.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 1812, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": [], "ig": 0.571, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "If your harness can't compose tool calls or direct results of them to outside of context, you have a harness problem, not an MCP problem"}, {"id": 50526016, "au": "ijidak", "dom": 28, "sr": 91, "sc": 0.09, "ep": 1.28, "bs": 1.19, "d": 2, "age": 11.65, "grav": 110.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 3060, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.455, "fa": 0.0, "gp": 0.146, "bl": 0.45, "ds": 0.0, "txt": "Interesting. Where do you see their marketing that impresses you?\n\nI mainly read Hacker News. So not surprised I've missed it.\n\nBut, I'm curious because I love to study good marketing."}, {"id": 50527225, "au": "gitgud", "dom": 132, "sr": 92, "sc": 0.04, "ep": 2.03, "bs": 1.99, "d": 0, "age": 8.78, "grav": 72.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 17, "qw": 0, "k": 5432, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": ["https://chromewebstore.google.com/detail/claude/fcoeoabgfenejglbffodgkkbkcdhcgfn"], "ig": 0.635, "fa": 0.0, "gp": 0.372, "bl": 0.75, "ds": 0.0, "txt": "Nice, this seems to directly compete with the Anthropic Claude extension which has currently has 23 million user's\n\nhttps://chromewebstore.google.com/detail/claude/fcoeoabgfene..."}, {"id": 50524187, "au": "guipsp", "dom": 124, "sr": 93, "sc": -0.04, "ep": 1.16, "bs": 1.19, "d": 1, "age": 14.42, "grav": 154.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 883, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 0.4, "fa": 0.0, "gp": 0.149, "bl": 0.45, "ds": 0.0, "txt": "Well, it's an extension, so the api surface is different on FF. So it's not just a matter of them not listing it."}, {"id": 50529019, "au": "TiredOfLife", "dom": 91, "sr": 94, "sc": -0.14, "ep": 1.05, "bs": 1.19, "d": 1, "age": 3.9, "grav": 24.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 4, "k": 12046, "kpp": 3.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "model_ask", "flbl": "Model & Ask (Dont)", "urls": [], "ig": 0.308, "fa": 0.0, "gp": 0.228, "bl": 0.45, "ds": 0.0, "txt": "> releases like 3 projects a week\n\nI will make it easy for you and wont ask for all 36. List at least 20 projects they have released in past 3 months"}, {"id": 50525174, "au": "skeledrew", "dom": 125, "sr": 95, "sc": -0.15, "ep": 1.04, "bs": 1.19, "d": 1, "age": 13.09, "grav": 132.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 2225, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 0.364, "fa": 0.0, "gp": 0.128, "bl": 0.45, "ds": 0.0, "txt": "I made an extension a while back that fully exposes all of Firefox so it's CLI-accessible. It's actually not that much effort."}, {"id": 50524135, "au": "sixtyj", "dom": 123, "sr": 96, "sc": -0.2, "ep": 2.85, "bs": 3.05, "d": 0, "age": 14.49, "grav": 155.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 3, "k": 895, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 0.812, "fa": 0.0, "gp": 0.646, "bl": 1.15, "ds": 0.0, "txt": "> Your real browser: \nChrome, Edge, Brave, Arc, Helium, Vivaldi, Opera and Chromium.\n\nFirefox not?"}, {"id": 50530299, "au": "testtestmetest", "dom": 10, "sr": 97, "sc": -0.24, "ep": 2.54, "bs": 2.78, "d": 2, "age": 0.64, "grav": 5.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 74, "qw": 0, "k": -3, "kpp": -0.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "model_ask", "flbl": "Model & Ask (Dont)", "urls": [], "ig": 0.614, "fa": 0.34, "gp": 0.088, "bl": 1.05, "ds": 0.0, "txt": "I dont want it doing damage to the sanbox either. I have half a dozen sandboxes running 24/7, there's definately a balance. My sandbox can't say dont run python for this type of task or similar conditional permissions. There are gaurdrails that the harness should handle well.\n\nAlso the harness should definately just have a solid permission structure for the average user that 1000% is not using a sandbox, most people I know naively do not and think these things are perfectly safe."}, {"id": 50527587, "au": "sebws", "dom": 49, "sr": 98, "sc": -0.31, "ep": 0.89, "bs": 1.19, "d": 2, "age": 7.9, "grav": 61.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 44, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "model_ask", "flbl": "Model & Ask (Dont)", "urls": [], "ig": 0.377, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "SST is on version 4, and is not maintained. There is the beginnings of a community fork due to not getting a response from the maintainers for months."}, {"id": 50528795, "au": "ghosty141", "dom": 7, "sr": 99, "sc": -0.31, "ep": 0.88, "bs": 1.19, "d": 3, "age": 4.44, "grav": 28.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 922, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": [], "ig": 0.376, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Doesn't change his argument that sandboxing should be done outside the harness. You can also handle network access etc externally."}, {"id": 50529252, "au": "ozgrakkurt", "dom": 22, "sr": 100, "sc": -0.34, "ep": 0.85, "bs": 1.19, "d": 2, "age": 3.29, "grav": 20.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 1312, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "model_ask", "flbl": "Model & Ask (Dont)", "urls": [], "ig": 0.346, "fa": 0.0, "gp": 0.026, "bl": 0.45, "ds": 0.0, "txt": "Is there a harness that is good software?\n\nEvery single one I looked into looks like low quality vibecoded typescript."}, {"id": 50525253, "au": "testtestmetest", "dom": 77, "sr": 101, "sc": -0.4, "ep": 2.38, "bs": 2.78, "d": 2, "age": 12.92, "grav": 129.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 50, "qw": 0, "k": -3, "kpp": -0.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 1.013, "fa": 0.0, "gp": 0.0, "bl": 1.05, "ds": 0.0, "txt": "He runs Opencode and major stakeholder in the parent company. They don't too publish an org chart. Just because you dont give yourself the the Chief Executive title doesn't mean you aren't the Chief executive. Thr not a ceo thing is kind of a twitter meme too, hes the guy in charge."}, {"id": 50527159, "au": "01100011", "dom": 29, "sr": 102, "sc": -0.4, "ep": 0.79, "bs": 1.19, "d": 2, "age": 8.98, "grav": 74.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 9877, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.336, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Odd thing to say after the MSFT and FAA outages but sadly you’re probably right. The prophecy of Idiocracy is coming to pass."}, {"id": 50529288, "au": "circularfoyers", "dom": 102, "sr": 103, "sc": -0.59, "ep": 0.6, "bs": 1.19, "d": 1, "age": 3.21, "grav": 19.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 810, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "model_ask", "flbl": "Model & Ask (Dont)", "urls": [], "ig": 0.256, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Annoyingly the engineers in my team just argue it's not a risk because they have haven't witnessed it themselves or know anyone personally that have."}, {"id": 50525736, "au": "testtestmetest", "dom": 34, "sr": 104, "sc": -0.6, "ep": 2.19, "bs": 2.78, "d": 2, "age": 12.19, "grav": 118.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": -3, "kpp": -0.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 0.93, "fa": 0.0, "gp": 0.0, "bl": 1.05, "ds": 0.0, "txt": "Took me about half a day.\n\nGranted, Ive neen building browser automation tools on top of cdp for many years now."}, {"id": 50525324, "au": "doctaj", "dom": 83, "sr": 105, "sc": -0.64, "ep": 0.55, "bs": 1.19, "d": 2, "age": 12.82, "grav": 128.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 636, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.179, "fa": 0.0, "gp": 0.088, "bl": 0.45, "ds": 0.0, "txt": "No, they just all know how to game the different socials and they do, even if it's obnoxious or cringe."}, {"id": 50527732, "au": "antupis", "dom": 55, "sr": 106, "sc": -0.65, "ep": 0.54, "bs": 1.19, "d": 5, "age": 7.41, "grav": 56.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 1069, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": [], "ig": 0.23, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Imo if you’re not running harnesses on sandbox you are doing something wrong and you absolutely should not trust harness safety features."}, {"id": 50527415, "au": "orliesaurus", "dom": 161, "sr": 107, "sc": -0.76, "ep": 0.43, "bs": 1.19, "d": 0, "age": 8.28, "grav": 66.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 3188, "kpp": 2.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.155, "fa": 0.0, "gp": 0.046, "bl": 0.45, "ds": 0.0, "txt": "as much of a non-vercel fanboy I am, I think agent-browser by vercel is where it's at these days"}, {"id": 50524899, "au": "jareklupinski", "dom": 84, "sr": 108, "sc": -0.77, "ep": 0.42, "bs": 1.19, "d": 2, "age": 13.53, "grav": 139.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 15, "k": 3226, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.179, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "> if indeed that is what you need, then perhaps I do not want success at all.\n\nwhat would success bring you?\n\nif what you want is success at all costs however, that is where you have to start"}, {"id": 50524534, "au": "vibebingo", "dom": 155, "sr": 109, "sc": -0.88, "ep": 1.63, "bs": 2.52, "d": 0, "age": 13.97, "grav": 146.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "model_ask", "flbl": "Model & Ask (Dont)", "urls": [], "ig": 0.443, "fa": 0.0, "gp": 0.408, "bl": 0.95, "ds": 0.0, "txt": "Oh this is a problem? I just ask my agent to do stuff with a browser and it figures it out."}, {"id": 50530025, "au": "knocte", "dom": 122, "sr": 110, "sc": -0.9, "ep": 0.3, "bs": 1.19, "d": 1, "age": 1.27, "grav": 8.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 10, "k": 995, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 0.126, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "> it's the most flexible harness\n\nMore than Pi?\n\n> 10 quid with practicality unlimited usage\n\nWeren't you talking about the harness? now you're talking about their AI plans"}, {"id": 50528028, "au": "laughing_snyder", "dom": 44, "sr": 111, "sc": -0.97, "ep": 2.08, "bs": 3.05, "d": 1, "age": 6.48, "grav": 46.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 8, "k": 35, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 0.62, "fa": 0.0, "gp": 0.431, "bl": 1.15, "ds": 0.0, "txt": "> Opencode V2 basically threw security out the window.\n\nPlease elaborate. What is the problem if I only use OpenCode v2 (without extensions like Browse)."}, {"id": 50527358, "au": "testtestmetest", "dom": 73, "sr": 112, "sc": -1.07, "ep": 1.71, "bs": 2.78, "d": 5, "age": 8.43, "grav": 68.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": -3, "kpp": -0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "mcp_server", "flbl": "Mcp & Server (Playwright)", "urls": [], "ig": 0.728, "fa": 0.0, "gp": 0.0, "bl": 1.05, "ds": 0.0, "txt": "I found this to be too minimal, but I would try again. Are there any power users of it that have written up? The thing is I do like plugin-esque paradigms.and I do need mcp functionality."}, {"id": 50527656, "au": "huybuidac", "dom": 74, "sr": 113, "sc": -1.34, "ep": 2.37, "bs": 3.71, "d": 1, "age": 7.67, "grav": 59.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 2, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 0.695, "fa": 0.0, "gp": 0.51, "bl": 1.4, "ds": 0.0, "txt": "I used OpenCode a lot before, but I had to drop it and switch to Claude code (again). It’s missing a lot of features, especially session-to-session communication."}, {"id": 50527653, "au": "ryuuseijin", "dom": 71, "sr": 114, "sc": -1.42, "ep": 0.56, "bs": 1.99, "d": 4, "age": 7.68, "grav": 59.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 17, "qw": 0, "k": 140, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://maki.sh/"], "ig": 0.24, "fa": 0.0, "gp": 0.0, "bl": 0.75, "ds": 0.0, "txt": "I really like maki [1]. It's been very well put together and I like its focus on speed and simplicity.\n\n[1]: https://maki.sh/"}, {"id": 50527340, "au": "testtestmetest", "dom": 54, "sr": 115, "sc": -1.59, "ep": 1.2, "bs": 2.78, "d": 4, "age": 8.49, "grav": 68.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": -3, "kpp": -0.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "model_ask", "flbl": "Model & Ask (Dont)", "urls": [], "ig": 0.509, "fa": 0.0, "gp": 0.0, "bl": 1.05, "ds": 0.0, "txt": "Thats too bad, its the equivalent of being a gun manufacturer and opting not to put safetys on the weapons you make. I dont really trust their team tbh. I'll stay on v1 for now until I find time to migrate to a different harness."}, {"id": 50528744, "au": "christkv", "dom": 106, "sr": 116, "sc": -1.59, "ep": 1.46, "bs": 3.05, "d": 1, "age": 4.57, "grav": 29.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 2208, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "mcp_server", "flbl": "Mcp & Server (Playwright)", "urls": [], "ig": 0.62, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Yeah I'm a big fan of the Playwright MCP server I use it a ton."}, {"id": 50524191, "au": "goda90", "dom": 127, "sr": 117, "sc": -1.67, "ep": 1.38, "bs": 3.05, "d": 1, "age": 14.41, "grav": 154.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 5473, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 0.505, "fa": 0.0, "gp": 0.133, "bl": 1.15, "ds": 0.0, "txt": "Looks like they only target Chromium-based browsers with their extension."}, {"id": 50524732, "au": "skeptic_ai", "dom": 94, "sr": 118, "sc": -2.32, "ep": 1.92, "bs": 4.24, "d": 1, "age": 13.73, "grav": 142.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 101, "kpp": 0.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "mcp_server", "flbl": "Mcp & Server (Playwright)", "urls": [], "ig": 0.292, "fa": 0.0, "gp": 0.854, "bl": 1.6, "ds": 0.0, "txt": "I sent a support question and they don’t even know what exact models are running. lol"}, {"id": 50524309, "au": "ekisu", "dom": 158, "sr": 119, "sc": -2.45, "ep": 1.26, "bs": 3.71, "d": 1, "age": 14.26, "grav": 151.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 2, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "mcp_server", "flbl": "Mcp & Server (Playwright)", "urls": [], "ig": 0.439, "fa": 0.0, "gp": 0.159, "bl": 1.4, "ds": 0.0, "txt": "you don't have to use their hosted models, nor their agent, for that matter\n\nwas this comment made by literally looking at the url? XD"}, {"id": 50528739, "au": "ffemac", "dom": 79, "sr": 120, "sc": -2.54, "ep": 1.7, "bs": 4.24, "d": 1, "age": 4.58, "grav": 29.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 23, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 0.54, "fa": 0.0, "gp": 0.294, "bl": 1.6, "ds": 0.0, "txt": "I purged OpenCode (and KiloCode) after I realized the security situation (on code and mentality level)"}, {"id": 50524782, "au": "OG_BME", "dom": 76, "sr": 121, "sc": -2.71, "ep": 1.53, "bs": 4.24, "d": 1, "age": 13.66, "grav": 141.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 92, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 0.126, "fa": 0.0, "gp": 0.85, "bl": 1.6, "ds": 0.0, "txt": "He's not the CEO (although everyone thinks he is)"}, {"id": 50529313, "au": "circularfoyers", "dom": 153, "sr": 122, "sc": -2.86, "ep": 1.38, "bs": 4.24, "d": 1, "age": 3.12, "grav": 18.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 810, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": [], "ig": 0.587, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Arguably so is browsing a lot of the internet without extensions like uBlock Origin."}, {"id": 50528211, "au": "__m", "dom": 112, "sr": 123, "sc": -3.07, "ep": 1.17, "bs": 4.24, "d": 1, "age": 5.96, "grav": 41.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 528, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 0.417, "fa": 0.0, "gp": 0.13, "bl": 1.6, "ds": 0.0, "txt": "Is there existing api though for controlling a browser from a different process?"}, {"id": 50528079, "au": "meatmanek", "dom": 149, "sr": 124, "sc": -3.08, "ep": 1.16, "bs": 4.24, "d": 1, "age": 6.33, "grav": 45.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 1183, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 0.495, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Are you burning tokens having your agent reinvent the wheel every time it needs a wheel?"}, {"id": 50529078, "au": "jwblackwell", "dom": 162, "sr": 125, "sc": -3.19, "ep": 1.05, "bs": 4.24, "d": 1, "age": 3.78, "grav": 23.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 968, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 0.445, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "just ran a comparison and this is much faster and completed 14/14 tasks vs 13/14 for agent-browser"}, {"id": 50527208, "au": "hank2000", "dom": 141, "sr": 126, "sc": -3.29, "ep": 0.95, "bs": 4.24, "d": 0, "age": 8.83, "grav": 72.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 128, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 0.285, "fa": 0.0, "gp": 0.197, "bl": 1.6, "ds": 0.0, "txt": "Are folks using opencode over say… openhands? Or pi?"}, {"id": 50526937, "au": "liuliu", "dom": 26, "sr": 127, "sc": -3.35, "ep": 1.81, "bs": 5.17, "d": 3, "age": 9.43, "grav": 80.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 104, "qw": 0, "k": 3350, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "model_ask", "flbl": "Model & Ask (Dont)", "urls": [], "ig": 0.771, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "I am referring to \"craftsman\" software: it covers broad range of users flows well (from generic on-boarding, to very specific feature that rarely used), with generic user behavior modeling so it \"feels\" natural when reveal features progressively, with proper animation in-between to visually guide user's mental model of the software itself.\n\nThese are gone, not because the generic \"enshittification\", but because with the new-wave of software, there is no need to \"model user behavior\" or guide \"user metal model\" any more: user tells exactly what software they want, based on what their mental model is. There is no need for such craftsman software any more."}, {"id": 50526464, "au": "raincole", "dom": 60, "sr": 128, "sc": -3.37, "ep": 0.87, "bs": 4.24, "d": 4, "age": 10.65, "grav": 96.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 55, "k": 14394, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 0.197, "fa": 0.0, "gp": 0.282, "bl": 1.6, "ds": 0.0, "txt": "> And before anyone says \"use Pi, it's great\", I tried it and while it is fine, I think I fundamentally don't want to use a node-based tool ever again. Don't know why, they just always feel \"slick\" in all the least useful, most flashy ways. Anyone have any recommendations for the \"sublime text 3\"/nvim of stable and reliable harnesses?\n\nI really don't get it, since Pi has always been \"vim of harness space\" for me..."}, {"id": 50526121, "au": "latentsea", "dom": 159, "sr": 129, "sc": -3.56, "ep": 0.68, "bs": 4.24, "d": 1, "age": 11.45, "grav": 107.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 1039, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.287, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Just use the spare R9700 you have lying around and run locally."}, {"id": 50526513, "au": "xXSLAYERXx", "dom": 25, "sr": 130, "sc": -3.58, "ep": 0.66, "bs": 4.24, "d": 2, "age": 10.52, "grav": 94.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 78, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": [], "ig": 0.194, "fa": 0.0, "gp": 0.141, "bl": 1.6, "ds": 0.0, "txt": "What is good software. Something that works / solves a problem? Or something else?"}, {"id": 50527919, "au": "Iolaum", "dom": 16, "sr": 131, "sc": -3.6, "ep": 0.64, "bs": 4.24, "d": 2, "age": 6.81, "grav": 50.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 1756, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 0.187, "fa": 0.0, "gp": 0.136, "bl": 1.6, "ds": 0.0, "txt": "He is likely talking about Dax who trolls a lot but is not the CEO."}, {"id": 50529667, "au": "slurpyb", "dom": 47, "sr": 132, "sc": -3.63, "ep": 0.61, "bs": 4.24, "d": 3, "age": 2.22, "grav": 13.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 106, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 0.258, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "How on earth can you open up your defence with “claude made a” ????"}, {"id": 50529729, "au": "haolez", "dom": 24, "sr": 133, "sc": -3.66, "ep": 0.58, "bs": 4.24, "d": 3, "age": 2.05, "grav": 12.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 4384, "kpp": 2.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.246, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "I had good experiences with deepseek-harness and open-mercato/cezar."}, {"id": 50527946, "au": "davmar", "dom": 50, "sr": 134, "sc": -3.67, "ep": 1.5, "bs": 5.17, "d": 3, "age": 6.73, "grav": 49.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 117, "qw": 7, "k": 443, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "model_ask", "flbl": "Model & Ask (Dont)", "urls": [], "ig": 0.638, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "> SST is on version 4\n\nok, last i used it, which was within the last 12 months, it was v3. i was wrong.\n\n> is not maintained\n\nthey're running off investor money (maybe profitable now, i don't know), do you expect them to spend their runway to maintain a project that clearly isn't going to work as a business model?\n\nthey spent years, day and night (i'm sure) working as hard as possible to build the SST tool, which by the way, could be used for free. (they even built seed.run - a way to deploy your SST projects)\n\nhow many years of their work are we entitled to? i am going to keep defending these guys against critics. it is so easy to be a critic and so hard to build something from nothing."}, {"id": 50528167, "au": "morsch", "dom": 99, "sr": 135, "sc": -3.74, "ep": 0.5, "bs": 4.24, "d": 2, "age": 6.09, "grav": 43.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 11387, "kpp": 3.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 0.211, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "I'm a heavy user of both and Codex seems way more polished."}, {"id": 50527909, "au": "brw", "dom": 39, "sr": 136, "sc": -3.93, "ep": 1.24, "bs": 5.17, "d": 3, "age": 6.84, "grav": 50.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 80, "qw": 0, "k": 634, "kpp": 10.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": [], "ig": 0.527, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "Pulumi and creating your own abstractions for it I think. That's most of what SST always looked like to me.\n\nUnless you mean SST Console specifically, which I think is what GP is talking about. I didn't actually know that existed until just now but it actually looks pretty good. Don't think I've seen anything else quite like it before.\n\nShame they abandoned it. I like Pulumi honestly so anything that builds on top of it/improves its developer experience is great to see."}, {"id": 50527870, "au": "arshxyz", "dom": 163, "sr": 137, "sc": -4.02, "ep": 0.22, "bs": 4.24, "d": 1, "age": 6.96, "grav": 51.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 364, "kpp": 5.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": 0.092, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "What makes it better than this or CDP?"}, {"id": 50528613, "au": "brabel", "dom": 27, "sr": 138, "sc": -4.13, "ep": 1.03, "bs": 5.17, "d": 4, "age": 4.89, "grav": 32.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 34, "qw": 0, "k": 8687, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "model_ask", "flbl": "Model & Ask (Dont)", "urls": [], "ig": 0.44, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "You are using that word wrong. What you described is just good UX. Craftsmanship is more about how the software looks like from the inside. It’s architecture, separation of concerns, test ability and malleability."}, {"id": 50527947, "au": "davmar", "dom": 58, "sr": 139, "sc": -4.17, "ep": 0.92, "bs": 5.09, "d": 3, "age": 6.72, "grav": 49.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 443, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.391, "fa": 0.0, "gp": 0.0, "bl": 1.92, "ds": 0.0, "txt": "sounds like a different product would be a better fit for you"}, {"id": 50527188, "au": "OleksandrC", "dom": 72, "sr": 140, "sc": -4.26, "ep": 0.77, "bs": 5.04, "d": 4, "age": 8.89, "grav": 73.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 8, "qw": 0, "k": 271, "kpp": 8.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://usehax.dev/"], "ig": 0.329, "fa": 0.0, "gp": 0.0, "bl": 1.9, "ds": 0.0, "txt": "Try hax (https://usehax.dev/). Minimal, not flashy, plain old school C."}, {"id": 50527963, "au": "luisrudge", "dom": 40, "sr": 141, "sc": -4.55, "ep": 0.49, "bs": 5.04, "d": 3, "age": 6.67, "grav": 48.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 15, "qw": 0, "k": 482, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": ["https://alchemy.dev"], "ig": 0.208, "fa": 0.0, "gp": 0.0, "bl": 1.9, "ds": 0.0, "txt": "https://alchemy.dev and you won't want to use anything else. don't waste time with pulumi or terraform"}, {"id": 50529863, "au": "sebws", "dom": 51, "sr": 142, "sc": -4.58, "ep": 1.43, "bs": 6.02, "d": 4, "age": 1.68, "grav": 10.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 91, "qw": 0, "k": 44, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "mcp_server", "flbl": "Mcp & Server (Playwright)", "urls": ["https://x.com/vimtor/status/2039039247286501688", "https://github.com/anomalyco/sst/graphs/commit-activity"], "ig": 0.609, "fa": 0.0, "gp": 0.0, "bl": 2.27, "ds": 0.0, "txt": "people pay for the SST console. I would say that people are entitled to their work as part of the general expectation of how paying for services works.\n\nvulnerabilities in SST have been reported to them. in April they announced [0] their intent to maintain and support SST. take a look at the commit activity graph [1]. I'm not saying that they are beholden to provide support for years for free. I'm saying that they are currently paid to support SST and are not providing it, and that for those who aren't paying they owe an acknowledgement.\n\n[0] https://x.com/vimtor/status/2039039247286501688\n[1] https://github.com/anomalyco/sst/graphs/commit-activity"}, {"id": 50526498, "au": "windexh8er", "dom": 86, "sr": 143, "sc": -5.28, "ep": 1.48, "bs": 6.76, "d": 3, "age": 10.55, "grav": 95.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 44, "qw": 0, "k": 5158, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "mcp_server", "flbl": "Mcp & Server (Playwright)", "urls": ["https://www.thenerdreich.com/"], "ig": 0.631, "fa": 0.0, "gp": 0.0, "bl": 2.55, "ds": 0.0, "txt": "They see success publicly and seem to be drawn to it like flies on shit.  I mean look at the drivel and pure propaganda that Garry Tan posts on X still.  It's like money gives you a pass to be a raging lunatic.\n\nHighly recommend \"The Nerd Reich\" [0].\n\n[0] https://www.thenerdreich.com/"}, {"id": 50530618, "au": "mickeyp", "dom": 65, "sr": 144, "sc": -5.36, "ep": 1.5, "bs": 6.86, "d": 8, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 65, "qw": 0, "k": 2230, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 5, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "model_ask", "flbl": "Model & Ask (Dont)", "urls": [], "ig": 0.638, "fa": 0.0, "gp": 0.0, "bl": 2.59, "ds": 0.0, "txt": "Ah, I think I misunderstood you. Sorry about that.\n\nYou can use any model you like with dreamcoder. The harness steers the models well, and they'll turn out the same quality code as the other frontier harnesses.\n\nI use several: Qwen 3.8 27B for local, which is a cracked little model; a Codex sub (Astra, Sol); and the free monthly credits I get with my claude sub for UI/visual stuff."}, {"id": 50529957, "au": "mickeyp", "dom": 69, "sr": 145, "sc": -5.54, "ep": 0.4, "bs": 5.94, "d": 8, "age": 1.43, "grav": 9.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 2230, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 5, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.17, "fa": 0.0, "gp": 0.0, "bl": 2.24, "ds": 0.0, "txt": "I'll definitely take a look at Tauri. Thanks for turning me on to it."}, {"id": 50528067, "au": "lasergear", "dom": 42, "sr": 146, "sc": -5.79, "ep": 0.97, "bs": 6.76, "d": 5, "age": 6.37, "grav": 45.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": 0.329, "fa": 0.0, "gp": 0.133, "bl": 2.55, "ds": 0.0, "txt": "Both opencode and alchemy.run are big proponents of effect."}, {"id": 50530333, "au": "testtestmetest", "dom": 8, "sr": 147, "sc": -6.4, "ep": 1.55, "bs": 7.95, "d": 4, "age": 0.55, "grav": 5.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 84, "qw": 0, "k": -3, "kpp": -0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "model_ask", "flbl": "Model & Ask (Dont)", "urls": [], "ig": 0.66, "fa": 0.0, "gp": 0.0, "bl": 3.0, "ds": 0.0, "txt": "You really wanting handle this at the sanbox layer?  I have 100 different containers configurations, only a few differnet harness configurations.\n\nYou're just being stubborn, the best UX is through the harness. Most users dont even know how to configure a sandbox properly and dont even use one.\n\nIve known quite a few naive people that have gotten their home directories wiped and really gotten burned. Many users of these products dont even know how to use a terminal and these harness companies are marketing to the average joe."}, {"id": 50529805, "au": "s1ugh34d_", "dom": 4, "sr": 148, "sc": -6.42, "ep": 1.27, "bs": 7.68, "d": 3, "age": 1.85, "grav": 11.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 44, "qw": 0, "k": 2, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": [], "ig": 0.539, "fa": 0.0, "gp": 0.0, "bl": 2.9, "ds": 0.0, "txt": "A harness that controls the sandbox is exactly what I’m after. Tools don’t always need to share the same space, and I can isolate work much better if separate toolchains are isolated in sandboxes. My biggest gripe with the major harnesses is how they sandbox tool calls."}, {"id": 50526421, "au": "pkulak", "dom": 95, "sr": 149, "sc": -8.18, "ep": 0.0, "bs": 6.89, "d": 1, "age": 10.75, "grav": 97.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 12735, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.65, "bl": 2.6, "ds": 0.0, "txt": "Or agent-browser."}, {"id": 50524348, "au": "mrdw", "dom": 105, "sr": 150, "sc": -8.41, "ep": 0.0, "bs": 6.89, "d": 1, "age": 14.21, "grav": 150.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 5, "qw": 0, "k": 33, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": ["https://github.com/ChromeDevTools/chrome-devtools-mcp"], "ig": -0.95, "fa": 0.0, "gp": 0.494, "bl": 2.6, "ds": 0.0, "txt": "Also we have Chrome's official\nhttps://github.com/ChromeDevTools/chrome-devtools-mcp"}, {"id": 50524343, "au": "mrdw", "dom": 135, "sr": 151, "sc": -8.52, "ep": 0.0, "bs": 6.89, "d": 0, "age": 14.22, "grav": 150.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 2, "qw": 0, "k": 33, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://github.com/ChromeDevTools/chrome-devtools-mcp"], "ig": -0.95, "fa": 0.0, "gp": 0.416, "bl": 2.6, "ds": 0.0, "txt": "why not https://github.com/ChromeDevTools/chrome-devtools-mcp"}, {"id": 50526576, "au": "voxelghost", "dom": 154, "sr": 152, "sc": -8.73, "ep": 0.0, "bs": 6.89, "d": 0, "age": 10.38, "grav": 92.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 552, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "opencode_usage", "flbl": "Opencode & Usage (Codex)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.269, "bl": 2.6, "ds": 0.0, "txt": "What could possibly go wrong"}, {"id": 50524820, "au": "frizlab", "dom": 130, "sr": 153, "sc": -8.95, "ep": 0.0, "bs": 6.89, "d": 1, "age": 13.62, "grav": 140.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 5695, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.119, "bl": 2.6, "ds": 0.0, "txt": "Nor Safari"}, {"id": 50524661, "au": "damsta", "dom": 128, "sr": 154, "sc": -8.96, "ep": 0.0, "bs": 6.89, "d": 1, "age": 13.82, "grav": 144.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 441, "kpp": 5.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.114, "bl": 2.6, "ds": 0.0, "txt": "And also Arc is dead"}, {"id": 50530387, "au": "andreynering", "dom": 23, "sr": 155, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 3, "age": 0.44, "grav": 5.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 0, "qw": 0, "k": 507, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://github.com/charmbracelet/crush"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "https://github.com/charmbracelet/crush"}, {"id": 50527410, "au": "pupppet", "dom": 38, "sr": 156, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 8.29, "grav": 66.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 3351, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Love SST, what are the alternatives?"}, {"id": 50528375, "au": "luisrudge", "dom": 43, "sr": 157, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 5, "age": 5.59, "grav": 38.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 482, "kpp": 4.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "ops, sorry"}, {"id": 50529265, "au": "slopinthebag", "dom": 66, "sr": 158, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 5, "age": 3.27, "grav": 19.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 1372, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "why browser and not tauri?"}, {"id": 50524917, "au": "giwook", "dom": 88, "sr": 159, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 13.49, "grav": 138.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 1001, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "harness_agent", "flbl": "Harness & Agent (Access)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Unfortunately it takes years to grow up"}, {"id": 50528425, "au": "gkbrk", "dom": 115, "sr": 160, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 5.46, "grav": 37.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 2997, "kpp": 4.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "browser_firefox", "flbl": "Browser & Firefox (Agents)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Yeah, CDP is very popular for this."}, {"id": 50528412, "au": "Maledictus", "dom": 126, "sr": 161, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 5.48, "grav": 37.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 1, "qw": 0, "k": 223, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Link?"}, {"id": 50526122, "au": "sans_souse", "dom": 144, "sr": 162, "sc": -10.65, "ep": 0.0, "bs": 8.88, "d": 0, "age": 11.44, "grav": 107.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 4, "qw": 0, "k": 1194, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://opencode.ai/robots.txt"], "ig": -0.95, "fa": 0.0, "gp": 0.318, "bl": 3.35, "ds": 0.0, "txt": "Check out https://opencode.ai/robots.txt for a treat"}, {"id": 50528369, "au": "Lukas_Skywalker", "dom": 113, "sr": 163, "sc": -11.11, "ep": 0.0, "bs": 8.88, "d": 2, "age": 5.6, "grav": 38.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 1, "qw": 0, "k": 1723, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://chromedevtools.github.io/devtools-protocol/"], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.35, "ds": 0.0, "txt": "Yes: https://chromedevtools.github.io/devtools-protocol/"}, {"id": 50527996, "au": "testtestmetest", "dom": 41, "sr": 164, "sc": -11.9, "ep": 0.0, "bs": 9.67, "d": 4, "age": 6.59, "grav": 48.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": -3, "kpp": -0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 3.65, "ds": 0.0, "txt": "alchemy.run*"}, {"id": 50530140, "au": "s_dev", "dom": 36, "sr": 165, "sc": -13.28, "ep": 0.0, "bs": 11.13, "d": 1, "age": 0.99, "grav": 7.2, "surf": 19.6, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 28, "k": 7727, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.06, "bl": 4.2, "ds": 0.0, "txt": ">Their CEO spends all day on twitter talking about how much better he is than everyone. And how nobody can use agents like he can. Its quite obnoxious\n\nWhat are some specific examples of this?"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "hn_top40";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 40);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 40);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 40);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `${shown.length} of ${pool.length} comments` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>

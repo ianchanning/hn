@@ -1,0 +1,1401 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HN 50556287 // Ruby2ßhell: Pre-authentication RCE on stock Rails — Epistemic Observatory</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      scrollbar-gutter: stable;
+      overflow-anchor: none;
+    }
+    @supports (interpolate-size: allow-keywords) {
+      :root { interpolate-size: allow-keywords; }
+    }
+    body {
+      margin: 8px;
+      /* background: rgb(246, 246, 239); */
+      color: rgb(13, 13, 13);
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 85%;
+      background: rgb(246, 246, 239);
+    }
+    .hn-header {
+      background: rgb(246, 246, 239);
+    }
+    .topbar {
+      background: rgb(255, 102, 0);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 10pt;
+      line-height: 12pt;
+      color: rgb(0, 0, 0);
+    }
+    .hn-logo {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      text-align: center;
+      border: 1px solid rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .hnname, .hnname a {
+      color: rgb(0, 0, 0);
+      font-weight: 700;
+      text-decoration: none;
+      margin-right: 4px;
+      font-size: 10pt;
+    }
+    .pagetop, .pagetop a {
+      color: rgb(0, 0, 0);
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      line-height: 12px;
+      text-decoration: none;
+      text-transform: lowercase;
+    }
+    .pagetop a:hover, .topbar-right a:hover {
+      text-decoration: underline;
+    }
+    .topbar-right {
+      padding-right: 4px;
+      white-space: nowrap;
+      font-size: 10pt;
+      font-family: Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      text-transform: lowercase;
+    }
+    .fatitem-box {
+      padding: 10px 8px 8px 8px;
+      background: rgb(246, 246, 239);
+    }
+    .story-titleline {
+      font: 10.5pt/14pt Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin-bottom: 2px;
+    }
+    a.story-title {
+      color: rgb(0, 0, 0);
+      text-decoration: none;
+    }
+    a.story-title:visited {
+      color: rgb(130, 130, 130);
+    }
+    .sitebit, .sitebit a {
+      font-size: 8pt;
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .sitebit a:hover, .subtext a:hover {
+      text-decoration: underline;
+    }
+    .subtext {
+      font: 7.5pt/11pt Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      padding-bottom: 2px;
+    }
+    .subtext a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .toptext {
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 8px 0 6px 0;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .toptext a {
+      color: rgb(0, 0, 0);
+      text-decoration: underline;
+    }
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .col-1 { grid-column: span 1; min-width: 0; }
+    .col-2 { grid-column: span 2; min-width: 0; }
+    .col-3 { grid-column: span 3; min-width: 0; }
+    .col-4 { grid-column: span 4; min-width: 0; }
+    .col-5 { grid-column: span 5; min-width: 0; }
+    .col-6 { grid-column: span 6; min-width: 0; }
+    .col-7 { grid-column: span 7; min-width: 0; }
+    .col-8 { grid-column: span 8; min-width: 0; }
+    .col-9 { grid-column: span 9; min-width: 0; }
+    .col-10 { grid-column: span 10; min-width: 0; }
+    .col-11 { grid-column: span 11; min-width: 0; }
+    .col-12 { grid-column: span 12; min-width: 0; }
+
+    .band {
+      border-bottom: 1px solid rgb(195, 195, 190);
+      padding: 24px 0;
+    }
+    .sec-tag {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgb(255, 51, 0);
+      margin-bottom: 6px;
+    }
+    h2 {
+      font-size: 12px;
+      font-weight: normal;
+      line-height: 1.12;
+      margin: 0 0 10px;
+    }
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .kpi-cell {
+      padding: 8px 0;
+    }
+    .kpi-label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgb(90, 90, 88);
+    }
+    .kpi-val {
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin: 4px 0;
+    }
+    .kpi-val.hi { color: rgb(255, 51, 0); }
+    .kpi-val.ok { color: rgb(0, 138, 75); }
+    .kpi-sub {
+      color: rgb(90, 90, 88);
+    }
+
+    /* Cyber-Industrial Recessed OLED Bays (Locked Equal-Height & Zero-Jitter) */
+    .oled-bay {
+      color: rgb(35, 35, 35);
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(35, 38, 42);
+      padding: 16px;
+      position: relative;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .oled-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      height: 16px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 10px;
+      font: 600 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .oled-head > span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .oled-head span.sig { color: rgb(0, 230, 118); flex-shrink: 0; }
+    canvas.plot {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      height: 300px;
+      display: block;
+      border: 1px solid rgb(42, 47, 54);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px 12px;
+      height: 34px;
+      overflow: hidden;
+      margin-top: 10px;
+      font: 500 11px/15px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(35, 35, 35);
+    }
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+    .probe-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      height: 88px;
+      border-left: 3px solid rgb(255, 51, 0);
+      color: rgb(35, 35, 35);
+      overflow: hidden;
+    }
+    .probe-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-height: 60px;
+    }
+
+    /* Collapsible Sections Styled as HN Collapsed Comments */
+    details.proof-drawer {
+      border: 0;
+      padding: 0 8px;
+      margin: 4px 0 6px 0;
+    }
+    details.proof-drawer[open] {
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    details.proof-drawer:not([open]) {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary,
+    details.proof-drawer > summary {
+      display: none;
+    }
+    details.proof-drawer > summary.hn-summary::-webkit-details-marker { display: none; }
+    details.proof-drawer > summary.hn-summary:hover {
+      color: rgb(34, 34, 34);
+    }
+    details.proof-drawer > summary .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    details.proof-drawer > summary .hn-user {
+      color: rgb(34, 34, 34);
+      font-weight: normal;
+    }
+    details.proof-drawer > summary .sec-headline {
+      color: rgb(100, 100, 100);
+    }
+    details.proof-drawer > summary .toggle-pill {
+      color: rgb(130, 130, 130);
+      font: 400 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: transparent;
+      padding: 0;
+      margin-left: 2px;
+    }
+    details.proof-drawer[open] > summary .toggle-pill::before { content: attr(data-hide); }
+    details.proof-drawer:not([open]) > summary .toggle-pill::before { content: attr(data-show); }
+    .proof-body {
+      padding-top: 10px;
+    }
+
+    /* Scientific Ablation Table */
+    table.ablation {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.ablation th, table.ablation td {
+      padding: 9px 11px;
+      border-bottom: 1px solid rgb(214, 214, 208);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.ablation th:first-child, table.ablation td:first-child {
+      text-align: left;
+    }
+    table.ablation th {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: normal;
+    }
+    table.ablation tr.winner {
+      background: rgba(0, 230, 118, 0.11);
+      font-weight: 700;
+    }
+    table.ablation tr.hn-row {
+      background: rgba(255, 51, 0, 0.08);
+    }
+
+    /* Controls & Explorer */
+    .control-panel {
+      background: rgb(239, 239, 234);
+      border: 1px solid rgb(13, 13, 13);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .slider-row {
+      margin-bottom: 11px;
+    }
+    .slider-lbl {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: rgb(255, 51, 0);
+    }
+    .btn-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    button.tab-btn {
+      appearance: none;
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+    button.nav-btn,
+    button.mode-tab,
+    button.topbar-toggle {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: rgb(0, 0, 0);
+      cursor: pointer;
+      text-decoration: none;
+      line-height: inherit;
+      vertical-align: baseline;
+      transition: color 0.12s ease;
+      text-transform: lowercase;
+    }
+    button.nav-btn:hover,
+    button.nav-btn.active,
+    button.mode-tab:hover,
+    button.mode-tab.active,
+    button.topbar-toggle:hover,
+    button.topbar-toggle.active {
+      color: rgb(255, 255, 255);
+      text-decoration: none;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    input.search-in, select.sel-in {
+      background: rgb(255, 255, 253);
+      border-color: rgb(129, 127, 132);
+      border-radius: 4px;
+      border-width: 1px;
+      color: rgb(13, 13, 13);
+      min-width: 0;
+    }
+    input.search-in { 
+      flex: 1;
+      font-weight: 400;
+      font: 400 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 220px;
+    }
+    .probe-inline-btn {
+      appearance: none;
+      border: 1px solid rgb(0, 230, 118);
+      border-radius: 4px;
+      background: rgba(0, 230, 118, 0.14);
+      color: rgb(0, 230, 118);
+      padding: 1px 7px;
+      margin-left: 6px;
+      font: 700 10.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    /* Comment Cards — Authentic Hacker News Surface & Typography */
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+      overflow-anchor: none;
+    }
+    article.c-card {
+      background: rgb(246, 246, 239);
+      border-left: 4px solid rgb(255, 102, 0);
+      padding: 11px 15px 10px;
+    }
+    article.c-card.tier-epistemic_gold { border-left-color: rgb(0, 158, 96); }
+    article.c-card.tier-grounded_analysis { border-left-color: rgb(16, 98, 188); }
+    article.c-card.tier-meme_or_snark { border-left-color: rgb(230, 145, 0); }
+    article.c-card.tier-bullshit_or_flamewar { border-left-color: rgb(255, 51, 0); }
+    article.c-card.tier-downvoted_sink { border-left-color: rgb(156, 156, 156); }
+
+    .hn-comhead {
+      font: 8pt/1.35 Verdana, Geneva, sans-serif;
+      color: rgb(130, 130, 130);
+      margin-bottom: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .hn-comhead a {
+      color: rgb(130, 130, 130);
+      text-decoration: none;
+    }
+    .hn-comhead a:hover { text-decoration: underline; }
+    .hn-votearrow {
+      color: rgb(150, 150, 150);
+      font-size: 9px;
+      margin-right: 1px;
+    }
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font: 600 10px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(90, 90, 86);
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: rgb(236, 236, 228);
+      border: 1px solid rgb(204, 204, 194);
+      border-radius: 4px;
+      color: rgb(35, 35, 35);
+    }
+    .badge.rank-sig { background: rgb(13, 13, 13); color: rgb(247, 247, 245); border-color: rgb(13, 13, 13); }
+    .badge.rescue { background: rgba(0, 180, 100, 0.15); border-color: rgb(0, 140, 80); color: rgb(0, 105, 58); }
+    .badge.drop { background: rgba(255, 51, 0, 0.12); border-color: rgb(220, 45, 0); color: rgb(175, 30, 0); }
+    .badge.c5a { background: rgba(255, 179, 0, 0.20); border-color: rgb(195, 130, 0); color: rgb(120, 75, 0); }
+
+    /* Exact news.css Verdana comment font & downvote fade color ramp */
+    .c-body {
+      white-space: pre-wrap;
+      font: 9.5pt/1.44 Verdana, Geneva, sans-serif;
+      color: rgb(0, 0, 0);
+      margin: 6px 0 9px;
+      max-width: 96ch;
+      overflow-wrap: anywhere;
+    }
+    .c-body.comm-c00 { color: rgb(0, 0, 0); }
+    .c-body.comm-c5a { color: rgb(90, 90, 90); }
+    .c-body.comm-c73 { color: rgb(115, 115, 115); }
+    .c-body.comm-c88 { color: rgb(136, 136, 136); }
+    .c-body.comm-c9c { color: rgb(156, 156, 156); }
+    .c-body.comm-cae { color: rgb(174, 174, 174); }
+    .c-body.comm-cbe { color: rgb(190, 190, 190); }
+    .c-body.comm-cce { color: rgb(206, 206, 206); }
+    .c-body.comm-cdd { color: rgb(221, 221, 221); }
+    .c-body .hn-quote {
+      color: rgb(85, 85, 85);
+      font-style: italic;
+    }
+    .vec-bars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: rgb(88, 88, 84);
+      padding-top: 8px;
+      border-top: 1px dashed rgb(218, 218, 212);
+    }
+    .ext-link {
+      color: rgb(16, 78, 158);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    footer.sheet-foot {
+      padding: 14px;
+      color: rgb(90, 90, 88);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dual-oled {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    details.graph-drawer {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    details.graph-drawer:not([open]) > .oled-bay,
+    details.graph-drawer:not([open]) > .control-panel {
+      display: none;
+    }
+    summary.graph-summary {
+      list-style: none;
+      pointer-events: none;
+      cursor: default;
+      min-width: 0;
+    }
+    summary.graph-summary::-webkit-details-marker { display: none; }
+    .graph-title-group { min-width: 0; }
+    .mob-graph-pill { display: none; }
+    .dual-oled h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 960px) {
+      .col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+      .col-7, .col-8, .col-9, .col-10, .col-11 { grid-column: span 12; }
+      .dual-oled { grid-template-columns: 1fr; gap: 10px; }
+      details.graph-drawer { display: block; }
+      summary.graph-summary {
+        pointer-events: auto;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      summary.graph-summary h2 {
+        display: none;
+      }
+      details.graph-drawer[open] > .oled-bay,
+      details.graph-drawer[open] > .control-panel {
+        margin-top: 8px;
+      }
+      .mob-graph-pill {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        color: rgb(35, 35, 35);
+        font: 400 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: 0.06em;
+      }
+      details.graph-drawer[open] > summary .mob-graph-pill::before { content: "[-]"; }
+      details.graph-drawer:not([open]) > summary .mob-graph-pill::before { content: "[+]"; }
+      .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .filter-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 8px;
+      }
+      .filter-bar select.sel-in,
+      .filter-bar input.search-in {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 750px) {
+      body { margin: 0; }
+      .wrap { width: 100%; }
+      .topbar { padding: 4px 6px; flex-wrap: wrap; row-gap: 4px; }
+      .topbar-right { padding-right: 2px; }
+      td.title { font-size: 11pt; line-height: 15pt; }
+      td.subtext { font-size: 8.5pt; line-height: 13pt; }
+      tr.spacer td { height: 7px; }
+    }
+  </style>
+  <script>
+    (function() {
+      if (window.location.pathname.includes("/items/")) {
+        var m = window.location.pathname.match(/\/items\/(\d+)\.html/);
+        if (m) {
+          var base = window.location.pathname.replace(/\/items\/\d+\.html$/, "");
+          var target = (base || "") + "/item?id=" + m[1];
+          try {
+            history.replaceState(null, "", target);
+          } catch(e) {}
+        }
+      }
+    })();
+  </script>
+</head>
+<body>
+<div class="wrap">
+  <header class="hn-header">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="https://news.ycombinator.com" class="hn-logo">E</a>
+        <a href="https://ianchanning.com/hn" class="hnname">Epistemic News</a>
+        <span class="pagetop" id="modeTabs">
+          <button type="button" class="nav-btn mode-tab active" data-mode="top_signal" role="tab" aria-selected="true">Top 40</button> | <button type="button" class="nav-btn mode-tab" data-mode="hn_top40" role="tab" aria-selected="false">HN Top 40</button>
+        </span>
+      </div>
+      <div class="topbar-right">
+        <button type="button" class="nav-btn topbar-toggle" id="exploreToggleBtn" aria-expanded="false">explore</button> | <button type="button" class="nav-btn topbar-toggle" id="evidenceToggleBtn" aria-expanded="false">evidence</button>
+      </div>
+    </div>
+    <div class="fatitem-box">
+      <div class="story-titleline">
+        <a class="story-title" href="https://verialabs.com/ruby2shell/">Ruby2ßhell: Pre-authentication RCE on stock Rails</a> <span class="sitebit comhead"> (<a href="https://news.ycombinator.com/from?site=verialabs.com"><span class="sitestr">verialabs.com</span></a>)</span>
+      </div>
+      <div class="subtext">
+        <span class="subline">
+          <span class="score">385 points</span> by <a href="https://news.ycombinator.com/user?id=jdns">jdns</a> <span class="age" title="2026-11-19T05:09:11.000Z"><a href="https://news.ycombinator.com/item?id=50556287">21 hours ago</a></span> | <a href="https://news.ycombinator.com/item?id=50556287">166&nbsp;comments</a> | 84.9% bullshit
+        </span>
+      </div>
+      
+    </div>
+  </header>
+
+  <details class="proof-drawer" id="proofDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Evidence</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body">
+      <p style="margin: 0 0 12px; color: rgb(70, 70, 68);">
+        Replacing surface crowd prediction and <code>(T + 2)^1.8</code> recency decay with Shannon/IDF surprisal, Popperian falsifiability,
+        Frankfurtian bullshit suppression, inverse <code>news.arc</code> physics, and submodular portfolio selection.
+      </p>
+      <div class="kpi-strip">
+        <div class="kpi-cell">
+          <div class="kpi-label">Corpus Audited</div>
+          <div class="kpi-val">166</div>
+          <div class="kpi-sub">1 HTML page(s) &bull; 110 cached/live authors</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Actual Useful Signal</div>
+          <div class="kpi-val ok">15.1%</div>
+          <div class="kpi-sub">25 comments (5 Gold / 3.0%)</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Chatter &amp; Bullshit</div>
+          <div class="kpi-val hi">84.9%</div>
+          <div class="kpi-sub">69 chatter &bull; 69 BS &bull; 0 faded</div>
+        </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Primary Citations</div>
+        <div class="kpi-val ok">3</div>
+        <div class="kpi-sub">10% of Epistemic Top 30 cite Tier 2/3</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Portfolio Diversity</div>
+        <div class="kpi-val">0.880</div>
+        <div class="kpi-sub">5 auto-discovered TF-IDF facets</div>
+      </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Largest Root Monopoly</div>
+          <div class="kpi-val hi">66</div>
+          <div class="kpi-sub">HN POS 1..66 (39.8% of thread)</div>
+        </div>
+      </div>
+    </div>
+    <div class="proof-body grid-12">
+      <div class="col-7">
+        <div class="sec-tag">01A / UNSUPERVISED 5-CLUSTER FACETS (SPHERICAL K-MEANS++)</div>
+        <h2>Auto-Discovered Sub-Themes &amp; Signal Yield</h2>
+        <div style="overflow-x:auto">
+          <table class="ablation" id="facetDiagTable">
+            <thead>
+              <tr>
+                <th>Discovered Facet Cluster</th>
+                <th>Comments</th>
+                <th>Useful Signal</th>
+                <th>Signal %</th>
+                <th>Centroid Salient Terms</th>
+              </tr>
+            </thead>
+            <tbody id="facetDiagBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="sec-tag">01B / SOURCE REGISTRY &amp; STORY ANCHORS</div>
+        <h2>Cross-Domain Citations &amp; TF-IDF Anchors</h2>
+        <div style="overflow-x:auto; max-height: 365px; overflow-y: auto;">
+          <table class="ablation" id="sourceCatTable">
+            <thead>
+              <tr>
+                <th>Source Registry Category</th>
+                <th>Cited Comments</th>
+              </tr>
+            </thead>
+            <tbody id="sourceCatBody"></tbody>
+          </table>
+          <div id="anchorListBox" style="color: rgb(90, 90, 88); margin-top: 16px;"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="proof-drawer" id="labDrawer">
+    <summary class="hn-summary" style="display:none">
+      <span class="hn-comhead">
+        <span class="hn-user">Explore</span>
+        <span class="toggle-pill" data-show="[+]" data-hide="[-]"></span>
+      </span>
+    </summary>
+    <div class="proof-body grid-12">
+      <div class="col-3">
+        <details class="graph-drawer" id="tunerDrawer">
+          <summary class="graph-summary">
+            <div class="graph-title-group">
+              <div class="sec-tag">02A / CALIBRATE</div>
+              <h2>Epistemic Tuner</h2>
+            </div>
+            <span class="mob-graph-pill"></span>
+          </summary>
+          <div class="control-panel">
+            <div class="slider-row">
+              <div class="slider-lbl"><span>1. Info Gain (IDF)</span><span id="val_ig"></span></div>
+              <input type="range" id="sl_ig" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>2. Falsifiability</span><span id="val_fa"></span></div>
+              <input type="range" id="sl_fa" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>3. Gravity &amp; Precision</span><span id="val_gp"></span></div>
+              <input type="range" id="sl_gp" min="0" max="4" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>4. Bullshit Penalty</span><span id="val_bp"></span></div>
+              <input type="range" id="sl_bp" min="0" max="5" step="0.05">
+            </div>
+            <div class="slider-row">
+              <div class="slider-lbl"><span>5. Downvote Sink</span><span id="val_dp"></span></div>
+              <input type="range" id="sl_dp" min="0" max="5" step="0.05">
+            </div>
+            <button class="tab-btn" id="resetWeightsBtn" style="width:100%;margin-top:6px">Reset Calibrated Weights</button>
+            <p>
+              Drag any weight to watch the 166-point phase plane and comment ranking re-solve instantaneously.<br>
+              &bull; <strong>c5A Rescue:</strong> Sourced <code>c5A</code> rebuttals survive partisan downvotes.<br>
+              &bull; <strong>Context Gate:</strong> Meme links &amp; bare drops get zero citation boost.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-9">
+        <div class="dual-oled">
+          <details class="graph-drawer" id="phaseDrawer" open>
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02B / EPISTEMIC PHASE PLANE</div>
+                <h2>Crowd Chatter vs. Grounded Signal</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: Bullshit // X: Epistemic</span>
+                <span class="sig">TAP POINT (N = 166)</span>
+              </div>
+              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold (5)</span>
+                <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded (20)</span>
+                <span><i class="dot" style="background:rgb(148,163,184)"></i>Chatter (69)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Meme (3)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>BS (69)</span>
+              </div>
+              <div class="probe-box"><div id="phaseProbe" class="probe-clamp">Tap or hover any point to inspect its coordinates and filter the comment below.</div></div>
+            </div>
+          </details>
+
+          <details class="graph-drawer" id="gravityDrawer">
+            <summary class="graph-summary">
+              <div class="graph-title-group">
+                <div class="sec-tag">02C / NEWS.ARC GRAVITY &amp; TREE-LOCK</div>
+                <h2>Why Live HN Buried Primary Evidence</h2>
+              </div>
+              <span class="mob-graph-pill"></span>
+            </summary>
+            <div class="oled-bay">
+              <div class="oled-head">
+                <span>Y: HN POS (1..166) // X: Age (Hours)</span>
+                <span class="sig">(T + 2)^1.8</span>
+              </div>
+              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <div class="legend-row">
+                <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; 50)</span>
+                <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>
+                <span><i class="dot" style="background:rgb(255,68,0)"></i>Downvoted / Mod-Rebuked</span>
+              </div>
+              <div class="probe-box"><div id="gravProbe" class="probe-clamp">Top slot (cowlevel, 16.2h); largest subtree (@cowlevel) occupies 66 slots (HN POS 1..66).</div></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="band grid-12" id="explorerSection" style="padding-top:16px">
+    <div class="col-12">
+      <div class="filter-bar">
+        <select id="facetSelect" class="sel-in" aria-label="Topic facet">
+          <option value="all">All Facets (166)</option>
+          <option value="safe_unsafe">Safe &amp; Unsafe (Java) (32)</option>
+          <option value="incorrect_german">Incorrect &amp; German (Edit) (29)</option>
+          <option value="single_byte">Single &amp; Byte (Overflow) (28)</option>
+          <option value="java_runtime">Java &amp; Runtime (Code) (27)</option>
+          <option value="publish_gitlab">Publish &amp; Gitlab (Patch) (24)</option>
+          <option value="general_commentary">General Commentary (26)</option>
+        </select>
+        <input type="search" id="searchInput" class="search-in" placeholder="Search text, @author, ruby, rails, patched, byte, fixed...">
+      </div>
+      <div id="resultMeta" style="color:rgb(90,90,88);margin-bottom:10px;padding: 0 8px;"></div>
+      <div id="cardContainer" class="card-list"></div>
+    </div>
+  </section>
+
+  <footer class="sheet-foot">
+    <span>SILICON PIRATE &times; CARBON PIRATE // ZERO-HASH DEFENSIVE ARTIFACT (RGB ONLY)</span>
+    <span>SOURCE: HN 50556287 + VERIALABS.COM + ALGOLIA + AUTHOR CACHE</span>
+  </footer>
+</div>
+
+<script id="observatoryData" type="application/json">{"story_id": 50556287, "story_title": "Ruby2ßhell: Pre-authentication RCE on stock Rails", "story_url": "https://verialabs.com/ruby2shell/", "is_benchmark": false, "manifest": {"version": "2.1.0", "story_id": 50556287, "story_title": "Ruby2ßhell: Pre-authentication RCE on stock Rails", "story_url": "https://verialabs.com/ruby2shell/", "points": 385, "story_author": "jdns", "article_source": "fetched_url", "t1_ref_utc": "2026-11-20T02:05:42+00:00", "t2_ref_utc": "2026-11-20T02:05:42+00:00", "delta_minutes": 0.0, "story_anchors": ["ruby", "rails", "patched", "byte", "fixed", "code", "vulnerable", "buffer", "earlier", "version", "input", "release", "gitlab", "overflow", "end", "fix", "vulnerability", "hell", "pre-authentication", "rce", "ruby2", "stock", "list", "character", "encodings"], "facet_labels": {"safe_unsafe": "Safe & Unsafe (Java)", "publish_gitlab": "Publish & Gitlab (Patch)", "single_byte": "Single & Byte (Overflow)", "java_runtime": "Java & Runtime (Code)", "incorrect_german": "Incorrect & German (Edit)", "general_commentary": "General Commentary"}, "facet_clusters": [{"slug": "safe_unsafe", "label": "Safe & Unsafe (Java)", "count": 32, "top_terms": ["safe", "unsafe", "java", "rust"]}, {"slug": "publish_gitlab", "label": "Publish & Gitlab (Patch)", "count": 24, "top_terms": ["publish", "gitlab", "patch", "poc"]}, {"slug": "single_byte", "label": "Single & Byte (Overflow)", "count": 28, "top_terms": ["single", "byte", "overflow", "encoding"]}, {"slug": "java_runtime", "label": "Java & Runtime (Code)", "count": 27, "top_terms": ["java", "runtime", "code", "php"]}, {"slug": "incorrect_german", "label": "Incorrect & German (Edit)", "count": 29, "top_terms": ["incorrect", "german", "edit", "binding"]}], "counts": {"total_comments": 166, "live_t2_comments": 166, "algolia_dead_comments": 0, "downvoted_faded_t2": 0, "unique_authors_profiled": 110, "mod_rebuked_comments": 0, "near_duplicates_gt_065": 0, "pages_fetched": 1}, "sha256": {"corpus.json": "179b0556eb0256b6e95d944e56a7d218568afea8088aa7ad320e4bcdce3626e7"}}, "judge": null, "weights": {"info_gain": 2.35, "falsifiability": 2.85, "gravity_progeny": 1.45, "bullshit_penalty": 2.65, "downvote_penalty": 3.1, "mmr_sim_lambda": 2.3, "mmr_root_lambda": 0.42, "mmr_facet_lambda": 0.22}, "tiers": {"epistemic_gold": 5, "grounded_analysis": 20, "crowd_chatter": 69, "bullshit_or_flamewar": 69, "meme_or_snark": 3}, "facets": {"safe_unsafe": 32, "incorrect_german": 29, "publish_gitlab": 24, "single_byte": 28, "java_runtime": 27, "general_commentary": 26}, "facet_options": [{"slug": "safe_unsafe", "label": "Safe & Unsafe (Java)", "count": 32}, {"slug": "incorrect_german", "label": "Incorrect & German (Edit)", "count": 29}, {"slug": "single_byte", "label": "Single & Byte (Overflow)", "count": 28}, {"slug": "java_runtime", "label": "Java & Runtime (Code)", "count": 27}, {"slug": "publish_gitlab", "label": "Publish & Gitlab (Patch)", "count": 24}, {"slug": "general_commentary", "label": "General Commentary", "count": 26}], "facet_diagnostics": [{"slug": "safe_unsafe", "label": "Safe & Unsafe (Java)", "count": 32, "useful": 5, "useful_pct": 15.6, "terms": "safe, unsafe, java, rust"}, {"slug": "incorrect_german", "label": "Incorrect & German (Edit)", "count": 29, "useful": 7, "useful_pct": 24.1, "terms": "incorrect, german, edit, binding"}, {"slug": "single_byte", "label": "Single & Byte (Overflow)", "count": 28, "useful": 6, "useful_pct": 21.4, "terms": "single, byte, overflow, encoding"}, {"slug": "java_runtime", "label": "Java & Runtime (Code)", "count": 27, "useful": 3, "useful_pct": 11.1, "terms": "java, runtime, code, php"}, {"slug": "publish_gitlab", "label": "Publish & Gitlab (Patch)", "count": 24, "useful": 4, "useful_pct": 16.7, "terms": "publish, gitlab, patch, poc"}, {"slug": "general_commentary", "label": "General Commentary", "count": 26, "useful": 0, "useful_pct": 0.0, "terms": "general, commentary"}], "source_categories": [{"category": "general_web", "count": 10}, {"category": "gov_legal", "count": 1}, {"category": "primary_technical_doc", "count": 1}, {"category": "code_repository", "count": 1}, {"category": "low_cred_or_joke", "count": 1}], "story_anchors": ["ruby", "rails", "patched", "byte", "fixed", "code", "vulnerable", "buffer", "earlier", "version", "input", "release", "gitlab", "overflow", "end", "fix", "vulnerability", "hell"], "largest_root": {"root_id": 50558077, "author": "cowlevel", "slots": 66, "start_dom": 1, "end_dom": 66, "share_pct": 39.8, "top_dom1_age": 16.2, "top_dom1_author": "cowlevel"}, "buried_cutoff": 50, "rescue_top_k": 33, "ablations": [], "tournament": [], "comments": [{"id": 50562512, "au": "nsagent", "dom": 10, "sr": 1, "sc": 14.88, "ep": 14.88, "bs": 0.0, "d": 6, "age": 9.32, "grav": 78.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 157, "qw": 31, "k": 1679, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "epistemic_gold", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": ["https://www.nsa.gov/Press-Room/Press-Releases-Statements/Press-Release-View/article/3608324/us-and-international-partners-issue-recommendations-to-secure-software-products/", "https://www.microsoft.com/en-us/security/blog/2026/11/09/forge-lab-uses-agentic-tools-to-identify-memory-safety-issues-in-rust/"], "ig": 1.634, "fa": 3.33, "gp": 1.07, "bl": 0.0, "ds": 0.0, "txt": "This sub-thread in the conversation is about Java, so comparisons to Ruby aren't what's relevant. Here's part of the relevant GP comment.\n\n> It's important to note that Java, like Rust, is generally seen as a memory safe language. But it has bits of assembly, just like Rust has unsafe blocks, to handle some operations.\n\nAnd according to sources like CISA and the NSA [1], Java is considered memory safe. Furthermore, Rust has been found to have some memory safety issues as well [2]. I think the point to get across is that yes, Rust can help eliminate a very large set of memory safety bugs, but it's prone to issues that other generally considered memory safe languages also have: at some point to do useful work there are going to be unsafe operations. The surface area might be much smaller, so you're likely better off using a memory safe language if you can help it, but it's not a panacea for having layers of security, especially since it means any issue found is likely to affect a large swath of code written in the language because it's in a load bearing area of the language ecosystem.\n\n[1]: https://www.nsa.gov/Press-Room/Press-Releases-Statements/Pre...\n\n[2]: https://www.microsoft.com/en-us/security/blog/2026/11/09/for..."}, {"id": 50558233, "au": "shevy-java", "dom": 101, "sr": 2, "sc": 13.96, "ep": 13.96, "bs": 0.0, "d": 3, "age": 15.82, "grav": 178.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 3, "lu": 0, "w": 209, "qw": 13, "k": 2084, "kpp": 0.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": ["https://www.rechtschreibrat.com/DOX/RfdR_Amtliches-Regelwerk_2024.pdf"], "ig": 1.518, "fa": 2.99, "gp": 1.292, "bl": 0.0, "ds": 0.0, "txt": "> It even seems the \"more correct\" uppercase form of ß is now ẞ, not SS.\n\nBut that is wrong. In german I only know of ß aka downcased version.\n\nẞ seems another character. I have no idea what it is, other than looking\nclose to ẞ, but it most assuredly is not existing in the german language.\nThere is simply no uppercased variant. 'ss' is \"Doppel-s' - that is not\nß. In german we have \"das\" (which is the), but it can be \"das\" or \"dass\"\ndepending on the sentence, in particular after a ',' character. I often\nmisspell it, since I prefer \"das\", when in reality sometimes one has to\nuse \"dass\". But 'ß' is very different to that - to claim that 'ß' is\nequivalent to 'ss' is simply incorrect. I have no idea who that \n\"Council for German Orthography\" is, but clearly they don't know anything\nabout German. Who put that Council in charge of anything? Are these drunks?\nThe claim that the capital has been preferred, is also factually wrong. Who\nis writing all that?\n\nEdit: Oh I see, you have that from Wikipedia.\n\nThe .pdf can be found here:\n\nhttps://www.rechtschreibrat.com/DOX/RfdR_Amtliches-Regelwerk...\n\nSo from what I can see, this is only the:\n\n\"Leibniz-Institut für Deutsche Sprache\"\n\nThat is not a unified authority for anything. It\nis totally unclear to me why the wikipedia article\nclaims that this is legally binding for anyone.\nThat's just factually incorrect. Is Wikipedia no\nlonger proofread"}, {"id": 50559033, "au": "mr_mitm", "dom": 102, "sr": 3, "sc": 7.73, "ep": 7.88, "bs": 0.0, "d": 4, "age": 14.01, "grav": 147.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 82, "qw": 0, "k": 4592, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": ["https://www.duden.de/sprachwissen/rechtschreibregeln/doppel-s-und-scharfes-s\u0023D160"], "ig": 1.345, "fa": 0.62, "gp": 2.034, "bl": 0.0, "ds": 0.0, "txt": "Who are you to decide what does and doesn't exist in the German language? You are no more authoritative than the Leibniz-Institut either.\n\nEdit: The Leibniz-Institut is just the publisher. The author, the Rat für deutsche Rechtschreibung, is legitimized by the German (and six other countries') government.\n\nThe Duden is also seen by many as authoritative and also knows and allows the capital ß: https://www.duden.de/sprachwissen/rechtschreibregeln/doppel-...\n\nEdit 2: It's also not illegal to use whatever made up rules you want. Nothing about this is legally binding anywhere."}, {"id": 50565074, "au": "jerf", "dom": 165, "sr": 4, "sc": 7.51, "ep": 7.51, "bs": 0.0, "d": 5, "age": 6.54, "grav": 47.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 172, "qw": 0, "k": 94927, "kpp": 5.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "publish_gitlab", "flbl": "Publish & Gitlab (Patch)", "urls": ["https://projectzero.google/2021/12/a-deep-dive-into-nso-zero-click.html", "https://projectzero.google/2022/03/forcedentry-sandbox-escape.html"], "ig": 1.626, "fa": 0.62, "gp": 1.328, "bl": 0.0, "ds": 0.0, "txt": "No, every crash does not prove an RCE can exist. However certain types of crashes are smelly enough that it's safest just to assume that someone, somewhere, on some system can probably lift it into an exploit.\n\nIf you are not calibrated with how small a hole it can take to lift a system up into full code execution, I recommend budgeting a couple of hours to spend with https://projectzero.google/2021/12/a-deep-dive-into-nso-zero... and https://projectzero.google/2022/03/forcedentry-sandbox-escap... . I think way too many developers still don't grok what hackers can do, even before AIs. They too often think just in limited terms about the hole itself without understanding where the holes can lead.\n\nI've red teamed some systems locally, and I've found rather a wide variety of issues that I couldn't actually work into a working exploit, either at all or in any reasonable manner that didn't require me to very carefully configure a system in an unrealistic manner just so it could be exploited, but even at a much smaller scale you really just want to fix them rather than worry about them. Defense in depth if nothing else."}, {"id": 50558800, "au": "cyphar", "dom": 72, "sr": 5, "sc": 7.42, "ep": 7.42, "bs": 0.0, "d": 1, "age": 14.57, "grav": 156.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 43, "qw": 0, "k": 12719, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "epistemic_gold", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": ["https://projectzero.google/2014/08/the-poisoned-nul-byte-2014-edition.html"], "ig": 1.471, "fa": 0.96, "gp": 0.848, "bl": 0.0, "ds": 0.0, "txt": "There was an even more restrictive single NUL byte heap overflow in glibc in 2014 that the ProjectZero folks managed to turn into ACE and thus an LPE in setuid binaries[1]. The final section that talks about bickering over exploitability seems particularly pertinent today.\n\n[1]: https://projectzero.google/2014/08/the-poisoned-nul-byte-201..."}, {"id": 50558132, "au": "weinzierl", "dom": 108, "sr": 6, "sc": 7.13, "ep": 7.13, "bs": 0.0, "d": 2, "age": 16.06, "grav": 182.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 65, "qw": 0, "k": 28907, "kpp": 5.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": [], "ig": 1.64, "fa": 0.62, "gp": 1.041, "bl": 0.0, "ds": 0.0, "txt": "Can you elaborate on what makes ß special enough to enable the vulnerability.\n\nA quick search showed that there are other cases in legacy encodings that expand to multiple bytes.\n\nFor example 0xEF in ISO 6937 expands to CA BC 4E in UTF-8 after case transformation. Similar to ß this is a case with a single byte legacy encoding with a single lowercase unicode codepoint which has no precomposed upper case equivalent."}, {"id": 50559337, "au": "edelbitter", "dom": 112, "sr": 7, "sc": 6.14, "ep": 6.29, "bs": 0.0, "d": 1, "age": 13.43, "grav": 137.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 81, "qw": 0, "k": 470, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": [], "ig": 1.599, "fa": 0.62, "gp": 0.527, "bl": 0.0, "ds": 0.0, "txt": "I believe these deserve a mention in your unit tests:\n\n1. ÿ (LATIN SMALL LETTER Y WITH DIAERESIS) is in ISO-8859-1, but Ÿ (LATIN CAPITAL LETTER Y WITH DIAERESIS) is not - however, theres this thing called Windows-1252 which is often treated as equivalent, where it is.. but not in the same place as in ISO-8859-15.\n\n2. The Unicode (and correct) uppercase of µ (MICRO SIGN) is Μ (GREEK CAPITAL LETTER MU) which should look like M (LATIN CAPITAL LETTER M) .. only the latter can be expressed in Windows-1252.\n\n3. The ISO-8859-12 encoding is a lie."}, {"id": 50558241, "au": "deprave", "dom": 77, "sr": 8, "sc": 6.03, "ep": 6.18, "bs": 0.0, "d": 1, "age": 15.8, "grav": 178.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 29, "qw": 0, "k": 490, "kpp": 4.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": ["https://phrack.org/issues/55/frame-pointer-overwriting\u0023article"], "ig": 0.99, "fa": 0.96, "gp": 0.772, "bl": 0.0, "ds": 0.0, "txt": "There was an article on this topic in Phrack 55 back in 1999: https://phrack.org/issues/55/frame-pointer-overwriting\u0023artic...\n\nExploitation conditions are likely more challenging today but that’s the earliest reference I know for exploiting a single byte overflow."}, {"id": 50562814, "au": "jascha_eng", "dom": 51, "sr": 9, "sc": 5.99, "ep": 6.14, "bs": 0.0, "d": 3, "age": 8.97, "grav": 74.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 166, "qw": 0, "k": 1076, "kpp": 4.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "publish_gitlab", "flbl": "Publish & Gitlab (Patch)", "urls": [], "ig": 1.612, "fa": 0.34, "gp": 0.954, "bl": 0.0, "ds": 0.0, "txt": "No this is correct I think. And it's not easy to control what lives next to that buffer. But AI probably can figure out a chain of requests that this then changes the length block of another object or flips a pointer or something, so it's tedious but can be used to escalate to basically arbitrary memory corruption. That's kinda the issue with AI, this would have been extremely tedious to exploit before LLMs but now anyone with an unlocked good enough model can do it.\n\nThat's why hiding the POC still helps a bit, because any model probably will require quite a bit of wall clock time to actually build one itself. Then making that work on e.g. a running gitlab instance with other traffic... much harder yet again I'd assume since that should alter memory state without you having control over it.\n\nStill if someone builds an exploit with even 1% success rate they just need to run it on enough instances in parallel and will eventually break through some of them probably."}, {"id": 50557382, "au": "circularfoyers", "dom": 67, "sr": 10, "sc": 5.81, "ep": 5.81, "bs": 0.0, "d": 0, "age": 17.78, "grav": 215.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 31, "qw": 0, "k": 810, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": ["https://news.ycombinator.com/item?id=50554038"], "ig": 0.931, "fa": 0.62, "gp": 1.278, "bl": 0.0, "ds": 0.0, "txt": "Thought this was another vulnerability for a second, but for anyone else who thought the same, this is already covered in the Ruby advisory being discussed here https://news.ycombinator.com/item?id=50554038 (which covers six other vulnerabilities)."}, {"id": 50559290, "au": "ekidd", "dom": 4, "sr": 11, "sc": 5.54, "ep": 5.84, "bs": 0.0, "d": 3, "age": 13.52, "grav": 139.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 143, "qw": 0, "k": 11602, "kpp": 9.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": 1.354, "fa": 0.34, "gp": 1.162, "bl": 0.0, "ds": 0.0, "txt": "Tons of production Rust systems use very little unsafe. I've been writing production Rust since 2015, and in that time, I wrote maybe 30 lines of unsafe production code. (Most of it in Tokio primitives.)\n\nNow, in web-facing systems, the biggest concern is the low-level crypto libraries, which need to be written in assembly to avoid timing attacks. These (and related libraries) have seen multiple security advisories in the past year, some related to unsafe (I think?) and some related to logic errors. But overall, those advisories have mostly been lower priority, or affected mostly niche use cases.\n\nIf you only have a small amount of unsafe code, then it's possible to audit it more aggressively. And there's only a limited amount of space for bugs. So what I would expect for Rust is a trickle of security bugs, many of them niche or low severity, that slows down with time."}, {"id": 50568144, "au": "edelbitter", "dom": 69, "sr": 12, "sc": 5.3, "ep": 5.3, "bs": 0.0, "d": 1, "age": 2.47, "grav": 14.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 102, "qw": 0, "k": 470, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "publish_gitlab", "flbl": "Publish & Gitlab (Patch)", "urls": [], "ig": 1.996, "fa": 0.0, "gp": 0.419, "bl": 0.0, "ds": 0.0, "txt": "Hopefully, one step towards that is adapting our release atom feed & patch rollouts procedure. So we can apply upstream's \"disable feature XYZ unless marked critical locally then P3, otherwise P2\" recommendation before having a human check whether the full patch compiles from source / does not contain new supply chain risks / does not come with relevant regressions / ..\n\nWhen we arrive at that stage, then we can work down the list of disabled-until-patched components for everything that has already been prepared for emergency shutdown. Not on-call, but at the next convenient schedule. Then its just a number of open items for the day, not a disruption."}, {"id": 50558409, "au": "aja12", "dom": 2, "sr": 13, "sc": 5.16, "ep": 5.61, "bs": 0.0, "d": 1, "age": 15.4, "grav": 171.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 92, "qw": 0, "k": 34, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 1.531, "fa": 0.0, "gp": 1.385, "bl": 0.0, "ds": 0.0, "txt": "It's important to note that Java, like Rust, is generally seen as a memory safe language. But it has bits of assembly, just like Rust has unsafe blocks, to handle some operations. Hence the Java2shell recent vulnerability.\nGranted Rust may have less need for them and more facilities to audit them, but it is not by itself a panacea that will fix all memory issues.\nIn essence, there is no software stack that is fully memory safe, it is more a matter of restricting the memory unsafe parts in fewer, more scrutinized, better contained sections."}, {"id": 50559950, "au": "tialaramex", "dom": 21, "sr": 14, "sc": 5.16, "ep": 5.6, "bs": 0.0, "d": 5, "age": 12.45, "grav": 122.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 178, "qw": 0, "k": 33106, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "publish_gitlab", "flbl": "Publish & Gitlab (Patch)", "urls": [], "ig": 1.983, "fa": 0.0, "gp": 0.651, "bl": 0.0, "ds": 0.0, "txt": "We know LLVM has miscompilation bugs. Sometimes it is practical for Rust to fix those bugs and so it carries patches for LLVM, but in some cases LLVM IR semantics are just incoherent nonsense. An example of the former (Rust carries patches): LLVM got confused about discriminants when Rust uses niches, when the niche bit pattern used was usually right next to the legitimate values for a type the bug in LLVM caused little notice, it could corrupt data but probably not. However Rust changed which bit patterns to prefer here, so e.g. None for Option<char> went from 0x0011_0000 to the bit pattern 0xFFFF_FFFF and now that same LLVM bug caused crashes as values which had previously been very slightly wrong were instead hugely wrong.\n\nFor an example of the latter (LLVM is just nonsense): LLVM still today has a bug found years ago where pointer provenance (a legitimate but hard to think about idea for optimising compilers) accidentally leaks into integers, and so LLVM can end up with two integers a, b which it believes are not equal and yet a - b == 0. Boom."}, {"id": 50558077, "au": "cowlevel", "dom": 1, "sr": 15, "sc": 4.97, "ep": 5.63, "bs": 0.0, "d": 0, "age": 16.18, "grav": 185.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 67, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": [], "ig": 1.4, "fa": 0.0, "gp": 1.617, "bl": 0.0, "ds": 0.0, "txt": "So the recent RCE wave seems to be people finding more single byte overflows and such, but reporting them as RCEs because AI can do the tedious grunt work of finding the rest of the vulnerability chain.\n\nIf any single byte overflow can be converted into an RCE with minimal human effort then we have no choice but to prove the whole software stack is memory safe."}, {"id": 50558643, "au": "cubefox", "dom": 105, "sr": 16, "sc": 4.97, "ep": 5.26, "bs": 0.0, "d": 4, "age": 14.84, "grav": 161.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 47, "qw": 15, "k": 8109, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "grounded_analysis", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": [], "ig": 1.057, "fa": 0.64, "gp": 0.657, "bl": 0.0, "ds": 0.0, "txt": "Wikipedia says ẞ is \"preferred\", which is plausible when an organization with an impressive name declares it preferable. Nobody says it's legally binding.\n\n> I often misspell it, since I prefer \"das\", when in reality sometimes one has to use \"dass\".\n\nIt's confusing because both can mean \"that\".\n\n\"That is true.\" = \"Das ist wahr.\"\n\n\"He said that it is true.\" = \"Er sagte, dass es wahr ist.\""}, {"id": 50562403, "au": "tialaramex", "dom": 44, "sr": 17, "sc": 4.91, "ep": 5.35, "bs": 0.0, "d": 4, "age": 9.44, "grav": 80.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 129, "qw": 16, "k": 33106, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 1.378, "fa": 0.42, "gp": 0.634, "bl": 0.0, "ds": 0.0, "txt": "> PPS The Java memory model is just superior to Rust's in every way...deal with it.\n\nI don't see it. In Safe Rust we can't write a Data Race so we get SC/DRF because we know we don't have a data race. If we write unsafe Rust we do need to be careful not to break the rules and introduce a data race.\n\nIn Java we do not get such a promise at all, just the SC/DRF proof, any of our code might race. However, if we do lose Sequential Consistency we still have defined behaviour, we probably no longer understand how our program behaves (if it's not trivial) but we can say e.g. \"I didn't write any code to delete the database\" and so conclude it doesn't delete the database.\n\nThis doesn't seem like a clean win. I can see valuing either proposition more, but \"in every way\" I don't get that."}, {"id": 50565997, "au": "djha-skin", "dom": 68, "sr": 18, "sc": 4.72, "ep": 5.09, "bs": 0.0, "d": 0, "age": 5.48, "grav": 37.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 83, "qw": 0, "k": 5313, "kpp": 4.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": [], "ig": 1.566, "fa": 0.0, "gp": 0.972, "bl": 0.0, "ds": 0.0, "txt": "I remember being a kid in a small town. My dad got into an auto accident, and the next day the DJs talked about it on the radio. Then we moved to the Chicago area and the morning news only ever talked about how many accidents we'd see that day on our theoretical morning commute during the traffic segment.\n\nAt what point will we stop considering individual x2shell ultra-critical CVEs news in the age of AI? Like, how many of these are we finding per hour?"}, {"id": 50558454, "au": "zamadatix", "dom": 36, "sr": 19, "sc": 4.58, "ep": 5.02, "bs": 0.0, "d": 2, "age": 15.3, "grav": 169.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 117, "qw": 0, "k": 20811, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 1.474, "fa": 0.28, "gp": 0.521, "bl": 0.0, "ds": 0.0, "txt": "Yeah, \"memory safe\" goes out the window if you prefer to implement parts in assembly. This is where portable SIMD (e.g. the Java vuln was from SIMD), which is abstracted & safe but not necessarily as performant as it could be, is becoming a more reasonable trade off.\n\nOf course I'm not sure how much it counts to be \"using a memory safe language\" when you have to call put to unsafe code anyways. I.e. just because the library you'd like to use is C but the rest of your project is Rust doesn't mean you're really using a me ory safe language, it means you're sometimes using one. We have a long way to go before environments allow using memory safety fully I think."}, {"id": 50561988, "au": "insanitybit", "dom": 30, "sr": 20, "sc": 4.55, "ep": 4.99, "bs": 0.0, "d": 3, "age": 9.89, "grav": 86.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 76, "qw": 33, "k": 4756, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": 1.019, "fa": 0.7, "gp": 0.416, "bl": 0.0, "ds": 0.0, "txt": "> Because safe Rust is so constrained, Rust relies on unsafe much more than Java, and their need for intrinsics is about the same (although Java lets you turn off individual intrinsics at runtime).\n\nThis is silly. Rust also has tooling for dealing with unsafe - tools for proving unsafe code, tools for verifying unsafe code, tools for fuzzing it, etc.\n\nJava, and other languages like it, often drop into unsafe code where it's far weirder and less supported because they have to because the languages are too slow to do the work they want to do.\n\nAnd obviously you have all of the complexity of a massive, JIT'd runtime written in C++."}, {"id": 50561793, "au": "echoangle", "dom": 82, "sr": 21, "sc": 4.34, "ep": 4.78, "bs": 0.0, "d": 1, "age": 10.12, "grav": 89.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 62, "qw": 2, "k": 5303, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": [], "ig": 1.384, "fa": 0.28, "gp": 0.501, "bl": 0.0, "ds": 0.0, "txt": "> pronounced like \"S\"\n\nYes, but it's always pronounced \"sharp\" (like the hiss of a snake), so the letter is used to disambiguate some words. In some contexts (switzerland, capital writing until the capital ß was introduced), it's replaced by ss but then there could technically be two meanings, for example \"Maße\" is measurements and \"Masse\" is mass, although most of the time it's clear from the context."}, {"id": 50561888, "au": "tptacek", "dom": 73, "sr": 22, "sc": 4.32, "ep": 4.83, "bs": 0.0, "d": 1, "age": 10.02, "grav": 87.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 114, "qw": 0, "k": 426786, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 1.615, "fa": 0.0, "gp": 0.716, "bl": 0.0, "ds": 0.0, "txt": "The simplest core mechanism of these kinds of exploits is that you can groom the heap by triggering lots of similar-sized allocations, so you have a good guess as to what the heap will contain where your wild write occurs, and then you can trigger specific allocations to land juicy victim structs in the heap where you want them.\n\nIt's an evolution of the old \"nop sled\" idea from stack overflows (and viruses before that), where you don't know exactly what the stack addresses you're targeting are, but you can in your exploit trigger payload include data that will carpet bomb the stack with NOP instructions so that you have a big window to guess."}, {"id": 50568028, "au": "insanitybit", "dom": 32, "sr": 23, "sc": 4.31, "ep": 5.6, "bs": 0.85, "d": 5, "age": 2.68, "grav": 16.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 108, "qw": 80, "k": 4756, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "grounded_analysis", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": 1.489, "fa": 0.42, "gp": 0.622, "bl": 0.32, "ds": 0.0, "txt": "This is nonsense. Java doesn't \"compile like C or C++ or Rust or Zig\" any more than Python does. \"Python compiles to bytecode! you can use mypyc!\" who cares? That's obviously not the point.\n\nUnsafe is still plenty prevalent in Java, nor is the use of C++ libraries.\n\n> sometimes with more aggressive optimisations and sometimes with less aggressive ones.\n\nYes, well, that's some handwaving.\n\n> Unsafe mostly used to be used for certain memory operations before VarHandles and FFM.\n\nYes. It is still very prevelant.\n\n> No, that's also inaccurate. The \"massive runtime\" is largely a compiler (and it doesn't matter what language that's in), and memory management, where the Rust runtime is also about as massive and written in C (the various malloc/free implementations).\n\nRidiculous. \"largely a compiler\" - it contains a JIT compiler, as in it's a runtime compiler that allocates executable code at runtime and then runs it. (a) Of course it matters what language it's in (b) JITs are an incredible source of security issues and have their own set of mitigations that have to be applied.\n\n> where the Rust runtime is also about as massive and written in C (the various malloc/free implementations).\n\nA ridiculous comparison."}, {"id": 50560677, "au": "hunterpayne", "dom": 87, "sr": 24, "sc": 4.18, "ep": 4.76, "bs": 0.0, "d": 1, "age": 11.48, "grav": 108.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 83, "qw": 0, "k": 471, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": [], "ig": 1.769, "fa": 0.0, "gp": 0.42, "bl": 0.0, "ds": 0.0, "txt": "The Swiss don't use it.  Its also not on most people's keyboards.  So great to make a command require a special unicode character, letting in yet another attack vector (and requiring us to scan code for letters that don't look quite right).  Reminds me of the single char => operator in Scala which has fallen out of use thankfully.\n\nPS There was a movement about multi-lingual/multi-charset programming several decades ago.  The international programming community killed it more multiple good reasons.  Its not cute, stop doing it."}, {"id": 50562295, "au": "pron", "dom": 31, "sr": 25, "sc": 3.45, "ep": 3.89, "bs": 0.0, "d": 4, "age": 9.55, "grav": 81.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 109, "qw": 50, "k": 25584, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": 1.077, "fa": 0.42, "gp": 0.113, "bl": 0.0, "ds": 0.0, "txt": "> Java, and other languages like it, often drop into unsafe code where it's far weirder and less supported because they have to because the languages are too slow to do the work they want to do.\n\nNo, that's not been the case for a while, at least since the introduction of VarHandles and FFM (which is why Unsafe is now in the process of being removed altogether). Of course, there's nothing slow in Java code; it compiles like C or C++ or Rust or Zig, sometimes with more aggressive optimisations and sometimes with less aggressive ones. Unsafe mostly used to be used for certain memory operations before VarHandles and FFM.\n\n> And obviously you have all of the complexity of a massive, JIT'd runtime written in C++.\n\nNo, that's also inaccurate. The \"massive runtime\" is largely a compiler (and it doesn't matter what language that's in), and memory management, where the Rust runtime is also about as massive and written in C (the various malloc/free implementations)."}, {"id": 50560780, "au": "wiether", "dom": 126, "sr": 26, "sc": 3.45, "ep": 3.67, "bs": 0.0, "d": 2, "age": 11.37, "grav": 106.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 2, "lu": 0, "w": 19, "qw": 0, "k": 1950, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "publish_gitlab", "flbl": "Publish & Gitlab (Patch)", "urls": ["https://docs.gitlab.com/releases/all-releases.xml"], "ig": 0.635, "fa": 0.75, "gp": 0.028, "bl": 0.0, "ds": 0.0, "txt": "Yeah things are crazy\n\nThey released 19.6.0 but it doesn't contains the fixed ruby\n\nAnd the releases feed don't have 19.6.0 https://docs.gitlab.com/releases/all-releases.xml"}, {"id": 50557447, "au": "Panzerschrek", "dom": 91, "sr": 27, "sc": 3.13, "ep": 4.23, "bs": 0.0, "d": 0, "age": 17.63, "grav": 212.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 461, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "grounded_analysis", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": [], "ig": 0.875, "fa": 0.0, "gp": 1.499, "bl": 0.0, "ds": 0.0, "txt": "I suppose this function has been written first in assumption, that case conversion doesn't affect length, but later ß -> SS conversion has been added without proper testing."}, {"id": 50560294, "au": "tialaramex", "dom": 9, "sr": 28, "sc": 3.04, "ep": 3.93, "bs": 0.0, "d": 5, "age": 11.98, "grav": 115.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 119, "qw": 0, "k": 33106, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 1.62, "fa": 0.0, "gp": 0.082, "bl": 0.0, "ds": 0.0, "txt": "Lets compare what's inside this Ruby bug, a C function rb_str_casemap which is 40-50 lines of C fiddling with pointers and calling into macros that presumably are familiar to Ruby developers but opaque to an outside viewer. Is it fixed? I guess so but I can't see very well to be sure, it was counting stuff before and now it is being more careful, I hope it's correct this time.\n\n... against str::to_uppercase the Rust function which has a single line of unsafe code, with a two line rationale provided to explain why it's OK to do this. As a subject matter expert I agree with the rationale. LGTM.\n\nEdited: We're talking about uppercase, they're basically mirrors, but we should choose the uppercase function."}, {"id": 50568151, "au": "robotmay", "dom": 125, "sr": 29, "sc": 3.02, "ep": 3.61, "bs": 0.0, "d": 2, "age": 2.46, "grav": 14.7, "surf": 7.2, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 97, "qw": 0, "k": 3279, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "publish_gitlab", "flbl": "Publish & Gitlab (Patch)", "urls": [], "ig": 1.431, "fa": 0.0, "gp": 0.168, "bl": 0.0, "ds": 0.0, "txt": "There's no information in the OP page to say when/whether companies like GitLab were notified ahead of time, though I would assume they have been. The security workflow and build process for releases at GitLab is quite slow, unfortunately, or at least it was when I worked there (pre-LLMs). It's quite a large process with lots of backporting etc, so if they only found out about it today I'd expect the patch in the next day or two. It should be possible to manually patch the version yourself though that might be awkward depending on the scale of the deployment."}, {"id": 50557892, "au": "barbegal", "dom": 71, "sr": 30, "sc": 2.73, "ep": 3.83, "bs": 0.0, "d": 0, "age": 16.6, "grav": 192.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 3095, "kpp": 4.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": [], "ig": 0.662, "fa": 0.0, "gp": 1.567, "bl": 0.0, "ds": 0.0, "txt": "More interested to see how you can use just a single byte overflow to trigger RCE. Definitely achievable but sounds tough."}, {"id": 50566853, "au": "goodmythical", "dom": 70, "sr": 31, "sc": 2.42, "ep": 3.59, "bs": 0.0, "d": 1, "age": 4.38, "grav": 28.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 42, "qw": 0, "k": 729, "kpp": 1.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": [], "ig": 1.53, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "you're listening to Bob in the Morning! Today's forecast calls for mixed showers and a scattering of zero-days during the afternoon commuter window followed by at least one outage during rush-hour, stay tuned for Alice's evening show for a preview of tomorrow's forecast!"}, {"id": 50561774, "au": "pron", "dom": 14, "sr": 32, "sc": 2.41, "ep": 3.07, "bs": 0.0, "d": 6, "age": 10.14, "grav": 89.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 162, "qw": 6, "k": 25584, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": 0.797, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "> That's where these unsafe calls occur.\n\nNo, it's not. A relatively common case for unsafe in Rust is in data structures. The data structures in the Java runtime are all written in Java and has almost no use of unsafe (there might be a few, but not becsause of language limitation, but because of initialisation order).\n\nAs for the JVM, much of it is a compiler. It doesn't matter what language it's written in, as it generates machine code. Indeed, the vulnerability disclosed yesterday was in a compiler intrinsic, but those are just as common in Rust.\n\nOther than that, the other big piece in the JVM is memory management, and it does, indeed, use C and C++ for memory management, but Rust also uses C (the various implementations of malloc/free in whatever runtime the Rust program is using; BTW, some popular malloc/free implementations are almost as big as Java's most complicated GC).\n\nAs for native C/C++ libraries (outside the JVM itself), Java programs do use some, but generally not more than Rust programs."}, {"id": 50559293, "au": "GTP", "dom": 38, "sr": 33, "sc": 2.38, "ep": 3.48, "bs": 0.0, "d": 2, "age": 13.51, "grav": 139.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 62, "qw": 0, "k": 2699, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "publish_gitlab", "flbl": "Publish & Gitlab (Patch)", "urls": [], "ig": 1.396, "fa": 0.0, "gp": 0.136, "bl": 0.0, "ds": 0.0, "txt": "Yes, ultimately it is about reducing the attack surface so that we get less exploits and also more reliable software (overflows can cause sporadic crashes). Still very much worth doing it IMO, even tough it doesn't sove all problems on its own. Apply defence in depth and combine this with other mitigation techniques. This is the path if you want robust systems."}, {"id": 50560009, "au": "t1234s", "dom": 81, "sr": 34, "sc": 2.27, "ep": 3.44, "bs": 0.0, "d": 0, "age": 12.37, "grav": 121.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 694, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": [], "ig": 0.691, "fa": 0.0, "gp": 1.251, "bl": 0.0, "ds": 0.0, "txt": "For people who haven't been to Germany the character that looks like a script B is pronounced like \"S\". Its a bit of humor in what is an annoying problem."}, {"id": 50558313, "au": "weinzierl", "dom": 110, "sr": 35, "sc": 2.16, "ep": 3.55, "bs": 0.0, "d": 4, "age": 15.65, "grav": 175.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 60, "qw": 0, "k": 28907, "kpp": 5.1, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": [], "ig": 1.365, "fa": 0.0, "gp": 0.237, "bl": 0.0, "ds": 0.0, "txt": "Ah, good point. If ISO-8859-1 is the only supported single-byte legacy encoding then ß is most likely the only case.\n\nEDIT: Thinking about it, my example from above should work with UTF-16 input.\n\nU+0149 is a single lower case BMP codepoint, so two bytes in UTF-16. It has no precomposed uppercase, so it turns into two codepoints and 4 bytes in UTF-8 and UTF-16."}, {"id": 50557994, "au": "bloak", "dom": 117, "sr": 36, "sc": 1.99, "ep": 2.87, "bs": 0.0, "d": 2, "age": 16.35, "grav": 188.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 2627, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "publish_gitlab", "flbl": "Publish & Gitlab (Patch)", "urls": [], "ig": 0.471, "fa": 0.62, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "So you have to convert ISO-2022-JP, for example? That sounds like a disaster waiting to happen."}, {"id": 50569064, "au": "OoooooooO", "dom": 104, "sr": 37, "sc": 1.95, "ep": 3.49, "bs": 0.0, "d": 4, "age": 0.48, "grav": 5.1, "surf": 31.4, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 147, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": [], "ig": 0.663, "fa": 0.68, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The uppercase ß is official in germany since 2017 and gets more and more used in uppercase writings since 2024 (STRASSE -> STRAẞE)."}, {"id": 50564412, "au": "jerf", "dom": 6, "sr": 38, "sc": 1.86, "ep": 2.96, "bs": 0.0, "d": 5, "age": 7.25, "grav": 54.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 86, "qw": 0, "k": 94927, "kpp": 5.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 1.165, "fa": 0.0, "gp": 0.154, "bl": 0.0, "ds": 0.0, "txt": "Do you run on CPUs based on the von Neumann architecture?\n\nIf so, those are built on unsafe operations internally.\n\nSafety is a lot more complicated than \"whether it is in an unsafe block of code in Rust\". If you insist that an unsafe primitive can not be handled well enough to become \"safe\" by some definition of safe then you collapse the entire programming language hierarchy into \"everything is completely unsafe\". Which may, from a certain point of view, be true, but isn't a particularly useful classification scheme."}, {"id": 50569048, "au": "OoooooooO", "dom": 103, "sr": 39, "sc": 1.83, "ep": 2.27, "bs": 0.0, "d": 5, "age": 0.52, "grav": 5.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 147, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.556, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Duden is just a normal book from a private company since 1995. It has no meaning at all as a source for anything since then."}, {"id": 50566716, "au": "gsich", "dom": 159, "sr": 40, "sc": 1.8, "ep": 2.39, "bs": 0.0, "d": 2, "age": 4.54, "grav": 29.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 1425, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": 1.016, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Yes. Look at PHP and Nginx which was only \"exploitable\" by very specific niche conditions. Overhyped security BS by some AI toddlers."}, {"id": 50559087, "au": "olejorgenb", "dom": 121, "sr": 41, "sc": 1.62, "ep": 2.72, "bs": 0.0, "d": 0, "age": 13.92, "grav": 145.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 902, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "publish_gitlab", "flbl": "Publish & Gitlab (Patch)", "urls": [], "ig": 0.66, "fa": 0.0, "gp": 0.809, "bl": 0.0, "ds": 0.0, "txt": "I assume Gitlab.com run a fixed version, but it would be good if they could confirm it now.."}, {"id": 50568101, "au": "aftbit", "dom": 48, "sr": 42, "sc": 1.6, "ep": 2.92, "bs": 0.0, "d": 1, "age": 2.54, "grav": 15.2, "surf": 12.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 56, "qw": 0, "k": 6823, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 0.9, "fa": 0.28, "gp": 0.008, "bl": 0.0, "ds": 0.0, "txt": "That may be necessary but it won't be sufficient. Memory safety breaks down at the edges. You can't trust the hardware (see Spectre or Rowhammer). Besides, even if the whole world were memory safe, with no buffer over/underflows or use after free or anything like that, you'd still get logic bugs like the recent sshhole."}, {"id": 50563329, "au": "BigTTYGothGF", "dom": 150, "sr": 43, "sc": 1.49, "ep": 3.0, "bs": 0.85, "d": 7, "age": 8.37, "grav": 67.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 31, "qw": 8, "k": 1361, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": 0.766, "fa": 0.42, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "> They exist, for longer than a decade\n\nAnd many of them target a version of python that's at least that old.\n\n> with users\n\nI'm confident they have users, but I don't believe that they exist in quantities beyond, as I said earlier, \"a rounding error\"."}, {"id": 50559493, "au": "K0nserv", "dom": 94, "sr": 44, "sc": 1.37, "ep": 2.91, "bs": 0.0, "d": 1, "age": 13.18, "grav": 133.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 55, "qw": 0, "k": 5329, "kpp": 6.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": [], "ig": 1.238, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "It looks like the original author did actually try to account for this by allocating 20 more bytes than the input length.\n\nFrom the blog post:\n\n    The output buffer is allocated as the input length plus 20 bytes. Each ß adds one byte to the output, so an input with 21 of them overflows the buffer by one byte."}, {"id": 50558224, "au": "debugnik", "dom": 109, "sr": 45, "sc": 1.07, "ep": 2.61, "bs": 0.0, "d": 3, "age": 15.84, "grav": 178.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 17, "k": 2517, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": [], "ig": 0.602, "fa": 0.42, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "From the Ruby docs:\n\n> Non-ASCII case mapping and folding are supported for UTF-8, UTF-16BE/LE, UTF-32BE/LE, and ISO-8859-1~16 Strings/Symbols.\n\nß might actually be the only character that expands to multiple bytes on the original encoding from that list of ISO encodings."}, {"id": 50565901, "au": "kyledrake", "dom": 74, "sr": 46, "sc": 1.06, "ep": 2.6, "bs": 0.0, "d": 2, "age": 5.63, "grav": 38.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 77, "qw": 0, "k": 8909, "kpp": 9.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 1.107, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I was under the impression that everyone adopted the OpenBSD randomized memory heap by default. Does this imply that it's not enough to prevent this sort of attack from working? If this is even slightly repeatable then the mechanism doesn't seem to be sufficiently random. I'm not an expert on low level memory allocation but at a high level it seems like we need to do a better job of randomizing the heap if this sort of thing is still possible."}, {"id": 50568654, "au": "pdntspa", "dom": 114, "sr": 47, "sc": 1.0, "ep": 2.1, "bs": 0.0, "d": 0, "age": 1.44, "grav": 9.2, "surf": 23.3, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 3550, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": [], "ig": 0.848, "fa": 0.0, "gp": 0.076, "bl": 0.0, "ds": 0.0, "txt": "This seems so basic that it strikes me odd that we are just now finding it. Does nobody in Germany use Ruby? That character is reasonably common in German."}, {"id": 50566098, "au": "afdbcreid", "dom": 7, "sr": 48, "sc": 0.94, "ep": 2.26, "bs": 0.0, "d": 5, "age": 5.35, "grav": 36.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 37, "qw": 0, "k": 1205, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": 0.925, "fa": 0.0, "gp": 0.063, "bl": 0.0, "ds": 0.0, "txt": "Arrays in Java (a loose equivalent of `Vec`) is a runtime primitive and implemented in a memory-unsafe language. References (loose equivalent of `Box` and `Arc`) as well. Java's `synchronized` (a loose equivalent to `Mutex`) as well. Those are not good counterexamples."}, {"id": 50558743, "au": "dcminter", "dom": 41, "sr": 49, "sc": 0.89, "ep": 2.43, "bs": 0.0, "d": 3, "age": 14.67, "grav": 158.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 66, "qw": 0, "k": 9947, "kpp": 4.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 0.953, "fa": 0.0, "gp": 0.133, "bl": 0.0, "ds": 0.0, "txt": "This ... isn't true? A lot of people perceived the Java plugin as being insecure in the browser, and indeed it was.\n\nThe perception of Java as being insecure on the server was only a thing amongst those who hadn't used it much since the Java plugin era.\n\nThat's why the Log4j vulnerability was a huge deal.\n\nI like Rust, but this kind of anti-Java-think is super dated and boring."}, {"id": 50557417, "au": "stuxf", "dom": 129, "sr": 50, "sc": 0.89, "ep": 1.99, "bs": 0.0, "d": 1, "age": 17.71, "grav": 214.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 0, "k": 83, "kpp": 6.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": [], "ig": 0.846, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "we were thinking of naming it ruby off rails haha, but this title ties into how this vulnerability works which was super cool"}, {"id": 50565458, "au": "darkamaul", "dom": 76, "sr": 51, "sc": 0.86, "ep": 2.4, "bs": 0.0, "d": 2, "age": 6.11, "grav": 43.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 41, "qw": 0, "k": 949, "kpp": 7.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": [], "ig": 1.023, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "To be able to effectively turn a single byte overwrite into ACE is still challenging because you will corrupt outside of your buffer, but this corruption must be meaningful.\n\nI would be curious to see how they were able to exploit it here."}, {"id": 50566203, "au": "afdbcreid", "dom": 15, "sr": 52, "sc": 0.85, "ep": 2.39, "bs": 0.0, "d": 7, "age": 5.21, "grav": 35.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 75, "qw": 0, "k": 1205, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 1.016, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Not accurate. Most datastructures that use unsafe in Rust are primitives; `Box`, `Vec`, `Rc`/`Arc`, `HashMap` and `BTreeMap`. Of those, only the equivalent to `HashMap` and `BTreeMap` are written in Java, and they can be written in safe Rust as well if you're willing to give up some of the performance (e.g. always initializing - thing that happens in Java as well). More complex data structures (e.g. graphs) can and often are implemented without unsafe at all."}, {"id": 50559465, "au": "jaapz", "dom": 124, "sr": 53, "sc": 0.82, "ep": 2.22, "bs": 0.0, "d": 1, "age": 13.22, "grav": 134.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 992, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": [], "ig": 0.943, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Interesting that it takes so long for them to release a patched version\n\nEDIT: 19.6.0 is now out  \nEDIT2: that version still comes with an unpatched ruby... incredible"}, {"id": 50559103, "au": "_3u10", "dom": 66, "sr": 54, "sc": 0.76, "ep": 2.3, "bs": 0.0, "d": 1, "age": 13.88, "grav": 145.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 38, "qw": 0, "k": 12680, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": [], "ig": 0.979, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "I don’t think it’s a single byte at least not in this case, you’d put your shell code into a string and then use enough double S to push it where it needs to go. I’m assuming each double S pushes one more byte."}, {"id": 50558677, "au": "enjoytheview", "dom": 80, "sr": 55, "sc": 0.75, "ep": 2.29, "bs": 0.0, "d": 1, "age": 14.79, "grav": 160.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 68, "qw": 0, "k": 116, "kpp": 5.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": [], "ig": 0.975, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The next byte in the heap might be the size of an allocation, so if you overwrite it and then free that other allocation, the heap code will think that there is a very large free area there instead of a small one, once you allocate that, you now have a very large heap overflow and can do more fun things. That is just one idea, there are many other ways."}, {"id": 50559707, "au": "F30", "dom": 79, "sr": 56, "sc": 0.75, "ep": 2.19, "bs": 0.0, "d": 3, "age": 12.81, "grav": 127.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 307, "kpp": 5.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": [], "ig": 0.519, "fa": 0.34, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Exactly, these advanced heap exploitation techniques are a relatively new development (last decade or so) and were not even remotely known in 1999. Most of the developments were driven by browser exploitation."}, {"id": 50557745, "au": "johnp_", "dom": 92, "sr": 57, "sc": 0.75, "ep": 2.12, "bs": 0.0, "d": 1, "age": 16.93, "grav": 199.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 218, "kpp": 2.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": [], "ig": 0.781, "fa": 0.0, "gp": 0.197, "bl": 0.0, "ds": 0.0, "txt": "There was never any guarantee that case conversion  is byte length equivalent. Except for pure ASCII, that's just been an incorrect assumption from the start."}, {"id": 50560487, "au": "hunterpayne", "dom": 43, "sr": 58, "sc": 0.75, "ep": 2.07, "bs": 0.0, "d": 3, "age": 11.73, "grav": 111.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 195, "qw": 0, "k": 471, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": 0.883, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Complete nonsense.  Many of the CVEs for Rust are things that just can't happen in the JVM.  And many of the Java CVEs require uses of the JDK that few people ever use.  You can dynamically load classes in the JVM (or you can turn that off).  Its a nice feature that isn't used all that often anymore but when you need it, its very powerful.  Lots of security folks made a living reporting CVEs around that. But its also why people are salty about CVEs and Java because they just reported the same security \"hole\" over and over again.  Yes the JVM can load classes dynamically.  If you don't need that, turn it off (or sign your jars).  But if you do need it, then the CVE is largely irrelevant.  That security researchers created this false impression of Java is a big part of why bug bounty programs aren't very popular anymore.  Crying wolf gets you put on the ignore list.\n\nPS Its the height of irony that the layer protecting Java webservices IS less secure than the Java webservice itself.\n\nPPS The Java memory model is just superior to Rust's in every way...deal with it."}, {"id": 50557538, "au": "weinzierl", "dom": 106, "sr": 59, "sc": 0.75, "ep": 3.2, "bs": 1.19, "d": 0, "age": 17.43, "grav": 208.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 28907, "kpp": 5.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": [], "ig": 0.491, "fa": 0.0, "gp": 1.41, "bl": 0.45, "ds": 0.0, "txt": "There should be other codepoints other than ß that in principle could be used for a vulnerability like that. There are even ones that expand to three codepoints, like ffi."}, {"id": 50558336, "au": "valleyer", "dom": 78, "sr": 60, "sc": 0.75, "ep": 1.95, "bs": 0.0, "d": 2, "age": 15.57, "grav": 174.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 2266, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "publish_gitlab", "flbl": "Publish & Gitlab (Patch)", "urls": [], "ig": 0.828, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The commit message for the Ruby fix says it's a heap buffer, so frame pointer smashing would not apply here."}, {"id": 50557565, "au": "stuxf", "dom": 107, "sr": 61, "sc": 0.75, "ep": 1.91, "bs": 0.0, "d": 1, "age": 17.38, "grav": 207.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 83, "kpp": 6.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": [], "ig": 0.679, "fa": 0.0, "gp": 0.217, "bl": 0.0, "ds": 0.0, "txt": "this relies on specific behavior with how the upcase function worked, the ß is the only one that expands in a way that works for this vulnerability."}, {"id": 50560032, "au": "nsagent", "dom": 5, "sr": 62, "sc": 0.75, "ep": 3.0, "bs": 1.19, "d": 4, "age": 12.34, "grav": 120.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 1679, "kpp": 4.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": 0.653, "fa": 0.0, "gp": 1.012, "bl": 0.45, "ds": 0.0, "txt": "Do you use core abstractions like Vec, String, Box, Arc, and Mutex? If so, those are built using unsafe code internally."}, {"id": 50560698, "au": "tptacek", "dom": 50, "sr": 63, "sc": 0.75, "ep": 1.79, "bs": 0.0, "d": 2, "age": 11.46, "grav": 107.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 58, "qw": 0, "k": 426786, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": [], "ig": 0.761, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "No, from my read of the code, it's a single-byte overflow because the casing code works 1 character at a time and doesn't account for the ß->SS expansion case. Not only is it a single byte, but that single byte has a fixed value; you can't use ß->SS to push some other character off the end of the string.\n\n(Correct me if I'm wrong!)"}, {"id": 50558290, "au": "debugnik", "dom": 93, "sr": 64, "sc": 0.75, "ep": 1.78, "bs": 0.0, "d": 2, "age": 15.71, "grav": 176.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 2517, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": [], "ig": 0.759, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "This only affects ISO-8859-1~16 encodings, Ruby only supports non-ASCII case folding for those and UTF. It might actually be the only character from that list of ISO encodings for which the length changes."}, {"id": 50562993, "au": "tialaramex", "dom": 11, "sr": 65, "sc": 0.75, "ep": 2.45, "bs": 0.85, "d": 7, "age": 8.74, "grav": 71.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 30, "qw": 0, "k": 33106, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 4, "meme": 0, "tier": "crowd_chatter", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 0.775, "fa": 0.22, "gp": 0.0, "bl": 0.32, "ds": 0.0, "txt": "Java's String::toUpperCase appears to be quite a lot more complicated than the Rust but it is at least all Java and thus without careful inspection I can assume it's memory safe."}, {"id": 50559102, "au": "pron", "dom": 3, "sr": 66, "sc": 0.75, "ep": 1.55, "bs": 0.0, "d": 2, "age": 13.88, "grav": 145.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 25584, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 0.34, "fa": 0.0, "gp": 0.519, "bl": 0.0, "ds": 0.0, "txt": "Because safe Rust is so constrained, Rust relies on unsafe much more than Java, and their need for intrinsics is about the same (although Java lets you turn off individual intrinsics at runtime)."}, {"id": 50561340, "au": "Thaxll", "dom": 24, "sr": 67, "sc": 0.75, "ep": 1.55, "bs": 0.0, "d": 3, "age": 10.65, "grav": 96.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 5581, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 0.409, "fa": 0.0, "gp": 0.403, "bl": 0.0, "ds": 0.0, "txt": "Rust is as vulnerable as the Java issue l, if you use simd you're in the same boat."}, {"id": 50559155, "au": "edelbitter", "dom": 99, "sr": 68, "sc": 0.75, "ep": 1.44, "bs": 0.0, "d": 3, "age": 13.78, "grav": 143.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 3, "k": 470, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": [], "ig": 0.612, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": ">ending a long debate\n\nThey did not. Participants from Liechtenstein and Switzerland don't even care about that letter (Swiss orthography does not make use of it), so they are not even a good place to begin such debate."}, {"id": 50558661, "au": "yuliyp", "dom": 54, "sr": 69, "sc": 0.75, "ep": 1.4, "bs": 0.0, "d": 2, "age": 14.81, "grav": 160.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 2472, "kpp": 3.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": [], "ig": 0.597, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "From the pseudocode it's always a single byte. Desyncing before the end of the buffer is fine. Desyncing at the very end causes the single byte overflow."}, {"id": 50566161, "au": "tptacek", "dom": 75, "sr": 70, "sc": 0.75, "ep": 3.38, "bs": 1.99, "d": 3, "age": 5.26, "grav": 35.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 31, "qw": 0, "k": 426786, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "publish_gitlab", "flbl": "Publish & Gitlab (Patch)", "urls": ["https://azeria-labs.com/grooming-the-ios-kernel-heap/"], "ig": 0.686, "fa": 0.62, "gp": 0.0, "bl": 0.75, "ds": 0.0, "txt": "All the heaps are (probably) randomized. I haven't seen an exploit for this (but know them to exist). ASLR is not a reliable countermeasure for these kinds of flaws. Here's a good starting point:\n\nhttps://azeria-labs.com/grooming-the-ios-kernel-heap/"}, {"id": 50557755, "au": "Gigachad", "dom": 144, "sr": 71, "sc": 0.75, "ep": 1.32, "bs": 0.0, "d": 1, "age": 16.89, "grav": 198.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 22, "qw": 0, "k": 25048, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": 0.47, "fa": 0.0, "gp": 0.149, "bl": 0.0, "ds": 0.0, "txt": "The bug here is in the C code for Ruby. Python is also written in C and just as likely to have memory bugs."}, {"id": 50563569, "au": "tptacek", "dom": 52, "sr": 72, "sc": 0.75, "ep": 1.31, "bs": 0.0, "d": 4, "age": 8.07, "grav": 63.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 426786, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": [], "ig": 0.556, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Right, I'm not talking down the severity of the vulnerability; if anything I think people are underrating it. But it's a constrained 1-byte overflow."}, {"id": 50558852, "au": "lionkor", "dom": 56, "sr": 73, "sc": 0.75, "ep": 1.31, "bs": 0.0, "d": 2, "age": 14.45, "grav": 154.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 32, "qw": 0, "k": 6988, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": 0.276, "fa": 0.0, "gp": 0.454, "bl": 0.0, "ds": 0.0, "txt": "The good news is that this was already the case, and we have tools that check for this; like fuzzers and sanitizers.\n\nNow to get people to use them it's an issue."}, {"id": 50558631, "au": "zamadatix", "dom": 65, "sr": 74, "sc": 0.75, "ep": 1.3, "bs": 0.0, "d": 2, "age": 14.87, "grav": 161.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 75, "qw": 0, "k": 20811, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "publish_gitlab", "flbl": "Publish & Gitlab (Patch)", "urls": [], "ig": 0.555, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "The problem now is it really doesn't matter as much. Before you had to put the work in to make the exploit chain work in the specific situation. Now you just need the entry point through the narrow hole in the exposed portion and a target set worth the tokens to customize it to work against one of the individual deployments. At least until we get better at making it difficult to chain things in response."}, {"id": 50560463, "au": "pron", "dom": 28, "sr": 75, "sc": 0.75, "ep": 1.1, "bs": 0.0, "d": 4, "age": 11.76, "grav": 112.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 25584, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 0.468, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "You're welcome to compare the prevalence of unsafe in Java and in Rust, both in the standard library and in user code, and you will see that this is very much correct."}, {"id": 50557838, "au": "CER10TY", "dom": 116, "sr": 76, "sc": 0.75, "ep": 2.17, "bs": 1.19, "d": 1, "age": 16.74, "grav": 195.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 97, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": [], "ig": 0.924, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "You can freely specify the encoding when sending multipart/form-data POST since Rails respects the charset attribute in Content-Type, eg Content-Type: text/plain; charset=Windows-1252"}, {"id": 50564131, "au": "t1234s", "dom": 83, "sr": 77, "sc": 0.75, "ep": 0.78, "bs": 0.0, "d": 2, "age": 7.53, "grav": 57.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 694, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": [], "ig": 0.331, "fa": 0.0, "gp": 0.0, "bl": 0.0, "ds": 0.0, "txt": "Now that I think about it the pronunciation of \"ß\" is important for people to know who don't speak German but want to order wine when visiting. Say weiss not weib."}, {"id": 50558346, "au": "toastal", "dom": 46, "sr": 78, "sc": 0.75, "ep": 1.96, "bs": 1.19, "d": 1, "age": 15.55, "grav": 173.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 24, "qw": 0, "k": 3716, "kpp": 2.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 0.307, "fa": 0.0, "gp": 0.852, "bl": 0.45, "ds": 0.0, "txt": "I like your comment since it points out that we need to enforce the memory situation—but it doesn’t prescribe Rust is the only solution."}, {"id": 50558531, "au": "anthk", "dom": 40, "sr": 79, "sc": 0.56, "ep": 1.76, "bs": 1.19, "d": 2, "age": 15.12, "grav": 166.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 5373, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 0.414, "fa": 0.0, "gp": 0.54, "bl": 0.45, "ds": 0.0, "txt": "Rust it's far better than Java. Since the old times Java was seen as a CVE generating machine for GNU/Linux environments."}, {"id": 50569022, "au": "OoooooooO", "dom": 89, "sr": 80, "sc": 0.41, "ep": 1.6, "bs": 1.19, "d": 3, "age": 0.6, "grav": 5.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 26, "qw": 0, "k": 147, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": [], "ig": 0.681, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "That was a sad day.\n\nWe finally got an official uppercase ẞ a few years ago, all glory to ß & ẞ. Maybe my next passport will already have an ẞ instead of ß."}, {"id": 50559655, "au": "vips7L", "dom": 20, "sr": 81, "sc": 0.22, "ep": 1.41, "bs": 1.19, "d": 4, "age": 12.88, "grav": 129.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 3737, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 0.474, "fa": 0.0, "gp": 0.204, "bl": 0.45, "ds": 0.0, "txt": "You don’t think there’s some intrinsic code in llvm that would be generating assembly that doesn’t match Rust’s safety rules?"}, {"id": 50557917, "au": "imtringued", "dom": 151, "sr": 82, "sc": 0.18, "ep": 1.38, "bs": 1.19, "d": 1, "age": 16.55, "grav": 191.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 12717, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.488, "fa": 0.0, "gp": 0.159, "bl": 0.45, "ds": 0.0, "txt": "The days of people feeling secure because they don't make egregious mistakes are unfortunately over. Now the rule is: You are vulnerable, you just don't know how."}, {"id": 50558984, "au": "mikrotikker", "dom": 138, "sr": 83, "sc": 0.15, "ep": 1.34, "bs": 1.19, "d": 1, "age": 14.13, "grav": 149.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 207, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": [], "ig": 0.569, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "More like use rails if you're writing it, use rust if you're making a real smart clanker do it.\n\nHe made rails for humans not for speed."}, {"id": 50561860, "au": "cubefox", "dom": 100, "sr": 84, "sc": 0.14, "ep": 1.33, "bs": 1.19, "d": 4, "age": 10.05, "grav": 88.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 8109, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": [], "ig": 0.567, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "The fact that they weren't participating in the debate doesn't mean the debate didn't end, let alone that it didn't begin."}, {"id": 50557723, "au": "sgt", "dom": 143, "sr": 85, "sc": 0.12, "ep": 1.32, "bs": 1.19, "d": 0, "age": 16.99, "grav": 200.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 18, "qw": 0, "k": 8603, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": 0.293, "fa": 0.22, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Django next? Although it's unlikely, Django is known to be above average in terms of security by now."}, {"id": 50560355, "au": "pron", "dom": 12, "sr": 86, "sc": -0.07, "ep": 1.13, "bs": 1.19, "d": 4, "age": 11.9, "grav": 114.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 21, "qw": 0, "k": 25584, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 0.186, "fa": 0.0, "gp": 0.476, "bl": 0.45, "ds": 0.0, "txt": "I didn't say there's a lot of unsafe (by whatever measure you consider that to be). I said there's a lot more than in Java."}, {"id": 50560728, "au": "millerm", "dom": 13, "sr": 87, "sc": -0.13, "ep": 1.06, "bs": 1.19, "d": 5, "age": 11.42, "grav": 107.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 1057, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 0.452, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "The JVM is written in an unsafe language. That's where these unsafe calls occur. Clients of these APIs have no control there. Java code itself is safe."}, {"id": 50566699, "au": "pron", "dom": 18, "sr": 88, "sc": -0.27, "ep": 0.92, "bs": 1.19, "d": 8, "age": 4.56, "grav": 29.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 25584, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "crowd_chatter", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.393, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Then you're in for a surprise. Take a look at TCMalloc and jemalloc. They're almost the size of HotSpot's most complex GC, then non-pause ZGC."}, {"id": 50557457, "au": "zelphirkalt", "dom": 120, "sr": 89, "sc": -0.31, "ep": 2.74, "bs": 3.05, "d": 0, "age": 17.61, "grav": 212.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 8535, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": [], "ig": 0.568, "fa": 0.0, "gp": 0.97, "bl": 1.15, "ds": 0.0, "txt": "Name as discussed earlier here on Hackernews :) Glad they went with that name."}, {"id": 50557991, "au": "pwdisswordfishq", "dom": 96, "sr": 90, "sc": -0.34, "ep": 0.86, "bs": 1.19, "d": 2, "age": 16.36, "grav": 188.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 306, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": [], "ig": 0.364, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "The Unicode case mappings are covered by backwards-compatibility guarantees.  \"ß\" is going to be mapped to \"SS\" forever."}, {"id": 50557786, "au": "DarkNova6", "dom": 152, "sr": 91, "sc": -0.34, "ep": 0.85, "bs": 1.19, "d": 1, "age": 16.84, "grav": 197.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 19, "qw": 0, "k": 2109, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": 0.266, "fa": 0.0, "gp": 0.154, "bl": 0.45, "ds": 0.0, "txt": "Above average doesn’t cut it these days. And doesn’t Python have some of the strongest exposures to C libraries?\n\nWell…"}, {"id": 50557665, "au": "speedgoose", "dom": 115, "sr": 92, "sc": -0.39, "ep": 2.66, "bs": 3.05, "d": 0, "age": 17.15, "grav": 203.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 9706, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": [], "ig": 0.548, "fa": 0.0, "gp": 0.945, "bl": 1.15, "ds": 0.0, "txt": "But can the attacker specify the encoding in rails? It's not like UTF-8 or GTFO?"}, {"id": 50566251, "au": "afdbcreid", "dom": 17, "sr": 93, "sc": -0.42, "ep": 0.77, "bs": 1.19, "d": 7, "age": 5.15, "grav": 34.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 15, "k": 1205, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": [], "ig": 0.33, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "> BTW, some popular malloc/free implementations are almost as big as Java's most complicated GC\n\nI'm pretty sure that's incorrect by a wide margin, and that all non-nop GCs java has are as large as at least some popular allocators."}, {"id": 50563018, "au": "gavinray", "dom": 22, "sr": 94, "sc": -0.42, "ep": 0.77, "bs": 1.19, "d": 4, "age": 8.71, "grav": 71.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 16, "qw": 0, "k": 8150, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 0.329, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "Take a peek into the Rust stdlib method implementations. The lang is built on a house of \"unsafe\"."}, {"id": 50558573, "au": "ninkendo", "dom": 34, "sr": 95, "sc": -0.54, "ep": 0.65, "bs": 1.19, "d": 2, "age": 15.0, "grav": 163.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 8589, "kpp": 3.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 0.169, "fa": 0.0, "gp": 0.177, "bl": 0.45, "ds": 0.0, "txt": "OP didn’t say anything about Rust, by the way. This post comes off as being defensive about a point nobody made."}, {"id": 50558890, "au": "roer", "dom": 119, "sr": 96, "sc": -0.58, "ep": 2.47, "bs": 3.05, "d": 4, "age": 14.34, "grav": 152.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 13, "qw": 0, "k": 514, "kpp": 7.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": ["https://www.sonarsource.com/blog/encoding-differentials-why-charset-matters/"], "ig": 0.637, "fa": 0.34, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Relevant article about that here: https://www.sonarsource.com/blog/encoding-differentials-why-...\n\nBrowsers stopped auto-detecting ISO-2022-JP for this reason."}, {"id": 50567127, "au": "slopinthebag", "dom": 29, "sr": 97, "sc": -0.73, "ep": 0.46, "bs": 1.19, "d": 3, "age": 3.97, "grav": 24.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 20, "qw": 0, "k": 1372, "kpp": 0.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "crowd_chatter", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 0.197, "fa": 0.0, "gp": 0.0, "bl": 0.45, "ds": 0.0, "txt": "is there a java runtime not written a memory unsafe language? because if so, by your own standards java is entirely unsafe"}, {"id": 50558434, "au": "srgb_vs_cmyk", "dom": 140, "sr": 98, "sc": -0.95, "ep": 1.57, "bs": 2.52, "d": 1, "age": 15.35, "grav": 170.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 27, "qw": 0, "k": 4, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": 0.667, "fa": 0.0, "gp": 0.0, "bl": 0.95, "ds": 0.0, "txt": "It is getting absurd, in span of 48h there is one for nginx, java, php and ruby; with another one for php and ruby in last month."}, {"id": 50557679, "au": "rob74", "dom": 95, "sr": 99, "sc": -1.0, "ep": 0.98, "bs": 1.99, "d": 1, "age": 17.1, "grav": 202.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 23, "qw": 0, "k": 17319, "kpp": 3.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": ["https://en.wikipedia.org/wiki/%C3%9F"], "ig": 0.419, "fa": 0.0, "gp": 0.0, "bl": 0.75, "ds": 0.0, "txt": "Ah, so that's the real reason \"ß\" is now allowed in uppercase too (https://en.wikipedia.org/wiki/%C3%9F)? Reducing the risk of security issues by removing an edge case?"}, {"id": 50568342, "au": "matiasdante", "dom": 132, "sr": 100, "sc": -1.17, "ep": 1.35, "bs": 2.52, "d": 0, "age": 2.1, "grav": 12.7, "surf": 15.8, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 33, "qw": 0, "k": 1, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": 0.571, "fa": 0.0, "gp": 0.008, "bl": 0.95, "ds": 0.0, "txt": "Nginx, Java, PHP, and now Ruby...all in the same week. AI is discovering a lot of these things at a rapid pace (or maybe it's just because of all the slop code out there)"}, {"id": 50558633, "au": "pluc", "dom": 133, "sr": 101, "sc": -1.22, "ep": 1.83, "bs": 3.05, "d": 0, "age": 14.87, "grav": 161.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 7028, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": 0.7, "fa": 0.0, "gp": 0.128, "bl": 1.15, "ds": 0.0, "txt": "Here come the united statesmen asking about Ruby 2b hell"}, {"id": 50557895, "au": "spikewall", "dom": 161, "sr": 102, "sc": -1.28, "ep": 1.77, "bs": 3.05, "d": 1, "age": 16.58, "grav": 192.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 9, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.341, "fa": 0.34, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "took glm a bit over 20 minutes to write one, based on the report."}, {"id": 50558222, "au": "boomlinde", "dom": 49, "sr": 103, "sc": -1.46, "ep": 1.58, "bs": 3.05, "d": 1, "age": 15.85, "grav": 179.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 3836, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": [], "ig": 0.366, "fa": 0.0, "gp": 0.499, "bl": 1.15, "ds": 0.0, "txt": "From my understanding it's only a single byte overflow if your payload only contains a single ß."}, {"id": 50561412, "au": "ok123456", "dom": 88, "sr": 104, "sc": -1.62, "ep": 1.43, "bs": 3.05, "d": 2, "age": 10.58, "grav": 95.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 4314, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": [], "ig": 0.194, "fa": 0.34, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "The Duden reform of 1995 removed most of its uses."}, {"id": 50559397, "au": "jaapz", "dom": 154, "sr": 105, "sc": -1.64, "ep": 1.4, "bs": 3.05, "d": 1, "age": 13.31, "grav": 135.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 992, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": 0.598, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "it's just a matter of time before the first big python RCE will be posted here"}, {"id": 50566867, "au": "0x457", "dom": 158, "sr": 106, "sc": -1.65, "ep": 1.4, "bs": 3.05, "d": 3, "age": 4.37, "grav": 28.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 2442, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "publish_gitlab", "flbl": "Publish & Gitlab (Patch)", "urls": [], "ig": 0.595, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Yeah, but GitLab ships \"all in one\" packaging that includes ruby."}, {"id": 50561612, "au": "phendrenad2", "dom": 164, "sr": 107, "sc": -1.67, "ep": 1.38, "bs": 3.05, "d": 4, "age": 10.35, "grav": 92.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 8245, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "publish_gitlab", "flbl": "Publish & Gitlab (Patch)", "urls": [], "ig": 0.587, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "Does every crash prove that a RCE can exist? This sounds halting problemy."}, {"id": 50557936, "au": "stuxf", "dom": 156, "sr": 108, "sc": -1.96, "ep": 2.41, "bs": 4.37, "d": 1, "age": 16.49, "grav": 190.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 29, "qw": 0, "k": 83, "kpp": 6.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "publish_gitlab", "flbl": "Publish & Gitlab (Patch)", "urls": [], "ig": 1.025, "fa": 0.0, "gp": 0.0, "bl": 1.65, "ds": 0.0, "txt": "would you rather we publish a PoC for a vulnerability that doesn't even have a patch yet? e.g self-hosted GitLab still hasn't shipped a newer version of Ruby that's patched...\n\nwould be wildly irresponsible"}, {"id": 50562244, "au": "pjmlp", "dom": 149, "sr": 109, "sc": -1.97, "ep": 1.07, "bs": 3.05, "d": 6, "age": 9.6, "grav": 82.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 134000, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": 0.457, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "They exist, for longer than a decade, with users."}, {"id": 50559344, "au": "GTP", "dom": 113, "sr": 110, "sc": -2.02, "ep": 2.36, "bs": 4.37, "d": 0, "age": 13.41, "grav": 137.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 36, "qw": 16, "k": 2699, "kpp": 2.1, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "publish_gitlab", "flbl": "Publish & Gitlab (Patch)", "urls": [], "ig": 0.423, "fa": 0.0, "gp": 0.94, "bl": 1.65, "ds": 0.0, "txt": "> We'll be publishing a proof of concept in a week, once people have had time to upgrade.\n\nI think one may now decide to publish the PoC straight away or not publish it at all, since an AI agent pointed at this post would very likely be able to produce one in a few minutes."}, {"id": 50557919, "au": "rs_rs_rs_rs_rs", "dom": 130, "sr": 111, "sc": -2.02, "ep": 1.03, "bs": 3.05, "d": 2, "age": 16.54, "grav": 191.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 476, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": 0.438, "fa": 0.0, "gp": 0.0, "bl": 1.15, "ds": 0.0, "txt": "And the fact that you can almost read it ruby 2 hell"}, {"id": 50564485, "au": "neko_ranger", "dom": 131, "sr": 112, "sc": -2.42, "ep": 1.82, "bs": 4.24, "d": 0, "age": 7.18, "grav": 54.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 12, "qw": 0, "k": 1299, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.515, "fa": 0.0, "gp": 0.42, "bl": 1.6, "ds": 0.0, "txt": "we Germans already have a word for this, we call it ruby2ßhellen"}, {"id": 50558157, "au": "trismegisti", "dom": 64, "sr": 113, "sc": -2.6, "ep": 1.11, "bs": 3.71, "d": 1, "age": 16.0, "grav": 181.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 17, "qw": 0, "k": 2, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 0.385, "fa": 0.0, "gp": 0.141, "bl": 1.4, "ds": 0.0, "txt": "But are those generic exploits, that don't rely on specific dynamic library and kernel versions? i doubt it."}, {"id": 50558061, "au": "sgt", "dom": 153, "sr": 114, "sc": -2.9, "ep": 1.34, "bs": 4.24, "d": 2, "age": 16.21, "grav": 185.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 8603, "kpp": 1.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 0.57, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Uh oh. I guess it's being hammered with people with Red Team access right now."}, {"id": 50560714, "au": "tptacek", "dom": 111, "sr": 115, "sc": -3.07, "ep": 1.17, "bs": 4.24, "d": 1, "age": 11.44, "grav": 107.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 10, "qw": 0, "k": 426786, "kpp": 5.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": [], "ig": 0.496, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "I went looking last night and found only the ß in Windows-1252."}, {"id": 50559394, "au": "jaapz", "dom": 146, "sr": 116, "sc": -3.23, "ep": 1.01, "bs": 4.24, "d": 3, "age": 13.33, "grav": 136.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 992, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": 0.432, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "yes, the version of python that almost everyone uses"}, {"id": 50558271, "au": "eecc", "dom": 60, "sr": 117, "sc": -3.29, "ep": 0.95, "bs": 4.24, "d": 3, "age": 15.75, "grav": 177.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 5086, "kpp": 2.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 0.311, "fa": 0.0, "gp": 0.152, "bl": 1.6, "ds": 0.0, "txt": "because the assembly for the base64 decoding was handwritten, the paren't comment is still valid"}, {"id": 50558012, "au": "cubefox", "dom": 98, "sr": 118, "sc": -3.38, "ep": 0.86, "bs": 4.24, "d": 2, "age": 16.32, "grav": 187.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 42, "k": 8109, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": [], "ig": 0.142, "fa": 0.0, "gp": 0.36, "bl": 1.6, "ds": 0.0, "txt": "It even seems the \"more correct\" uppercase form of ß is now ẞ, not SS.\n\n> Traditionally, ⟨ß⟩ did not have a capital form, and was capitalized as ⟨SS⟩. Some type designers introduced capitalized variants. In 2017, the Council for German Orthography officially adopted a capital form ⟨ẞ⟩ as an acceptable variant, ending a long debate.[4] Since 2024 the capital has been preferred over ⟨SS⟩.[5]"}, {"id": 50564029, "au": "empath75", "dom": 26, "sr": 119, "sc": -3.43, "ep": 0.81, "bs": 4.24, "d": 3, "age": 7.63, "grav": 59.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 16957, "kpp": 2.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 0.189, "fa": 0.0, "gp": 0.254, "bl": 1.6, "ds": 0.0, "txt": "we have like a million lines of rust in production right now and zero unsafe."}, {"id": 50563524, "au": "stouset", "dom": 57, "sr": 120, "sc": -3.52, "ep": 1.64, "bs": 5.17, "d": 3, "age": 8.13, "grav": 64.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 115, "qw": 0, "k": 15786, "kpp": 3.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 0.588, "fa": 0.0, "gp": 0.181, "bl": 1.95, "ds": 0.0, "txt": "We have had fuzzers and sanitizers for decades. Despite their widespread use, we still experience a deluge of memory safety issues in memory unsafe languages, including in projects that heavily lean on these tools.\n\nThe actual good news is that we have multiple mature languages that entirely remove the need for users to configure and run fuzzers and sanitizers and remember to always obey arcane rules in order to avoid memory corruption.\n\nWe’ve been encouraging people to walk, not run, to the exits and switch from C and C++ to memory-safe equivalents. Now it is clear that the time for walking is over and the remaining holdouts should be at the very least jogging if not running."}, {"id": 50565527, "au": "mimischi", "dom": 86, "sr": 121, "sc": -3.6, "ep": 0.64, "bs": 4.24, "d": 2, "age": 6.04, "grav": 42.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 182, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": [], "ig": 0.272, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "iOS Safari will find „ß“ when you search for “ss”. Not hard at all!"}, {"id": 50561384, "au": "jpardoe", "dom": 37, "sr": 122, "sc": -3.63, "ep": 0.61, "bs": 4.24, "d": 2, "age": 10.61, "grav": 95.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 14, "qw": 0, "k": 23, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": [], "ig": 0.205, "fa": 0.0, "gp": 0.091, "bl": 1.6, "ds": 0.0, "txt": "Is it not theoretically possible, even if it comes at the cost of performance?"}, {"id": 50561495, "au": "BigTTYGothGF", "dom": 90, "sr": 123, "sc": -3.69, "ep": 0.55, "bs": 4.24, "d": 2, "age": 10.48, "grav": 94.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 45, "k": 1361, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.235, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "> So great to make a command require a special unicode character\n\nWhat command? Also perhaps you missed this part of the article:\n\n> The same loop is in several ISO-8859 and Windows-125x encodings and has been there since Ruby 2.4.0. It is reached by upcase, swapcase, downcase(:fold) and casecmp?.\n\n> UTF-8 strings take a different code path and are not affected."}, {"id": 50569028, "au": "OoooooooO", "dom": 97, "sr": 124, "sc": -3.69, "ep": 0.55, "bs": 4.24, "d": 3, "age": 0.57, "grav": 5.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 147, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": [], "ig": 0.234, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "We finally got uppercase ß = ẞ but .upper() will never work correct forever ..."}, {"id": 50558537, "au": "anthk", "dom": 63, "sr": 125, "sc": -3.72, "ep": 0.52, "bs": 4.24, "d": 2, "age": 15.11, "grav": 165.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 13, "qw": 0, "k": 5373, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": [], "ig": 0.22, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "At least C folks can use something like BoehmGC and calm down things a little."}, {"id": 50566223, "au": "afdbcreid", "dom": 25, "sr": 126, "sc": -3.74, "ep": 0.5, "bs": 4.24, "d": 4, "age": 5.19, "grav": 34.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 1205, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 0.214, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Actually, Rust can have fully safe SIMD (Java too, but it's still in preview AFAIK)."}, {"id": 50559921, "au": "ecshafer", "dom": 62, "sr": 127, "sc": -3.78, "ep": 0.46, "bs": 4.24, "d": 3, "age": 12.49, "grav": 123.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 11044, "kpp": 5.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.196, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Good news for the computer industry employees though."}, {"id": 50558203, "au": "xnickb", "dom": 59, "sr": 128, "sc": -3.79, "ep": 0.45, "bs": 4.24, "d": 2, "age": 15.89, "grav": 179.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 500, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.191, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "This is bad news for computer industry. See the recent Java4Shell."}, {"id": 50561565, "au": "BigTTYGothGF", "dom": 148, "sr": 129, "sc": -3.84, "ep": 0.4, "bs": 4.24, "d": 5, "age": 10.4, "grav": 92.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 1361, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": 0.171, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Are non-cpython implementations anything more than a rounding error?"}, {"id": 50558442, "au": "dingaling911", "dom": 61, "sr": 130, "sc": -3.86, "ep": 0.38, "bs": 4.24, "d": 4, "age": 15.34, "grav": 169.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 11, "qw": 0, "k": 175, "kpp": 0.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.16, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "I think the point is that the weakest link WILL be found."}, {"id": 50558034, "au": "lmz", "dom": 118, "sr": 131, "sc": -3.92, "ep": 0.32, "bs": 4.24, "d": 3, "age": 16.27, "grav": 186.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 2389, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.136, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Clients have to do the same with server responses."}, {"id": 50560722, "au": "pjmlp", "dom": 147, "sr": 132, "sc": -3.99, "ep": 0.25, "bs": 4.24, "d": 4, "age": 11.43, "grav": 107.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 134000, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": 0.106, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "Which isn't the language, rather one of its implementations."}, {"id": 50559580, "au": "spikewall", "dom": 163, "sr": 133, "sc": -4.03, "ep": 1.0, "bs": 5.04, "d": 3, "age": 13.0, "grav": 130.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 1, "lu": 0, "w": 10, "qw": 0, "k": 9, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "publish_gitlab", "flbl": "Publish & Gitlab (Patch)", "urls": ["https://pastebin.com/y3WQEcSU"], "ig": 0.427, "fa": 0.0, "gp": 0.0, "bl": 1.9, "ds": 0.0, "txt": "crash, https://pastebin.com/y3WQEcSU - for rce you will need a bit more time/tokens."}, {"id": 50560228, "au": "cerved", "dom": 39, "sr": 134, "sc": -4.08, "ep": 0.16, "bs": 4.24, "d": 2, "age": 12.07, "grav": 116.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 9, "qw": 0, "k": 1409, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": 0.067, "fa": 0.0, "gp": 0.0, "bl": 1.6, "ds": 0.0, "txt": "You're conflating Java with the JVM but sure."}, {"id": 50566723, "au": "pron", "dom": 16, "sr": 135, "sc": -4.26, "ep": 0.91, "bs": 5.17, "d": 8, "age": 4.54, "grav": 29.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 53, "qw": 0, "k": 25584, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 0.386, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "I know that you can write slow data structures in safe Rust, but the standard library's data structures are supposed to be efficient. Anyway, a quick look at how common unsafe is in Rust vs Java, both in the standard library and in applications, and you'll see that it's much more common in Rust."}, {"id": 50559296, "au": "supersimpleguy", "dom": 35, "sr": 136, "sc": -4.33, "ep": 0.84, "bs": 5.17, "d": 3, "age": 13.51, "grav": 139.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 39, "qw": 0, "k": -2, "kpp": -0.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.356, "fa": 0.0, "gp": 0.0, "bl": 1.95, "ds": 0.0, "txt": "…it was a metaphor to agree with the OP’s point.\n\nNot everyone on the web is looking to start an argument; some people use literary devices to reinforce their point. If anyone is defensive about a point nobody made, it’s you."}, {"id": 50558772, "au": "cowlevel", "dom": 42, "sr": 137, "sc": -5.07, "ep": 1.29, "bs": 6.36, "d": 3, "age": 14.62, "grav": 157.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 25, "qw": 0, "k": 1839, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": 0.451, "fa": 0.0, "gp": 0.159, "bl": 2.4, "ds": 0.0, "txt": "Java CVEs were mostly holes in Java's own sandbox (e.g. used to run multiple applets from different websites in the same VM) which has been abandoned."}, {"id": 50566195, "au": "indemnity", "dom": 58, "sr": 138, "sc": -5.21, "ep": 1.15, "bs": 6.36, "d": 3, "age": 5.22, "grav": 35.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 28, "qw": 0, "k": 1284, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": [], "ig": 0.489, "fa": 0.0, "gp": 0.0, "bl": 2.4, "ds": 0.0, "txt": "Ah yes, the \"programmers just need to be better\" argument.\n\nI would prefer something be impossible by construction.\n\nThere are memory-safe options with little/no performance overhead compared to C/C++."}, {"id": 50567471, "au": "charcircuit", "dom": 19, "sr": 139, "sc": -5.24, "ep": 1.12, "bs": 6.36, "d": 4, "age": 3.51, "grav": 21.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 23, "qw": 11, "k": 2420, "kpp": 0.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": 0.458, "fa": 0.0, "gp": 0.029, "bl": 2.4, "ds": 0.0, "txt": ">which need to be written in assembly to avoid timing attacks\n\nAssembly provides no timing guarantees. You will want something higher level built on top of assembly that can guarantee it for a specific processor."}, {"id": 50558662, "au": "phil294", "dom": 134, "sr": 140, "sc": -5.26, "ep": 1.36, "bs": 6.62, "d": 0, "age": 14.81, "grav": 160.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": -1, "lu": 1, "w": 10, "qw": 0, "k": 1761, "kpp": 7.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "single_byte", "flbl": "Single & Byte (Overflow)", "urls": ["https://www.youtube.com/watch?v=vDjW_dRyKXY"], "ig": 0.517, "fa": 0.0, "gp": 0.103, "bl": 2.5, "ds": 0.0, "txt": "Fortunately, Rails' creator DHH recommends to use Rust nowadays anyway. https://www.youtube.com/watch?v=vDjW_dRyKXY"}, {"id": 50569261, "au": "pron", "dom": 33, "sr": 141, "sc": -5.46, "ep": 1.4, "bs": 6.86, "d": 6, "age": 0.05, "grav": 3.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 103, "qw": 44, "k": 25584, "kpp": 3.0, "td": 0.0, "mod": 0, "pp": 5, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": 0.597, "fa": 0.0, "gp": 0.0, "bl": 2.59, "ds": 0.0, "txt": "> This is nonsense. Java doesn't \"compile like C or C++ or Rust or Zig\" any more than Python does.\n\nIt really does, though. Perhaps you're unfamiliar?\n\n> Unsafe is still plenty prevalent in Java, nor is the use of C++ libraries.\n\nMy statement was that unsafe is much more prevalent in Rust than in Java, and that is true.\n\n> Yes, well, that's some handwaving.\n\nI'm sorry that I can't teach you principles of compilation here, but feel free to dig deeper.\n\n> Yes. It is still very prevelant.\n\nMuch less than in Rust.\n\n> Ridiculous... A ridiculous comparison.\n\nYou don't sound like either a runtime or compiler engineer at all, or you wouldn't have found any of this ridiculous in the least (or news). In that case, I hope that telling you that what I wrote was true might enrage you enough to learn more about these subjects, and perhaps our community will have grown by another member."}, {"id": 50561476, "au": "makemefundyou20", "dom": 85, "sr": 142, "sc": -6.25, "ep": 0.51, "bs": 6.76, "d": 1, "age": 10.5, "grav": 94.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 8, "qw": 0, "k": 3, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": 0.217, "fa": 0.0, "gp": 0.0, "bl": 2.55, "ds": 0.0, "txt": "just makes it difficult to search for us."}, {"id": 50562214, "au": "tguedes", "dom": 166, "sr": 143, "sc": -7.46, "ep": 1.15, "bs": 8.61, "d": 5, "age": 9.64, "grav": 82.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 15, "qw": 0, "k": 343, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 1, "tier": "meme_or_snark", "facet": "publish_gitlab", "flbl": "Publish & Gitlab (Patch)", "urls": [], "ig": 0.491, "fa": 0.0, "gp": 0.0, "bl": 3.25, "ds": 0.0, "txt": "The authors say that the vuln allows RCE and they will publish a PoC in a week"}, {"id": 50557384, "au": "rs_rs_rs_rs_rs", "dom": 128, "sr": 144, "sc": -7.71, "ep": 0.0, "bs": 6.89, "d": 0, "age": 17.77, "grav": 215.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 476, "kpp": 1.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.976, "bl": 2.6, "ds": 0.0, "txt": "For once a bug name that's cool."}, {"id": 50557446, "au": "lousken", "dom": 122, "sr": 145, "sc": -7.72, "ep": 0.0, "bs": 6.89, "d": 0, "age": 17.63, "grav": 212.5, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 1745, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.97, "bl": 2.6, "ds": 0.0, "txt": "Scheiße2Shell?"}, {"id": 50558379, "au": "wiether", "dom": 123, "sr": 146, "sc": -7.87, "ep": 0.0, "bs": 6.89, "d": 0, "age": 15.47, "grav": 172.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 1950, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "publish_gitlab", "flbl": "Publish & Gitlab (Patch)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.861, "bl": 2.6, "ds": 0.0, "txt": "Get ready to upgrade your GitLab instance..."}, {"id": 50557875, "au": "tvvocold", "dom": 127, "sr": 147, "sc": -7.88, "ep": 0.0, "bs": 6.89, "d": 0, "age": 16.63, "grav": 193.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 1958, "kpp": 4.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.855, "bl": 2.6, "ds": 0.0, "txt": "One Shell a Day, Ops Run Away."}, {"id": 50559953, "au": "InsidiousWombat", "dom": 27, "sr": 148, "sc": -8.43, "ep": 0.0, "bs": 6.89, "d": 3, "age": 12.44, "grav": 122.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 515, "kpp": 2.2, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "incorrect_german", "flbl": "Incorrect & German (Edit)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.475, "bl": 2.6, "ds": 0.0, "txt": "That's just not correct"}, {"id": 50559548, "au": "jaxn", "dom": 157, "sr": 149, "sc": -8.49, "ep": 0.0, "bs": 6.89, "d": 2, "age": 13.07, "grav": 132.0, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 3008, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "publish_gitlab", "flbl": "Publish & Gitlab (Patch)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.436, "bl": 2.6, "ds": 0.0, "txt": "the patch is to update ruby"}, {"id": 50558130, "au": "miohtama", "dom": 55, "sr": 150, "sc": -8.95, "ep": 0.0, "bs": 6.89, "d": 1, "age": 16.07, "grav": 183.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 13582, "kpp": 3.8, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.122, "bl": 2.6, "ds": 0.0, "txt": "This is bad news for C/C++"}, {"id": 50559338, "au": "slekker", "dom": 141, "sr": 151, "sc": -9.01, "ep": 0.0, "bs": 6.89, "d": 0, "age": 13.43, "grav": 137.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 0, "k": 319, "kpp": 1.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.076, "bl": 2.6, "ds": 0.0, "txt": "DHH in shambles"}, {"id": 50564080, "au": "teaearlgraycold", "dom": 8, "sr": 152, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 5, "age": 7.58, "grav": 58.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 4118, "kpp": 1.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "safe_unsafe", "flbl": "Safe & Unsafe (Java)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Unsafe rust is still safer than normal C."}, {"id": 50566216, "au": "afdbcreid", "dom": 23, "sr": 153, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 5, "age": 5.2, "grav": 34.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 1205, "kpp": 2.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "java_runtime", "flbl": "Java & Runtime (Code)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "So is the JVM, and?"}, {"id": 50562221, "au": "anthk", "dom": 45, "sr": 154, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 4, "age": 9.63, "grav": 82.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 16, "k": 5373, "kpp": 0.6, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": ">PPS The Java memory model is just superior to Rust's in every way...deal with it.\n\nYou forgot the interpreter itself. Good luck."}, {"id": 50558735, "au": "jjgreen", "dom": 47, "sr": 155, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 14.69, "grav": 158.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 1, "qw": 0, "k": 10453, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Heretical"}, {"id": 50565418, "au": "boomlinde", "dom": 53, "sr": 156, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 3, "age": 6.14, "grav": 43.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 7, "qw": 0, "k": 3836, "kpp": 1.8, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Yeah that seems right on a second look"}, {"id": 50564006, "au": "t1234s", "dom": 84, "sr": 157, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 7.65, "grav": 59.2, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 694, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Weiß => Weiss"}, {"id": 50558754, "au": "jjgreen", "dom": 135, "sr": 158, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 14.66, "grav": 158.1, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 0, "k": 10453, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "... also annexing the Sudetenland, so YMMV."}, {"id": 50558979, "au": "mikrotikker", "dom": 136, "sr": 159, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 14.16, "grav": 149.6, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 2, "qw": 0, "k": 207, "kpp": 0.3, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Please stop"}, {"id": 50561541, "au": "jjgreen", "dom": 137, "sr": 160, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 3, "age": 10.43, "grav": 93.3, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 10453, "kpp": 2.4, "td": 0.0, "mod": 0, "pp": 3, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "That's what Poland said."}, {"id": 50561536, "au": "BigTTYGothGF", "dom": 142, "sr": 161, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 1, "age": 10.44, "grav": 93.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 5, "qw": 0, "k": 1361, "kpp": 1.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "Every cloud has a silver lining."}, {"id": 50557862, "au": "pjmlp", "dom": 145, "sr": 162, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 16.66, "grav": 193.9, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 1, "qw": 0, "k": 134000, "kpp": 1.7, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "general_commentary", "flbl": "General Commentary", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "CPython."}, {"id": 50557890, "au": "gsich", "dom": 155, "sr": 163, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 0, "age": 16.6, "grav": 192.8, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 1425, "kpp": 0.5, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "publish_gitlab", "flbl": "Publish & Gitlab (Patch)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "no poc. go away."}, {"id": 50558345, "au": "oguz-ismail2", "dom": 160, "sr": 164, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 15.55, "grav": 173.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 6, "qw": 1, "k": 73, "kpp": 1.4, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "publish_gitlab", "flbl": "Publish & Gitlab (Patch)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": ">we\n\nI doubt you have a PoC at all"}, {"id": 50558827, "au": "paulannesley", "dom": 162, "sr": 165, "sc": -9.12, "ep": 0.0, "bs": 6.89, "d": 2, "age": 14.5, "grav": 155.4, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 3, "qw": 0, "k": 780, "kpp": 3.9, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "publish_gitlab", "flbl": "Publish & Gitlab (Patch)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.0, "bl": 2.6, "ds": 0.0, "txt": "RCE or crash?"}, {"id": 50558344, "au": "realsdx", "dom": 139, "sr": 166, "sc": -11.43, "ep": 0.0, "bs": 9.41, "d": 0, "age": 15.55, "grav": 173.7, "surf": 0.0, "fade": "c00", "dt": 0, "ut": 0, "lu": 0, "w": 4, "qw": 0, "k": 3, "kpp": 1.0, "td": 0.0, "mod": 0, "pp": 0, "meme": 0, "tier": "bullshit_or_flamewar", "facet": "publish_gitlab", "flbl": "Publish & Gitlab (Patch)", "urls": [], "ig": -0.95, "fa": 0.0, "gp": 0.146, "bl": 3.55, "ds": 0.0, "txt": "Another day, another RCE!"}]}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("observatoryData").textContent);
+  const DEFAULT_W = DATA.weights;
+  const TOTAL_N = Math.max(1, DATA.comments.length);
+  const BURIED_CUTOFF = DATA.buried_cutoff || 500;
+  const RESCUE_TOP_K = DATA.rescue_top_k || 80;
+  let curW = {
+    ig: DEFAULT_W.info_gain,
+    fa: DEFAULT_W.falsifiability,
+    gp: DEFAULT_W.gravity_progeny,
+    bp: DEFAULT_W.bullshit_penalty,
+    dp: DEFAULT_W.downvote_penalty
+  };
+  let activeMode = "top_signal";
+  let selectedId = null;
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Render 01A / 01B tables (benchmark ablation OR live unsupervised diagnostics)
+  const abBody = document.getElementById("ablationBody");
+  if (abBody && DATA.ablations && DATA.ablations.length > 0) {
+    const maxAbScore = Math.max(...DATA.ablations.map(r => r.score));
+    DATA.ablations.forEach((r, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (Math.abs(r.score - maxAbScore) < 0.02) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(r.name)}</td>`,
+        `<td><strong>${r.score.toFixed(2)}</strong></td>`,
+        `<td>${r.ndcg20.toFixed(3)}</td>`,
+        `<td>${r.pairwise_concordance.toFixed(3)}</td>`,
+        `<td>${(100 * r.adversarial_acc).toFixed(1)}%</td>`,
+        `<td>${(100 * r.buried_gold_recall_top45).toFixed(1)}%</td>`,
+        `<td>${(100 * r.bullshit_sink_percentile).toFixed(1)}%</td>`,
+        `<td>${r.top20_diversity.toFixed(3)}</td>`
+      ].join("");
+      abBody.appendChild(tr);
+    });
+  }
+
+  const tBody = document.getElementById("tourneyBody");
+  if (tBody && DATA.tournament && DATA.tournament.length > 0) {
+    DATA.tournament.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "hn-row";
+      else if (t.disposition === "promoted_champion" || t.disposition === "promoted_best") tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(t.stage)}${t.disposition === "promoted_champion" ? " ★" : ""}</td>`,
+        `<td>${escHtml(t.sha)}</td>`,
+        `<td><strong>${t.score.toFixed(2)}</strong></td>`,
+        `<td>${t.dev_score.toFixed(2)}</td>`,
+        `<td>${t.holdout_score.toFixed(2)}</td>`
+      ].join("");
+      tBody.appendChild(tr);
+    });
+  }
+
+  const fdBody = document.getElementById("facetDiagBody");
+  if (fdBody && DATA.facet_diagnostics) {
+    DATA.facet_diagnostics.forEach((f, idx) => {
+      const tr = document.createElement("tr");
+      if (idx === 0) tr.className = "winner";
+      tr.innerHTML = [
+        `<td>${escHtml(f.label)}</td>`,
+        `<td>${f.count}</td>`,
+        `<td><strong>${f.useful}</strong></td>`,
+        `<td>${f.useful_pct.toFixed(1)}%</td>`,
+        `<td style="text-align:left">${escHtml(f.terms)}</td>`
+      ].join("");
+      fdBody.appendChild(tr);
+    });
+  }
+
+  const scBody = document.getElementById("sourceCatBody");
+  if (scBody && DATA.source_categories) {
+    if (DATA.source_categories.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>No external links</td><td>0</td>`;
+      scBody.appendChild(tr);
+    } else {
+      DATA.source_categories.forEach(sc => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${escHtml(sc.category)}</td><td><strong>${sc.count}</strong></td>`;
+        scBody.appendChild(tr);
+      });
+    }
+  }
+  const ancBox = document.getElementById("anchorListBox");
+  if (ancBox && DATA.story_anchors && DATA.story_anchors.length > 0) {
+    ancBox.textContent = "UNSUPERVISED STORY ANCHORS: " + DATA.story_anchors.join(", ");
+  }
+
+  // Bind Sliders
+  const sliderMap = [
+    ["ig", "sl_ig", "val_ig"],
+    ["fa", "sl_fa", "val_fa"],
+    ["gp", "sl_gp", "val_gp"],
+    ["bp", "sl_bp", "val_bp"],
+    ["dp", "sl_dp", "val_dp"]
+  ];
+  function syncSliders() {
+    sliderMap.forEach(([k, sid, vid]) => {
+      const el = document.getElementById(sid);
+      el.value = curW[k];
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+    });
+  }
+  sliderMap.forEach(([k, sid, vid]) => {
+    document.getElementById(sid).addEventListener("input", (e) => {
+      curW[k] = parseFloat(e.target.value);
+      document.getElementById(vid).textContent = curW[k].toFixed(2);
+      recomputeAndRender();
+    });
+  });
+  document.getElementById("resetWeightsBtn").addEventListener("click", () => {
+    curW = {
+      ig: DEFAULT_W.info_gain,
+      fa: DEFAULT_W.falsifiability,
+      gp: DEFAULT_W.gravity_progeny,
+      bp: DEFAULT_W.bullshit_penalty,
+      dp: DEFAULT_W.downvote_penalty
+    };
+    syncSliders();
+    recomputeAndRender();
+  });
+
+  function isDefaultWeights() {
+    return Math.abs(curW.ig - DEFAULT_W.info_gain) < 1e-4 &&
+           Math.abs(curW.fa - DEFAULT_W.falsifiability) < 1e-4 &&
+           Math.abs(curW.gp - DEFAULT_W.gravity_progeny) < 1e-4 &&
+           Math.abs(curW.bp - DEFAULT_W.bullshit_penalty) < 1e-4 &&
+           Math.abs(curW.dp - DEFAULT_W.downvote_penalty) < 1e-4;
+  }
+
+  const agesSorted = DATA.comments.map(c => c.age).sort((a, b) => a - b);
+  const p98Age = agesSorted.length ? agesSorted[Math.floor(0.98 * (agesSorted.length - 1))] : 12.0;
+  const MAX_AGE_PLOT = Math.max(4.0, Math.ceil(p98Age));
+
+  let liveList = [];
+  function recomputeAndRender() {
+    const useCanonical = isDefaultWeights();
+    liveList = DATA.comments.map(c => {
+      const pos = curW.ig * c.ig + curW.fa * c.fa + curW.gp * c.gp;
+      const neg = curW.bp * c.bl + curW.dp * c.ds;
+      const dynScore = useCanonical ? c.sc : (pos - neg);
+      return Object.assign({}, c, {
+        liveScore: dynScore,
+        liveEp: Math.max(0, pos),
+        liveBs: Math.max(0, neg)
+      });
+    });
+    if (useCanonical) {
+      liveList.sort((a, b) => a.sr - b.sr);
+    } else {
+      liveList.sort((a, b) => (b.liveScore - a.liveScore) || (a.dom - b.dom));
+    }
+    liveList.forEach((c, i) => { c.liveRank = i + 1; });
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  const TIER_COLORS = {
+    epistemic_gold: "rgb(0, 230, 118)",
+    grounded_analysis: "rgb(56, 189, 248)",
+    crowd_chatter: "rgba(148, 163, 184, 0.45)",
+    meme_or_snark: "rgb(255, 179, 0)",
+    bullshit_or_flamewar: "rgba(255, 68, 0, 0.72)",
+    downvoted_sink: "rgba(110, 118, 128, 0.45)"
+  };
+
+  // Plot 1: 2D Epistemic Phase Plane
+  const pCanvas = document.getElementById("phaseCanvas");
+  const pCtx = pCanvas.getContext("2d");
+  let phasePts = [];
+  function drawPhaseCanvas() {
+    const W = pCanvas.width, H = pCanvas.height;
+    pCtx.clearRect(0, 0, W, H);
+    pCtx.strokeStyle = "rgb(30, 36, 44)";
+    pCtx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) {
+      pCtx.beginPath(); pCtx.moveTo((W * i) / 6, 0); pCtx.lineTo((W * i) / 6, H); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, (H * i) / 6); pCtx.lineTo(W, (H * i) / 6); pCtx.stroke();
+    }
+    pCtx.strokeStyle = "rgba(0, 230, 118, 0.32)";
+    pCtx.setLineDash([4, 4]);
+    pCtx.beginPath(); pCtx.moveTo(30, H - 24); pCtx.lineTo(W - 20, 20); pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    const maxX = 16.5, maxY = 16.5;
+    phasePts = [];
+    const drawOrder = [...liveList].reverse();
+    drawOrder.forEach(c => {
+      const x = 32 + Math.min(1, c.liveEp / maxX) * (W - 52);
+      const y = (H - 26) - Math.min(1, c.liveBs / maxY) * (H - 46);
+      const r = c.tier === "epistemic_gold" ? 4.2 : (c.tier === "grounded_analysis" ? 2.8 : 2.0);
+      pCtx.fillStyle = TIER_COLORS[c.tier] || "rgb(148,163,184)";
+      pCtx.beginPath();
+      pCtx.arc(x, y, r, 0, Math.PI * 2);
+      pCtx.fill();
+      if (selectedId === c.id) {
+        pCtx.strokeStyle = "rgb(255, 255, 255)";
+        pCtx.lineWidth = 2;
+        pCtx.beginPath();
+        pCtx.arc(x, y, r + 4, 0, Math.PI * 2);
+        pCtx.stroke();
+      }
+      phasePts.push({ x, y, c });
+    });
+    pCtx.fillStyle = "rgb(140, 150, 162)";
+    pCtx.font = "10px ui-monospace, Menlo, monospace";
+    pCtx.fillText("EPISTEMIC POTENTIAL (INFO + FALSIFIABILITY) ->", W - 295, H - 7);
+    pCtx.fillText("BULLSHIT / SINK LOAD ^", 8, 14);
+  }
+
+  // Plot 2: news.arc Age vs HN DOM Rank
+  const gCanvas = document.getElementById("gravityCanvas");
+  const gCtx = gCanvas.getContext("2d");
+  let gravPts = [];
+  function drawGravityCanvas() {
+    const W = gCanvas.width, H = gCanvas.height;
+    gCtx.clearRect(0, 0, W, H);
+    const lr = DATA.largest_root || { slots: 0, start_dom: 1, end_dom: 1, author: "root" };
+    if (lr.slots > 1) {
+      const yStart = 20 + (lr.start_dom / TOTAL_N) * (H - 44);
+      const yEnd = 20 + (lr.end_dom / TOTAL_N) * (H - 44);
+      gCtx.fillStyle = "rgba(255, 68, 0, 0.09)";
+      gCtx.fillRect(32, yStart, W - 48, Math.max(4, yEnd - yStart));
+      gCtx.fillStyle = "rgba(255, 110, 64, 0.75)";
+      gCtx.font = "10px ui-monospace, Menlo, monospace";
+      gCtx.fillText(
+        `LARGEST SUBTREE (@${lr.author}: ${lr.slots} SLOTS, HN POS ${lr.start_dom}..${lr.end_dom})`,
+        40,
+        Math.min(H - 22, yStart + 13)
+      );
+    }
+
+    gravPts = [];
+    liveList.forEach(c => {
+      const x = 32 + Math.min(1, c.age / MAX_AGE_PLOT) * (W - 52);
+      const y = 20 + Math.min(1, c.dom / TOTAL_N) * (H - 44);
+      let col = "rgba(148, 163, 184, 0.30)";
+      let rad = 2.0;
+      if (c.tier === "epistemic_gold") { col = "rgb(0, 230, 118)"; rad = 4.2; }
+      else if (c.surf >= 4.0) { col = "rgb(255, 179, 0)"; rad = 3.2; }
+      else if (c.dt >= 2 || c.mod) { col = "rgba(255, 68, 0, 0.7)"; rad = 2.4; }
+      gCtx.fillStyle = col;
+      gCtx.beginPath();
+      gCtx.arc(x, y, rad, 0, Math.PI * 2);
+      gCtx.fill();
+      if (selectedId === c.id) {
+        gCtx.strokeStyle = "rgb(255, 255, 255)";
+        gCtx.lineWidth = 2;
+        gCtx.beginPath();
+        gCtx.arc(x, y, rad + 4, 0, Math.PI * 2);
+        gCtx.stroke();
+      }
+      gravPts.push({ x, y, c });
+    });
+    gCtx.fillStyle = "rgb(140, 150, 162)";
+    gCtx.fillText(`COMMENT AGE IN HOURS (0h -> ${MAX_AGE_PLOT}h) ->`, W - 245, H - 7);
+    gCtx.fillText("HN POS 1 (TOP)", 8, 14);
+    gCtx.fillText(`HN POS ${TOTAL_N.toLocaleString()}`, 8, H - 8);
+  }
+
+  function clearSelectedPoint() {
+    selectedId = null;
+    document.getElementById("searchInput").value = "";
+    drawPhaseCanvas();
+    drawGravityCanvas();
+    renderCards();
+  }
+
+  function attachCanvasProbe(canvas, getPts, probeElId) {
+    const probeEl = document.getElementById(probeElId);
+    function findNearest(ev, maxDistSq) {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const sx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+      const sy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+      let best = null, bestD = maxDistSq;
+      for (const p of getPts()) {
+        const d = (p.x - sx) * (p.x - sx) + (p.y - sy) * (p.y - sy);
+        if (d < bestD) { bestD = d; best = p.c; }
+      }
+      return best;
+    }
+    function showProbeSummary(hit, isPinned) {
+      const delta = hit.dom - hit.liveRank;
+      const dStr = delta >= 0 ? `+${delta}` : `${delta}`;
+      const snippet = escHtml(hit.txt.slice(0, 88).replace(/\s+/g, " "));
+      probeEl.innerHTML =
+        `<div class="hn-comhead">${escHtml(hit.au)} | Signal ${hit.liveRank} vs HN ${hit.dom} (${dStr})</div>${snippet}..."`;
+      const jBtn = probeEl.querySelector("[data-probe-jump]");
+      if (jBtn) {
+        jBtn.addEventListener("click", () => {
+          document.getElementById("explorerSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+      const cBtn = probeEl.querySelector("[data-probe-clear]");
+      if (cBtn) {
+        cBtn.addEventListener("click", clearSelectedPoint);
+      }
+    }
+    canvas.addEventListener("mousemove", (ev) => {
+      if (selectedId !== null) return;
+      const hit = findNearest(ev, 169);
+      if (hit) showProbeSummary(hit, false);
+    });
+    canvas.addEventListener("click", (ev) => {
+      const hit = findNearest(ev, 576);
+      if (!hit) return;
+      selectedId = hit.id;
+      document.getElementById("searchInput").value = String(hit.id);
+      showProbeSummary(hit, true);
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  }
+  attachCanvasProbe(pCanvas, () => phasePts, "phaseProbe");
+  attachCanvasProbe(gCanvas, () => gravPts, "gravProbe");
+
+  function formatHnBody(raw) {
+    return raw.split("\n").map(line => {
+      const safe = escHtml(line);
+      return line.trimStart().startsWith(">")
+        ? `<span class="hn-quote">${safe}</span>`
+        : safe;
+    }).join("\n");
+  }
+
+  function renderCards() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const facet = document.getElementById("facetSelect").value;
+    let pool = liveList;
+
+    if (q) {
+      pool = pool.filter(c =>
+        String(c.id) === q ||
+        c.au.toLowerCase().includes(q.replace(/^@/, "")) ||
+        c.txt.toLowerCase().includes(q)
+      );
+    } else {
+      if (activeMode === "top_signal") {
+        pool = pool.slice(0, 40);
+      } else if (activeMode === "buried_gems") {
+        pool = pool.filter(c => c.dom > BURIED_CUTOFF && c.liveRank <= RESCUE_TOP_K);
+      } else if (activeMode === "hn_top40") {
+        pool = [...liveList].sort((a, b) => a.dom - b.dom).slice(0, 40);
+      } else if (activeMode === "c5a_rescues") {
+        pool = pool.filter(c => c.dt === 1 && c.ut >= 2);
+      } else if (activeMode === "bullshit_traps") {
+        const demoteFloor = Math.max(40, Math.round(TOTAL_N * 0.40));
+        const topCeil = Math.max(20, Math.round(TOTAL_N * 0.15));
+        pool = pool.filter(c =>
+          (c.meme > 0 && (c.k >= 5000 || c.urls.length > 0)) ||
+          (c.lu > 0 && c.urls.length > 0) ||
+          (c.dom <= topCeil && c.liveRank > demoteFloor)
+        ).slice(0, 40);
+      } else if (activeMode === "mod_morgue") {
+        pool = [...liveList].filter(c => c.mod === 1 || c.dt >= 2 || c.pp >= 4).slice(0, 40);
+      }
+    }
+
+    if (facet !== "all") {
+      pool = pool.filter(c => c.facet === facet);
+    }
+
+    const prevScrollY = window.scrollY;
+    const shown = pool.slice(0, 40);
+    const metaEl = document.getElementById("resultMeta");
+    metaEl.innerHTML =
+      `${shown.length} of ${pool.length} comments` +
+      (q ? ` &nbsp;<button type="button" id="clearFilterBtn" class="tab-btn" style="padding:2px 8px;box-shadow:none">Clear</button>` : "");
+    const clrBtn = document.getElementById("clearFilterBtn");
+    if (clrBtn) {
+      clrBtn.addEventListener("click", clearSelectedPoint);
+    }
+
+    const rescueJump = Math.max(25, Math.min(150, Math.round(TOTAL_N * 0.15)));
+    const demoteDrop = -Math.max(40, Math.min(300, Math.round(TOTAL_N * 0.25)));
+    const box = document.getElementById("cardContainer");
+    box.innerHTML = shown.map(c => {
+      const delta = c.dom - c.liveRank;
+      const deltaBadge = delta >= rescueJump
+        ? `<span class="badge rescue">RESCUED +${delta} SPOTS</span>`
+        : (delta <= demoteDrop ? `<span class="badge drop">DEMOTED ${delta} SPOTS</span>` : "");
+      const fadeBadge = c.dt === 1
+        ? `<span class="badge c5a">HN FADE: ${escHtml(c.fade)} (RESCUED)</span>`
+        : (c.dt >= 2 ? `<span class="badge drop">HN FADE: ${escHtml(c.fade)} (TIER ${c.dt})</span>` : "");
+      const modBadge = c.mod ? `<span class="badge drop">MOD REBUKED (dang/tomhow)</span>` : "";
+      const surfBadge = c.surf >= 4.0 ? `<span class="badge c5a">SURF MIRAGE ${c.surf}x</span>` : "";
+      const urlLinks = c.urls.map(u => {
+        let host = "source";
+        try { host = new URL(u).hostname.replace(/^www\./, ""); } catch (_e) {}
+        return `<a class="ext-link" href="${escHtml(u)}">[${escHtml(host)}]</a>`;
+      }).join(" ");
+
+      const commClass = "comm-" + String(c.fade || "c00").toLowerCase();
+      return `<article class="c-card tier-${c.tier}">
+        <div class="hn-comhead">
+          <a href="https://news.ycombinator.com/user?id=${encodeURIComponent(c.au)}">${escHtml(c.au)}</a>
+          <span>${c.age} hours ago</span>
+          <span>|</span>
+          <span>depth ${c.d}</span>
+          <span>|</span>
+          <span>karma ${c.k.toLocaleString()} (${c.kpp}/post)</span>
+          <span>|</span>
+          <a href="https://news.ycombinator.com/item?id=${c.id}">link</a>
+        </div>
+        <div class="c-meta">
+          <span class="badge rank-sig">SIGNAL ${c.liveRank}</span>
+          <span class="badge">HN POS ${c.dom}</span>
+          ${deltaBadge} ${fadeBadge} ${modBadge} ${surfBadge}
+          <span class="badge">${escHtml(c.flbl || c.facet.replace(/_/g, " "))}</span>
+        </div>
+        <div class="c-body ${commClass}">${formatHnBody(c.txt)}</div>
+        <div class="vec-bars">
+          <span>SCORE: <strong>${c.liveScore.toFixed(2)}</strong></span>
+          <span>INFO: +${(curW.ig * c.ig).toFixed(2)}</span>
+          <span>FALSIFIABILITY: +${(curW.fa * c.fa).toFixed(2)}</span>
+          <span>GRAVITY/PRECISION: +${(curW.gp * c.gp).toFixed(2)}</span>
+          <span>BULLSHIT LOAD: -${(curW.bp * c.bl).toFixed(2)}</span>
+          <span>DOWNVOTE SINK: -${(curW.dp * c.ds).toFixed(2)}</span>
+          ${urlLinks ? `<span>LINKS: ${urlLinks}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    if (window.scrollY !== prevScrollY) {
+      window.scrollTo(0, prevScrollY);
+    }
+  }
+
+  const modeTabs = document.querySelectorAll(".mode-tab");
+  modeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const mode = tab.getAttribute("data-mode");
+      if (mode === activeMode) return;
+      activeMode = mode;
+      modeTabs.forEach(t => {
+        const isActive = t === tab;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      selectedId = null;
+      document.getElementById("searchInput").value = "";
+      drawPhaseCanvas();
+      drawGravityCanvas();
+      renderCards();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", renderCards);
+  document.getElementById("facetSelect").addEventListener("change", renderCards);
+
+  const labDrawer = document.getElementById("labDrawer");
+  const proofDrawer = document.getElementById("proofDrawer");
+  const expBtn = document.getElementById("exploreToggleBtn");
+  const eviBtn = document.getElementById("evidenceToggleBtn");
+
+  if (expBtn && labDrawer) {
+    expBtn.addEventListener("click", () => {
+      labDrawer.open = !labDrawer.open;
+    });
+    labDrawer.addEventListener("toggle", () => {
+      const isOpen = labDrawer.open;
+      expBtn.classList.toggle("active", isOpen);
+      expBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  if (eviBtn && proofDrawer) {
+    eviBtn.addEventListener("click", () => {
+      proofDrawer.open = !proofDrawer.open;
+    });
+    proofDrawer.addEventListener("toggle", () => {
+      const isOpen = proofDrawer.open;
+      eviBtn.classList.toggle("active", isOpen);
+      eviBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  const tunerDrawer = document.getElementById("tunerDrawer");
+  const phaseDrawer = document.getElementById("phaseDrawer");
+  const gravityDrawer = document.getElementById("gravityDrawer");
+  const graphDrawers = [tunerDrawer, phaseDrawer, gravityDrawer];
+
+  [labDrawer, phaseDrawer, gravityDrawer].forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        drawPhaseCanvas();
+        drawGravityCanvas();
+      }
+    });
+  });
+
+  const mobMq = window.matchMedia("(max-width: 960px)");
+  function syncViewportDrawers(isMobile) {
+    if (!isMobile) {
+      // Desktop: Tuner & both graphs stay open side-by-side inside the lab drawer (mobile-only inner collapse)
+      graphDrawers.forEach(d => { d.open = true; });
+    } else {
+      // Mobile: keep Tuner & second graph collapsed initially so Phase Plane + Comments stay tight
+      tunerDrawer.open = false;
+    }
+    drawPhaseCanvas();
+    drawGravityCanvas();
+  }
+  syncViewportDrawers(mobMq.matches);
+  mobMq.addEventListener("change", (e) => syncViewportDrawers(e.matches));
+
+  syncSliders();
+  recomputeAndRender();
+})();
+</script>
+</body>
+</html>
