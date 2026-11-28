@@ -67,16 +67,18 @@ type alias RawDevBundle =
     , catalog : Maybe Catalog
     , router : Maybe RouterConfig
     , page : String
+    , q : String
     }
 
 
 devBundleDecoder : Decode.Decoder RawDevBundle
 devBundleDecoder =
-    Decode.map4 RawDevBundle
+    Decode.map5 RawDevBundle
         (Decode.maybe (Decode.field "observatory" ObsDecode.payloadDecoder))
         (Decode.maybe (Decode.field "catalog" ObsDecode.catalogDecoder))
         (Decode.maybe (Decode.field "router" ObsDecode.routerConfigDecoder))
         (Decode.oneOf [ Decode.field "page" Decode.string, Decode.succeed "observatory" ])
+        (Decode.oneOf [ Decode.field "q" Decode.string, Decode.succeed "" ])
 
 
 init : Decode.Value -> ( RootModel, Cmd RootMsg )
@@ -86,8 +88,15 @@ init flags =
             case rawBundle.observatory of
                 Just obsPayload ->
                     let
-                        ( om, obsCmd ) =
+                        ( omInit, obsCmd ) =
                             ObsModel.initFromPayload obsPayload
+
+                        om =
+                            if String.isEmpty rawBundle.q then
+                                omInit
+
+                            else
+                                { omInit | searchQuery = rawBundle.q }
 
                         im =
                             case rawBundle.catalog of

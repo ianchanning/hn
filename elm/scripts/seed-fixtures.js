@@ -213,7 +213,15 @@ ${makeDevBundle(defaultPage)}
         }
       }
       var root = document.getElementById("elm-root");
-      Elm.Main.init({ node: root, flags: flags });
+      flags.q = new URLSearchParams(window.location.search).get('q') || '';
+      var app = Elm.Main.init({ node: root, flags: flags });
+      if (app && app.ports && app.ports.setUrlQuery) {
+        app.ports.setUrlQuery.subscribe(function (q) {
+          var u = new URL(window.location.href);
+          if (q) { u.searchParams.set('q', q); } else { u.searchParams.delete('q'); }
+          window.history.replaceState(null, '', u.toString());
+        });
+      }
     })();
   </script>
 </body>

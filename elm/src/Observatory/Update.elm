@@ -21,10 +21,10 @@ update msg model =
                         , searchQuery = ""
                     }
             in
-            ( newModel, Cmd.none )
+            ( newModel, Ports.setUrlQuery "" )
 
         SearchInput q ->
-            ( { model | searchQuery = q }, Cmd.none )
+            ( { model | searchQuery = q }, Ports.setUrlQuery q )
 
         FacetChanged slug ->
             ( { model | selectedFacet = slug }, Cmd.none )
@@ -37,7 +37,7 @@ update msg model =
                         , selectedCommentId = Nothing
                     }
             in
-            ( newModel, Cmd.none )
+            ( newModel, Ports.setUrlQuery "" )
 
         SliderChanged field val ->
             let
@@ -94,13 +94,16 @@ update msg model =
 
         CanvasProbeReceived probe ->
             let
+                q =
+                    String.fromInt probe.commentId
+
                 newModel =
                     { model
                         | selectedCommentId = Just probe.commentId
-                        , searchQuery = String.fromInt probe.commentId
+                        , searchQuery = q
                     }
             in
-            ( newModel, Cmd.none )
+            ( newModel, Ports.setUrlQuery q )
 
         CanvasProbeHovered probe ->
             ( { model | selectedCommentId = Just probe.commentId }, Cmd.none )
@@ -113,7 +116,7 @@ update msg model =
                         , searchQuery = ""
                     }
             in
-            ( newModel, Cmd.none )
+            ( newModel, Ports.setUrlQuery "" )
 
         ToggleProofDrawer ->
             ( { model | proofDrawerOpen = not model.proofDrawerOpen }, Cmd.none )

@@ -1,6 +1,7 @@
-module Observatory.Ports exposing
+port module Observatory.Ports exposing
     ( computeGravityPlot
     , computePhasePlot
+    , setUrlQuery
     )
 
 {-| Plot coordinate computation for inline SVG scatter plots.
@@ -8,6 +9,9 @@ module Observatory.Ports exposing
 
 import Observatory.Types exposing (..)
 import Observatory.View.Style exposing (tierDotColour)
+
+
+port setUrlQuery : String -> Cmd msg
 
 
 computePhasePlot : { a | liveList : List LiveComment, selectedCommentId : Maybe Int } -> ObservatoryPayload -> PlotCommand
