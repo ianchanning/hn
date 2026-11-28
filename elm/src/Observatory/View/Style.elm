@@ -424,9 +424,6 @@ viewLogo =
             , SvgAttr.y "0.5"
             , SvgAttr.width "19"
             , SvgAttr.height "19"
-            , SvgAttr.fill "none"
-            , SvgAttr.stroke "rgb(255, 255, 255)"
-            , SvgAttr.strokeWidth "1"
             ]
             []
         , Svg.text_

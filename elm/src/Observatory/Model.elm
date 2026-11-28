@@ -25,6 +25,7 @@ type alias Model =
     , proofDrawerOpen : Bool
     , labDrawerOpen : Bool
     , tunerDrawerOpen : Bool
+    , gravityDrawerOpen : Bool
     , viewport : Viewport
     , error : Maybe String
     }
@@ -47,6 +48,7 @@ init flags =
               , proofDrawerOpen = False
               , labDrawerOpen = False
               , tunerDrawerOpen = True
+              , gravityDrawerOpen = True
               , viewport = Desktop
               , error = Just (Decode.errorToString err)
               }
@@ -76,6 +78,7 @@ initFromPayload payload =
             , proofDrawerOpen = False
             , labDrawerOpen = False
             , tunerDrawerOpen = True
+            , gravityDrawerOpen = True
             , viewport = Desktop
             , error = Nothing
             }

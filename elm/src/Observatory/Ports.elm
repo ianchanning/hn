@@ -14,7 +14,7 @@ computePhasePlot : { a | liveList : List LiveComment, selectedCommentId : Maybe 
 computePhasePlot model _ =
     let
         width =
-            540.0
+            420.0
 
         height =
             300.0
@@ -67,7 +67,7 @@ computePhasePlot model _ =
     , axisConfig =
         { maxX = maxX
         , maxY = maxY
-        , xLabel = "SIGNAL (INFO + FALSIFIABILITY) →"
+        , xLabel = "SIGNAL →"
         , yLabel = "↑ BULLSHIT"
         }
     , largestRoot = Nothing
@@ -78,7 +78,7 @@ computeGravityPlot : { a | liveList : List LiveComment, selectedCommentId : Mayb
 computeGravityPlot model payload =
     let
         width =
-            540.0
+            420.0
 
         height =
             300.0
@@ -144,7 +144,7 @@ computeGravityPlot model payload =
     , axisConfig =
         { maxX = maxAgePlot
         , maxY = totalN
-        , xLabel = "COMMENT AGE (0..." ++ String.fromFloat maxAgePlot ++ "h) →"
+        , xLabel = "AGE (0..." ++ String.fromFloat maxAgePlot ++ "h) →"
         , yLabel = "↑ HN POS 1"
         }
     , largestRoot =

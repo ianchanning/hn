@@ -102,6 +102,9 @@ update msg model =
             in
             ( newModel, Cmd.none )
 
+        CanvasProbeHovered probe ->
+            ( { model | selectedCommentId = Just probe.commentId }, Cmd.none )
+
         ClearSelection ->
             let
                 newModel =
@@ -121,8 +124,21 @@ update msg model =
         ToggleTunerDrawer ->
             ( { model | tunerDrawerOpen = not model.tunerDrawerOpen }, Cmd.none )
 
+        ToggleGravityDrawer ->
+            ( { model | gravityDrawerOpen = not model.gravityDrawerOpen }, Cmd.none )
+
         ViewportChanged vp ->
-            ( { model | viewport = vp }, Cmd.none )
+            if vp == model.viewport then
+                ( model, Cmd.none )
+
+            else
+                ( { model
+                    | viewport = vp
+                    , tunerDrawerOpen = vp == Desktop
+                    , gravityDrawerOpen = vp == Desktop
+                  }
+                , Cmd.none
+                )
 
         CanvasHover _ _ _ ->
             ( model, Cmd.none )

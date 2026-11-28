@@ -176,6 +176,7 @@ mockModel =
     , proofDrawerOpen = True
     , labDrawerOpen = True
     , tunerDrawerOpen = True
+    , gravityDrawerOpen = True
     , viewport = Desktop
     , error = Nothing
     }

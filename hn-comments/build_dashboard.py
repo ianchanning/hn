@@ -1480,7 +1480,7 @@ def build_html(
                 <span>Bullshit (Y) // Signal (X) </span>
                 <span class="sig">TAP POINT (N = {total_cnt:,})</span>
               </div>
-              <canvas id="phaseCanvas" class="plot" width="540" height="300"></canvas>
+              <canvas id="phaseCanvas" class="plot" width="420" height="300"></canvas>
               <div class="legend-row">
                 <span><i class="dot" style="background:rgb(0,230,118)"></i>Gold ({tiers.get("epistemic_gold", 0)})</span>
                 <span><i class="dot" style="background:rgb(56,189,248)"></i>Grounded ({tiers.get("grounded_analysis", 0)})</span>
@@ -1505,7 +1505,7 @@ def build_html(
                 <span>HN POS (1..{live_cnt:,}) (Y) // Age (Hours) (X)</span>
                 <span class="sig">(T + 2)^1.8</span>
               </div>
-              <canvas id="gravityCanvas" class="plot" width="540" height="300"></canvas>
+              <canvas id="gravityCanvas" class="plot" width="420" height="300"></canvas>
               <div class="legend-row">
                 <span><i class="dot" style="background:rgb(0,230,118)"></i>Buried Gold (HN POS &gt; {buried_cutoff})</span>
                 <span><i class="dot" style="background:rgb(255,179,0)"></i>Surf Mirage (&lt;3.2h)</span>

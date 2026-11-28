@@ -18,10 +18,12 @@ type Msg
     | CanvasHover CanvasId Float Float
     | CanvasClick CanvasId Float Float
     | CanvasProbeReceived CanvasProbeEvent
+    | CanvasProbeHovered CanvasProbeEvent
     | ClearSelection
     | ToggleProofDrawer
     | ToggleLabDrawer
     | ToggleTunerDrawer
+    | ToggleGravityDrawer
     | ViewportChanged Viewport
     | NoOp
 

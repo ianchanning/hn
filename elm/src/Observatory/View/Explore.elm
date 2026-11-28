@@ -49,7 +49,7 @@ viewExplore model payload =
             , div [ class "col-9" ]
                 [ div [ class "dual-oled" ]
                     [ viewPhaseDrawer (computePhasePlot model payload) payload totalComments selectedComment
-                    , viewGravityDrawer (computeGravityPlot model payload) payload totalComments selectedComment
+                    , viewGravityDrawer model.gravityDrawerOpen (computeGravityPlot model payload) payload totalComments selectedComment
                     ]
                 ]
             ]
@@ -172,22 +172,7 @@ viewTunerDrawer model payload totalComments cw =
                 ]
                 [ text "Reset Calibrated Weights" ]
             , p []
-                [ text
-                    ("Drag any weight to watch the "
-                        ++ formatThousands totalComments
-                        ++ "-point comment ranking re-solve."
-                    )
-                , br [] []
-                , text "• "
-                , strong [] [ text "c5A Rescue: " ]
-                , text "Sourced "
-                , code [] [ text "c5A" ]
-                , text " rebuttals survive partisan downvotes."
-                , br [] []
-                , text "• "
-                , strong [] [ text "Context Gate: " ]
-                , text "Meme links & bare drops get zero citation boost."
-                ]
+                [ text "Adjusting re-ranks comments." ]
             ]
         ]
 
@@ -197,7 +182,7 @@ viewPhaseDrawer plotCmd payload totalComments selectedComment =
     details [ class "graph-drawer", id "phaseDrawer", attribute "open" "" ]
         [ summary [ class "graph-summary" ]
             [ div [ class "graph-title-group" ]
-                [ div [ class "sec-tag" ] [ text "BULLSHIT VS SIGNAL" ]
+                [ div [ class "sec-tag" ] [ text "BULLSHIT VS SIGNAL (INFO + FALSIFIABILITY)" ]
                 , h2 [] [ text "Crowd Chatter vs. Grounded Signal" ]
                 ]
             , span [ class "mob-graph-pill" ] []
@@ -229,9 +214,16 @@ viewPhaseDrawer plotCmd payload totalComments selectedComment =
         ]
 
 
-viewGravityDrawer : PlotCommand -> ObservatoryPayload -> Int -> Maybe LiveComment -> Html Msg
-viewGravityDrawer plotCmd payload totalComments selectedComment =
+viewGravityDrawer : Bool -> PlotCommand -> ObservatoryPayload -> Int -> Maybe LiveComment -> Html Msg
+viewGravityDrawer isOpen plotCmd payload totalComments selectedComment =
     let
+        openAttr =
+            if isOpen then
+                [ attribute "open" "" ]
+
+            else
+                []
+
         lr =
             payload.largestRoot
 
@@ -250,10 +242,10 @@ viewGravityDrawer plotCmd payload totalComments selectedComment =
                 ++ String.fromInt lr.endDom
                 ++ ")."
     in
-    details [ class "graph-drawer", id "gravityDrawer", attribute "open" "" ]
-        [ summary [ class "graph-summary" ]
+    details (class "graph-drawer" :: id "gravityDrawer" :: openAttr)
+        [ summary [ class "graph-summary", onClick ToggleGravityDrawer ]
             [ div [ class "graph-title-group" ]
-                [ div [ class "sec-tag" ] [ text "HN POS vs AGE" ]
+                [ div [ class "sec-tag" ] [ text "HN POS vs COMMENT AGE" ]
                 , h2 [] [ text "Why Live HN Buried Primary Evidence" ]
                 ]
             , span [ class "mob-graph-pill" ] []
@@ -327,13 +319,13 @@ viewSvgPlot cmd =
                     (\i ->
                         let
                             gx =
-                                String.fromFloat (540.0 * toFloat i / 6.0)
+                                String.fromFloat (420.0 * toFloat i / 6.0)
 
                             gy =
                                 String.fromFloat (300.0 * toFloat i / 6.0)
                         in
-                        [ Svg.line [ SvgAttr.x1 gx, SvgAttr.y1 "0", SvgAttr.x2 gx, SvgAttr.y2 "300", SvgAttr.stroke "rgb(30, 36, 44)", SvgAttr.strokeWidth "1" ] []
-                        , Svg.line [ SvgAttr.x1 "0", SvgAttr.y1 gy, SvgAttr.x2 "540", SvgAttr.y2 gy, SvgAttr.stroke "rgb(30, 36, 44)", SvgAttr.strokeWidth "1" ] []
+                        [ Svg.line [ SvgAttr.x1 gx, SvgAttr.y1 "0", SvgAttr.x2 gx, SvgAttr.y2 "300", SvgAttr.class "grid-line" ] []
+                        , Svg.line [ SvgAttr.x1 "0", SvgAttr.y1 gy, SvgAttr.x2 "420", SvgAttr.y2 gy, SvgAttr.class "grid-line" ] []
                         ]
                     )
 
@@ -390,8 +382,11 @@ viewSvgPlot cmd =
                             col =
                                 "rgba(" ++ String.fromInt p.colour.r ++ ", " ++ String.fromInt p.colour.g ++ ", " ++ String.fromInt p.colour.b ++ ", " ++ String.fromFloat p.colour.a ++ ")"
 
-                            probeMsg =
+                            clickMsg =
                                 CanvasProbeReceived { canvasId = cmd.canvasId, commentId = p.commentId }
+
+                            hoverMsg =
+                                CanvasProbeHovered { canvasId = cmd.canvasId, commentId = p.commentId }
 
                             dot =
                                 Svg.circle
@@ -399,8 +394,8 @@ viewSvgPlot cmd =
                                     , SvgAttr.cy cy
                                     , SvgAttr.r (String.fromFloat p.radius)
                                     , SvgAttr.fill col
-                                    , SvgEvents.onClick probeMsg
-                                    , SvgEvents.onMouseOver probeMsg
+                                    , SvgEvents.onClick clickMsg
+                                    , SvgEvents.onMouseOver hoverMsg
                                     ]
                                     []
                         in
@@ -410,9 +405,7 @@ viewSvgPlot cmd =
                                 [ SvgAttr.cx cx
                                 , SvgAttr.cy cy
                                 , SvgAttr.r (String.fromFloat (p.radius + 4.0))
-                                , SvgAttr.fill "none"
-                                , SvgAttr.stroke "rgb(255, 255, 255)"
-                                , SvgAttr.strokeWidth "2"
+                                , SvgAttr.class "dot-selected"
                                 ]
                                 []
                             ]
@@ -423,11 +416,10 @@ viewSvgPlot cmd =
 
         axisLabels =
             [ Svg.text_
-                [ SvgAttr.x "245"
+                [ SvgAttr.x "345"
                 , SvgAttr.y "293"
                 , SvgAttr.fill "rgb(140, 150, 162)"
                 , SvgAttr.fontSize "10px"
-                , SvgAttr.fontFamily "ui-monospace, Menlo, monospace"
                 ]
                 [ Svg.text cmd.axisConfig.xLabel ]
             , Svg.text_
@@ -435,16 +427,20 @@ viewSvgPlot cmd =
                 , SvgAttr.y "14"
                 , SvgAttr.fill "rgb(140, 150, 162)"
                 , SvgAttr.fontSize "10px"
-                , SvgAttr.fontFamily "ui-monospace, Menlo, monospace"
                 ]
                 [ Svg.text cmd.axisConfig.yLabel ]
+            ]
+
+        axisLines =
+            [ Svg.line [ SvgAttr.x1 "0", SvgAttr.y1 "0", SvgAttr.x2 "0", SvgAttr.y2 "300", SvgAttr.class "axis-line" ] []
+            , Svg.line [ SvgAttr.x1 "0", SvgAttr.y1 "300", SvgAttr.x2 "420", SvgAttr.y2 "300", SvgAttr.class "axis-line" ] []
             ]
     in
     Svg.svg
         [ SvgAttr.id cmd.canvasId
         , SvgAttr.class "plot"
-        , SvgAttr.viewBox "0 0 540 300"
-        , SvgAttr.width "540"
+        , SvgAttr.viewBox "0 0 420 300"
+        , SvgAttr.width "420"
         , SvgAttr.height "300"
         ]
-        (gridLines ++ largestRootHighlight ++ pointNodes ++ axisLabels)
+        (gridLines ++ axisLines ++ largestRootHighlight ++ pointNodes ++ axisLabels)
