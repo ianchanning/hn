@@ -299,7 +299,9 @@ document.addEventListener("click", (ev) => {{
     const m = hrefAttr.match(/[?&]id=(\\d+)/);
     if (m) {{
       ev.preventDefault();
-      window.location.href = `./items/${{encodeURIComponent(m[1])}}.html`;
+      const qVal = new URLSearchParams(window.location.search).get("q");
+      const qSuffix = qVal ? `?q=${{encodeURIComponent(qVal)}}` : "";
+      window.location.href = `./items/${{encodeURIComponent(m[1])}}.html${{qSuffix}}`;
     }}
   }}
 }});
@@ -309,7 +311,9 @@ document.addEventListener("submit", (ev) => {{
     const raw = (document.getElementById("hnInput")?.value || "").trim();
     const m = raw.match(/[?&]id=(\\d+)/) || raw.match(/^(\\d+)$/) || raw.match(/(\\d{{5,}})/);
     if (m) {{
-      window.location.href = `./items/${{encodeURIComponent(m[1])}}.html`;
+      const qVal = new URLSearchParams(window.location.search).get("q");
+      const qSuffix = qVal ? `?q=${{encodeURIComponent(qVal)}}` : "";
+      window.location.href = `./items/${{encodeURIComponent(m[1])}}.html${{qSuffix}}`;
     }}
   }}
 }});
