@@ -44,62 +44,6 @@ def _get_observatory_js() -> str:
     return ELM_OBSERVATORY_JS.read_text(encoding="utf-8")
 
 
-def _heal_mismatched_elm_css(pub_html: Path, style_css: str) -> bool:
-    """Refresh stale legacy `<style>` in archived items that already embed new Elm JS."""
-    if not style_css:
-        return False
-    raw = pub_html.read_text(encoding="utf-8")
-    if 'data-b' not in raw or '[id="cards"]' in raw:
-        return False
-    updated, count = STYLE_BLOCK_RE.subn(
-        lambda _m: f"<style>\n{style_css}\n  </style>", raw, count=1
-    )
-    if count != 1 or updated == raw:
-        return False
-    assert "#" not in updated, f"Zero-hash violated while healing {pub_html}"
-    pub_html.write_text(updated, encoding="utf-8")
-    return True
-
-
-def _heal_item_url_sync(pub_html: Path) -> bool:
-    """Ensure every published observatory contains the zero-hash URL synchronizer in `<head>`."""
-    raw = pub_html.read_text(encoding="utf-8")
-    if "</head>" not in raw:
-        return False
-    if 'history.replaceState' in raw and 'target = (base || "") + "/item?id="' in raw:
-        return False
-
-    sync_snippet = """  <script>
-    (function() {
-      if (window.location.pathname.includes("/items/")) {
-        var m = window.location.pathname.match(/\\/items\\/(\\d+)\\.html/);
-        if (m) {
-          var base = window.location.pathname.replace(/\\/items\\/\\d+\\.html$/, "");
-          var target = (base || "") + "/item?id=" + m[1];
-          try {
-            history.replaceState(null, "", target);
-          } catch(e) {}
-        }
-      }
-    })();
-  </script>"""
-    assert "#" not in sync_snippet, "Zero-hash violated in sync_snippet"
-
-    # If it has an older sync snippet, remove it before re-injecting into <head>
-    if "history.replaceState" in raw:
-        raw = re.sub(
-            r"<script>\s*\(function\(\)\s*\{\s*if\s*\(window\.location\.pathname\.includes\(\"/items/\"\)\).*?</script>\s*",
-            "",
-            raw,
-            flags=re.S,
-        )
-
-    updated = raw.replace("</head>", f"{sync_snippet}\n</head>", 1)
-    if "#" not in raw:
-        assert "#" not in updated, f"Zero-hash violated while healing URL sync in {pub_html}"
-    pub_html.write_text(updated, encoding="utf-8")
-    return True
-
 
 def _get_style_css() -> str:
     """Read consolidated Elm styles, guaranteeing zero `#` characters."""
@@ -112,7 +56,6 @@ def _get_style_css() -> str:
 
 ITEM_FILE_RE = re.compile(r"^show-me-hn-(\d+)\.html$")
 PUBLISHED_ITEM_RE = re.compile(r"^(\d+)\.html$")
-STYLE_BLOCK_RE = re.compile(r"<style[^>]*>.*?</style>", re.S | re.I)
 OBS_JSON_RE = re.compile(
     r'<script\s+id=["\']observatoryData["\']\s+type=["\']application/json["\']>(.*?)</script>',
     flags=re.S,
@@ -256,8 +199,12 @@ def extract_item_summary(html_path: Path, item_id: int) -> dict[str, Any]:
     }
 
 
+ROUTER_SHELL = HERE / "shells" / "item-router.html"
+ROUTER_CONFIG_TOKEN = "<!-- ROUTER_CONFIG -->"
+
+
 def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -> str:
-    """Build zero-hash `item.html` / `404.html` router preserving `/item?id=<id>` in the URL bar."""
+    """Build zero-hash `item.html` / `404.html` by stamping config into static shell."""
     actions_url = (
         f"{server_url.rstrip('/')}/{repo.strip('/')}/actions/workflows/{workflow_file}"
         if repo
@@ -275,248 +222,9 @@ def render_item_router_html(*, repo: str, server_url: str, workflow_file: str) -
         .replace("</", "<\\/")
         .replace("#", "\\u0023")
     )
-
-    doc = f"""<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Item Router // Better Signal News</title>
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  <link rel="manifest" href="/site.webmanifest">
-  <script>
-    (function() {{
-      var m = window.location.search.match(/[?&]id=(\\d+)/);
-      if (m && m[1]) {{
-        var base = window.location.pathname.replace(/\\/item(?:\\.html|\\/)?$/, "").replace(/\\/404\\.html$/, "").replace(/\\/$/, "");
-        window.location.replace((base || "") + "/items/" + encodeURIComponent(m[1]) + ".html");
-      }}
-    }})();
-  </script>
-  <style>
-    * {{ box-sizing: border-box; }}
-    html {{
-      scrollbar-gutter: stable;
-      overflow-anchor: none;
-    }}
-    body {{
-      margin: 8px;
-      padding: 0;
-      background: rgb(246, 246, 239);
-      color: rgb(0, 0, 0);
-      font: 8pt/1.35 Verdana, Geneva, sans-serif;
-      -webkit-font-smoothing: antialiased;
-    }}
-    .wrap {{
-      width: 85%;
-      max-width: 1240px;
-      margin: 0 auto;
-      background: rgb(246, 246, 239);
-    }}
-    .topbar {{
-      background: rgb(255, 102, 0);
-      padding: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      min-height: 24px;
-    }}
-    .topbar-left {{
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 5px;
-      font-size: 10pt;
-      line-height: 12pt;
-      color: rgb(0, 0, 0);
-    }}
-    .hn-logo {{
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      flex-shrink: 0;
-      vertical-align: middle;
-    }}
-    a.hnname {{
-      color: rgb(0, 0, 0);
-      font-weight: 700;
-      text-decoration: none;
-      margin-right: 4px;
-    }}
-    .pagetop, .pagetop a, .topbar-right, .topbar-right a {{
-      color: rgb(0, 0, 0);
-      font-size: 10pt;
-      text-decoration: none;
-    }}
-    .topbar-right {{
-      padding-right: 4px;
-      white-space: nowrap;
-      font-size: 9pt;
-      text-transform: none;
-    }}
-    .shell {{
-      max-width: 1240px;
-      margin: 0 auto;
-      width: 85%;
-      padding: 16px 0 26px;
-      border-top: 3px solid rgb(13, 13, 13);
-      border-bottom: 1px solid rgb(13, 13, 13);
-    }}
-    .eyebrow {{
-      font: 600 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: rgb(255, 51, 0);
-      margin-bottom: 10px;
-    }}
-    h1 {{
-      margin: 0 0 10px;
-      font-size: 32px;
-      letter-spacing: -0.035em;
-      line-height: 1.05;
-    }}
-    p {{ color: rgb(55, 55, 52); margin: 8px 0 16px; }}
-    code, pre {{
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 12.5px;
-    }}
-    pre {{
-      background: rgb(13, 15, 17);
-      color: rgb(228, 232, 236);
-      padding: 12px 14px;
-      overflow-x: auto;
-      border: 1px solid rgb(35, 38, 42);
-    }}
-    .actions {{
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 16px;
-    }}
-    a.btn {{
-      display: inline-block;
-      padding: 8px 14px;
-      border: 1px solid rgb(13, 13, 13);
-      background: rgb(13, 13, 13);
-      color: rgb(247, 247, 245);
-      text-decoration: none;
-      font: 600 12px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
-    }}
-    a.btn.alt {{
-      background: rgb(255, 255, 253);
-      color: rgb(13, 13, 13);
-    }}
-    @media (max-width: 750px) {{
-      body {{ margin: 0; }}
-      .wrap {{ width: 100%; }}
-      .topbar {{ padding: 4px 6px; flex-wrap: wrap; }}
-      .topbar-right {{ font-size: 8pt; padding-right: 2px; }}
-      td.title {{ font-size: 11pt; line-height: 15pt; }}
-      td.subtext {{ font-size: 8.5pt; line-height: 13pt; }}
-      tr.spacer td {{ height: 7px; }}
-    }}
-  </style>
-</head>
-<body>
-<div class="wrap">
-  <div class="topbar">
-    <div class="topbar-left">
-      <a class="hn-logo" href="./" aria-label="Better Signal News Logo"><svg class="hn-logo" width="20" height="20" viewBox="0 0 20 20" role="img" aria-label="Better Signal News Logo"><rect x="0.5" y="0.5" width="19" height="19" fill="none" stroke="rgb(255, 255, 255)" stroke-width="1"></rect><text x="10" y="10" text-anchor="middle" dominant-baseline="central" fill="rgb(255, 255, 255)" font-family="Verdana, Geneva, sans-serif" font-size="12" font-weight="bold">BS</text></svg></a>
-      <a class="hnname" href="./">Better Signal News</a>
-    </div>
-  </div>
-</div>
-<div class="shell" id="routerStatus" style="display: none;">
-  <div class="eyebrow">NYX OBSERVATORY // HN URI MIRROR</div>
-  <h1 id="statusTitle">Loading Better Signal News...</h1>
-  <p id="statusBody">Resolving <code>/item?id=...</code> from static observatory archive.</p>
-</div>
-<script id="routerConfig" type="application/json">{cfg_json}</script>
-<script>
-(async () => {{
-  const CFG = JSON.parse(document.getElementById("routerConfig").textContent);
-  const params = new URLSearchParams(window.location.search);
-  let rawId = (params.get("id") || "").trim();
-
-  // Also accept full HN URL passed in ?id= or path /item/<id>
-  if (rawId && !/^\\d+$/.test(rawId)) {{
-    const m = rawId.match(/[?&]id=(\\d+)/) || rawId.match(/(\\d+)/);
-    rawId = m ? m[1] : "";
-  }}
-  if (!rawId) {{
-    const pm = window.location.pathname.match(/\\/item(?:s)?\\/(\\d+)(?:\\.html|\\/)?$/);
-    if (pm) rawId = pm[1];
-  }}
-
-  const siteBase = window.location.pathname
-    .replace(/\\/item(?:\\.html|\\/)?$/, "")
-    .replace(/\\/items\\/\\d+(?:\\.html|\\/)?$/, "")
-    .replace(/\\/404\\.html$/, "")
-    .replace(/\\/$/, "");
-  const indexHref = (siteBase || ".") + "/";
-
-  const titleEl = document.getElementById("statusTitle");
-  const bodyEl = document.getElementById("statusBody");
-  const shellEl = document.getElementById("routerStatus");
-
-  function showStatus() {{
-    if (shellEl) shellEl.style.display = "block";
-  }}
-
-  if (!rawId || !/^\\d+$/.test(rawId)) {{
-    showStatus();
-    titleEl.textContent = "Missing or Invalid Hacker News Item ID";
-    bodyEl.innerHTML =
-      "Append <code>?id=50472038</code> just like Hacker News (<code>/item?id=50472038</code>), or browse the published index.";
-    const bar = document.createElement("div");
-    bar.className = "actions";
-    bar.innerHTML = `<a class="btn" href="${{indexHref}}">Open Published Index</a>`;
-    shellEl.appendChild(bar);
-    return;
-  }}
-
-  const artifactUrl = `${{siteBase}}/items/${{encodeURIComponent(rawId)}}.html`;
-  try {{
-    const resp = await fetch(artifactUrl);
-    if (resp.ok) {{
-      window.location.replace(artifactUrl);
-      return;
-    }}
-  }} catch (_err) {{
-    // Fall through to helpful not-yet-built view
-  }}
-
-  showStatus();
-  const hnUrl = `https://news.ycombinator.com/item?id=${{encodeURIComponent(rawId)}}`;
-  titleEl.textContent = `HN Item ${{rawId}} Not Yet Built`;
-  bodyEl.innerHTML =
-    `No pre-built observatory was found at <code>/items/${{rawId}}.html</code>. ` +
-    `Trigger the GitHub Actions workflow with item ID <code>${{rawId}}</code> to publish <code>/item?id=${{rawId}}</code>:`;
-
-  const pre = document.createElement("pre");
-  pre.textContent =
-    `gh workflow run ${{CFG.workflow_file}} -f target=${{rawId}}\\n` +
-    `uv run --no-project python hn-comments/cli.py ${{rawId}} --open`;
-  shellEl.appendChild(pre);
-
-  const bar = document.createElement("div");
-  bar.className = "actions";
-  const btns = [];
-  if (CFG.actions_url) {{
-    btns.push(`<a class="btn" href="${{CFG.actions_url}}">Run GitHub Workflow</a>`);
-  }}
-  btns.push(`<a class="btn alt" href="${{hnUrl}}">View Original HN Thread</a>`);
-  btns.push(`<a class="btn alt" href="${{indexHref}}">Published Index</a>`);
-  bar.innerHTML = btns.join("");
-  shellEl.appendChild(bar);
-}})();
-</script>
-</body>
-</html>
-"""
+    shell = ROUTER_SHELL.read_text(encoding="utf-8")
+    assert ROUTER_CONFIG_TOKEN in shell, f"Missing {ROUTER_CONFIG_TOKEN} in {ROUTER_SHELL}"
+    doc = shell.replace(ROUTER_CONFIG_TOKEN, cfg_json)
     assert "#" not in doc, f"Zero-hash violated in router HTML at {doc.find('#')}"
     return doc
 
@@ -720,7 +428,6 @@ def build_pages_site(
 
     # Scan all published `items/<id>.html` and enforce safe-under-1GB archive retention
     pinned_ids = {50467087} | forced | source_repo_ids | set(resolved_fp_ids)
-    current_style_css = _get_style_css()
     raw_entries: list[tuple[int, Path, dict[str, Any], int, datetime]] = []
     total_bytes = 0
     for pub_html in sorted(items_dir.glob("*.html")):
@@ -728,8 +435,6 @@ def build_pages_site(
         if not pm:
             continue
         sid = int(pm.group(1))
-        _heal_mismatched_elm_css(pub_html, current_style_css)
-        _heal_item_url_sync(pub_html)
         meta = extract_item_summary(pub_html, sid)
         fsize = pub_html.stat().st_size
         total_bytes += fsize
